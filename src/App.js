@@ -8,14 +8,16 @@ import './assets/bootstrap/css/bootstrap.css'
 
 
 import Navbar from "./components/Navbar/Navbar";
+import SearchBar from "./components/SerachBar/SearchBar";
 
 function App() {
   return (
-    <>
-      <BrowserRouter>
-        <Route exact path='/' component={Navbar}/>
-      </BrowserRouter>
-    </>
+      <>
+          <BrowserRouter>
+              <Route exact path='/' component={SearchBar}/>
+              <Route exact path='/' component={Navbar}/>
+          </BrowserRouter>
+      </>
   );
 }
 

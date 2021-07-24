@@ -1,0 +1,16 @@
+.search-bar-container{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin: 10px 5px;
+  width: 100vw;
+  max-width: 600px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  .search-input{
+    width: 80% ;
+    height: 40px;
+    direction: rtl;
+  }
+}
