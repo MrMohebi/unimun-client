@@ -1,0 +1,36 @@
+@font-face {
+    font-family: IranSans;
+    src: url("IRANSansMobile.ttf") format("truetype");
+}
+
+.IranSans{
+    font-family: IranSans, serif;
+}
+@font-face {
+    font-family: IranSansLight;
+    src: url("IRANSansMobile_Light.ttf") format("truetype");
+}
+.IranSansLight{
+    font-family: IranSansLight, serif;
+}
+@font-face {
+    font-family: IranSansMedium;
+    src: url("IRANSansMobile_Medium.ttf") format("truetype");
+}
+.IranSansMedium{
+    font-family: IranSansMedium, serif;
+}
+@font-face {
+    font-family: IranSansBold;
+    src: url("IRANSansMobile_Bold.ttf") format("truetype");
+}
+.IranSansBold{
+    font-family: IranSansBold, serif;
+}
+@font-face {
+    font-family: IranSansUltraLight;
+    src: url("IRANSansMobile_UltraLight.ttf") format("truetype");
+}
+.IranSansUltraLight{
+    font-family: IranSansUltraLight, serif;
+}
