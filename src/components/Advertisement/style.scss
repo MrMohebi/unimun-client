@@ -1,0 +1,14 @@
+.advertisement-main-container{
+  height: 100%;
+  overflow: scroll;
+  .advertisement-section{
+    height: 100px;
+    padding: 5px;
+    margin: 5px;
+    border-top: solid 1px #000000;
+
+    span{
+      font-size: 0.9em;
+    }
+  }
+}
