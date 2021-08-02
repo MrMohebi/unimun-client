@@ -9,6 +9,7 @@ import './assets/bootstrap/css/bootstrap.css'
 
 import Navbar from "./components/Navbar/Navbar";
 import SearchBar from "./components/SerachBar/SearchBar";
+import MainPage from "./components/_Pages/MainPage/MainPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <BrowserRouter>
               <Route exact path='/' component={SearchBar}/>
               <Route exact path='/' component={Navbar}/>
+              <Route exact path='/' component={MainPage}/>
           </BrowserRouter>
       </>
   );
