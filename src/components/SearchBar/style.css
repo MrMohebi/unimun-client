@@ -1,0 +1,21 @@
+.search-bar-container {
+  padding: 20px;
+}
+.search-bar-container .search-bar {
+  width: 100%;
+  border-radius: 10px;
+  background: #F6F8FA;
+  height: 50px;
+}
+.search-bar-container .search-bar input {
+  height: inherit;
+  margin: 0 5px 0 5px;
+  width: 100%;
+  background: inherit;
+  border: none;
+}
+.search-bar-container .search-bar img {
+  padding: 5px;
+}
+
+/*# sourceMappingURL=style.css.map */
