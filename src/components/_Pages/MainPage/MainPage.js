@@ -1,6 +1,4 @@
-import React, {Component} from 'react';
-import directIcon from './icons/directIcon.svg';
-import searchIcon from './icons/searchNormal.svg';
+import React from 'react';
 import noteBook from './icons/noteBookIcon.svg';
 import views from './icons/eye.svg';
 import plusSign from './icons/add.svg';
@@ -12,104 +10,21 @@ import book from './icons/book-deactivated.svg';
 import blueBar from './icons/blue-Rectangle.svg';
 import IranSANS from '../../../assets/fonts/IRANSansMobile.ttf';
 
-const MainPage = () => {
 
+import SearchBar from "../../SearchBar/SearchBar";
+import HeaderMain from "../../HeaderMain/HeaderMain";
+
+import "./style.css"
+
+const MainPage = () => {
         return (
             <div>
                 <div>
-                    <div className={"d-flex flex-row-reverse justify-content-between mb-3"}
-                          style={{fontFamily: 'IranSANS'}}
-                    >
-
-                        <img
-                            src={directIcon} alt='directIcon' className={"start order-3 me-auto"}
-                            style={{
-                                margin:15,
-                                height:30,
-                                width:30
-                            }}
-                        />
-                        <div className={"d-flex flex-row-reverse"}>
-                            <h6
-                                className={"order-1"}
-                                style={{
-                                    color: '#000',
-                                    marginRight: 20,
-                                    marginTop: 17
-                                }}
-                            >
-                                یونیـــ
-                            </h6>
-
-                            <h6
-                                className={"flex-sm-fill order-2"}
-                                style={{
-                                    color: '#1da1f2',
-                                    margin: 0,
-                                    marginTop: 17,
-                                    alignItem: 'end'
-                                }}
-                            >
-                                مون
-                            </h6>
-                        </div>
-
-
-
+                    <HeaderMain/>
+                    <SearchBar/>
                 </div>
 
-                    <span
-                        className={"searchBar d-flex"}
-                        style={{
-                            paddingLeft: 15,
-                            fontFamily: IranSANS,
-                            marginBottom: 15
-                        }}
-                    >
-                        <form className={"d-flex form-control"}
-                              style={{
-                                  background: '#F6F8FA',
-                                  width: '95%',
-                                  alignItems: 'center'
-                              }}
-                        >
-                            <p
-                                style={{
-                                    paddingTop: 0,
-                                    margin: 0
-                                }}
-                            >
-                                همه
-                            </p>
-
-                            <input placeholder={"جستجو"}
-                                   className={"text-end p-2 align-self-center"}
-                                   color={"#c1c1c1"}
-                                   style={{
-                                       fontSize: 14,
-                                       width: '100%',
-                                       paddingRight: 40,
-                                       border: 0,
-                                       background: '#F6F8FA'
-                                   }}
-                            />
-
-                            <img
-                                src={searchIcon} alt='searchButton'
-                            />
-
-                    </form>
-
-                </span>
-
-                </div>
-                {/*add functional button*/}
-
-
-                <div
-                    style={{background: '#F6F8FA',
-                            height: 625}}
-                >
+                <div style={{background: '#F6F8FA'}}>
 
                     <span
                         className={"popularSubjects"}
