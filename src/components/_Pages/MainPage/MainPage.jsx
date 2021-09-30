@@ -10,26 +10,13 @@ import profile from './icons/profile-deactivated.svg';
 import wallet from './icons/wallet-deactivated.svg';
 import book from './icons/book-deactivated.svg';
 import blueBar from './icons/blue-Rectangle.svg';
-import IranSANS from '../../assets/fonts/IRANSans(FaNum).ttf';
+import IranSANS from '../../../assets/fonts/IRANSansMobile.ttf';
 
-class MainPage extends Component {
+const MainPage = () => {
 
-    // state = {
-    //     buttonList:[
-    //
-    //     ],
-    //
-    //     adsList:[
-    //
-    //     ]
-    // }
-
-    render() {
         return (
             <div>
-
                 <div>
-
                     <div className={"d-flex flex-row-reverse justify-content-between mb-3"}
                           style={{fontFamily: 'IranSANS'}}
                     >
@@ -394,7 +381,6 @@ class MainPage extends Component {
                 </div>
             </div>
         );
-    }
 }
 
 export default MainPage;
