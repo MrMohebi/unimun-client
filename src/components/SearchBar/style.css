@@ -9,7 +9,8 @@
 }
 .search-bar-container .search-bar input {
   height: inherit;
-  margin: 0 5px 0 5px;
+  margin: 0 5px 0 20px;
+  width: 100%;
   background: inherit;
   border: none;
 }
