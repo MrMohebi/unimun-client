@@ -1,0 +1,13 @@
+.buttons-style{
+    width: 60px;
+    height: 25px;
+    padding-top: 5px;
+    border-radius: 6px;
+    background: #F6F8FA;
+    color: #657786;
+    font-size: 12px;
+}
+
+.paddings{
+    padding: 15px 20px 15px 20px ;
+}
