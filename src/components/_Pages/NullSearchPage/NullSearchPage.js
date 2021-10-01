@@ -10,9 +10,9 @@ import DelIcon from './icons/DeleteIcon.svg';
 const NullSearchPage = () => {
     return (
         <div>
-            <div>
-                Search-Bar goes here
-            </div>
+            {/*<div>*/}
+            {/*    Search-Bar goes here*/}
+            {/*</div>*/}
             <div className={"d-flex flex-row justify-content-between paddings"}>
                 <img src={DelIcon} alt="Delete Icon"/>
                 <div className={"ml-auto"} style={{paddingRight: 15}}>
