@@ -3,11 +3,14 @@ import React from 'react';
 //css
 import './style.css'
 import buildings from './icons/buildings.svg';
-import uniPicture from './icons/uniPic.svg'
+import uniPicture from './icons/uniPic.svg';
+
+import SearchBar from "../../SearchBar/SearchBar";
 
 const SearchPage = () => {
     return (
         <div>
+            <SearchBar/>
             <div className={"paddings d-flex flex-row-reverse"} style={{paddingTop:25}}>
                 <img src={buildings} alt="select Uni"/>
                 <span className={"text-color-black"} style={{paddingRight:10}}>
