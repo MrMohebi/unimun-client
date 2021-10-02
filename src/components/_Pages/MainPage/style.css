@@ -17,4 +17,20 @@
   padding: 10px;
 }
 
+.adsCard {
+  padding: 25px;
+  background: #ffffff;
+  border-radius: 15px;
+  max-width: 700px;
+  margin: 20px;
+  height: 140px;
+}
+.adsCard .ad-category {
+  font-size: 0.7em;
+  color: #5c5c5c;
+}
+.adsCard .ad-price {
+  font-size: 0.7em;
+}
+
 /*# sourceMappingURL=style.css.map */
