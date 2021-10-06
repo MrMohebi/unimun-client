@@ -10,7 +10,7 @@ const FilterSearchPage = () => {
     }
     const [value, setValue] = useState([100, 250]);
     const [maxLength] = useState(450);
-    const [sliderMarksStep] = useState(30);
+    const [sliderMarksStep] = useState(25);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -33,17 +33,18 @@ const FilterSearchPage = () => {
                     <span>
                         موضوع آگهی
                     </span>
-                    <span>
+                    <span className="gray-text">
                         موضوع
                     </span>
                 </div>
             </div>
+            <div className="border-bottom ml-4 mr-4 mt-3"/>
             <div className="filter-page-container d-flex flex-column">
                 <div className="d-flex flex-row justify-content-between">
                     <span>
                         از 10 تا 450 هزارتومان
                     </span>
-                    <span>
+                    <span className="gray-text">
                         بودجه
                     </span>
                 </div>
@@ -55,13 +56,14 @@ const FilterSearchPage = () => {
                         step={5}
                         min={0}
                         max={maxLength}
-                        marks={Array(maxLength/sliderMarksStep).fill.map((_, index)=>({value:index* sliderMarksStep, label:"'"}))}
+                        marks={Array(maxLength/sliderMarksStep).fill("").map((_, index)=>({value:index* sliderMarksStep, label:"'"}))}
                         getAriaValueText={textValue}
                         valueLabelDisplay="auto"
                         disableSwap
                     />
                 </div>
             </div>
+            <div className="border-bottom ml-4 mr-4 mt-3"/>
             <div className="filter-page-container d-flex flex-row justify-content-between">
                 <span>
                     نام دانشگاه
@@ -70,6 +72,7 @@ const FilterSearchPage = () => {
                     دانشگاه
                 </span>
             </div>
+            <div className="border-bottom ml-4 mr-4 mt-3"/>
             <div className="d-flex flex-row-reverse align-items-center">
                 <Checkbox/>
                 <span className="pt-2">
@@ -77,7 +80,7 @@ const FilterSearchPage = () => {
                 </span>
             </div>
             <div className="filter-page-container d-flex flex-row-reverse">
-                <span className="page-footer">
+                <span className="page-footer w-100">
                     با انجام دادن آگهی های فوری امتیاز بیشتری دریافت میکنید
                 </span>
             </div>

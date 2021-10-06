@@ -1,5 +1,5 @@
 .filter-page-container{
-    padding: 20px;
+    padding: 20px 20px 0 20px;
 
     .blue-text{
         color: #1DA1F2;
@@ -17,4 +17,11 @@
         color: #657786;
         background: #F6F8FA;
     }
+    .gray-text{
+        color: #5B5F64;
+    }
+}
+
+.search-bar-container{
+    padding: 20px 20px 0 20px;
 }
