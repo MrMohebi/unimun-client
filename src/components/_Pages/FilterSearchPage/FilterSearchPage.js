@@ -79,8 +79,8 @@ const FilterSearchPage = () => {
                     فقط آگهی های فوری
                 </span>
             </div>
-            <div className="filter-page-container d-flex flex-row-reverse">
-                <span className="page-footer w-100">
+            <div className="page-footer d-flex flex-row-reverse">
+                <span className="page-footer-text">
                     با انجام دادن آگهی های فوری امتیاز بیشتری دریافت میکنید
                 </span>
             </div>

@@ -12,11 +12,6 @@
             color: #1DA1F2;
         }
     }
-    .page-footer{
-        font-size: 0.69em;
-        color: #657786;
-        background: #F6F8FA;
-    }
     .gray-text{
         color: #5B5F64;
     }
@@ -24,4 +19,14 @@
 
 .search-bar-container{
     padding: 20px 20px 0 20px;
+}
+
+.page-footer {
+    padding: 10px 20px 10px 20px;
+    background: #F6F8FA;
+
+    .page-footer-text {
+        font-size: 0.69em;
+        color: #657786;
+    }
 }
