@@ -15,7 +15,7 @@ const AdsCard = ({adsTitle, adsCategory, adsPrice, adsOptions}) => {
                 <div className="d-flex flex-column justify-content-between align-items-end">
                     <div>
                         <h6 className={"IranSansBold"}>{adsTitle}</h6>
-                        <span className={"IranSansMedium ad-category"}>{adsCategory}</span>
+                        <span className={"IranSansMedium ad-category d-flex flex-row-reverse"}>{adsCategory}</span>
                     </div>
                     <span className={"IranSansBold ad-price"} style={{fontSize:"0.7em"}}>
                         بدون محدودیت
