@@ -1,0 +1,33 @@
+
+.navbar-button {
+  @apply w-20 flex flex-col items-center justify-center;
+}
+
+.navbar {
+  @apply bg-white justify-between w-full absolute h-nav bottom-0 flex flex-row-reverse justify-around;
+  box-shadow: #d1d1d145 0 -8px 10px 0px;
+}
+
+.nav-active {
+  @apply text-primary;
+  //&:after {
+  //  left: 50%;
+  //  transform: translateX(-50%);
+  //  @apply bg-primary;
+  //  content: ' ';
+  //  position: absolute;
+  //  width: 40px;
+  //  height: 4px;
+  //  border-radius: 0 0 20% 20%;
+  //  top: 0;
+  //}
+}
+.nav-indicator{
+  @apply bg-primary;
+  content: ' ';
+  position: absolute;
+  width: 40px;
+  height: 4px;
+  border-radius: 0 0 20% 20%;
+  top: 0;
+}

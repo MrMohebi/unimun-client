@@ -8,8 +8,7 @@ const Home: NextPage = () => {
         <title>Unimun</title>
         <meta name="description" content="Unimun" />
       </Head>
-      <main >
-        Hi :)
+      <main>
       </main>
     </div>
   )
