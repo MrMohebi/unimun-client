@@ -2,9 +2,11 @@ import React, {useEffect} from 'react';
 import Icon from "../../view/Icon/Icon";
 import Link from "next/link";
 import {useRouter} from "next/router";
+import Tab from "../../view/Tab/Tab";
 
 const Navbar = () => {
     const router = useRouter();
+    let [active, setActive] = React.useState(0)
 
     const navbarIcons = [
         {
@@ -35,34 +37,26 @@ const Navbar = () => {
 
     ]
 
-    const moveIndicator = ()=>{
-        navbarIcons.forEach((item,index)=>{
-            if (item.path === router.pathname){
-                let clicked = document.getElementById('nav-' + index)!.getBoundingClientRect()
-                console.log(clicked.left)
-                document.getElementById('nav-indicator')!.style.left = ((clicked.left + (clicked.width/2)) - 20) + 'px'
+
+    useEffect(() => {
+        navbarIcons.forEach((navItem, index) => {
+            if (navItem.path === router.pathname) {
+                setActive(index)
             }
         })
-    }
-
-    useEffect(()=>{
-        moveIndicator()
-        window.addEventListener('resize',()=>{
-            moveIndicator()
-        })
-    })
+    }, [])
 
 
     return (
-        <div className="navbar">
-            <div id={'nav-indicator'} className={'nav-indicator transition-all'}/>
+        <Tab indicatorSizeDivider={2} activeIndex={active}>
             {
                 navbarIcons.map((item, index) => {
                         let active: boolean;
                         active = router.pathname === item.path;
                         return (
-                            <Link key={item.path} href={item.path}>
+                            <Link passHref={true} key={item.path} href={item.path}>
                                 <div onClick={() => {
+                                    setActive(index)
 
                                 }} id={'nav-' + index} key={item.name}
                                      className={'navbar-button relative ' + (active ? 'nav-active' : '')}>
@@ -71,12 +65,11 @@ const Navbar = () => {
                                     <span className={'IranSansMedium text-sm mt-1'}>{item.name}</span>
                                 </div>
                             </Link>
-
                         )
                     }
                 )
             }
-        </div>
+        </Tab>
     );
 };
 
