@@ -57,7 +57,6 @@ const Navbar = () => {
                             <Link passHref={true} key={item.path} href={item.path}>
                                 <div onClick={() => {
                                     setActive(index)
-
                                 }} id={'nav-' + index} key={item.name}
                                      className={'navbar-button relative ' + (active ? 'nav-active' : '')}>
                                     <Icon w={1.7} h={1.7} unit={'rem'} fill={active}

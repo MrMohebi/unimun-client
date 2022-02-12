@@ -39,7 +39,7 @@ const Tab = ({children, activeIndex, indicatorAtBottom, indicatorSizeDivider}: P
             window.removeEventListener("resize", moveIndicator);
         };
 
-    }, [])
+    }, [activeIndex])
 
     return (
         <div className="navbar">
