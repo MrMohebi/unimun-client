@@ -12,7 +12,7 @@ jobs:
     name: deploy
     steps:
       - name: Deploy to Staging server
-        run: ls -la ../
+        run: ls -la .
 #       - name: Deploy to Staging server
 #         uses: easingthemes/ssh-deploy@main
 #         env:
