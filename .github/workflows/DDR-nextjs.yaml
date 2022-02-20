@@ -6,33 +6,33 @@ on:
         - ci-cd
 
 jobs:
-  dockerize-and-run:
-#     needs: deploy
-    if: github.event.head_commit.message == 'deploy'
-    runs-on: ubuntu-latest
-    name: 'dockerize and run'
-    steps:
-      - name: ls -a via ssh
-        uses: fifsky/ssh-action@master
-        with:
-          command: |
-            cd /root
-            ls -a
-          host: ${{ secrets.SSH_HOST }}
-          user: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY}}
   deploy:
     if: github.event.head_commit.message == 'deploy'
     runs-on: ubuntu-latest
     name: deploy
     steps:
-      - name: Deploy to Staging server
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SOURCE: "dist/"
-          REMOTE_HOST: ${{ secrets.SSH_HOST }}
-          REMOTE_USER: ${{ secrets.SSH_USER }}
-          TARGET: ${{ secrets.FRONT_DEPLOY_PATH }}
+      - run: ls
+#       - name: Deploy to Staging server
+#         uses: easingthemes/ssh-deploy@main
+#         env:
+#           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+#           SOURCE: "dist/"
+#           REMOTE_HOST: ${{ secrets.SSH_HOST }}
+#           REMOTE_USER: ${{ secrets.SSH_USER }}
+#           TARGET: ${{ secrets.FRONT_DEPLOY_PATH }}
   
-
+#   dockerize-and-run:
+#     needs: deploy
+#     if: github.event.head_commit.message == 'deploy'
+#     runs-on: ubuntu-latest
+#     name: 'dockerize and run'
+#     steps:
+#       - name: ls -a via ssh
+#         uses: fifsky/ssh-action@master
+#         with:
+#           command: |
+#             cd /root
+#             ls -a
+#           host: ${{ secrets.SSH_HOST }}
+#           user: ${{ secrets.SSH_USER }}
+#           key: ${{ secrets.SSH_PRIVATE_KEY}}
