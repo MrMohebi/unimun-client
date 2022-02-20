@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     name: deploy
     steps:
+      - uses: actions/checkout@v2
       - name: Deploy to Staging server
         run: ls -la .
       - name: Deploy to Staging server
