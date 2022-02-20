@@ -31,9 +31,11 @@ jobs:
     steps:
       - name: ls -a via ssh
         uses: fifsky/ssh-action@master
+        env:
+          FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEPLOY_PATH }}
         with:
           command: |
-            cd ${{ secrets.SSH_PRIVATE_KEY }}
+            cd ../$FRONT_DEPLOY_PATH
             docker-compose up -d --build
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
