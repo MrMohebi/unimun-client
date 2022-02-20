@@ -1,0 +1,38 @@
+name: deploy-dockerize-run
+
+on: 
+  push:
+      branches:
+        - master
+
+jobs:
+  deploy:
+    if: github.event.head_commit.message == 'deploy'
+    runs-on: Ubuntu 20.04
+    name: deploy
+    steps:
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }} 
+          known_hosts: ${{ secrets.SSH_HOST }} 
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+      - name: Deploy with rsync
+        run: rsync -avzn ./dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.FRONT_DEPLOY_PATH }}
+  
+  dockerize-and-run:
+    needs: deploy
+    if: github.event.head_commit.message == 'deploy'
+    runs-on: Ubuntu 20.04
+    name: 'dockerize and run'
+    steps:
+      - name: ls -a via ssh
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            cd /root
+            ls -a
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
