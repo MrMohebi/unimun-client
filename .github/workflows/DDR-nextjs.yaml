@@ -28,10 +28,10 @@ jobs:
     if: github.event.head_commit.message == 'deploy'
     runs-on: ubuntu-latest
     name: 'dockerize and run'
+    env:
+      FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEPLOY_PATH }}
     steps:
       - name: run ducker
-        env:
-          FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEPLOY_PATH }}
         uses: fifsky/ssh-action@master
         with:
           command: |
