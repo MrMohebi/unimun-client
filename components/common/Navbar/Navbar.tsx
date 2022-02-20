@@ -4,6 +4,7 @@ import Link from "next/link";
 import {useRouter} from "next/router";
 import Tab from "../../view/Tab/Tab";
 
+
 const Navbar = () => {
     const router = useRouter();
     let [active, setActive] = React.useState(0)
@@ -40,7 +41,11 @@ const Navbar = () => {
 
     useEffect(() => {
         navbarIcons.forEach((navItem, index) => {
-            if (navItem.path === router.pathname) {
+
+            if (navItem.path !== '/' && router.pathname.includes(navItem.path)) {
+                setActive(index)
+            }
+            if (navItem.path === '/' && router.pathname === '/'){
                 setActive(index)
             }
         })
@@ -51,8 +56,13 @@ const Navbar = () => {
         <Tab indicatorSizeDivider={2} activeIndex={active}>
             {
                 navbarIcons.map((item, index) => {
-                        let active: boolean;
-                        active = router.pathname === item.path;
+                        let active: boolean = false;
+                        if (item.path !== '/') {
+                            active = router.pathname.includes(item.path) && router.pathname.length > 2
+                        }
+                        if (router.pathname === '/' && item.path === '/') {
+                            active = true;
+                        }
                         return (
                             <Link passHref={true} key={item.path} href={item.path}>
                                 <div onClick={() => {
@@ -60,7 +70,7 @@ const Navbar = () => {
                                 }} id={'nav-' + index} key={item.name}
                                      className={'navbar-button relative ' + (active ? 'nav-active' : '')}>
                                     <Icon w={1.7} h={1.7} unit={'rem'} fill={active}
-                                          svg={'assets/svgs/navbar/' + item.svg + '-' + (active ? 'bold' : 'outline') + '.svg'}/>
+                                          svg={'/assets/svgs/navbar/' + item.svg + '-' + (active ? 'bold' : 'outline') + '.svg'}/>
                                     <span className={'IranSansMedium text-sm mt-1'}>{item.name}</span>
                                 </div>
                             </Link>
