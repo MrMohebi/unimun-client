@@ -18,6 +18,16 @@ jobs:
           known_hosts: ${{ secrets.SSH_HOST }} 
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+      - name: ls -a via ssh
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            cd /root
+            ls -a
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
+
       - name: Deploy with rsync
         run: rsync -avz ./src/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.FRONT_DEPLOY_PATH }}
   
