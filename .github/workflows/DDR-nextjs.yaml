@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     if: github.event.head_commit.message == 'deploy'
-    runs-on: Ubuntu 20.04
+    runs-on: ubuntu-latest
     name: deploy
     steps:
       - name: Install SSH Key
@@ -24,7 +24,7 @@ jobs:
   dockerize-and-run:
     needs: deploy
     if: github.event.head_commit.message == 'deploy'
-    runs-on: Ubuntu 20.04
+    runs-on: ubuntu-latest
     name: 'dockerize and run'
     steps:
       - name: ls -a via ssh
