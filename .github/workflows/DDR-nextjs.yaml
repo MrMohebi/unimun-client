@@ -29,10 +29,10 @@ jobs:
     runs-on: ubuntu-latest
     name: 'dockerize and run'
     steps:
-      - name: ls -a via ssh
-        uses: fifsky/ssh-action@master
+      - name: run ducker
         env:
           FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEPLOY_PATH }}
+        uses: fifsky/ssh-action@master
         with:
           command: |
             cd "$FRONT_DEPLOY_PATH"
