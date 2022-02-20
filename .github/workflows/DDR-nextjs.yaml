@@ -3,7 +3,7 @@ name: deploy-dockerize-run
 on: 
   push:
       branches:
-        - ci-cd
+        - master
 
 jobs:
   deploy:
