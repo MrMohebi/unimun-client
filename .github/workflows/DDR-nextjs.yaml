@@ -33,8 +33,8 @@ jobs:
         uses: fifsky/ssh-action@master
         with:
           command: |
-            cd /root
-            ls -a
+            cd ${{ secrets.SSH_PRIVATE_KEY }}
+            docker-compose up -d --build
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY}}
