@@ -13,8 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Deploy to Staging server
-        run: ls -la .
-      - name: Deploy to Staging server
         uses: easingthemes/ssh-deploy@main
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
