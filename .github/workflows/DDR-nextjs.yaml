@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     name: deploy
     steps:
-      - run: ls
+      - name: Deploy to Staging server
+        run: ls -la
 #       - name: Deploy to Staging server
 #         uses: easingthemes/ssh-deploy@main
 #         env:
