@@ -35,7 +35,8 @@ jobs:
           FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEPLOY_PATH }}
         with:
           command: |
-            cd "$FRONT_DEPLOY_PATH"../
+            cd "$FRONT_DEPLOY_PATH"
+            cd ../
             docker-compose up -d --build
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
