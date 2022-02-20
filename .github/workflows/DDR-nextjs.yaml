@@ -35,7 +35,7 @@ jobs:
         uses: fifsky/ssh-action@master
         with:
           command: |
-            cd "$FRONT_DEPLOY_PATH"
+            cd ${{env.FRONT_DEPLOY_PATH}}
             cd ../
             ls -la
           host: ${{ secrets.SSH_HOST }}
