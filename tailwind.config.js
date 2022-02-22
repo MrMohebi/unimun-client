@@ -19,6 +19,7 @@ module.exports = {
         primary:'#1DA1F2',
         textBlack:'#292D32',
         textDark:'#657786',
+        textDarker:'#5B5F64',
         background:'#F6F8FA'
       }
     },

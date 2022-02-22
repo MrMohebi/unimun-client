@@ -2,16 +2,17 @@ import React from 'react';
 
 interface Props {
     id: string,
-    width: string,
+    borderSize: string,
     borderColor: string,
     wrapperClassname?: string,
     dir?: string,
     numOnly: boolean,
     labelText?: string,
-    maxLength?: number
+    maxLength?: number,
+    onChange?: any
 }
 
-const Input = ({id, width, wrapperClassname, dir, numOnly, labelText, maxLength}: Props) => {
+const Input = ({id, wrapperClassname, dir, numOnly, labelText, maxLength, onChange,borderColor,borderSize}: Props) => {
 
 
     return (
@@ -24,8 +25,12 @@ const Input = ({id, width, wrapperClassname, dir, numOnly, labelText, maxLength}
                     e.currentTarget.value = e.currentTarget.value.slice(0, e.currentTarget.value.length - 1)
 
                 }
+
+                if (onChange) {
+                    onChange(e)
+                }
             }} dir={dir ? dir : 'rtl'} id={id}
-                   className={`w-${width} bg-transparent IranSans rounded-md border-2 border-primary h-12 outline-0 px-3`}/>
+                   className={` bg-transparent h-full w-full IranSans rounded-md  border-${borderSize} border-${borderColor} h-12 outline-0 px-3`}/>
             {labelText ?
                 <label dir={'rtl'} className={'IranSans text-textDark text-sm mr-3 mt-2'}
                        htmlFor={id}>{labelText}</label>

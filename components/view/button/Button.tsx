@@ -6,6 +6,8 @@ interface Props {
     bottomCenter?: boolean,
     rippleColor?: string,
     children?: any,
+    disabled?: boolean,
+    onClick?: any
 }
 
 const Button = (props: Props) => {
@@ -23,8 +25,14 @@ const Button = (props: Props) => {
         }, 600)
     }
     return (
-        <button id={'rButton'} onClick={rippleEffect}
-                className={`${props.className} relative outline-0 overflow-hidden`}>
+        <button disabled={props.disabled} id={'rButton'} onClick={(e) => {
+            if (!props.disabled)
+                rippleEffect(e)
+            if (props.onClick) {
+                props.onClick(e)
+            }
+        }}
+                className={`${props.className} ${props.disabled ? 'pointer-events-none' : ''} relative outline-0 overflow-hidden`}>
             {props.children}
         </button>
     );
