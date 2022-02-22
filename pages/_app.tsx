@@ -6,6 +6,7 @@ import Navbar from "../components/common/Navbar/Navbar";
 const Layouts = [
     {
         routes: ['', 'profile'],
+        except:['login'],
         component: <Navbar/>
     },
 
@@ -13,13 +14,12 @@ const Layouts = [
 
 function MyApp({Component, pageProps}: AppProps) {
     const router = useRouter()
-    console.log()
     return (
         <>
             <Component {...pageProps} />
             {
                 Layouts.map((ui,index) => {
-                    if (ui.routes.includes(router.pathname.split('/')[1])) {
+                    if (ui.routes.includes(router.pathname.split('/')[1]) && !router.pathname.includes(ui.except[0])) {
                         return (
                             <div key={index}>
                                 {ui.component}

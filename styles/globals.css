@@ -43,6 +43,23 @@
   @apply bg-primary;
 }
 
+.ripple {
+  border-radius: 50%;
+  animation: ripple 0.5s forwards;
+  width: 1px;
+  height: 1px;
+  transform-origin: center;
+}
+
+@keyframes ripple {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(150);
+    opacity: 0;
+  }
+}
 html,
 body {
   padding: 0;
