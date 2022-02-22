@@ -27,7 +27,6 @@ const VCodeInput = (props:Props) => {
         setErr(props.err)
     },[code,props.success, props.err])
 
-
     return (
         <div className={'w-full relative px-3 h-28  flex flex-row-reverse justify-around items-center'}>
             <Input id={'Vcode'} wrapperClassname={'w-100 h-full text-tiny absolute w-full opacity-0'} borderSize={'0'} borderColor={'transparent'} maxLength={props.length} numOnly={true} onChange={(e:any)=>{
