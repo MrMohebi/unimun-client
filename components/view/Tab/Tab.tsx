@@ -42,9 +42,9 @@ const Tab = ({children, activeIndex, indicatorAtBottom, indicatorSizeDivider}: P
     }, [activeIndex])
 
     return (
-        <div className="navbar">
+        <div className="w-full h-full flex flex-row justify-between">
             <div ref={indicatorRef} id={'nav-indicator'}
-                 className={`nav-indicator transition-all ${indicatorAtBottom ? 'bottom-0' : 'top-0'}`}/>
+                 className={`nav-indicator transition-all ${indicatorAtBottom ? 'bottom-0 rounded-t-md' : 'top-0 rounded-b-md'}`}/>
             <div id={'children'} className={'contents'}>
                 {
                     children

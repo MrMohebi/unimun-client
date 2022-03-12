@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
 import Button from "../../components/view/button/Button";
-import VCodeInput from "../../components/common/VCodeInput/VCodeInput";
+import VCodeInput from "../../components/normal/profile/VCodeInput/VCodeInput";
 
 const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState('00000000000')
@@ -22,6 +22,9 @@ const Login = () => {
     let codeValidation = (code: string) => {
 
         return code.length === 4;
+    }
+    let stepBack = ()=>{
+        setStep(currentStep-1)
     }
 
     const steps = [
@@ -54,9 +57,10 @@ const Login = () => {
                     <span id={'login-description'}
                           className={'IranSansMedium text-sm text-textSecondary'}>{steps[currentStep]?.description}</span>
                 </div>
+
                 {
                     currentStep === 0 ?
-                        <Input id={'1'} borderColor={'primary'} borderSize={'2'}
+                        <Input id={'1'}
                                wrapperClassname={`mt-5 ${currentStep === 0 ? "opacity-100" : 'opacity-0'} transition-all h-14 duration-400`}
                                numOnly={false}
                                onChange={(e: any) => {
@@ -66,7 +70,7 @@ const Login = () => {
                                }}
                                dir={'ltr'} labelText={'مثل 09123456789'} maxLength={11}/>
                         : currentStep === 1 ?
-                            <VCodeInput success={allowForNextStep} err={vCodeError} onChange={(code: string) => {
+                            <VCodeInput stepBack={stepBack} success={allowForNextStep} err={vCodeError} onChange={(code: string) => {
                                 setVCodeError(false)
                                 if (codeValidation(code)) {
                                     if (code !== '0000') {
@@ -81,7 +85,7 @@ const Login = () => {
                             }} length={4}/>
                             :
                             currentStep === 2 ?
-                                <Input id={'1'} borderColor={'primary'} borderSize={'2'}
+                                <Input id={'1'}
                                        wrapperClassname={`mt-5 transition-all h-14 duration-400`}
                                        numOnly={false}
                                        dir={'rtl'} labelText={'نام و نام خانوادگی یا هر چیزی که صلاح میدونین'}

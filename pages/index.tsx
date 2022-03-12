@@ -1,14 +1,17 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import Ads from "../components/normal/home/Ads/Ads";
 
 const Home: NextPage = () => {
+
   return (
-    <div className={'bg-background'} >
+    <div className={'bg-background'}>
       <Head>
         <title>Unimun</title>
         <meta name="description" content="Unimun" />
       </Head>
-      <main>
+      <main className={'h-full'}>
+          <Ads/>
       </main>
     </div>
   )

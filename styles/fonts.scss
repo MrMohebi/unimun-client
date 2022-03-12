@@ -12,3 +12,17 @@
 .IranSansMedium{
   font-family: IranSansMedium;
 }
+@font-face {
+  font-family: "IranSansBlack";
+  src: url("/assets/fonts/IranSansFarsiNums/IRANSans(FaNum)_Black.ttf");
+}
+.IranSansBlack{
+  font-family: IranSansBlack;
+}
+@font-face {
+  font-family: "IranSansBold";
+  src: url("/assets/fonts/IranSansFarsiNums/IRANSans(FaNum)_Bold.ttf");
+}
+.IranSansBold{
+  font-family: IranSansBold;
+}

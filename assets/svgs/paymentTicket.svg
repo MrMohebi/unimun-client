@@ -1,0 +1,299 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 403 511">
+    <defs>
+        <filter id="a" x="41" y="0" width="320" height="320" filterUnits="userSpaceOnUse">
+            <feOffset dy="8">
+                <input>SourceAlpha</input>
+            </feOffset>
+            <feGaussianBlur stdDeviation="9" result="b"/>
+            <feFlood flood-color="#455b63" flood-opacity="0.102"/>
+            <feComposite operator="in" in2="b"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+        <clipPath id="c">
+            <rect width="266" height="263" rx="15" transform="translate(0 -0.41)" fill="#1da1f2"/>
+        </clipPath>
+        <linearGradient id="d" x1="-0.783" y1="-1.419" x2="0.871" y2="0.54" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#fff"/>
+            <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="e" x1="-2.726" y1="-1.953" x2="0.776" y2="0.139" xlink:href="#d"/>
+        <filter id="f" x="55" y="159" width="291" height="146" filterUnits="userSpaceOnUse">
+            <feOffset dy="8" input="SourceAlpha"/>
+            <feGaussianBlur stdDeviation="9" result="g"/>
+            <feFlood flood-color="#455b63" flood-opacity="0.102"/>
+            <feComposite operator="in" in2="g"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+        <filter id="h" x="91" y="187" width="79" height="74" filterUnits="userSpaceOnUse">
+            <feOffset dy="3" input="SourceAlpha"/>
+            <feGaussianBlur stdDeviation="3" result="i"/>
+            <feFlood flood-color="#1da1f2" flood-opacity="0.412" result="j"/>
+            <feComposite operator="out" in="SourceGraphic" in2="i"/>
+            <feComposite operator="in" in="j"/>
+            <feComposite operator="in" in2="SourceGraphic"/>
+        </filter>
+        <linearGradient id="k" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#1da1f2" stop-opacity="0"/>
+            <stop offset="1" stop-color="#1da1f2"/>
+        </linearGradient>
+        <filter id="l" x="61" y="200" width="139" height="91" filterUnits="userSpaceOnUse">
+            <feOffset input="SourceAlpha"/>
+            <feGaussianBlur stdDeviation="10" result="m"/>
+            <feFlood flood-color="#455b63" flood-opacity="0.102"/>
+            <feComposite operator="in" in2="m"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+        <filter id="n" x="0" y="151" width="403" height="360" filterUnits="userSpaceOnUse">
+            <feOffset dy="8" input="SourceAlpha"/>
+            <feGaussianBlur stdDeviation="9" result="o"/>
+            <feFlood flood-color="#455b63" flood-opacity="0.102"/>
+            <feComposite operator="in" in2="o"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+    </defs>
+    <g transform="translate(-13 -140)">
+        <g transform="translate(-93 76)">
+            <g transform="matrix(1, 0, 0, 1, 106, 64)" filter="url(#a)">
+                <rect width="266" height="266" rx="15" transform="translate(68 19)" fill="#1da1f2"/>
+            </g>
+            <g transform="translate(174 86.41)" clip-path="url(#c)">
+                <path d="M-1150.4,1294.087s106.865-14.434,186.944-82.973,111.688-202.444,137.1-181.443-18.813,285.672-42.475,284.567c-13.061-.611-209.1-.179-281.57,0C-1209.194,1314.382-1150.4,1294.087-1150.4,1294.087Z"
+                      transform="translate(1158.597 -1030.512)" fill="url(#d)"/>
+                <path d="M-1171.93,1046.742c76.659-70.912,256.042-84.42,280.056-69.854s22.948,245.415.589,244.648-275.995,5.931-283.093-2.885S-1248.59,1117.654-1171.93,1046.742Z"
+                      transform="translate(1167.386 -939.526)" fill="url(#e)"/>
+            </g>
+            <text transform="translate(307 212)" fill="#bbe3fb" font-size="13"
+                  font-family="IRANSansFaNum-Medium, IRANSansFaNum" font-weight="500">
+                <tspan x="-21.871" y="0">موجودی</tspan>
+            </text>
+            <text transform="translate(422 108)" fill="#fff" font-size="13"
+                  font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                <tspan x="-58.24" y="0">یـونی بانک</tspan>
+            </text>
+            <g transform="matrix(1, 0, 0, 1, 106, 64)" filter="url(#f)">
+                <rect width="237" height="92" rx="10" transform="translate(82 178)" fill="#fff"/>
+            </g>
+            <g transform="translate(196.735 251.239)">
+                <g>
+                    <rect width="79" height="74" rx="6" transform="translate(0.265 -0.239)" fill="#44bafc"/>
+                    <g transform="matrix(1, 0, 0, 1, -90.74, -187.24)" filter="url(#h)">
+                        <rect width="79" height="74" rx="6" transform="translate(91 187)" fill="#fff"/>
+                    </g>
+                </g>
+                <g transform="translate(0 2.274)">
+                    <rect width="14" height="14" rx="4" transform="translate(60.265 3.487)" fill="#fff"/>
+                    <g transform="translate(65.703 7.585)">
+                        <path d="M.522,5.289A.529.529,0,0,1,0,4.759V.525A.523.523,0,0,1,.32.038.534.534,0,0,1,.891.151L2.283,1.563a.538.538,0,0,1,0,.748.52.52,0,0,1-.738,0l-.5-.508V4.759A.529.529,0,0,1,.522,5.289Z"
+                              transform="translate(1.39 0.002)" fill="#00bfa5"/>
+                        <path d="M.52,2.468a.513.513,0,0,1-.369-.155.538.538,0,0,1,0-.748L1.543.153a.52.52,0,0,1,.738,0,.538.538,0,0,1,0,.748L.889,2.313A.513.513,0,0,1,.52,2.468Z"
+                              fill="#00bfa5"/>
+                    </g>
+                    <text transform="translate(26.265 12.487)" fill="#fff" font-size="10"
+                          font-family="IRANSansFaNum-Medium, IRANSansFaNum" font-weight="500">
+                        <tspan x="-12.835" y="0">30,000</tspan>
+                    </text>
+                    <g transform="translate(5 3.176)">
+                        <text transform="translate(6.265 8.311)" fill="#fff" font-size="4"
+                              font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                            <tspan x="-6.391" y="0">توما</tspan>
+                        </text>
+                        <text transform="translate(3.265 4.311)" fill="#fff" font-size="4"
+                              font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                            <tspan x="-2.816" y="0">ن</tspan>
+                        </text>
+                    </g>
+                </g>
+                <g  transform="translate(0 22.735)">
+                    <rect width="14" height="14" rx="4" transform="translate(60.265 3.026)" fill="#fff"/>
+                    <g transform="translate(65.703 7.584)">
+                        <g transform="translate(0 0)">
+                            <path d="M.522,5.293a.518.518,0,0,1-.2-.042A.53.53,0,0,1,0,4.764V.529A.529.529,0,0,1,.522,0a.529.529,0,0,1,.522.529V3.486l.5-.508a.52.52,0,0,1,.738,0,.538.538,0,0,1,0,.748L.891,5.138A.518.518,0,0,1,.522,5.293Z"
+                                  transform="translate(1.39)" fill="#ff1e60"/>
+                            <path d="M1.912,2.468a.513.513,0,0,1-.369-.155L.151.9a.538.538,0,0,1,0-.748.52.52,0,0,1,.738,0L2.281,1.565a.538.538,0,0,1,0,.748A.513.513,0,0,1,1.912,2.468Z"
+                                  transform="translate(0 2.825)" fill="#ff1e60"/>
+                        </g>
+                    </g>
+                    <text transform="translate(24.265 12.026)" fill="#fff" font-size="10"
+                          font-family="IRANSansFaNum-Medium, IRANSansFaNum" font-weight="500">
+                        <tspan x="-10.683" y="0">3,000</tspan>
+                    </text>
+                    <g transform="translate(5 3.176)">
+                        <text transform="translate(6.265 8.85)" fill="#fff" font-size="4"
+                              font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                            <tspan x="-6.391" y="0">توما</tspan>
+                        </text>
+                        <text transform="translate(3.265 3.85)" fill="#fff" font-size="4"
+                              font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                            <tspan x="-2.816" y="0">ن</tspan>
+                        </text>
+                    </g>
+                </g>
+                <line x2="63" transform="translate(8.265 22.761)" fill="none" stroke="#bbe3fb" stroke-linecap="round"
+                      stroke-width="0.2"/>
+                <rect width="79" height="74" rx="15" transform="translate(0.265 -0.239)" fill="url(#k)"/>
+                <g transform="matrix(1, 0, 0, 1, -90.74, -187.24)" filter="url(#l)">
+                    <rect width="79" height="31" rx="6" transform="translate(91 230)" fill="#1da1f2"/>
+                </g>
+                <text transform="translate(39.265 60.761)" fill="#fff" font-size="11"
+                      font-family="IRANSansFaNum-Medium, IRANSansFaNum" font-weight="500">
+                    <tspan x="-23.081" y="0">تراکنش ها</tspan>
+                </text>
+            </g>
+            <g id="balanceHolder" class="balanceHolder" transform="translate(249.026 154.615)">
+                <text transform="translate(71.974 34.385)" fill="#fff" font-size="28"
+                      font-family="IRANSans-Bold, IRANSans" font-weight="700">
+                    <tspan id="balance" class="balance" x="-43.595" y="0">55,4545</tspan>
+                </text>
+                <text transform="translate(23.974 30.385)" fill="#fff" font-size="15"
+                      font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                    <tspan x="-23.967" y="0">توما</tspan>
+                </text>
+                <text transform="translate(14.974 15.385)" fill="#fff" font-size="16"
+                      font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                    <tspan x="-11.263" y="0">ن</tspan>
+                </text>
+            </g>
+            <text transform="translate(320 272)" fill="#fff" font-size="15"
+                  font-family="IRANSansFaNum-Medium, IRANSansFaNum" font-weight="500">
+                <tspan x="-19.252" y="0">30,000</tspan>
+            </text>
+            <g transform="translate(285.402 259.197)">
+                <text transform="translate(9.598 12.803)" fill="#fff" font-size="6"
+                      font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                    <tspan x="-9.587" y="0">توما</tspan>
+                </text>
+                <text transform="translate(6.598 5.803)" fill="#fff" font-size="6"
+                      font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                    <tspan x="-4.223" y="0">ن</tspan>
+                </text>
+            </g>
+            <g transform="translate(383.162 252.376)">
+                <text transform="translate(28.838 25.624)" fill="#fff" font-size="6"
+                      font-family="IRANSansFaNum-Medium, IRANSansFaNum" font-weight="500">
+                    <tspan x="-29.473" y="0">قابل استفاده</tspan>
+                </text>
+                <g transform="translate(7.926)">
+                    <g transform="translate(0)">
+                        <path d="M0,.863V4.428A2.949,2.949,0,0,0,2.952,7.38H11.3a2.961,2.961,0,0,0,2.959-2.959V.863A.861.861,0,0,0,13.4,0H.863A.861.861,0,0,0,0,.863ZM4.278,4.991H2.852a.535.535,0,1,1,0-1.07H4.278a.535.535,0,1,1,0,1.07Zm4.635,0H6.061a.535.535,0,1,1,0-1.07H8.913a.535.535,0,1,1,0,1.07Z"
+                              transform="translate(1.426 7.309)" fill="#fff"/>
+                        <path d="M8.2.863V2.952a.861.861,0,0,1-.863.863H.863A.869.869,0,0,1,0,2.938,2.946,2.946,0,0,1,2.952,0H7.337A.861.861,0,0,1,8.2.863Z"
+                              transform="translate(1.426 2.424)" fill="#fff"/>
+                        <path d="M3.544,0h-2.1A1.331,1.331,0,0,0,0,1.448v2.1A1.331,1.331,0,0,0,1.448,4.991h2.1A1.331,1.331,0,0,0,4.991,3.544v-2.1A1.331,1.331,0,0,0,3.544,0Zm.471,1.747L2.325,3.722a.349.349,0,0,1-.264.128H2.046a.366.366,0,0,1-.264-.107L1,2.973a.37.37,0,0,1,0-.521.364.364,0,0,1,.521,0l.5.492L3.444,1.276a.372.372,0,0,1,.521-.043A.358.358,0,0,1,4.014,1.747Z"
+                              transform="translate(10.696 1.426)" fill="#fff"/>
+                        <path d="M0,0H17.113V17.113H0Z" fill="none" opacity="0"/>
+                    </g>
+                </g>
+            </g>
+            <text transform="translate(320 314)" fill="#fff" font-size="16"
+                  font-family="IRANSansFaNum-Medium, IRANSansFaNum" font-weight="500">
+                <tspan x="-19.485" y="0">20,000</tspan>
+            </text>
+            <g transform="translate(285.402 300.12)">
+                <text transform="translate(9.598 12.88)" fill="#fff" font-size="6"
+                      font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                    <tspan x="-9.587" y="0">توما</tspan>
+                </text>
+                <text transform="translate(6.598 5.88)" fill="#fff" font-size="6"
+                      font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                    <tspan x="-4.223" y="0">ن</tspan>
+                </text>
+            </g>
+            <g transform="translate(385.436 295.573)">
+                <text transform="translate(24 24.416)" fill="#fff" font-size="6"
+                      font-family="IRANSansFaNum-Medium, IRANSansFaNum" font-weight="500">
+                    <tspan x="-23.619" y="0">بلوکه شده</tspan>
+                </text>
+                <g transform="translate(5.084)">
+                    <g transform="translate(0)">
+                        <path d="M0,.863V4.428A2.949,2.949,0,0,0,2.952,7.38H11.3a2.961,2.961,0,0,0,2.959-2.959V.863A.861.861,0,0,0,13.4,0H.863A.861.861,0,0,0,0,.863ZM4.278,4.991H2.852a.535.535,0,1,1,0-1.07H4.278a.535.535,0,1,1,0,1.07Zm4.635,0H6.061a.535.535,0,1,1,0-1.07H8.913a.535.535,0,1,1,0,1.07Z"
+                              transform="translate(1.426 7.309)" fill="#fff"/>
+                        <path d="M8.2.863V2.952a.861.861,0,0,1-.863.863H.863A.869.869,0,0,1,0,2.938,2.946,2.946,0,0,1,2.952,0H7.337A.861.861,0,0,1,8.2.863Z"
+                              transform="translate(1.426 2.424)" fill="#fff"/>
+                        <path d="M3.544,0h-2.1A1.331,1.331,0,0,0,0,1.448v2.1A1.331,1.331,0,0,0,1.448,4.991h2.1A1.331,1.331,0,0,0,4.991,3.544v-2.1A1.331,1.331,0,0,0,3.544,0Zm.264,3.2a.468.468,0,0,1,.121.314.429.429,0,0,1-.121.292.435.435,0,0,1-.606,0L2.5,3.1l-.7.713A.434.434,0,0,1,1.184,3.2L1.9,2.5,1.191,1.8a.444.444,0,0,1-.007-.613.431.431,0,0,1,.613.007l.7.706.713-.713a.435.435,0,0,1,.606,0,.522.522,0,0,1,.121.314.49.49,0,0,1-.114.3l-.713.713Z"
+                              transform="translate(10.696 1.426)" fill="#fff"/>
+                        <path d="M0,0H17.113V17.113H0Z" fill="none" opacity="0"/>
+                    </g>
+                </g>
+            </g>
+            <line x2="137" transform="translate(281 289)" fill="none" stroke="#bbe3fb" stroke-linecap="round"
+                  stroke-width="0.2"/>
+            <line y2="34" transform="translate(375 251)" fill="none" stroke="#bbe3fb" stroke-linecap="round"
+                  stroke-width="0.2"/>
+            <line y2="34" transform="translate(375 292)" fill="none" stroke="#bbe3fb" stroke-linecap="round"
+                  stroke-width="0.2"/>
+            <path d="M12.067,4a8.067,8.067,0,1,0,8.067,8.067A8.076,8.076,0,0,0,12.067,4Zm3.453,6.68-4.034,4.034a.606.606,0,0,1-.856,0L8.614,12.7a.6.6,0,0,1,.856-.856l1.589,1.589,3.606-3.606a.605.605,0,0,1,.856.856Z"
+                  transform="translate(183.933 92.933)" fill="#fff"/>
+        </g>
+        <g transform="matrix(1, 0, 0, 1, 13, 140)" filter="url(#n)">
+            <path d="M583-1946H254a10.011,10.011,0,0,1-10-10v-67.465A12.969,12.969,0,0,0,251-2035a12.971,12.971,0,0,0-7-11.536V-2242a10.011,10.011,0,0,1,10-10H583a10.011,10.011,0,0,1,10,10v195.464A12.97,12.97,0,0,0,586-2035a12.97,12.97,0,0,0,7,11.535V-1956A10.011,10.011,0,0,1,583-1946Z"
+                  transform="translate(-217 2422)" fill="#fff"/>
+        </g>
+        <line x2="299" y2="1" transform="translate(64.5 525.5)" fill="none" stroke="#e1e8ed" stroke-width="2"
+              stroke-dasharray="6"/>
+        <g class="amountHolder" transform="translate(-15 -10)">
+            <text transform="translate(210 479)" fill="#292d32" font-size="32"
+                  font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                <tspan class="amount" x="0" y="0">5,000</tspan>
+            </text>
+            <g transform="translate(181.479 448.101)">
+                <text transform="translate(21.521 30.899)" fill="#13171a" font-size="14"
+                      font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                    <tspan x="-22.37" y="0">توما</tspan>
+                </text>
+                <text transform="translate(12.521 16.899)" fill="#13171a" font-size="14"
+                      font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                    <tspan x="-9.855" y="0">ن</tspan>
+                </text>
+            </g>
+        </g>
+        <g class="success" opacity=".001" >
+            <text transform="translate(214 415)" fill="#21b876" font-size="20"
+                  font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                <tspan x="-86.887" y="0">واریز موفقیت آمیز بود</tspan>
+            </text>
+            <path d="M24,4A20,20,0,1,0,44,24,20.023,20.023,0,0,0,24,4Zm8.561,16.561-10,10a1.5,1.5,0,0,1-2.122,0l-5-5A1.5,1.5,0,0,1,17.56,23.44L21.5,27.379l8.939-8.939a1.5,1.5,0,0,1,2.123,2.121Z"
+                  transform="translate(190 335)" fill="#21b876"/>
+        </g>
+
+        <g class="failed" opacity=".001" >
+            <text transform="translate(214 415)" fill="#ff1e60" font-size="20"
+                  font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+                <tspan x="-63.039" y="0">واریز ناموفق بود</tspan>
+            </text>
+            <path d="M24,4A20,20,0,1,0,44,24,20,20,0,0,0,24,4Zm7.561,25.439a1.5,1.5,0,0,1-2.122,2.122L24,26.121,18.561,31.56a1.5,1.5,0,1,1-2.122-2.12L21.879,24,16.44,18.561a1.5,1.5,0,1,1,2.121-2.121L24,21.879l5.439-5.439a1.5,1.5,0,1,1,2.121,2.121L26.121,24Z"
+                  transform="translate(190 335)" fill="#ff1e60"/>
+        </g>
+
+
+        <rect width="33" height="33" rx="10" transform="translate(71 554)" fill="#e1e8ed"/>
+        <g transform="translate(78.71 561.71)">
+            <path d="M7.594,11.951H4.356C1.342,11.951,0,10.609,0,7.594V4.356C0,1.342,1.342,0,4.356,0H7.594c3.015,0,4.356,1.342,4.356,4.356V7.594C11.951,10.609,10.609,11.951,7.594,11.951ZM4.356,1.157c-2.39,0-3.2.81-3.2,3.2V7.594c0,2.39.81,3.2,3.2,3.2H7.594c2.39,0,3.2-.81,3.2-3.2V4.356c0-2.39-.81-3.2-3.2-3.2Z"
+                  transform="translate(0.964 5.59)" fill="#657786"/>
+            <path d="M7.594,11.951H6.746a.582.582,0,0,1-.578-.578V8.982c0-2.39-.81-3.2-3.2-3.2H.578A.582.582,0,0,1,0,5.2V4.356C0,1.342,1.342,0,4.356,0H7.594c3.015,0,4.356,1.342,4.356,4.356V7.594C11.951,10.609,10.609,11.951,7.594,11.951Zm-.27-1.157h.27c2.39,0,3.2-.81,3.2-3.2V4.356c0-2.39-.81-3.2-3.2-3.2H4.356c-2.39,0-3.2.81-3.2,3.2v.27H2.968c3.015,0,4.356,1.342,4.356,4.356Z"
+                  transform="translate(5.59 0.964)" fill="#657786"/>
+            <path d="M0,0H18.5V18.5H0Z" fill="none" opacity="0"/>
+        </g>
+        <text transform="translate(155 576)" fill="#657786" font-size="14"
+              font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+            <tspan x="-35.341" y="0">584684288</tspan>
+        </text>
+        <text transform="translate(330 574)" fill="#657786" font-size="12"
+              font-family="IRANSansFaNum-Medium, IRANSansFaNum" font-weight="500">
+            <tspan x="-24.532" y="0">کد پیگیری</tspan>
+        </text>
+
+        <g class="failedButton" opacity="0.001">
+            <g transform="translate(64 544)" fill="#fff" stroke="#ff1e60" stroke-width="2">
+                <rect width="300" height="51" rx="10" stroke="none"/>
+                <rect x="1" y="1" width="298" height="49" rx="9" fill="none"/>
+            </g>
+            <text transform="translate(215 575)" fill="#ff1e60" font-size="18"
+                  font-family="IRANSansFaNum-Medium, IRANSansFaNum" font-weight="500">
+                <tspan x="-42.46" y="0">تلاش مجدد</tspan>
+            </text>
+        </g>
+
+    </g>
+
+</svg>

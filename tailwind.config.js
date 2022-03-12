@@ -6,14 +6,11 @@ module.exports = {
   theme: {
     extend: {
       fontSize:{
-        tiny:'0.6em'
+        tiny:'0.65em'
       },
       spacing: {
-        'nav': '68px',
+        'nav': '60px',
         '0p':'0%'
-      },
-      boxShadow: {
-        'top': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
       },
       colors:{
         primary:'#1DA1F2',

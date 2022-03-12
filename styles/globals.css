@@ -6,7 +6,7 @@
 }
 
 .navbar {
-  @apply bg-white justify-between w-full absolute h-nav bottom-0 flex flex-row-reverse justify-around;
+  @apply bg-white justify-between w-full fixed bottom-0 flex justify-around h-nav;
   box-shadow: #d1d1d145 0 -8px 10px 0px;
 }
 
@@ -20,7 +20,6 @@
   position: absolute;
   width: 40px;
   height: 4px;
-  border-radius: 0 0 20% 20%;
 }
 
 @font-face {
@@ -37,6 +36,22 @@
 }
 .IranSansMedium {
   font-family: IranSansMedium;
+}
+
+@font-face {
+  font-family: "IranSansBlack";
+  src: url("/assets/fonts/IranSansFarsiNums/IRANSans(FaNum)_Black.ttf");
+}
+.IranSansBlack {
+  font-family: IranSansBlack;
+}
+
+@font-face {
+  font-family: "IranSansBold";
+  src: url("/assets/fonts/IranSansFarsiNums/IRANSans(FaNum)_Bold.ttf");
+}
+.IranSansBold {
+  font-family: IranSansBold;
 }
 
 .icon-background {
@@ -69,6 +84,19 @@ body {
 
 body {
   background-color: #F6F8FA;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+#__next {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 a {
