@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
-import Test from '../../assets/svgs/paymentTicket.svg'
-import Button from "../../components/view/button/Button";
+import PaymentBaseSVG from '../../assets/svgs/paymentTicket.svg'
+import Button from "../../components/view/Button/Button";
 
 const PaymentInfo = () => {
 
@@ -64,7 +64,7 @@ const PaymentInfo = () => {
     return (
         <div className={'w-100 h-100 left-1/2  top-1/2 flex flex-col items-center justify-center '}>
             <div className={'w-full h-full max-w-md  '} ref={svgRef}>
-                <Test/>
+                <PaymentBaseSVG/>
             </div>
             <div className={'w-full text-center IranSans text-textDark'}>
                 <span>اگر مبلغ از حساب شما کسر شده است</span>

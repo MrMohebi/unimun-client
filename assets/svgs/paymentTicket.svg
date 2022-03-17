@@ -19,7 +19,7 @@
         </linearGradient>
         <linearGradient id="e" x1="-2.726" y1="-1.953" x2="0.776" y2="0.139" xlink:href="#d"/>
         <filter id="f" x="55" y="159" width="291" height="146" filterUnits="userSpaceOnUse">
-            <feOffset dy="8" input="SourceAlpha"/>
+            <feOffset dy="8"/>
             <feGaussianBlur stdDeviation="9" result="g"/>
             <feFlood flood-color="#455b63" flood-opacity="0.102"/>
             <feComposite operator="in" in2="g"/>

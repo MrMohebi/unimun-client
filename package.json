@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p 3232",
-    "lint": "next lint"
+    "lint": "next lint",
+    "tailwind-config-viewer": "tailwind-config-viewer -o"
   },
   "dependencies": {
     "@apollo/client": "^3.5.9",

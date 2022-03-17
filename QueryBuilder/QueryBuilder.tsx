@@ -1,41 +1,21 @@
-import {gql} from "@apollo/client";
+import * as gql from "gql-query-builder";
 import {getAds} from "./Queries/Ads";
 
-
-const QueryBuilder = ()=>{
+interface Params {
+    type: 'query' | 'mutation',
+    operation: string,
+    operationName: string,
+    fields: [],
 
 }
 
-// gql`
-// query ads(){
-//
-// }
-// `
 
-// const QueryBuilder = (type: "mutation" | "query", queryName: string, queryParams?: object[], data: any) => {
-//
-//     return gql`
-//         ${type}{
-//             ${queryName}${queryParams?.length ? "(" : ""}
-//             ${queryParams?.length ? queryParams.map((param) => `
-//             ${param['name']}:${param['val']},
-//             `) : ""}
-//             ${queryParams?.length ? ")" : ""}
-//             ${"{"}
-//             ${data.map((level1) => {
-//         return `
-//                 ${level1['name']}
-//                 ${level1['subsets']?.length ? `
-//                 {
-//                 ${level1['subsets'].map(subset => subset)}
-//                 }
-//                 ` : ``}
-//                 `
-//     })}
-//             ${"}"}
-//         }
-//     `
-//
-//     return gql``;
-// }
-// export default QueryBuilder
+const QueryBuilder = (type:'query'|'mutation',operationName:string,operation:string,fields:any) => {
+    if (type === 'query') {
+        return (
+            gql.query({operation: operation, fields: fields}, null, {operationName: operationName})
+        )
+    }
+}
+
+export default QueryBuilder

@@ -2,7 +2,7 @@
   @apply w-20 flex flex-col items-center justify-center;
 }
 .navbar {
-  @apply bg-white justify-between w-full fixed bottom-0 flex justify-around h-nav ;
+  @apply bg-white w-full fixed bottom-0  h-nav ;
   box-shadow: #d1d1d145 0 -8px 10px 0px;
 }
 .nav-active {

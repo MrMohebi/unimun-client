@@ -6,7 +6,7 @@
 }
 
 .navbar {
-  @apply bg-white justify-between w-full fixed bottom-0 flex justify-around h-nav;
+  @apply bg-white w-full fixed bottom-0  h-nav;
   box-shadow: #d1d1d145 0 -8px 10px 0px;
 }
 
@@ -75,8 +75,77 @@
     opacity: 0;
   }
 }
+input[type=range] {
+  box-sizing: border-box;
+  appearance: none;
+  width: 100%;
+  margin: 0;
+  padding: 0 2px;
+  /* Add some L/R padding to ensure box shadow of handle is shown */
+  overflow: hidden;
+  border: 0;
+  border-radius: 1px;
+  outline: none;
+  background: linear-gradient(#1da1f2, #1da1f2) no-repeat center;
+  /* Use a linear gradient to generate only the 2px height background */
+  background-size: 100% 2px;
+  pointer-events: none;
+}
+
+input[type=range]:active, input[type=range]:focus {
+  outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 28px;
+  background-color: #1da1f2;
+  position: relative;
+  margin: 5px 0;
+  /* Add some margin to ensure box shadow is shown */
+  cursor: pointer;
+  appearance: none;
+  pointer-events: all;
+  box-shadow: 0 1px 4px 0.5px rgba(0, 0, 0, 0.25);
+}
+
+input[type=range]::-webkit-slider-thumb::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 13px;
+  left: 100%;
+  width: 2000px;
+  height: 2px;
+}
+
+.multi-range {
+  position: relative;
+  height: 50px;
+}
+
+.multi-range input[type=range] {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.multi-range input[type=range]:nth-child(1)::-webkit-slider-thumb::before {
+  background-color: red;
+}
+
+.multi-range input[type=range]:nth-child(2) {
+  background: none;
+}
+
+.multi-range input[type=range]:nth-child(2)::-webkit-slider-thumb::before {
+  background-color: grey;
+}
+
 html,
 body {
+  direction: rtl;
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
@@ -87,25 +156,12 @@ body {
 }
 
 html,
-body {
-  margin: 0;
-}
-
+body,
 #__next {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  margin: 0;
+  height: 100%;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
-}
+/*# sourceMappingURL=DoubleSlider.css.map */
 
 /*# sourceMappingURL=globals.css.map */

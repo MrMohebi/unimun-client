@@ -18,8 +18,8 @@ const Button = (props: Props) => {
         ripple.className = 'ripple absolute'
         ripple.style.backgroundColor = props.rippleColor ?? '#6e6e6e'
         button.appendChild(ripple)
-        ripple.style.top = e.pageY - e.currentTarget.getBoundingClientRect().top + 'px'
-        ripple.style.left = e.pageX - e.currentTarget.getBoundingClientRect().left + 'px'
+        ripple.style.top = e.clientY - e.currentTarget.getBoundingClientRect().top + 'px'
+        ripple.style.left = e.clientX - e.currentTarget.getBoundingClientRect().left + 'px'
         setTimeout(() => {
             button.removeChild(ripple)
         }, 600)

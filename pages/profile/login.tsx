@@ -1,14 +1,56 @@
 import React, {useEffect, useState} from 'react';
 import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
-import Button from "../../components/view/button/Button";
+import Button from "../../components/view/Button/Button";
 import VCodeInput from "../../components/normal/profile/VCodeInput/VCodeInput";
+import * as queryBuilder from 'gql-query-builder'
+import {gql, useLazyQuery, useMutation, makeVar} from "@apollo/client";
+import {useRouter} from "next/router";
+import {IsLoggedIn} from "../../store/user";
+import {Token} from "../../store/user";
 
 const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState('00000000000')
     const [currentStep, setStep] = useState(0)
     const [allowForNextStep, setAllowForNextStep] = useState(false)
+    const [vCodeHint, setVCodeHint] = useState()
     const [vCodeError, setVCodeError] = useState(false)
+    const [vCode, setVCode] = useState("")
+    const router = useRouter()
+
+
+    const SendVCodequery = queryBuilder.mutation({
+        operation: 'sendVCode',
+        variables: {
+            phone: {value: phoneNumber, required: true},
+        },
+        fields: ['status', 'message', 'errors', {data: ['vCode']}]
+    })
+
+    const VerifyVCode = queryBuilder.mutation({
+
+        operation: 'verifyVCode',
+        variables: {
+            phone: {value: phoneNumber, required: true},
+            vCode: {value: vCode, required: true},
+            referenceCode: 'MRM75'
+        },
+        fields: ['status', 'message',{data:['id','phone','token']}]
+
+        // operation: 'sendVCode',
+        // variables: {
+        //     phone: {value: phoneNumber, required: true},
+        // },
+        // fields: ['status', 'message', 'errors', {data: ['vCode']}]
+    })
+
+
+    const [sendVcode, {
+        data,
+        error,
+        loading
+    }] = useMutation(gql`${SendVCodequery.query}`, {variables: SendVCodequery.variables})
+    const [verifyVCode, verifyVCodeResult] = useMutation(gql`${VerifyVCode.query}`, {variables: VerifyVCode.variables})
 
     let phoneNumberValidation = (phone: string) => {
         if (phone[0] === '0' && phone[1] === '9') {
@@ -20,12 +62,12 @@ const Login = () => {
     }
 
     let codeValidation = (code: string) => {
-
         return code.length === 4;
     }
-    let stepBack = ()=>{
-        setStep(currentStep-1)
+    let stepBack = () => {
+        setStep(currentStep - 1)
     }
+
 
     const steps = [
         {
@@ -43,9 +85,21 @@ const Login = () => {
 
     ]
 
+    if (verifyVCodeResult.data) {
+        if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS") {
+            IsLoggedIn(true)
+            Token(verifyVCodeResult.data.verifyVCode.data.token)
+            router.push('/')
+        }
+    }
     useEffect(() => {
 
-    }, [])
+
+        if (data && data.sendVCode.data.vCode) {
+            setVCodeHint(parseInt(data.sendVCode.data.vCode[0]))
+        }
+
+    }, [data, error, loading])
 
     return (
         <div dir={'rtl'} className={'w-full'}>
@@ -61,32 +115,36 @@ const Login = () => {
                 {
                     currentStep === 0 ?
                         <Input id={'1'}
-                               wrapperClassname={`mt-5 ${currentStep === 0 ? "opacity-100" : 'opacity-0'} transition-all h-14 duration-400`}
+                               wrapperClassName={`mt-5 ${currentStep === 0 ? "opacity-100" : 'opacity-0'} transition-all h-14 duration-400`}
                                numOnly={false}
                                onChange={(e: any) => {
                                    if (phoneNumberValidation(e.currentTarget.value)) {
+                                       setPhoneNumber(e.currentTarget.value)
                                        setAllowForNextStep(true)
                                    }
                                }}
                                dir={'ltr'} labelText={'مثل 09123456789'} maxLength={11}/>
                         : currentStep === 1 ?
-                            <VCodeInput stepBack={stepBack} success={allowForNextStep} err={vCodeError} onChange={(code: string) => {
-                                setVCodeError(false)
-                                if (codeValidation(code)) {
-                                    if (code !== '0000') {
-                                        setAllowForNextStep(true)
-                                        setVCodeError(false)
-                                    } else {
-                                        setVCodeError(true)
-                                    }
-                                } else {
-                                    setAllowForNextStep(false)
-                                }
-                            }} length={4}/>
+                            <VCodeInput hint={vCodeHint} stepBack={stepBack} success={allowForNextStep} err={vCodeError}
+                                        onChange={(code: string) => {
+                                            setVCodeError(false)
+                                            if (codeValidation(code)) {
+                                                setVCode(code)
+                                                verifyVCode()
+                                                if (code !== '0000') {
+                                                    setAllowForNextStep(true)
+                                                    setVCodeError(false)
+                                                } else {
+                                                    setVCodeError(true)
+                                                }
+                                            } else {
+                                                setAllowForNextStep(false)
+                                            }
+                                        }} length={4}/>
                             :
                             currentStep === 2 ?
                                 <Input id={'1'}
-                                       wrapperClassname={`mt-5 transition-all h-14 duration-400`}
+                                       wrapperClassName={`mt-5 transition-all h-14 duration-400`}
                                        numOnly={false}
                                        dir={'rtl'} labelText={'نام و نام خانوادگی یا هر چیزی که صلاح میدونین'}
                                        onChange={(e: any) => {
@@ -113,6 +171,10 @@ const Login = () => {
                         className={'text-primary'}>قوانین حریم ‌خصوصی</span> را می‌ پذیرم</span>
                 </div>
                 <Button onClick={() => {
+
+                    if (currentStep === 0) {
+                        sendVcode()
+                    }
                     setAllowForNextStep(false)
                     if (currentStep === steps.length - 1) {
                     } else {
