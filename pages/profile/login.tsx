@@ -13,7 +13,7 @@ const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState('00000000000')
     const [currentStep, setStep] = useState(0)
     const [allowForNextStep, setAllowForNextStep] = useState(false)
-    const [vCodeHint, setVCodeHint] = useState()
+    const [vCodeHint, setVCodeHint] = useState(0)
     const [vCodeError, setVCodeError] = useState(false)
     const [vCode, setVCode] = useState("")
     const router = useRouter()
