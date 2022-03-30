@@ -218,8 +218,6 @@ const Index = () => {
                         </div>
 
 
-
-
                     </div>
 
                 </Step>
@@ -234,7 +232,6 @@ const Index = () => {
                     if (currentStep !== 1)
                         setCurrentStep(currentStep + 1)
                     else {
-
                         createAd()
                     }
                 }}>
