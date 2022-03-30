@@ -10,7 +10,7 @@ const SvgModifier = (props:Props) => {
 
     const svgHolder = useRef<HTMLDivElement>(null)
     useEffect(()=>{
-        svgHolder.current.querySelector(props.elementSelector)
+        // svgHolder.current.querySelector(props.elementSelector)
     })
     return (
         <div ref={svgHolder} id={'svgHolder'}>
