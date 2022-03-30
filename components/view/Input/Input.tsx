@@ -1,5 +1,4 @@
 import React from 'react';
-import divider from "../Divider/Divider";
 
 interface Props {
     id: string,
@@ -13,16 +12,17 @@ interface Props {
     maxLength?: number,
     onChange?: any,
     multiLine?:boolean,
-    autoFocus?:boolean
+    autoFocus?:boolean,
+    defaultValue?:string
 }
 
-const Input = ({id, wrapperClassName,inputClassName, dir, numOnly, labelText, maxLength, onChange,multiLine,autoFocus}: Props) => {
+const Input = ({id, wrapperClassName,inputClassName, dir, numOnly, labelText, maxLength, onChange,multiLine,autoFocus,defaultValue}: Props) => {
 
 
     return (
         !multiLine?
         <div className={wrapperClassName ?? ''}>
-            <input autoFocus={autoFocus} onChange={(e) => {
+            <input defaultValue={defaultValue} autoFocus={autoFocus} onChange={(e) => {
                 if (numOnly && isNaN(parseInt(e.currentTarget.value[e.currentTarget.value.length - 1]))) {
                     e.currentTarget.value = e.currentTarget.value.slice(0, e.currentTarget.value.length - 1)
                 }
@@ -34,7 +34,7 @@ const Input = ({id, wrapperClassName,inputClassName, dir, numOnly, labelText, ma
                     onChange(e)
                 }
             }} dir={dir ? dir : 'rtl'} id={id}
-                   className={inputClassName??`bg-transparent h-full w-full IranSans border-2 border-primary rounded-lg bg-pri h-12 outline-0 px-3`}/>
+                   className={inputClassName+` bg-transparent h-full w-full IranSans border-2 border-primary rounded-lg bg-pri outline-0 px-3`}/>
             {labelText ?
                 <label dir={'rtl'} className={'IranSans text-textDark text-sm mr-3 mt-2'}
                        htmlFor={id}>{labelText}</label>

@@ -29,6 +29,7 @@ type Ad {
     priceEnd: Int
     priceStart: Int
     publishedAt: Int
+    seen: Int
     tagLink: String
     title: String
     universityID: String
@@ -68,11 +69,13 @@ type Login {
 
 type Mutation {
     addSubscriber(age: String, email: String, name: String, phone: String): Int
-    chargeWallet(amount: Int!, walletID: String!): Response_chargeWallet_vesb
-    createAd(categoryID: String, details: String, hashtags: [String], priceEnd: Int!, priceStart: Int!, title: String!): Response_createAd_ubdo
-    sendVCode(phone: String!, userAgent: String): Response_sendVCode_ruca
-    updateUser(bio: String, birthAt: Int, email: String, hasAdsHistory: Boolean, hasAskHistory: Boolean, hasBookHistory: Boolean, hasLastSeen: Boolean, lastname: String, name: String, universityID: ID, username: String): Response_updateUser_efbc
-    verifyVCode(phone: String!, vCode: String!): Response_verifyVCode_ywsh
+    chargeWallet(amount: Int!, walletID: String!): Response_chargeWallet_twyj
+    createAd(categoryID: String, details: String, hashtags: [String], priceEnd: Int!, priceStart: Int!, title: String!): Response_createAd_ptvg
+    seen(list: [Seen], type: String!): Response_seen_oxjv
+    sendVCode(phone: String!, userAgent: String): Response_sendVCode_xkmx
+    updateUser(bio: String, birthAt: Int, email: String, hasAdsHistory: Boolean, hasAskHistory: Boolean, hasBookHistory: Boolean, hasLastSeen: Boolean, lastname: String, name: String, universityID: ID, username: String): Response_updateUser_psht
+    uploadPublicFileAccess(adID: String, bookID: String, fileMime: String!, fileName: String!, filePath: String!, type: String!): Response_uploadPublicFileAccess_qlii
+    verifyVCode(phone: String!, referenceCode: String, vCode: String!): Response_verifyVCode_zxlm
 }
 
 "Information about pagination using a Relay style cursor connection."
@@ -116,67 +119,91 @@ type PaginatorInfo {
 }
 
 type Query {
+    ad(id: ID!): Ad
     ads(
         "A cursor after which elements are returned."
         after: String,
         "Limits number of fetched items. Maximum allowed value: 100."
-        first: Int = 20
+        first: Int = 20,
+        searchText: String
     ): AdConnection
-    test(x: String): Response_test_jmtq
-    user: Response_user_czhy
-    wallet: Response_wallet_nizw
+    isReferenceCodeValid(referenceCode: String): Response_isReferenceCodeValid_egss
+    test(x: String): Response_test_dtmz
+    user: Response_user_rfjx
+    wallet: Response_wallet_qrcd
 }
 
-type Response_chargeWallet_vesb {
+type Response_chargeWallet_twyj {
     data: CreatePayment
     errors: String
     message: String
     status: Status!
 }
 
-type Response_createAd_ubdo {
+type Response_createAd_ptvg {
     data: Ad
     errors: String
     message: String
     status: Status!
 }
 
-type Response_sendVCode_ruca {
+type Response_isReferenceCodeValid_egss {
+    data: Boolean
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_seen_oxjv {
+    data: Boolean
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_sendVCode_xkmx {
     data: VCode
     errors: String
     message: String
     status: Status!
 }
 
-type Response_test_jmtq {
+type Response_test_dtmz {
     data: TTT
     errors: String
     message: String
     status: Status!
 }
 
-type Response_updateUser_efbc {
+type Response_updateUser_psht {
     data: User
     errors: String
     message: String
     status: Status!
 }
 
-type Response_user_czhy {
+type Response_uploadPublicFileAccess_qlii {
+    data: Boolean
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_user_rfjx {
     data: User
     errors: String
     message: String
     status: Status!
 }
 
-type Response_verifyVCode_ywsh {
+type Response_verifyVCode_zxlm {
     data: Login
     errors: String
     message: String
     status: Status!
 }
 
-type Response_wallet_nizw {
+type Response_wallet_qrcd {
     data: Wallet
     errors: String
     message: String
@@ -218,7 +245,7 @@ type User {
     hasBookHistory: Boolean
     hasLastSeen: Boolean
     id: ID!
-    introducersID: ID
+    introducerID: ID
     isEmailActivated: Boolean
     isPhoneActivated: Boolean
     lastname: String
@@ -228,6 +255,7 @@ type User {
     phone: String
     profileIDs: [ID]
     referenceCode: String
+    referenceCodeLeft: Int
     savedAdsIDs: [ID]
     savedAskIDs: [ID]
     savedBookIDs: [ID]
@@ -240,6 +268,7 @@ type User {
 type VCode {
     firstCharacter: String
     hint: String
+    isSignup: Boolean
     length: Int!
     phone: String!
     vCode: String!
@@ -304,4 +333,10 @@ input OrderByClause {
     column: String!
     "The direction that is used for ordering."
     order: SortOrder!
+}
+
+input Seen {
+    id: ID!
+    times: Int!
+    type: String
 }

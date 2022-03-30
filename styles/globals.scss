@@ -1,11 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "navbar";
+@import "components/navbar";
 @import "fonts";
-@import "icon";
-@import "ripple";
-@import "../components/view/DoubleSlider/css/DoubleSlider";
+@import "components/icon";
+@import "components/ripple";
+@import 'components/doubleSlider';
+@import "pages/profile";
 
 
 
@@ -45,7 +46,7 @@ body,
 //
 //
 
-/*# sourceMappingURL=DoubleSlider.css.map */
+/*# sourceMappingURL=doubleSlider.css.map */
 
 
 

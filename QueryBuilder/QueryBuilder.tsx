@@ -1,5 +1,4 @@
 import * as gql from "gql-query-builder";
-import {getAds} from "./Queries/Ads";
 
 interface Params {
     type: 'query' | 'mutation',

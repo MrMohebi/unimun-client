@@ -37,6 +37,9 @@ const Tab = ({children, activeIndex, indicatorAtBottom, indicatorSizeDivider}: P
     }
 
     useEffect(() => {
+        setTimeout(() => {
+            moveIndicator()
+        }, 200)
         moveIndicator()
         window.addEventListener("resize", moveIndicator);
         return () => {

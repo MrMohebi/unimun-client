@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useState} from 'react';
 import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
 import Divider from "../../components/view/Divider/Divider";
@@ -8,37 +8,31 @@ import StepperFragment from "../../components/view/StepperFtagment/StepperFragme
 import Step from "../../components/view/StepperFtagment/Step/Step";
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
-import * as queryBuilder from "gql-query-builder";
 import {useMutation} from "@apollo/client";
 import {gql} from "@apollo/client";
 import {Token} from "../../store/user";
+import {newItemQuery} from "../../queries/withAuthentication/items";
+import GallerySVG from '../../assets/svgs/gallery.svg'
+import NewPhotoSVG from '../../assets/svgs/newPhoto.svg'
 
 
-const NewAd = () => {
+const Index = () => {
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [lowerPrice, setLower] = useState(10)
     const [upperPrice, setUpper] = useState(300)
     const [hashtags, setHashtags] = useState([] as string[])
-    const [lastHashtagError, setLastHashtagError] = useState(false)
     const [currentStep, setCurrentStep] = useState(0)
-    const newAdQuery = queryBuilder.mutation({
-        operation: "createAd",
-        variables: {
-            title: {value: title, required: true},
-            priceStart: {value: lowerPrice+1000, required: true},
-            priceEnd: {value: upperPrice+1000, required: true},
-            details: {value: description},
-            hashtags: {value: JSON.stringify(hashtags),type:"[String]"}
-        },
-        fields:['status','message','errors',{data:['id','title']}]
-    })
 
-    const [createAd,{data,loading,error}] = useMutation(gql`${newAdQuery.query}`,{variables:newAdQuery.variables, context: {
+    let query = newItemQuery(title, lowerPrice, upperPrice, description, hashtags)
+
+    const [createAd, {data, loading, error}] = useMutation(gql`${query.query}`, {
+        variables: query.variables, context: {
             headers: {
-                "token":Token()
+                "token": Token()
             }
-        }})
+        }
+    })
 
     const router = useRouter()
 
@@ -50,23 +44,24 @@ const NewAd = () => {
                 else
                     router.push('/')
 
-            }} back={true} alignment={'right'} title={'ثبت آگهی'}>
+            }} back={true} alignment={'rtl'} title={'ثبت آگهی'}>
                 <div className={'absolute left-2'}>
                 </div>
             </Header>
             <StepperFragment step={currentStep}>
 
                 <Step step={0}>
-                    <section>
+                    <section className={'pb-20'}>
                         <div className={'w-full h-40 bg-white mt-1 px-4 pt-3 new-section'}>
                             <span className={'text-textDark text-lg IranSansMedium  '}>عنوان آگهی</span>
                             <div className={'w-full flex items-center justify-center mt-4'}>
-                                <Input id={'title'} numOnly={false} wrapperClassName={'w-11/12'} onChange={(e:any) => {
-                                    setTitle(e.currentTarget.value)
-                                }}
+                                <Input id={'title'} numOnly={false} wrapperClassName={'w-11/12 h-12'}
+                                       onChange={(e: any) => {
+                                           setTitle(e.currentTarget.value)
+                                       }}
                                        labelText={'در عنوان اگهی به موارد مهم اشاره کنید'}/>
                             </div>
-                            <Divider type={'horizontal'} color={'#d7d7d7'} className={'mt-4'}/>
+                            <Divider type={'horizontal'} color={'#d7d7d7'} className={'mt-10'}/>
                         </div>
                         <div className={'w-full bg-white px-4 pt-3 new-section'}>
                             <div className={'w-full flex flex-row justify-between'}>
@@ -78,7 +73,6 @@ const NewAd = () => {
                                     <span className={'mx-0.5'}>{upperPrice}</span>
                                     <div dir={'ltr'} className={'w-10 h-10'}>
                                         <ThousandTomans/>
-
                                     </div>
                                 </div>
                             </div>
@@ -116,15 +110,7 @@ const NewAd = () => {
                                         <div key={hashtag + index} id={'hashtag-' + index}
                                              className={`IranSansMedium text-primary text-sm w-auto h-9 border border-gray-300 rounded-xl flex flex-row justify-center items-center mx-1 cursor-pointer mt-2 px-2 transition-all`}>
                                             <span id={'hashtag-tag-' + index}>#</span>
-                                            <input autoFocus={true} maxLength={20} onBlur={(e) => {
-                                                // if (!e.currentTarget.value) {
-                                                //     let filteredTags = hashtags.filter((tag, fIndex) => {
-                                                //         if (fIndex === index)
-                                                //             return false
-                                                //     })
-                                                //     setHashtags([...filteredTags])
-                                                // }
-                                            }} onChange={(e) => {
+                                            <input autoFocus={true} maxLength={20} onChange={(e) => {
                                                 let updatedHashtags = hashtags
                                                 updatedHashtags[index] = e.currentTarget.value
                                                 setHashtags([...updatedHashtags])
@@ -183,11 +169,12 @@ const NewAd = () => {
                     </section>
                 </Step>
 
+
                 <Step step={1}>
                     <div className={'w-full bg-white mt-1 px-4 pb-10 pt-3 new-section'}>
                         <span className={'text-textDark text-lg IranSansMedium  '}>توضیحات اضافه</span>
                         <div className={'w-full flex items-center justify-center mt-4 h-40'}>
-                            <Input onChange={(e:any) => {
+                            <Input onChange={(e: any) => {
                                 setDescription(e.currentTarget.value)
                             }} multiLine={true} id={'title'} numOnly={false}
                                    inputClassName={'bg-transparent h-full w-full IranSans border-2 border-primary rounded-lg bg-pri h-26  outline-0 px-3 py-4 '}
@@ -197,13 +184,40 @@ const NewAd = () => {
                     </div>
 
 
-                    <div className={'w-full bg-white px-4 pt-3 new-section pb-5 mt-4'}>
+                    <div className={'w-full bg-white px-5 pt-3 new-section pb-5 mt-4'}>
                         <div className={'w-full flex flex-row justify-between'}>
-                            <span className={' text-lg IranSansMedium text-primary '}>فایل</span>
-                            <div className={'IranSansMedium flex flex-row items-center justify-center'}>
-                                <span className={'mx-0.5 text-primary text-xl'}>0/{3}</span>
-                            </div>
+                            <span className={' text-lg IranSansMedium text-primary '}>آپلود</span>
                         </div>
+                        <div className={'flex flex-row justify-between items-center'}>
+                            <div className={'flex flex-row items-center justify-start mt-3'}>
+                                <div className={'h-6 w-6'}>
+                                    <GallerySVG/>
+                                </div>
+                                <span className={'IranSans mr-2'}>عکس</span>
+                            </div>
+
+                            <span className={'text-primary IranSansMedium text-md'}>{"1/5"}</span>
+                        </div>
+
+                        <div className={'new-photos w-full flex flex-wrap justify-center mt-3'}>
+
+                            <div className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative'}>
+                                <div className={'flex flex-col items-center justify-center'}>
+                                    <div className={'h-7 w-7'}><NewPhotoSVG/></div>
+                                    <span className={'text-sm IranSansMedium'}>افزودن عکس</span>
+                                </div>
+                            </div>
+
+                               <div className={'loaded-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative'}>
+                                <div className={'flex flex-col items-center justify-center'}>
+                                    <div className={'h-7 w-7'}><NewPhotoSVG/></div>
+                                    <span className={'text-sm IranSansMedium'}>افزودن عکس</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+
 
 
                     </div>
@@ -252,4 +266,4 @@ const NewAd = () => {
     );
 };
 
-export default NewAd;
+export default Index;

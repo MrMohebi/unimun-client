@@ -1,15 +1,15 @@
 <svg  xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 40 31">
     <g transform="translate(-543 11.16)">
         <text transform="translate(563 13.84)" fill="#13171a" font-size="12"
-              font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+              font-family="IranSans, IRANSansFaNum" font-weight="700">
             <tspan x="-19.174" y="0">توما</tspan>
         </text>
         <text transform="translate(555 1.84)" fill="#13171a" font-size="12"
-              font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+              font-family="IranSans, IRANSansFaNum" font-weight="700">
             <tspan x="-8.447" y="0">ن</tspan>
         </text>
         <text transform="translate(583 13.84)" fill="#13171a" font-size="12"
-              font-family="IRANSansFaNum-Bold, IRANSansFaNum" font-weight="700">
+              font-family="IranSans, IRANSansFaNum" font-weight="700">
             <tspan x="-18.835" y="0">هزار</tspan>
         </text>
     </g>
