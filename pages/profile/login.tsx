@@ -43,7 +43,6 @@ const Login = () => {
         setStep(0)
     }
 
-
     const steps = [
         {
             title: 'شماره تلفن خود را وارد کنید',
