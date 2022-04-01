@@ -2,10 +2,15 @@ import React from 'react';
 import * as queryBuilder from "gql-query-builder";
 
 
-export const getAppealsQuery = (adParams: string[]) => {
+export const getAppealsQuery = (adParams: string[],searchText?:string) => {
+
+    let variables = {}
+    variables.after = '';
+    if (searchText)
+        variables.searchText = searchText
     return queryBuilder.query({
         operation: 'appeals',
-        variables:{first:1},
-        fields: [{edges: [{node: adParams}]}]
+        variables:variables,
+        fields: [{edges: ['cursor', {node: adParams}],}]
     }, null, {operationName: 'getAppeals'})
 }

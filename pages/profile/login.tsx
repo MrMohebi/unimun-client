@@ -1,15 +1,14 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
 import Button from "../../components/view/Button/Button";
 import VCodeInput from "../../components/normal/profile/VCodeInput/VCodeInput";
-import * as queryBuilder from 'gql-query-builder'
-import {gql, useLazyQuery, useMutation, makeVar} from "@apollo/client";
+import {gql, useMutation} from "@apollo/client";
 import {useRouter} from "next/router";
-import {IsLoggedIn} from "../../store/user";
-import {Token} from "../../store/user";
+import {IsLoggedIn, UserToken} from "../../store/user";
 import PostSVG from '../../assets/svgs/post.svg'
 import {SendVCodeQuery, VerifyVCode} from "../../queries/normal/login";
+import {setToken} from "../../helpers/TokenHelper";
 
 const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState('00000000000')
@@ -94,7 +93,8 @@ const Login = () => {
             }
             if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && !sendVCodeResult.data.sendVCode.data.isSignup) {
                 IsLoggedIn(true)
-                Token(verifyVCodeResult.data.verifyVCode.data.token)
+                UserToken(verifyVCodeResult.data.verifyVCode.data.token)
+                setToken(verifyVCodeResult.data.verifyVCode.data.token)
                 router.push('/')
             }
         }
@@ -202,7 +202,8 @@ const Login = () => {
 
 
                             : currentStep === 2 ?
-                                <VCodeInput hint={vCodeHint} stepBack={stepBack} success={codeValidation(vCode)} err={vCodeError}
+                                <VCodeInput hint={vCodeHint} stepBack={stepBack} success={codeValidation(vCode)}
+                                            err={vCodeError}
                                             onChange={(code: string) => {
                                                 setVCodeError(false)
                                                 if (codeValidation(code)) {

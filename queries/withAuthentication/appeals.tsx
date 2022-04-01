@@ -1,9 +1,9 @@
 import React from "react";
 import * as queryBuilder from "gql-query-builder";
 
-export const newItemQuery = (title:string, lowerPrice:number, upperPrice:number, description:string, hashtags:string[]) => {
+export const newAppealQuery = (title:string, lowerPrice:number, upperPrice:number, description:string, hashtags:string[]) => {
     return queryBuilder.mutation({
-        operation: "createAd",
+        operation: "createAppeal",
         variables: {
             title: {value: title, required: true},
             priceStart: {value: lowerPrice * 1000, required: true},

@@ -16,7 +16,6 @@ const EachAppeal = (props: Props) => {
     return (
         <div className={'w-full h-full'}>
             <Header title={'آگهی'} back={true} backOnClick={() => {
-                console.log('back appeal')
             }}>
             </Header>
 

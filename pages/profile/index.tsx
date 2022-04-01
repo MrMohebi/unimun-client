@@ -9,7 +9,8 @@ import Drawer from "../../components/view/Drawer/Drawer";
 import JudgeSVG from '../../assets/svgs/judge.svg'
 import InfoSVG from '../../assets/svgs/info.svg'
 import SupportSVG from '../../assets/svgs/support.svg'
-import DownloadAppSVG from '../../assets/svgs/judge.svg'
+import DownloadAppSVG from '../../assets/svgs/downloadApp.svg'
+import {router} from "next/client";
 
 const Index = () => {
 
@@ -39,14 +40,15 @@ const Index = () => {
                     <Image src={BlinkEmoji} alt={''}/>
                 </div>
                 <Badge className={'mt-5'}>
-                    <Button rippleColor={'rgba(255,255,255,0.58)'}
+                    <Button onClick={()=>{
+                    router.push('/profile/login')
+                    }} rippleColor={'rgba(255,255,255,0.58)'}
                             className={'bg-primary w-36 h-11 rounded-2xl text-white '}>
                         <span>ورود | ثبت نام</span>
                     </Button>
                 </Badge>
 
                 <Drawer>
-
                     <span className={'IranSansBold text-primary'}>دربارمون</span>
                     <div className={'flex flex-col justify-center items-center IranSans'}>
                         <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
@@ -78,7 +80,7 @@ const Index = () => {
                     </div>
 
 
-                    <div className={'h-32'}></div>
+                    <div className={'h-44'}></div>
 
                 </Drawer>
 

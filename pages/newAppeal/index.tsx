@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
 import Divider from "../../components/view/Divider/Divider";
@@ -10,10 +10,18 @@ import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import {useMutation} from "@apollo/client";
 import {gql} from "@apollo/client";
-import {Token} from "../../store/user";
-import {newItemQuery} from "../../queries/withAuthentication/items";
+import {newAppealQuery} from "../../queries/withAuthentication/appeals";
 import GallerySVG from '../../assets/svgs/gallery.svg'
+import FileUploadSVG from '../../assets/svgs/fileUpload.svg'
+import GalleryImageSVG from '../../assets/svgs/galleryImage.svg'
 import NewPhotoSVG from '../../assets/svgs/newPhoto.svg'
+import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
+import axios from "axios";
+import FileSVG from "../../assets/svgs/file.svg";
+import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
+import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
+import {any} from "prop-types";
+import {UserToken} from "../../store/user";
 
 
 const Index = () => {
@@ -22,19 +30,105 @@ const Index = () => {
     const [lowerPrice, setLower] = useState(10)
     const [upperPrice, setUpper] = useState(300)
     const [hashtags, setHashtags] = useState([] as string[])
+    const [uploadedImages, setUploadedImages] = useState([])
+    const [uploadedFiles, setUpladedFiles] = useState([])
     const [currentStep, setCurrentStep] = useState(0)
-
-    let query = newItemQuery(title, lowerPrice, upperPrice, description, hashtags)
-
-    const [createAd, {data, loading, error}] = useMutation(gql`${query.query}`, {
-        variables: query.variables, context: {
-            headers: {
-                "token": Token()
-            }
-        }
-    })
-
     const router = useRouter()
+    const currentAppealTempId = useRef((Math.random() + 1).toString(36).substring(7))
+
+    let query = newAppealQuery(title, lowerPrice, upperPrice, description, hashtags)
+    const [createAppeal, {
+        data,
+        loading,
+        error
+    }] = useMutation(gql`${query.query}`, {variables: newAppealQuery(title, lowerPrice, upperPrice, description, hashtags).variables})
+
+
+    const uploadImage = (image: any) => {
+        let data = new FormData();
+        data.append('token', UserToken());
+        data.append('file', image);
+        data.append('appealID', currentAppealTempId.current);
+        data.append('uploadedAsFile', '0');
+
+        let config = {
+            method: 'post',
+            url: 'https://apidl.unimun.me/appealUpload.php',
+            headers: {},
+            data: data,
+            onUploadProgress: (progressEvent: any) => {
+                let percentCompleted = Math.round(
+                    (progressEvent.loaded * 100) / progressEvent.total
+                );
+                console.log(percentCompleted)
+            }
+        };
+
+        axios(config)
+            .then(function (response) {
+                console.log((response.data));
+                if (response.data !== 500 && response.data !== 401) {
+                    console.log(response.data.thumbnail)
+                    setUploadedImages([...uploadedImages, `https://dl.unimun.me/${response.data.thumbnail}`])
+                    // let updatedUploadedImages = uploadedImages
+                    // updatedUploadedImages.push(`https://${response.data.thumbnail}`)
+                    // setUploadedImages(updatedUploadedImages)
+                }
+            })
+
+            .catch(function (error) {
+                console.log('errorrrrr')
+                console.log(error);
+            });
+
+    }
+
+    const uploadFile = (file: any) => {
+        console.log(file)
+        let fileName = file.name;
+        let fileSize = file.size;
+
+        console.log(file)
+        let data = new FormData();
+        data.append('token', UserToken());
+        data.append('file', file);
+        data.append('appealID', currentAppealTempId.current.toString());
+        data.append('uploadedAsFile', '1');
+
+        let config = {
+            method: 'post',
+            url: 'https://apidl.unimun.me/appealUpload.php',
+            headers: {},
+            data: data,
+            onUploadProgress: (progressEvent: any) => {
+                let percentCompleted = Math.round(
+                    (progressEvent.loaded * 100) / progressEvent.total
+                );
+                console.log(percentCompleted)
+            }
+        };
+
+        axios(config)
+            .then(function (response) {
+                console.log((response));
+                if (response.data.hasOwnProperty('url')) {
+                    console.log(response.data.url)
+                    setUpladedFiles([...uploadedFiles, [fileName, fileSize]])
+                }
+            })
+
+            .catch(function (error) {
+                console.log('errorrrrr')
+                console.log(error);
+            });
+
+    }
+
+
+    useEffect(() => {
+        // currentAppealTempId.current = Math.floor(Math.random() * 9999999999)
+    }, [])
+
 
     return (
         <div className={'h-full'}>
@@ -171,7 +265,7 @@ const Index = () => {
 
 
                 <Step step={1}>
-                    <div className={'w-full bg-white mt-1 px-4 pb-10 pt-3 new-section'}>
+                    <div className={'w-full bg-white mt-1 px-4 pb-10 pt-3 new-section '}>
                         <span className={'text-textDark text-lg IranSansMedium  '}>توضیحات اضافه</span>
                         <div className={'w-full flex items-center justify-center mt-4 h-40'}>
                             <Input onChange={(e: any) => {
@@ -196,33 +290,105 @@ const Index = () => {
                                 <span className={'IranSans mr-2'}>عکس</span>
                             </div>
 
-                            <span className={'text-primary IranSansMedium text-md'}>{"1/5"}</span>
+                            <span
+                                className={'text-primary IranSansMedium text-md'}>{`${uploadedImages.length}/5`}</span>
                         </div>
 
-                        <div className={'new-photos w-full flex flex-wrap justify-center mt-3'}>
+                        <div
+                            className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-3 max-w-sm mx-auto'}>
+                            <div
+                                className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative mt-4'}>
+                                {
+                                    uploadedImages.length < 5 ?
+                                        <input type={'file'}
+                                               className={'opacity-0 absolute top-0 left-0 w-full h-full '}
+                                               accept={'.png,.jpeg,.jpg'} onInput={(e) => {
+                                            if (e.currentTarget && e.currentTarget.files && e.currentTarget.files.length)
+                                                uploadImage(e.currentTarget.files[0])
+                                        }}/> : null
+                                }
 
-                            <div className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative'}>
                                 <div className={'flex flex-col items-center justify-center'}>
                                     <div className={'h-7 w-7'}><NewPhotoSVG/></div>
                                     <span className={'text-sm IranSansMedium'}>افزودن عکس</span>
                                 </div>
                             </div>
-
-                               <div className={'loaded-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative'}>
-                                <div className={'flex flex-col items-center justify-center'}>
-                                    <div className={'h-7 w-7'}><NewPhotoSVG/></div>
-                                    <span className={'text-sm IranSansMedium'}>افزودن عکس</span>
-                                </div>
-                            </div>
-
+                            {
+                                uploadedImages.map((uploadedImage, index) => {
+                                    return (<div key={`${index}photo`}
+                                                 className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative overflow-hidden mt-4'}>
+                                            <img src={uploadedImage} alt={'Unimun ' + index}
+                                                 className={' w-full h-full'}/>
+                                            <div dir={'ltr'}
+                                                 className={'w-9 h-9  rounded-xl absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col justify-center items-center'}
+                                                 style={{background: 'rgba(255,255,255,0.85)'}}>
+                                                <SVGModifier SVGName={'galleryImage'} elementClass={'number'}
+                                                             value={(index + 1).toString()}>
+                                                    <GalleryImageSVG/>
+                                                </SVGModifier>
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
+                            {Array(5 - uploadedImages.length).fill('').map((photos, index) => {
+                                return (
+                                    <div key={`${index}photo`}
+                                         className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-dashed border-2 mx-3 relative mt-4'}>
+                                        <div className={'flex flex-col items-center justify-center opacity-60'}>
+                                            <div className={'h-7 w-7'}><GallerySVG/></div>
+                                            <span className={'text-sm IranSansMedium'}>عکس</span>
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </div>
 
+
+                        <div className={'flex flex-row justify-between items-center'}>
+                            <div className={'flex flex-row items-center justify-start mt-3'}>
+                                <div className={'h-6 w-6'}>
+                                    <FileUploadSVG/>
+                                </div>
+                                <span className={'IranSans mr-2'}>قایل</span>
+                            </div>
+                            <span
+                                className={'text-primary IranSansMedium text-md'}>{`${uploadedFiles.length}/5`}</span>
+                        </div>
+                        <div
+                            className={'new-file flex flex-col justify-center items-center mt-3 max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
+                            <input type={"file"} className={'absolute w-full h-full top-0 left-0 opacity-0 z-10'}
+                                   onInput={(e) => {
+                                       if (e && e.currentTarget && e.currentTarget.files)
+                                           uploadFile(e.currentTarget.files[0])
+                                   }}/>
+                            <div className={'file w-full flex flex-row justify-between items-center my-3'}>
+                                <div className={'file-right flex flex-row justify-center items-center'}>
+                                    <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><EmptyFileSVG/></div>
+                                    <div className={'IranSansMedium mr-4 opacity-60'}>افزودن فایل</div>
+                                </div>
+                                <div dir={'ltr'} className={'IranSans w-7 h-7 '}><FileUploadSVG/></div>
+                            </div>
+                        </div>
+
+
+                        {uploadedFiles.map((file, index) => {
+                            return (<div key={index+'file'}
+                                className={'new-file flex flex-col justify-center items-center mt-3 max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
+                                <div className={'file w-full flex flex-row justify-between items-center my-3'}>
+                                    <div className={'file-right flex flex-row justify-center items-center'}>
+                                        <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><FileSVG/></div>
+                                        <div className={'IranSansMedium mr-4 opacity-60'}>{file[0]}</div>
+                                    </div>
+                                    <div dir={'ltr'} className={'IranSans w-7 h-7 '}><FileUploadSVG/></div>
+                                </div>
+                            </div>)
+                        })}
+
+                        <div className={'h-32'}></div>
 
                     </div>
-
                 </Step>
-
-
             </StepperFragment>
 
             <div className={'w-full bottom-2 fixed flex flex-row items-center justify-center po'}>
@@ -232,7 +398,8 @@ const Index = () => {
                     if (currentStep !== 1)
                         setCurrentStep(currentStep + 1)
                     else {
-                        createAd()
+                        console.log(createAppeal())
+                        console.log(query)
                     }
                 }}>
                     <div className={'text-white IranSans w-8 '}/>
