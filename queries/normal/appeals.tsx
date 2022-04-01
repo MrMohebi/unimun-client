@@ -4,7 +4,7 @@ import * as queryBuilder from "gql-query-builder";
 
 export const getAppealsQuery = (adParams: string[],searchText?:string) => {
 
-    let variables = {}
+    let variables = {after:'',searchText}
     variables.after = '';
     if (searchText)
         variables.searchText = searchText

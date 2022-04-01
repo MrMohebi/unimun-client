@@ -16,7 +16,7 @@ import FileUploadSVG from '../../assets/svgs/fileUpload.svg'
 import GalleryImageSVG from '../../assets/svgs/galleryImage.svg'
 import NewPhotoSVG from '../../assets/svgs/newPhoto.svg'
 import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
-import axios from "axios";
+import axios, {AxiosRequestConfig} from "axios";
 import FileSVG from "../../assets/svgs/file.svg";
 import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
@@ -30,8 +30,8 @@ const Index = () => {
     const [lowerPrice, setLower] = useState(10)
     const [upperPrice, setUpper] = useState(300)
     const [hashtags, setHashtags] = useState([] as string[])
-    const [uploadedImages, setUploadedImages] = useState([])
-    const [uploadedFiles, setUpladedFiles] = useState([])
+    const [uploadedImages, setUploadedImages] = useState([]as string[])
+    const [uploadedFiles, setUpladedFiles] = useState([['','']] )
     const [currentStep, setCurrentStep] = useState(0)
     const router = useRouter()
     const currentAppealTempId = useRef((Math.random() + 1).toString(36).substring(7))
@@ -51,7 +51,7 @@ const Index = () => {
         data.append('appealID', currentAppealTempId.current);
         data.append('uploadedAsFile', '0');
 
-        let config = {
+        let config:AxiosRequestConfig = {
             method: 'post',
             url: 'https://apidl.unimun.me/appealUpload.php',
             headers: {},
@@ -85,8 +85,8 @@ const Index = () => {
 
     const uploadFile = (file: any) => {
         console.log(file)
-        let fileName = file.name;
-        let fileSize = file.size;
+        let fileName = file.name as string;
+        let fileSize = file.size as string;
 
         console.log(file)
         let data = new FormData();
@@ -95,7 +95,7 @@ const Index = () => {
         data.append('appealID', currentAppealTempId.current.toString());
         data.append('uploadedAsFile', '1');
 
-        let config = {
+        let config:AxiosRequestConfig = {
             method: 'post',
             url: 'https://apidl.unimun.me/appealUpload.php',
             headers: {},
