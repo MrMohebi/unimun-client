@@ -10,7 +10,7 @@ import NewAppealButton from "../NewAppealButton/NewAppealButton";
 import ThousandTomans from '../../../../assets/svgs/thousandTomans.svg'
 import {TailSpin} from "react-loader-spinner";
 import Search from "../Search/Search";
-import _ from 'lodash'
+import * as _ from 'lodash';
 
 const Appeals = () => {
 
