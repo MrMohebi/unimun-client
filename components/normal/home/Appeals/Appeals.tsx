@@ -10,7 +10,7 @@ import NewAppealButton from "../NewAppealButton/NewAppealButton";
 import ThousandTomans from '../../../../assets/svgs/thousandTomans.svg'
 import {TailSpin} from "react-loader-spinner";
 import Search from "../Search/Search";
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 const Appeals = () => {
 
@@ -133,17 +133,17 @@ const Appeals = () => {
                 <div className={'item-left w-1/2 h-full items-start flex flex-col justify-between'}>
                     <div className={'flex-col flex text-right'}>
                                             <span
-                                                className={'IranSansBold text-textBlack text-xl pt-1 whitespace-nowrap'}>{Appeal.title}</span>
+                                                className={'IranSansBold text-textBlack text-lg pt-1 whitespace-nowrap'}>{Appeal.title}</span>
                         <span
                             className={'IranSans text-textDarker mt-2 text-sm'}>{Appeal.details ? Appeal.details : "بدون توضیح"}</span>
                     </div>
                     <div
-                        className={'IranSansMedium text-textBlack whitespace-nowrap text-xl flex flex-row items-center'}>
+                        className={'IranSansMedium text-textBlack whitespace-nowrap text-xl flex flex-row items-end'}>
                         <span className={'mx-1'}>از</span>
                         <span className={'mx-1'}>{Appeal.priceStart / 1000}</span>
                         <span className={'mx-1'}>تا</span>
                         <span className={'mx-1'}>{Appeal.priceEnd / 1000}</span>
-                        <div dir={'ltr'} className={'w-10 h-10'}>
+                        <div dir={'ltr'} className={'w-10 h-10 flex flex-row items-center'}>
                             <ThousandTomans/>
                         </div>
                     </div>
