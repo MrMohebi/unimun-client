@@ -185,7 +185,7 @@ const Appeals = () => {
     }
     return (
         <div className={'h-full'}>
-            <Search onInputChange={_.debounce((e:React.ChangeEvent) => {
+            <Search onInputChange={_.debounce((e:React.ChangeEvent<HTMLInputElement>) => {
                 onSearchInputChange(e)
             }, 900)}/>
             <section onScroll={onAdSectionScroll}
