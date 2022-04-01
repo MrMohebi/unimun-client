@@ -128,7 +128,7 @@ const Appeals = () => {
             <div key={Appeal.title + index} onClick={() => {
                 adOnClick(Appeal)
             }}
-                 className={'item  w-full bg-white rounded-3xl  h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
+                 className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
 
                 <div className={'item-left w-1/2 h-full items-start flex flex-col justify-between'}>
                     <div className={'flex-col flex text-right'}>
@@ -168,7 +168,7 @@ const Appeals = () => {
                                         <span dir={'rtl'}
                                               className={' IranSans'}>{dateConverter(Appeal.createdAt)}</span>
 
-                        <div className={'h-4 border-primary  sm:block border mx-2'}/>
+                        <div className={'h-4 w-0 overflow-hidden border-primary  sm:block border mx-2'}/>
                         <div className={'flex flex-row  items-center justify-center'}>
                             <span className={'IranSans ml-1'}>{Appeal.seen ?? 0}</span>
 
@@ -185,11 +185,11 @@ const Appeals = () => {
     }
     return (
         <div className={'h-full'}>
-            <Search onInputChange={_.debounce((e:React.ChangeEvent<HTMLInputElement>) => {
+            <Search onInputChange={_.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 onSearchInputChange(e)
             }, 900)}/>
             <section onScroll={onAdSectionScroll}
-                     className={'w-full h-full overflow-scroll items-center px-6 pb-20 pt-5'}>
+                     className={'w-full h-full overflow-scroll items-center px-4 pb-20 pt-5'}>
                 <NewAppealButton hidden={newAdHidden}/>
                 {
 
