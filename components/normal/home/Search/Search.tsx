@@ -11,7 +11,7 @@ const Search = (props:Props) => {
     return (
         <div className={'sticky top-0 left-0 px-5 w-full bg-white pt-3 pb-5 rounded-br-xl rounded-bl-xl shadow-md'}>
             <div className={'search-upper flex flex-row justify-between items-center'}>
-                <div className={'IranSansBlack'}><span dir={'ltr'} className={'text-primary'}><span className={'text-textBlack'}>یونیـ</span>مون</span></div>
+                <div className={'IranSansBlack'}><span dir={'ltr'} className={'text-primary'}><span className={'text-textBlack'}>یونیـ</span>مـون</span></div>
                 <div className={'chat rounded-lg bg-background p-1.5 w-10 h-10'}>
                     <NotifSVG/>
                 </div>
