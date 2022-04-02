@@ -12,7 +12,6 @@ const Badge = (props: Props) => {
         <div className={'relative ' + props.className ?? ""}>
             {props.children}
             <div className={`absolute -top-0.5 -right-0.5 border border-2 white rounded-2xl ${props.text?'':'h-3 w-3'}`} style={{background:props.color??'red'}}/>
-
         </div>
     );
 };

@@ -1,27 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-.navbar-button {
-  @apply w-20 flex flex-col items-center justify-center;
-}
-
-.navbar {
-  @apply bg-white w-full fixed bottom-0  h-nav;
-  box-shadow: #d1d1d145 0 -8px 10px 0px;
-}
-
-.nav-active {
-  @apply text-primary;
-}
-
-.nav-indicator {
-  @apply bg-primary;
-  content: " ";
-  position: absolute;
-  width: 40px;
-  height: 4px;
-}
-
 @font-face {
   font-family: "IranSans";
   src: url("/assets/fonts/IranSansFarsiNums/IRANSans(FaNum).ttf");
@@ -52,6 +31,27 @@
 }
 .IranSansBold {
   font-family: IranSansBold;
+}
+
+.navbar-button {
+  @apply w-20 flex flex-col items-center justify-center;
+}
+
+.navbar {
+  @apply bg-white w-full fixed bottom-0  h-nav;
+  box-shadow: #d1d1d145 0 -8px 10px 0px;
+}
+
+.nav-active {
+  @apply text-primary;
+}
+
+.nav-indicator {
+  @apply bg-primary;
+  content: " ";
+  position: absolute;
+  width: 40px;
+  height: 4px;
 }
 
 .icon-background {
@@ -143,6 +143,50 @@ input[type=range]::-webkit-slider-thumb::before {
   background-color: grey;
 }
 
+.VCodeCursor {
+  animation: cursorAnimation 1s infinite ease;
+}
+
+@keyframes cursorAnimation {
+  0% {
+    opacity: 1;
+    transform: scaleX(1) scaleY(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(0.7) scaleY(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(1) scaleY(1);
+  }
+}
+#progressInput {
+  margin: 20px auto;
+  width: 30%;
+}
+
+.circle-background,
+.circle-progress {
+  fill: none;
+}
+
+.circle-background {
+  stroke: #ddd;
+}
+
+.circle-progress {
+  stroke: red;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.circle-text {
+  font-size: 3em;
+  font-weight: bold;
+  fill: red;
+}
+
 .profile-drawer-svg {
   @apply h-7 w-7 pb-10;
 }
@@ -165,7 +209,5 @@ body,
   margin: 0;
   height: 100%;
 }
-
-/*# sourceMappingURL=doubleSlider.css.map */
 
 /*# sourceMappingURL=globals.css.map */

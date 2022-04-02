@@ -7,3 +7,6 @@ export const setToken = (token: string) => {
 export const getToken = () => {
     return window.localStorage.getItem(TOKEN_KEY)??""
 }
+export const removeToken = () => {
+    return window.localStorage.removeItem(TOKEN_KEY)
+}

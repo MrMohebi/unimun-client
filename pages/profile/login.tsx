@@ -6,7 +6,6 @@ import VCodeInput from "../../components/normal/profile/VCodeInput/VCodeInput";
 import {gql, useMutation} from "@apollo/client";
 import {useRouter} from "next/router";
 import {IsLoggedIn, UserToken} from "../../store/user";
-import PostSVG from '../../assets/svgs/post.svg'
 import {SendVCodeQuery, VerifyVCode} from "../../queries/normal/login";
 import {setToken} from "../../helpers/TokenHelper";
 
@@ -16,6 +15,7 @@ const Login = () => {
     const [allowForNextStep, setAllowForNextStep] = useState(false)
     const [vCodeHint, setVCodeHint] = useState(0)
     const [vCodeError, setVCodeError] = useState(false)
+    const [vCodeSuccess, setVcodeSuccess] = useState(false)
     const [vCode, setVCode] = useState("")
     const [referenceCode, setReferenceCode] = useState("")
     const router = useRouter()
@@ -23,6 +23,7 @@ const Login = () => {
 
     const [sendVcode, sendVCodeResult] = useMutation(gql`${SendVCodeQuery(phoneNumber).query}`, {variables: SendVCodeQuery(phoneNumber).variables})
     const [verifyVCode, verifyVCodeResult] = useMutation(gql`${VerifyVCode(phoneNumber,vCode,referenceCode).query}`, {variables: VerifyVCode(phoneNumber, vCode, referenceCode).variables})
+    const [verifyReferral, verifyReferralResult] = useMutation(gql`${VerifyVCode(phoneNumber,vCode,referenceCode).query}`, {variables: VerifyVCode(phoneNumber, vCode, referenceCode).variables})
     // const [setName, setNameResult] = useMutation(gql`${VerifyVCode.query}`, {variables: VerifyVCode.variables})
 
     let phoneNumberValidation = (phone: string) => {
@@ -73,9 +74,7 @@ const Login = () => {
     }
     useEffect(() => {
 
-
         if (sendVCodeResult.data) {
-            console.log(sendVCodeResult)
             if (sendVCodeResult.data.sendVCode.data.vCode) {
                 setVCodeHint(parseInt(sendVCodeResult.data.sendVCode.data.vCode[0]))
             }
@@ -92,10 +91,16 @@ const Login = () => {
                 setStep(3)
             }
             if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && !sendVCodeResult.data.sendVCode.data.isSignup) {
-                IsLoggedIn(true)
-                UserToken(verifyVCodeResult.data.verifyVCode.data.token)
-                setToken(verifyVCodeResult.data.verifyVCode.data.token)
-                router.push('/')
+                setVcodeSuccess(true)
+                setTimeout(() => {
+                    IsLoggedIn(true)
+                    UserToken(verifyVCodeResult.data.verifyVCode.data.token)
+                    setToken(verifyVCodeResult.data.verifyVCode.data.token)
+                    router.push('/')
+                }, 1000)
+
+            } else {
+                setVCodeError(true)
             }
         }
 
@@ -127,6 +132,8 @@ const Login = () => {
     return (
         <div dir={'rtl'} className={'w-full'}>
             <Header backOnClick={() => {
+
+                setVCodeError(false)
                 if (currentStep === 0)
                     router.push('/')
                 if (currentStep === 1) {
@@ -144,18 +151,19 @@ const Login = () => {
 
             }} alignment={'rtl'} title={'ورود به یونیمون'} back={true}/>
             <div className={'w-full px-5 pt-4'}>
-                <span id={'login-title'} className={'IranSansMedium text-lg'}>{steps[currentStep]?.title}</span>
+                <span id={'login-title'} className={'IranSansMedium text-l'}>{steps[currentStep]?.title}</span>
                 <br/>
                 <div className={'px-2 mt-2'}>
                     <span id={'login-description'}
-                          className={'IranSansMedium text-sm text-textSecondary'}>{steps[currentStep]?.description}</span>
+                          className={'IranSans text-textBlack text-sm text-textSecondary'}>{steps[currentStep]?.description}</span>
                 </div>
 
                 {
                     currentStep === 0 ?
                         <div>
                             <Input id={'1'}
-                                   wrapperClassName={`mt-5 ${currentStep === 0 ? "opacity-100" : 'opacity-0'} transition-all h-14 duration-400`}
+                                   wrapperClassName={`mt-5 ${currentStep === 0 ? "opacity-100" : 'opacity-0'} transition-all h-14 duration-400 text`}
+                                   inputClassName={'text-center text-lg'}
                                    numOnly={true}
                                    onChange={(e: any) => {
                                        if (phoneNumberValidation(e.currentTarget.value)) {
@@ -174,11 +182,11 @@ const Login = () => {
                                        wrapperClassName={`mt-5 transition-all h-14 duration-400`}
                                        numOnly={false}
                                        dir={'ltr'}
-                                       inputClassName={'text-center'} labelText={'خب اگه کد دعوت نداشتیم چیکار کنیم ؟'}
-
+                                       inputClassName={'text-center'}
                                        onChange={(e: any) => {
                                            e.currentTarget.value = e.currentTarget.value.toUpperCase()
-                                           setReferenceCode(e.currentTarget.value.toString)
+                                           setReferenceCode(e.currentTarget.value)
+                                           console.log(referenceCode)
 
                                            if (e.currentTarget.value.length > 0) {
                                                setAllowForNextStep(true)
@@ -189,32 +197,43 @@ const Login = () => {
 
                                 />
                                 <div className={'mt-6 IranSans text-sm px-3 text-textDark'}>
-                                    اصلا نگران نباشید پایین صفحه رو نگا کنید
+                                    خب اگه کد دعوت نداشتیم چیکار کنیم ؟
                                     <br/>
-                                    همین الان میتونین یه تک پا به پیجمون برید و یه کد دعوت برا خودتون پیدا کنید
+                                    <br/>
+
+                                    اصلا نگران نباشید پایین صفحه رو نگا کنید :)
+                                    <br/>
 
                                 </div>
 
-                                <div dir={'ltr'} className={'max-w-sm   w-full pb-20 IranSans '}>
-                                    <PostSVG/>
-                                </div>
+
+                                <img src="/assets/image/postbox.png" alt="Unimun referral"
+                                     className={'w-full fixed bottom-14 left-1/2 -translate-x-1/2 '}/>
+
+                                {/*<div dir={'ltr'} className={'max-w-sm   w-full pb-20 IranSans '}>*/}
+                                {/*    <PostSVG/>*/}
+                                {/*</div>*/}
                             </div>
 
 
                             : currentStep === 2 ?
-                                <VCodeInput hint={vCodeHint} stepBack={stepBack} success={codeValidation(vCode)}
-                                            err={vCodeError}
-                                            onChange={(code: string) => {
-                                                setVCodeError(false)
-                                                if (codeValidation(code)) {
-                                                    setVCode(code)
+                                <div>
+                                    <VCodeInput hint={vCodeHint} stepBack={stepBack} success={vCodeSuccess}
+                                                err={vCodeError}
+                                                onChange={(code: string) => {
+                                                    console.log(code)
+                                                    setVCodeError(false)
+                                                    if (codeValidation(code)) {
+                                                        setVCode(code)
+                                                        setAllowForNextStep(true)
+                                                    } else {
+                                                        setAllowForNextStep(false)
+                                                    }
+                                                }} length={4}/>
 
-                                                    setAllowForNextStep(true)
 
-                                                } else {
-                                                    setAllowForNextStep(false)
-                                                }
-                                            }} length={4}/>
+                                </div>
+
                                 :
                                 currentStep === 3 ?
                                     <Input id={'1'}
@@ -234,24 +253,42 @@ const Login = () => {
                 }
 
             </div>
-            <div className={'w-full px-3 flex flex-row h-10 items-center fixed bottom-2'}>
+            <div className={'w-full px-3 flex flex-row h-10 items-center fixed bottom-4'}>
                 <div
-                    className={`${currentStep === 0 ? 'w-2/4 opacity-100 px-3' : ' opacity-0 w-0p h-0p  '} h-14 overflow-hidden  text-center transition-all float-right duration-500 `}>
+                    className={`${currentStep === 0 ? 'w-2/3 opacity-100 px-1' : ' opacity-0 w-0p h-0p'} h-14 overflow-hidden flex flex-row items-center justify-center  text-center transition-all float-right duration-500 `}
+                    style={{fontSize: "5vmin"}}>
                     <span className={'IranSansMedium text-tiny'}>با ورود به <span
-                        className={'text-primary'}>یـونـیـمـون</span> ، <span
-                        className={'text-primary'}>شـرایـط</span> و <span
+                        className={'text-black'}>یـونـیـمـون</span> ، <span
+                        className={'text-primary'}>شـرایـط</span>  و <br/><span
                         className={'text-primary'}>قوانین حریم ‌خصوصی</span> را می‌ پذیرم</span>
                 </div>
                 <Button loading={sendVCodeResult.loading || verifyVCodeResult.loading} onClick={() => {
-                    if (currentStep === 0) {
-                        sendVcode()
+                    if (!vCodeError) {
+                        if (currentStep === 0) {
+                            sendVcode()
+                        }
+                        if (currentStep === 1) {
+                            nextStep()
+                        }
+
+                        if (currentStep === 2 && codeValidation(vCode)) {
+                            verifyVCode()
+                        }
+                    } else {
+                        setVCodeError(false)
                     }
-                    if (currentStep === 2 && codeValidation(vCode)) {
-                        verifyVCode()
-                    }
-                }} disabled={!allowForNextStep || vCodeError} rippleColor={'rgba(255,255,255,0.62)'}
-                        className={`${currentStep === 0 ? 'w-2/4' : 'w-full'} ${allowForNextStep && !vCodeError ? 'bg-primary' : 'bg-textDark'} transition-all duration-500 h-12 rounded-xl`}>
-                    <span className={'text-md text-white IranSansMedium'}>تایید</span>
+
+                }} disabled={!allowForNextStep} rippleColor={'rgba(255,255,255,0.62)'}
+                        className={`${currentStep === 0 ? 'w-2/4' : 'w-full'}  ${allowForNextStep && !vCodeError ? 'bg-primary' :  !vCodeError? 'bg-textDark' : ''} ${vCodeError && currentStep === 2 ? 'bg-errorRed' : ''} transition-all text-md duration-500 h-14 rounded-xl `}>
+                    <span className={'text-md text-white IranSansMedium'}>
+
+                        {
+                            vCodeError && currentStep===2 ? "تلاش مجدد"
+                                :
+                                "تایید"
+                        }
+
+                    </span>
                 </Button>
             </div>
         </div>

@@ -1,52 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "components/navbar";
+
 @import "fonts";
+@import "components/navbar";
 @import "components/icon";
 @import "components/ripple";
 @import 'components/doubleSlider';
+@import 'components/VCodeInput';
+@import "components/circularProgressBar";
 @import "pages/profile";
-
 
 
 html,
 body {
-  direction:rtl;
+  direction: rtl;
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
   Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
-body{
+
+body {
   background-color: #F6F8FA;
 }
+
 html,
 body,
-#__next{
+#__next {
   margin: 0;
   height: 100%;
 }
-//
-//#__next {
-//  position: absolute;
-//  top: 0;
-//  bottom: 0;
-//  left: 0;
-//  right: 0;
-//}
-//a {
-//  color: inherit;
-//  text-decoration: none;
-//}
-//
-//* {
-//  box-sizing: border-box;
-//}
-//
-//
 
-/*# sourceMappingURL=doubleSlider.css.map */
 
 
 

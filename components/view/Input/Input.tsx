@@ -13,7 +13,8 @@ interface Props {
     onChange?: any,
     multiLine?:boolean,
     autoFocus?:boolean,
-    defaultValue?:string
+    defaultValue?:string,
+    textAlignment?:string
 }
 
 const Input = ({id, wrapperClassName,inputClassName, dir, numOnly, labelText, maxLength, onChange,multiLine,autoFocus,defaultValue}: Props) => {

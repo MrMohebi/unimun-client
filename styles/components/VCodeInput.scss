@@ -1,0 +1,20 @@
+.VCodeCursor{
+  animation:cursorAnimation 1s infinite  ease;
+  //border-radius: 1rem;
+
+}
+
+@keyframes cursorAnimation {
+  0%{
+    opacity: 1;
+    transform: scaleX(1) scaleY(1);
+  }
+  50%{
+    opacity: 1;
+    transform: scaleX(0.7) scaleY(1);
+  }
+  100%{
+    opacity: 1;
+    transform: scaleX(1) scaleY(1);
+  }
+}

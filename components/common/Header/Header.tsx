@@ -30,7 +30,7 @@ const Header = ({alignment, back, title, children, backOnClick}: Props) => {
             {
                 title ?
                     <div className={'px-2 -mt-2'}>
-                        <span className={'IranSansMedium text-md '}>{title} </span>
+                        <span className={'IranSansMedium text-sm '}>{title} </span>
                     </div>
                     :
                     null

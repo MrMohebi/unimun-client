@@ -1,3 +1,14 @@
+.VCodeCursor {
+  animation: cursorAnimation 1s infinite;
+}
 
+@keyframes cursorAnimation {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
 
 /*# sourceMappingURL=VCodeInput.css.map */

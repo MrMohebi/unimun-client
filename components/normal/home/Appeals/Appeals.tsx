@@ -138,12 +138,12 @@ const Appeals = () => {
                             className={'IranSans text-textDarker mt-2 text-sm'}>{Appeal.details ? Appeal.details : "بدون توضیح"}</span>
                     </div>
                     <div
-                        className={'IranSansMedium text-textBlack whitespace-nowrap text-xl flex flex-row items-end'}>
-                        <span className={'mx-1'}>از</span>
-                        <span className={'mx-1'}>{Appeal.priceStart / 1000}</span>
-                        <span className={'mx-1'}>تا</span>
-                        <span className={'mx-1'}>{Appeal.priceEnd / 1000}</span>
-                        <div dir={'ltr'} className={'w-10 h-10 flex flex-row items-center'}>
+                        className={'IranSansMedium text-textBlack whitespace-nowrap text-xl pt-2  flex flex-row items-end'}>
+                        <span className={'mx-0.5  flex flex-row items-end'}>از</span>
+                        <span className={'mx-0.5  flex flex-row items-end'}>{Appeal.priceStart / 1000}</span>
+                        <span className={'mx-0.5  flex flex-row items-end'}>تا</span>
+                        <span className={'mx-0.5  flex flex-row items-end'}>{Appeal.priceEnd / 1000}</span>
+                        <div dir={'ltr'} className={'w-12 h-12 flex flex-row mb-1 items-end'}>
                             <ThousandTomans/>
                         </div>
                     </div>
@@ -168,7 +168,7 @@ const Appeals = () => {
                                         <span dir={'rtl'}
                                               className={' IranSans'}>{dateConverter(Appeal.createdAt)}</span>
 
-                        <div className={'h-4 w-0 overflow-hidden border-primary  sm:block border mx-2'}/>
+                        <div className={'h-4 w-0 overflow-hidden border-primary bg-primary  sm:block border mx-2'}/>
                         <div className={'flex flex-row  items-center justify-center'}>
                             <span className={'IranSans ml-1'}>{Appeal.seen ?? 0}</span>
 
