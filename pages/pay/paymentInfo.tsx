@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import PaymentBaseSVG from '../../assets/svgs/paymentTicket.svg'
 import Button from "../../components/view/Button/Button";
 

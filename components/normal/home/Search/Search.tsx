@@ -1,5 +1,4 @@
 import React from 'react';
-import ChatSVG from '../../../../assets/svgs/chat.svg'
 import NotifSVG from '../../../../assets/svgs/notif.svg'
 import SearchSVG from '../../../../assets/svgs/search.svg'
 import CitySVG from '../../../../assets/svgs/city.svg'

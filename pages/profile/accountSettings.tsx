@@ -6,7 +6,7 @@ import VerifySVG from '../../assets/svgs/verify.svg';
 import LogoutSVG from '../../assets/svgs/logout.svg';
 import {useRouter} from "next/router";
 import {IsLoggedIn, UserToken} from "../../store/user";
-import {removeToken, setToken} from "../../helpers/TokenHelper";
+import {removeToken} from "../../helpers/TokenHelper";
 
 const AccountSettings = () => {
 

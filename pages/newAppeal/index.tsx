@@ -18,9 +18,7 @@ import NewPhotoSVG from '../../assets/svgs/newPhoto.svg'
 import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
 import axios, {AxiosRequestConfig} from "axios";
 import FileSVG from "../../assets/svgs/file.svg";
-import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
-import {any} from "prop-types";
 import {UserToken} from "../../store/user";
 
 
