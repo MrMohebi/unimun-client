@@ -30,18 +30,30 @@ const Index = () => {
     const [lowerPrice, setLower] = useState(10)
     const [upperPrice, setUpper] = useState(300)
     const [hashtags, setHashtags] = useState([] as string[])
-    const [uploadedImages, setUploadedImages] = useState([]as string[])
-    const [uploadedFiles, setUpladedFiles] = useState([['','']] )
+    const [uploadedImages, setUploadedImages] = useState([] as string[])
+    const [uploadedFiles, setUpladedFiles] = useState([] as string[])
     const [currentStep, setCurrentStep] = useState(0)
     const router = useRouter()
     const currentAppealTempId = useRef((Math.random() + 1).toString(36).substring(7))
 
-    let query = newAppealQuery(title, lowerPrice, upperPrice, description, hashtags)
+    let createFiles = ()=>{
+
+        let files=[]as any;
+        uploadedImages.forEach(image=>{
+            files.push(JSON.parse(image))
+        })
+        uploadedFiles.forEach(file=>{
+            files.push(JSON.parse(file))
+        })
+    return files
+    }
+
+    let query = newAppealQuery(title, lowerPrice, upperPrice, description, hashtags,createFiles())
     const [createAppeal, {
         data,
         loading,
         error
-    }] = useMutation(gql`${query.query}`, {variables: newAppealQuery(title, lowerPrice, upperPrice, description, hashtags).variables})
+    }] = useMutation(gql`${query.query}`, {variables: query.variables})
 
 
     const uploadImage = (image: any) => {
@@ -51,7 +63,7 @@ const Index = () => {
         data.append('appealID', currentAppealTempId.current);
         data.append('uploadedAsFile', '0');
 
-        let config:AxiosRequestConfig = {
+        let config: AxiosRequestConfig = {
             method: 'post',
             url: 'https://apidl.unimun.me/appealUpload.php',
             headers: {},
@@ -69,10 +81,9 @@ const Index = () => {
                 console.log((response.data));
                 if (response.data !== 500 && response.data !== 401) {
                     console.log(response.data.thumbnail)
-                    setUploadedImages([...uploadedImages, `https://dl.unimun.me/${response.data.thumbnail}`])
+                    setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
                     // let updatedUploadedImages = uploadedImages
                     // updatedUploadedImages.push(`https://${response.data.thumbnail}`)
-                    // setUploadedImages(updatedUploadedImages)
                 }
             })
 
@@ -95,7 +106,7 @@ const Index = () => {
         data.append('appealID', currentAppealTempId.current.toString());
         data.append('uploadedAsFile', '1');
 
-        let config:AxiosRequestConfig = {
+        let config: AxiosRequestConfig = {
             method: 'post',
             url: 'https://apidl.unimun.me/appealUpload.php',
             headers: {},
@@ -113,7 +124,7 @@ const Index = () => {
                 console.log((response));
                 if (response.data.hasOwnProperty('url')) {
                     console.log(response.data.url)
-                    setUpladedFiles([...uploadedFiles, [fileName, fileSize]])
+                    setUpladedFiles([...uploadedFiles, JSON.stringify(response.data)])
                 }
             })
 
@@ -317,7 +328,7 @@ const Index = () => {
                                 uploadedImages.map((uploadedImage, index) => {
                                     return (<div key={`${index}photo`}
                                                  className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative overflow-hidden mt-4'}>
-                                            <img src={uploadedImage} alt={'Unimun ' + index}
+                                            <img src={`https://dl.unimun.me/${JSON.parse(uploadedImage).thumbnail}`} alt={'Unimun ' + index}
                                                  className={' w-full h-full'}/>
                                             <div dir={'ltr'}
                                                  className={'w-9 h-9  rounded-xl absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col justify-center items-center'}
@@ -373,12 +384,12 @@ const Index = () => {
 
 
                         {uploadedFiles.map((file, index) => {
-                            return (<div key={index+'file'}
-                                className={'new-file flex flex-col justify-center items-center mt-3 max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
+                            return (<div key={index + 'file'}
+                                         className={'new-file flex flex-col justify-center items-center mt-3 max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
                                 <div className={'file w-full flex flex-row justify-between items-center my-3'}>
                                     <div className={'file-right flex flex-row justify-center items-center'}>
                                         <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><FileSVG/></div>
-                                        <div className={'IranSansMedium mr-4 opacity-60'}>{file[0]}</div>
+                                        <div className={'IranSansMedium mr-4 opacity-60'}>{(JSON.parse(file).url).split('/').reverse()[0]}</div>
                                     </div>
                                     <div dir={'ltr'} className={'IranSans w-7 h-7 '}><FileUploadSVG/></div>
                                 </div>

@@ -17,7 +17,7 @@ const AccountSettings = () => {
         IsLoggedIn(false)
         removeToken()
         UserToken('')
-        router.push('/')
+        router.push('/profile/login')
     }
     return (
         <div>

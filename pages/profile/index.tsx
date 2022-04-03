@@ -26,16 +26,17 @@ const Index = () => {
     const router = useRouter()
 
     console.log(getUserQuery().query);
-    const [getUser, {data,loading,error}] = useLazyQuery(gql`${getUserQuery().query}`)
-    const [progressPercentage,setProgressPercentage] = useState(0)
+    const [getUser, {data, loading, error}] = useLazyQuery(gql`${getUserQuery().query}`)
+    const [progressPercentage, setProgressPercentage] = useState(0)
 
     if (data)
         console.log(data
         )
-    useEffect(()=>{
-        getUser()
+    useEffect(() => {
+        if (UserToken())
+            getUser()
 
-    },[])
+    }, [])
 
 
     return (
@@ -60,45 +61,50 @@ const Index = () => {
                     </div>
                 </div>
 
-                {UserToken()?
-                    data?
-                    <div className={'contents'}>
-                        <div className={'w-full flex flex-col justify-center items-center'}>
-                            <span className={'mt-3 IranSansBold text-lg'}>{data.name??"بدون نام"}</span>
-                            <span className={'mt-1 IranSans text-sm text-textDark'}>{data.name??"بدون نام"}</span>
-                        </div>
-
-
-                        <div className={'w-full flex flex-row justify-between items-center px-4 mt-4'}>
-                            <div className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
-                                <span className={'text-primary IranSansBold text-xl'}>0</span>
-                                <span className={'text-primary IranSansBold text-tiny'}>آگهی</span>
-                                <span className={'text-textBlack IranSansBold text-sm'}>انجام شده</span>
-                            </div>
-                             <div className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
-                                {/*<span className={'text-primary IranSansBold text-xl'}>0</span>*/}
-                                {/*<span className={'text-primary IranSansBold text-tiny'}>آگهی</span>*/}
-                                 <CircularProgressBar sqSize={60} strokeWidth={2} percentage={progressPercentage} color={'#1da1f2'}/>
-                                 <span className={'text-textBlack IranSansBold text-sm mt-3'}>سطح</span>
-
-                             </div>
-                             <div className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
-                                <span className={'text-primary IranSansBold text-xl'}>0</span>
-                                <span className={'text-primary IranSansBold text-tiny'}>سوال</span>
-                                <span className={'text-textBlack IranSansBold text-sm'}>پاسخ داده</span>
+                {UserToken() ?
+                    data ?
+                        <div className={'contents'}>
+                            <div className={'w-full flex flex-col justify-center items-center'}>
+                                <span className={'mt-3 IranSansBold text-lg'}>{data.name ?? "بدون نام"}</span>
+                                <span className={'mt-1 IranSans text-sm text-textDark'}>{data.name ?? "بدون نام"}</span>
                             </div>
 
-                        </div>
 
-                        <div className={'px-4 w-full mt-4'}>
-                            <Button rippleColor={'rgba(22,155,255,0.5)'} className={'w-full border-2 border-primary rounded-lg h-10 text-primary'}>
-                                <span>ویرایش نمایه</span>
-                            </Button>
-                        </div>
+                            <div className={'w-full flex flex-row justify-between items-center px-4 mt-4'}>
+                                <div
+                                    className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
+                                    <span className={'text-primary IranSansBold text-xl'}>0</span>
+                                    <span className={'text-primary IranSansBold text-tiny'}>آگهی</span>
+                                    <span className={'text-textBlack IranSansBold text-sm'}>انجام شده</span>
+                                </div>
+                                <div
+                                    className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
+                                    {/*<span className={'text-primary IranSansBold text-xl'}>0</span>*/}
+                                    {/*<span className={'text-primary IranSansBold text-tiny'}>آگهی</span>*/}
+                                    <CircularProgressBar sqSize={60} strokeWidth={2} percentage={progressPercentage}
+                                                         color={'#1da1f2'}/>
+                                    <span className={'text-textBlack IranSansBold text-sm mt-3'}>سطح</span>
+
+                                </div>
+                                <div
+                                    className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
+                                    <span className={'text-primary IranSansBold text-xl'}>0</span>
+                                    <span className={'text-primary IranSansBold text-tiny'}>سوال</span>
+                                    <span className={'text-textBlack IranSansBold text-sm'}>پاسخ داده</span>
+                                </div>
+
+                            </div>
+
+                            <div className={'px-4 w-full mt-4'}>
+                                <Button rippleColor={'rgba(22,155,255,0.5)'}
+                                        className={'w-full border-2 border-primary rounded-lg h-10 text-primary'}>
+                                    <span>ویرایش نمایه</span>
+                                </Button>
+                            </div>
 
 
-                    </div>:
-                    <div>noData</div>
+                        </div> :
+                        <div>noData</div>
                     :
                     <div className={'contents'}>
                         <div className={'w-full flex flex-col justify-center items-center'}>
@@ -123,14 +129,16 @@ const Index = () => {
 
                 <Drawer closedHeight={170}>
                     {
-                        UserToken()?
+                        UserToken() ?
                             <div className={'mb-4'}>
                                 <span className={'IranSansBold text-primary'}>حساب</span>
                                 <Link passHref={true} href={'/profile/accountSettings'}>
                                     <div className={'flex flex-col justify-center items-center IranSans'}>
                                         <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                                             <div className={'profile-drawer-svg'}><SettingsSVG/></div>
-                                            <div className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>تنظیمات</div>
+                                            <div
+                                                className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>تنظیمات
+                                            </div>
                                         </button>
                                     </div>
                                 </Link>
@@ -139,33 +147,45 @@ const Index = () => {
                                 <div className={'flex flex-col justify-center items-center IranSans'}>
                                     <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                                         <div className={'profile-drawer-svg'}><MyAppealsSVG/></div>
-                                        <div className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>اگهی های من</div>
+                                        <div
+                                            className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>اگهی
+                                            های من
+                                        </div>
                                     </button>
                                 </div>
 
                                 <div className={'flex flex-col justify-center items-center IranSans'}>
                                     <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                                         <div className={'profile-drawer-svg'}><BookSVG/></div>
-                                        <div className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>کتاب های من</div>
+                                        <div
+                                            className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>کتاب
+                                            های من
+                                        </div>
                                     </button>
                                 </div>
 
                                 <div className={'flex flex-col justify-center items-center IranSans'}>
                                     <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                                         <div className={'profile-drawer-svg'}><PeopleSVG/></div>
-                                        <div className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>دعوت از دوستان</div>
+                                        <div
+                                            className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>دعوت
+                                            از دوستان
+                                        </div>
                                     </button>
                                 </div>
 
                                 <div className={'flex flex-col justify-center items-center IranSans'}>
                                     <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                                         <div className={'profile-drawer-svg'}><SaveSVG/></div>
-                                        <div className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>نشان ها و یاداشت ها</div>
+                                        <div
+                                            className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>نشان
+                                            ها و یاداشت ها
+                                        </div>
                                     </button>
                                 </div>
 
                             </div>
-                            :null
+                            : null
                     }
 
                     <span className={'IranSansBold text-primary '}>دربارمون</span>

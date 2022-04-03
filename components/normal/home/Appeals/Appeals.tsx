@@ -1,16 +1,19 @@
 import React, {useEffect, useRef, useState} from 'react';
 import Eye from "../../../../assets/svgCodes/Eye";
-import {gql, useLazyQuery} from "@apollo/client";
-import {IsLoggedIn} from "../../../../store/user";
-
+import {gql, useLazyQuery, useReactiveVar} from "@apollo/client";
+import Link from 'next/link'
 import {useRouter} from "next/router";
-import {currentAd} from "../../../../store/ads";
+import {currentAd, lastGottenAppeals} from "../../../../store/appeals";
 import {getAppealsQuery} from "../../../../queries/normal/appeals";
 import NewAppealButton from "../NewAppealButton/NewAppealButton";
 import ThousandTomans from '../../../../assets/svgs/thousandTomans.svg'
 import {TailSpin} from "react-loader-spinner";
 import Search from "../Search/Search";
 import _ from 'lodash';
+import Skeleton from "react-loading-skeleton";
+import {SkeletonTheme} from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
 
 const Appeals = () => {
 
@@ -28,26 +31,30 @@ const Appeals = () => {
     const scrollEnd = useRef(false)
 
 
-    const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen'])
+    const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen', 'id'])
     const [getAppeals, {
         data,
         loading,
         error
     }] = useLazyQuery(gql`${AppealsQuery.query}`);
 
+    const lastGottenAppealsState = useReactiveVar(lastGottenAppeals)
     useEffect(() => {
         if (!data && !loading) {
             getAppeals()
                 .then((e) => {
                     if (e.error === undefined) {
-                        setAppeals(e.data.appeals.edges)
+                        console.log(e)
+                        if (e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
+                            console.log(e)
+                            setAppeals(e.data.appeals.edges)
+                            lastGottenAppeals(e.data.appeals.edges)
+                        }
                     } else {
                         console.log('we have error then')
                     }
-
                 })
         }
-
         if (lastCursor) {
 
         }
@@ -123,30 +130,26 @@ const Appeals = () => {
         console.log(error)
     }
 
-    const appealUI = (Appeal: any, index: number) => {
-        return (
-            <div key={Appeal.title + index} onClick={() => {
-                adOnClick(Appeal)
-            }}
-                 className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
+    const appealsSkeleton = ()=>{
 
+
+        return(
+
+            <div
+                 className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
+                <SkeletonTheme baseColor="#202020" highlightColor="#444">
+                    <p>
+                        <Skeleton count={3} />
+                    </p>
+                </SkeletonTheme>
                 <div className={'item-left w-1/2 h-full items-start flex flex-col justify-between'}>
                     <div className={'flex-col flex text-right'}>
                                             <span
-                                                className={'IranSansBold text-textBlack text-lg pt-1 whitespace-nowrap'}>{Appeal.title}</span>
+                                                className={'IranSansBold text-textBlack text-lg pt-1 whitespace-nowrap'}><Skeleton/></span>
                         <span
-                            className={'IranSans text-textDarker mt-2 text-sm'}>{Appeal.details ? Appeal.details : "بدون توضیح"}</span>
+                            className={'IranSans text-textDarker mt-2 text-sm'}><Skeleton/> <div></div></span>
                     </div>
-                    <div
-                        className={'IranSansMedium text-textBlack whitespace-nowrap text-xl pt-2  flex flex-row items-end'}>
-                        <span className={'mx-0.5  flex flex-row items-end'}>از</span>
-                        <span className={'mx-0.5  flex flex-row items-end'}>{Appeal.priceStart / 1000}</span>
-                        <span className={'mx-0.5  flex flex-row items-end'}>تا</span>
-                        <span className={'mx-0.5  flex flex-row items-end'}>{Appeal.priceEnd / 1000}</span>
-                        <div dir={'ltr'} className={'w-12 h-12 flex flex-row mb-1 items-end'}>
-                            <ThousandTomans/>
-                        </div>
-                    </div>
+                    <Skeleton/>
                 </div>
 
                 <div className={'item-right w-1/2 h-full items-end justify-between flex flex-col'}>
@@ -165,26 +168,78 @@ const Appeals = () => {
                     </div>
                     <div
                         className={' flex flex-row-reverse items-center justify-center whitespace-nowrap text-sm'}>
-                                        <span dir={'rtl'}
-                                              className={' IranSans'}>{dateConverter(Appeal.createdAt)}</span>
-
-                        <div className={'h-4 w-0 overflow-hidden border-primary bg-primary  sm:block border mx-2'}/>
-                        <div className={'flex flex-row  items-center justify-center'}>
-                            <span className={'IranSans ml-1'}>{Appeal.seen ?? 0}</span>
-
-                            <div className={'h-4 w-4 ml-1'}>
-                                {Eye}
-                            </div>
-                        </div>
+                           <Skeleton/>
                     </div>
                 </div>
 
-
             </div>
+
+        )
+    }
+
+    const appealUI = (Appeal: any, index: number) => {
+        return (
+            <Link href={`/appeal/${Appeal.id}`}>
+
+                <div key={Appeal.title + index}
+                     className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
+
+                    <div className={'item-left w-1/2 h-full items-start flex flex-col justify-between'}>
+                        <div className={'flex-col flex text-right'}>
+                                            <span
+                                                className={'IranSansBold text-textBlack text-lg pt-1 whitespace-nowrap'}>{Appeal.title}</span>
+                            <span
+                                className={'IranSans text-textDarker mt-2 text-sm'}>{Appeal.details ? Appeal.details : "بدون توضیح"}</span>
+                        </div>
+                        <div
+                            className={'IranSansMedium text-textBlack whitespace-nowrap text-xl pt-2  flex flex-row items-end'}>
+                            <span className={'mx-0.5  flex flex-row items-end'}>از</span>
+                            <span className={'mx-0.5  flex flex-row items-end'}>{Appeal.priceStart / 1000}</span>
+                            <span className={'mx-0.5  flex flex-row items-end'}>تا</span>
+                            <span className={'mx-0.5  flex flex-row items-end'}>{Appeal.priceEnd / 1000}</span>
+                            <div dir={'ltr'} className={'w-12 h-12 flex flex-row mb-1 items-end'}>
+                                <ThousandTomans/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className={'item-right w-1/2 h-full items-end justify-between flex flex-col'}>
+                        <div>
+                            <div className={'w-10 h-10'}>
+                                {/*_________Note_________*/}
+                                {/*{Note}*/}
+                            </div>
+                        </div>
+                        <div>
+                            <div className={'w-auto h-16'}>
+                                {/*Instantaneous*/}
+
+                                {/*{Instantaneous}*/}
+                            </div>
+                        </div>
+                        <div
+                            className={' flex flex-row-reverse items-center justify-center whitespace-nowrap text-sm'}>
+                                        <span dir={'rtl'}
+                                              className={' IranSans'}>{dateConverter(Appeal.createdAt)}</span>
+
+                            <div className={'h-4 w-0 overflow-hidden border-primary bg-primary  sm:block border mx-2'}/>
+                            <div className={'flex flex-row  items-center justify-center'}>
+                                <span className={'IranSans ml-1'}>{Appeal.seen ?? 0}</span>
+
+                                <div className={'h-4 w-4 ml-1'}>
+                                    {Eye}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </Link>
+
         )
     }
     return (
-        <div className={'h-full'}>
+        <div className={'h-full overflow-hidden'}>
             <Search onInputChange={_.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 onSearchInputChange(e)
             }, 900)}/>
@@ -201,14 +256,26 @@ const Appeals = () => {
                             }
                         )
                         :
-                        appeals && !nothingFound ?
+                        appeals.length && !nothingFound ?
                             appeals.map((ad: any, index: number) => {
                                     let Appeal = ad.node
                                     return (appealUI(Appeal, index)
                                     )
                                 }
                             )
-                            : null
+                            : lastGottenAppealsState ?
+                                lastGottenAppealsState.map((ad: any, index: number) => {
+                                        let Appeal = ad.node
+                                        return (appealUI(Appeal, index)
+                                        )
+                                    }
+                                ):null
+
+                }
+                {
+                    // !lastGottenAppealsState.length && appeals.length?
+                        appealsSkeleton()
+                        // null
                 }
                 {!reachedEndState || loading ?
                     <div className={'w-full flex flex-col items-center justify-center mt-20'}>
