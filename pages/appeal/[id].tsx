@@ -4,15 +4,19 @@ import {gql, useLazyQuery} from "@apollo/client";
 import {getAppealQuery} from "../../queries/normal/appeals";
 import Header from "../../components/common/Header/Header";
 import Skeleton from "react-loading-skeleton";
+
 import Divider from "../../components/view/Divider/Divider";
 import Tab from "../../components/view/Tab/Tab";
 import FileSVG from "../../assets/svgs/file.svg";
 import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
 import ThousandTomans from '../../assets/svgs/thousandTomans.svg'
 
+import {passedTime} from "../../helpers/passedTime";
 import 'moment/locale/fa'
 import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
 import GalleryImageSVG from "../../assets/svgs/galleryImage.svg";
+import SkeletonElement from "../../components/view/Skeleton/Skeleton";
+import Head from "next/head";
 
 const moment = require('moment')
 
@@ -36,7 +40,6 @@ const Item = () => {
     const router = useRouter();
     const {id} = router.query;
 
-    moment.locale('en')
 
     const [currentMediaPart, setCurrentMediaPart] = useState('files')
     const [appeal, setAppeal] = useState({} as Appeal)
@@ -48,28 +51,21 @@ const Item = () => {
                 let appeal = e.data.appeal
                 let a = moment.now()
 
-                console.log(moment(a).format('YYYY/MM/DD').split('/'))
-                console.log(moment(moment(a).format('YYYY/MM/DD').split('/')).format('YYYY/MM/DD'))
-
                 let date = moment.unix(appeal.createdAt).add('d', -1).format('YYYY/MM/DD').split('/')
                 let dateNumeric = date.map((item: string) => {
                     return parseInt(item);
                 })
-                moment.locale('fa')
-                console.log(appeal)
+                console.log(passedTime(appeal.createdAt))
                 setAppeal({
                     ...appeal,
                     title: appeal.title,
                     priceStart: appeal.priceStart,
                     priceEnd: appeal.priceEnd,
                     details: appeal.details,
-                    createdAt: moment(dateNumeric).from(),
+                    createdAt: passedTime(appeal.createdAt),
                     hashtags: appeal.hashtags.length ? (JSON.parse(appeal.hashtags[0])) : [],
                     attachments: appeal.attachments
                 })
-                // if (e.data)
-                //     setAppeal(JSON.stringify(e.data.appeal))
-
             }
 
         })
@@ -80,6 +76,11 @@ const Item = () => {
     return (
         <div className={'w-full h-full'}>
 
+            <Head>
+                <title>Unimun Appeal</title>
+                <meta name="description" content="Unimun"/>
+            </Head>
+
             <Header title={'آگهی'} back={true} backOnClick={() => {
                 router.back()
             }}>
@@ -88,19 +89,22 @@ const Item = () => {
             <section className={'w-full bg-white px-5 pt-5'}>
 
                 <h1 className={'IranSansBold text-xl '}>{appeal.title ??
-                    <Skeleton width={200} height={30}/>}</h1>
+                    <SkeletonElement className={'w-40 h-8'}/>}</h1>
                 <div className={'IranSans text-textDark mt-3'}>{appeal.createdAt ? appeal.createdAt :
-                    <Skeleton width={200} height={30}/>}</div>
+                    <SkeletonElement className={'w-40 h-5'}/>}</div>
                 <div className={'flex flex-wrap items-center justify-start mt-4'}>
 
                     {
                         appeal.hashtags ?
                             appeal.hashtags.map(item => <div key={item}
-                                className={' mx-2 hashtag px-3 h-8 border border-gray-300 rounded-xl  flex flex-col justify-center items-center text-primary IranSansMedium text-sm'}>
+                                                             className={' mx-2 mt-4 hashtag px-3 h-8 border border-gray-300 rounded-xl  flex flex-col justify-center items-center text-primary IranSansMedium text-sm'}>
                                 <span># <span>{item}</span></span>
                             </div>)
                             :
-                            <Skeleton/>
+                            <div className={'flex w-full flex-row justify-start items-center  '}>
+                                <SkeletonElement className={'w-20 h-5 rounded-md'}/>
+                                <SkeletonElement className={'w-20 mr-3 h-5 rounded-md'}/>
+                            </div>
                     }
 
                 </div>
@@ -142,7 +146,11 @@ const Item = () => {
                 <div className={'px-5 mt-2'}>
                     <span className={'IranSansMedium'}>
                         {
-                            appeal.details ?? <Skeleton count={3}/>
+                            appeal.details ?? <div className={'w-full flex flex-col justify-center items-start'}>
+                                <SkeletonElement className={'w-full mt-2 h-5'}/>
+                                <SkeletonElement className={'w-full mt-2 h-5'}/>
+                                <SkeletonElement className={'w-full mt-2 h-5'}/>
+                            </div>
 
                         }
                 </span>
@@ -174,10 +182,10 @@ const Item = () => {
                             </div>
                         </div>
                         <div className={'w-full border'}/>
-                        <div className={'px-5'}>
+                        <div className={''}>
                             {
                                 currentMediaPart === 'files' ?
-                                    <div className={'files w-full flex flex-col items-center justify-center mt-3'}>
+                                    <div className={'files w-full flex flex-col items-center justify-center mt-3 px-5'}>
 
                                         {appeal.attachments.map((file: AttachmentFiles) => {
                                             if (file.uploadedAsFile) {
@@ -209,24 +217,24 @@ const Item = () => {
 
                                     </div>
                                     :
-                                    <div className={'photos grid grid-cols-4 justify-items-center'}>
+                                    <div className={'photos grid grid-cols-3 items-center justify-items-center'}>
                                         {
-                                            appeal.attachments.map((file:AttachmentFiles, index) => {
+                                            appeal.attachments.map((file: AttachmentFiles, index) => {
                                                 if (!file.uploadedAsFile)
                                                     return (<div key={`${index}photo`}
-                                                                 className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative overflow-hidden mt-4'}>
+                                                                 className={'aspect-square new-photo  cover-fill w-full flex flex-col justify-center items-center border-2  relative overflow-hidden '}>
                                                             <img src={`https://dl.unimun.me/${file.preview}`}
                                                                  alt={'Unimun ' + index}
                                                                  className={' w-full h-full'}/>
-                                                            <div dir={'ltr'}
-                                                                 className={'w-9 h-9  rounded-xl absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col justify-center items-center'}
-                                                                 style={{background: 'rgba(255,255,255,0.85)'}}>
-                                                                <SVGModifier SVGName={'galleryImage'}
-                                                                             elementClass={'number'}
-                                                                             value={(index + 1).toString()}>
-                                                                    <GalleryImageSVG/>
-                                                                </SVGModifier>
-                                                            </div>
+                                                            {/*<div dir={'ltr'}*/}
+                                                            {/*     className={'w-9 h-9  rounded-xl absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col justify-center items-center'}*/}
+                                                            {/*     style={{background: 'rgba(255,255,255,0.85)'}}>*/}
+                                                            {/*    /!*<SVGModifier SVGName={'galleryImage'}*!/*/}
+                                                            {/*    /!*             elementClass={'number'}*!/*/}
+                                                            {/*    /!*             value={(index + 1).toString()}>*!/*/}
+                                                            {/*    /!*    <GalleryImageSVG/>*!/*/}
+                                                            {/*    /!*</SVGModifier>*!/*/}
+                                                            {/*</div>*/}
                                                         </div>
                                                     )
                                             })

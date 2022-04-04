@@ -16,13 +16,11 @@ const VCodeInput = (props: Props) => {
     let inputs = Array(props.length)
     inputs.fill('')
     let lastLength = React.useRef([])
-    const router = useRouter()
 
     const [code, setCode] = React.useState("")
     const [numbersHolder, setNumbersHolder] = React.useState("")
     const [err, setErr] = React.useState(props.err)
     const [success, setSuccess] = React.useState(props.success)
-    const [hint, setHint] = React.useState(0)
     const [allowToSendVCode, setAllowToSendVCode] = useState(false);
 
     const deadLine = useRef(0);
@@ -95,7 +93,7 @@ const VCodeInput = (props: Props) => {
                 <span onClick={resendCode} className={`${allowToSendVCode ? 'text-primary' : 'text-gray-500'}`}>{}ارسال دوباره کد</span>
             </div>
             <div className={'IranSansMedium text-textDark text-sm'}>
-                چرا یکی از عدد ها پیداس ؟
+                چرا یکی از عدد ها پیداست ؟
                 <br/>
                 <br/>
                 <div className={'text-justify w-full'}>

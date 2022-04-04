@@ -10,15 +10,12 @@ import ThousandTomans from '../../../../assets/svgs/thousandTomans.svg'
 import {TailSpin} from "react-loader-spinner";
 import Search from "../Search/Search";
 import _ from 'lodash';
-import Skeleton from "react-loading-skeleton";
-import {SkeletonTheme} from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
+import SkeletonElement from "../../../view/Skeleton/Skeleton";
+import {passedTime} from "../../../../helpers/passedTime";
 
 
 const Appeals = () => {
-
     const now = Math.floor(Date.now() / 1000);
-    const router = useRouter();
     const [newAdHidden, setNewAdHidden] = useState(false);
     const [appeals, setAppeals] = useState([]);
     const [searchedAppeals, setSearchedAppeals] = useState([]);
@@ -28,7 +25,6 @@ const Appeals = () => {
     const [reachedEndState, setReachedEndState] = useState(false);
     const [nothingFound, setNothingFound] = useState(false);
     const lastScrollPosition = useRef(0);
-    const scrollEnd = useRef(false)
 
 
     const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen', 'id'])
@@ -45,8 +41,8 @@ const Appeals = () => {
                 .then((e) => {
                     if (e.error === undefined) {
                         console.log(e)
-                        if (e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
-                            console.log(e)
+
+                        if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
                             setAppeals(e.data.appeals.edges)
                             lastGottenAppeals(e.data.appeals.edges)
                         }
@@ -63,7 +59,7 @@ const Appeals = () => {
     }, [appeals, data, loading, error, lastCursor])
 
     const getNewerAppeals = () => {
-        if (!reachedEnd.current) {
+        if (!reachedEnd.current && !loading) {
             if (lastCursor != appeals[appeals.length - 1]['cursor']) {
                 lastCursor.current = (appeals[appeals.length - 1]['cursor'])
                 getAppeals({variables: {after: lastCursor.current}}).then((e) => {
@@ -104,7 +100,6 @@ const Appeals = () => {
     const onSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNothingFound(false)
 
-        console.log(event.target.value)
         searcheText.current = event.target.value
 
         searchAppeals({variables: {searchText: searcheText.current}}).then((e) => {
@@ -130,49 +125,50 @@ const Appeals = () => {
         console.log(error)
     }
 
-    const appealsSkeleton = ()=>{
+    const appealsSkeleton = () => {
 
 
-        return(
+        return (
+            Array(5).fill('').map((skeleton, index) => {
+                return (
+                    <div key={index + 'appealSkeleton'}
+                         className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
 
-            <div
-                 className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
-                <SkeletonTheme baseColor="#202020" highlightColor="#444">
-                    <p>
-                        <Skeleton count={3} />
-                    </p>
-                </SkeletonTheme>
-                <div className={'item-left w-1/2 h-full items-start flex flex-col justify-between'}>
-                    <div className={'flex-col flex text-right'}>
+                        <div className={'item-left w-1/2 h-full items-start flex flex-col justify-between'}>
+                            <div className={'flex-col flex text-right'}>
                                             <span
-                                                className={'IranSansBold text-textBlack text-lg pt-1 whitespace-nowrap'}><Skeleton/></span>
-                        <span
-                            className={'IranSans text-textDarker mt-2 text-sm'}><Skeleton/> <div></div></span>
-                    </div>
-                    <Skeleton/>
-                </div>
+                                                className={'IranSansBold text-textBlack text-lg pt-1 whitespace-nowrap'}><SkeletonElement
+                                                className={'w-32 mt-2 h-8'}/></span>
+                                <span
+                                    className={'IranSans text-textDarker mt-2 text-sm'}> <SkeletonElement
+                                    className={'w-32 mt-2 h-3'}/> <SkeletonElement
+                                    className={'w-32 mt-2 h-3'}/>  </span>
+                            </div>
+                            <SkeletonElement className={'w-32 mt-2 h-5'}/>
+                        </div>
 
-                <div className={'item-right w-1/2 h-full items-end justify-between flex flex-col'}>
-                    <div>
-                        <div className={'w-10 h-10'}>
-                            {/*_________Note_________*/}
-                            {/*{Note}*/}
+                        <div className={'item-right w-1/2 h-full items-end justify-between flex flex-col'}>
+                            <div>
+                                <div className={'w-10 h-10'}>
+                                    {/*_________Note_________*/}
+                                    {/*{Note}*/}
+                                </div>
+                            </div>
+                            <div>
+                                <div className={'w-auto h-16'}>
+                                    {/*Instantaneous*/}
+
+                                    {/*{Instantaneous}*/}
+                                </div>
+                            </div>
+                            <div
+                                className={' flex flex-row-reverse items-center justify-center whitespace-nowrap text-sm'}>
+                                <SkeletonElement className={'w-32 mt-2 h-5'}/></div>
                         </div>
                     </div>
-                    <div>
-                        <div className={'w-auto h-16'}>
-                            {/*Instantaneous*/}
+                )
+            })
 
-                            {/*{Instantaneous}*/}
-                        </div>
-                    </div>
-                    <div
-                        className={' flex flex-row-reverse items-center justify-center whitespace-nowrap text-sm'}>
-                           <Skeleton/>
-                    </div>
-                </div>
-
-            </div>
 
         )
     }
@@ -189,15 +185,25 @@ const Appeals = () => {
                                             <span
                                                 className={'IranSansBold text-textBlack text-lg pt-1 whitespace-nowrap'}>{Appeal.title}</span>
                             <span
+                                style={{
+                                    width: '200px',
+                                    height: '40px',
+                                    whiteSpace: 'break-spaces',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                }}
+                                // style={{height:'50px', display: 'block', overflow: 'hidden', wordWrap:'break-word', textOverflow:'ellipsis'}}
+
                                 className={'IranSans text-textDarker mt-2 text-sm'}>{Appeal.details ? Appeal.details : "بدون توضیح"}</span>
+
                         </div>
                         <div
-                            className={'IranSansMedium text-textBlack whitespace-nowrap text-xl pt-2  flex flex-row items-end'}>
+                            className={'IranSansMedium text-textBlack whitespace-nowrap text-lg pt-2  flex flex-row items-end'}>
                             <span className={'mx-0.5  flex flex-row items-end'}>از</span>
                             <span className={'mx-0.5  flex flex-row items-end'}>{Appeal.priceStart / 1000}</span>
                             <span className={'mx-0.5  flex flex-row items-end'}>تا</span>
                             <span className={'mx-0.5  flex flex-row items-end'}>{Appeal.priceEnd / 1000}</span>
-                            <div dir={'ltr'} className={'w-12 h-12 flex flex-row mb-1 items-end'}>
+                            <div dir={'ltr'} className={'w-10 h-10 flex flex-row mb-1 items-end'}>
                                 <ThousandTomans/>
                             </div>
                         </div>
@@ -220,7 +226,7 @@ const Appeals = () => {
                         <div
                             className={' flex flex-row-reverse items-center justify-center whitespace-nowrap text-sm'}>
                                         <span dir={'rtl'}
-                                              className={' IranSans'}>{dateConverter(Appeal.createdAt)}</span>
+                                              className={' IranSans'}>{passedTime(Appeal.createdAt)}</span>
 
                             <div className={'h-4 w-0 overflow-hidden border-primary bg-primary  sm:block border mx-2'}/>
                             <div className={'flex flex-row  items-center justify-center'}>
@@ -240,6 +246,7 @@ const Appeals = () => {
     }
     return (
         <div className={'h-full overflow-hidden'}>
+
             <Search onInputChange={_.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 onSearchInputChange(e)
             }, 900)}/>
@@ -269,13 +276,13 @@ const Appeals = () => {
                                         return (appealUI(Appeal, index)
                                         )
                                     }
-                                ):null
+                                ) : null
 
                 }
                 {
-                    // !lastGottenAppealsState.length && appeals.length?
+                    loading && !appeals.length ?
                         appealsSkeleton()
-                        // null
+                        : null
                 }
                 {!reachedEndState || loading ?
                     <div className={'w-full flex flex-col items-center justify-center mt-20'}>

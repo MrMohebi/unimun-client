@@ -127,8 +127,7 @@ const Index = () => {
             })
 
             .catch(function (error) {
-                console.log('errorrrrr')
-                console.log(error);
+
             });
 
     }
@@ -136,7 +135,12 @@ const Index = () => {
 
     useEffect(() => {
         // currentAppealTempId.current = Math.floor(Math.random() * 9999999999)
-    }, [])
+
+
+        if (data && data.createAppeal.status === 'SUCCESS') {
+            router.push('/')
+        }
+    }, [data, loading, error])
 
 
     return (
@@ -359,7 +363,7 @@ const Index = () => {
                                 <div className={'h-6 w-6'}>
                                     <FileUploadSVG/>
                                 </div>
-                                <span className={'IranSans mr-2'}>قایل</span>
+                                <span className={'IranSans mr-2'}>فایل</span>
                             </div>
                             <span
                                 className={'text-primary IranSansMedium text-md'}>{`${uploadedFiles.length}/5`}</span>
@@ -401,9 +405,9 @@ const Index = () => {
             </StepperFragment>
 
             <div className={'w-full bottom-2 fixed flex flex-row items-center justify-center po'}>
-                <Button
-                    className={'w-11/12 h-14  bg-primary rounded-xl flex flex-row justify-between items-center px-4'}
-                    rippleColor={'rgba(255,255,255,0.49)'} onClick={() => {
+                <Button loading={loading}
+                        className={'w-11/12 h-14  bg-primary rounded-xl flex flex-row justify-between items-center px-4'}
+                        rippleColor={'rgba(255,255,255,0.49)'} onClick={() => {
                     if (currentStep !== 1)
                         setCurrentStep(currentStep + 1)
                     else {

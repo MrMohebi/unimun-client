@@ -1,7 +1,7 @@
 import React from 'react';
 import AddSvg from "../../../../assets/svgs/add.svg";
 import Button from "../../../view/Button/Button";
-import {IsLoggedIn} from "../../../../store/user";
+import {UserToken} from "../../../../store/user";
 import {useRouter} from "next/router";
 
 const NewAppealButton = (props: { hidden: boolean }) => {
@@ -10,7 +10,7 @@ const NewAppealButton = (props: { hidden: boolean }) => {
         <div className={`fixed bottom-20 right-5  transition-all duration-300`}
         >
             <div onClick={() => {
-                if (IsLoggedIn()) {
+                if (UserToken().length) {
                     router.push('/newAppeal')
                 } else {
                     router.push('/profile/login')

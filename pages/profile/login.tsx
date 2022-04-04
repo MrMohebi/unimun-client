@@ -3,10 +3,10 @@ import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
 import Button from "../../components/view/Button/Button";
 import VCodeInput from "../../components/normal/profile/VCodeInput/VCodeInput";
-import {gql, useMutation} from "@apollo/client";
+import {gql, useLazyQuery, useMutation} from "@apollo/client";
 import {useRouter} from "next/router";
-import {IsLoggedIn, UserToken} from "../../store/user";
-import {SendVCodeQuery, VerifyVCode} from "../../queries/normal/login";
+import {UserToken} from "../../store/user";
+import {isReferenceCodeValid, SendVCodeQuery, VerifyVCode} from "../../queries/normal/login";
 import {setToken} from "../../helpers/TokenHelper";
 
 const Login = () => {
@@ -18,12 +18,13 @@ const Login = () => {
     const [vCodeSuccess, setVcodeSuccess] = useState(false)
     const [vCode, setVCode] = useState("")
     const [referenceCode, setReferenceCode] = useState("")
+    const [refCodeStatus, setRefCodeStatus] = useState("")
     const router = useRouter()
 
 
     const [sendVcode, sendVCodeResult] = useMutation(gql`${SendVCodeQuery(phoneNumber).query}`, {variables: SendVCodeQuery(phoneNumber).variables})
     const [verifyVCode, verifyVCodeResult] = useMutation(gql`${VerifyVCode(phoneNumber,vCode,referenceCode).query}`, {variables: VerifyVCode(phoneNumber, vCode, referenceCode).variables})
-    const [verifyReferral, verifyReferralResult] = useMutation(gql`${VerifyVCode(phoneNumber,vCode,referenceCode).query}`, {variables: VerifyVCode(phoneNumber, vCode, referenceCode).variables})
+    const [verifyReferral, verifyReferralResult] = useLazyQuery(gql`${isReferenceCodeValid().query}`, {variables: isReferenceCodeValid().variables})
     // const [setName, setNameResult] = useMutation(gql`${VerifyVCode.query}`, {variables: VerifyVCode.variables})
 
     let phoneNumberValidation = (phone: string) => {
@@ -78,8 +79,9 @@ const Login = () => {
             if (sendVCodeResult.data.sendVCode.data.vCode) {
                 setVCodeHint(parseInt(sendVCodeResult.data.sendVCode.data.vCode[0]))
             }
-            if (sendVCodeResult.data.sendVCode.data.isSignup) {
+            if (sendVCodeResult.data.sendVCode.data.isSignup && !referenceCode) {
                 setStep(1)
+                setAllowForNextStep(false)
             }
             if (!sendVCodeResult.data.sendVCode.data.isSignup) {
                 setStep(2)
@@ -93,7 +95,6 @@ const Login = () => {
             if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && !sendVCodeResult.data.sendVCode.data.isSignup) {
                 setVcodeSuccess(true)
                 setTimeout(() => {
-                    IsLoggedIn(true)
                     UserToken(verifyVCodeResult.data.verifyVCode.data.token)
                     setToken(verifyVCodeResult.data.verifyVCode.data.token)
                     router.push('/')
@@ -116,7 +117,6 @@ const Login = () => {
         //
         // if (verifyVCodeResult.data && currentStep < 3) {
         //     if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS") {
-        //         IsLoggedIn(true)
         //         Token(verifyVCodeResult.data.verifyVCode.data.token)
         //         router.push('/')
         //     }
@@ -178,21 +178,32 @@ const Login = () => {
 
                         : currentStep === 1 ?
                             <div>
-                                <Input key={'ref'} defaultValue={''} id={'ref-code'}
+                                <Input maxLength={6} key={'ref'} defaultValue={''} id={'ref-code'}
                                        wrapperClassName={`mt-5 transition-all h-14 duration-400`}
                                        numOnly={false}
                                        dir={'ltr'}
-                                       inputClassName={'text-center'}
+                                       inputClassName={`text-center ${refCodeStatus === 'SUCCESS' ? 'text-primary' : refCodeStatus === 'ERROR' ? 'text-errorRed' : ''}`}
                                        onChange={(e: any) => {
+
+                                           setRefCodeStatus('')
                                            e.currentTarget.value = e.currentTarget.value.toUpperCase()
                                            setReferenceCode(e.currentTarget.value)
-                                           console.log(referenceCode)
+                                           if (e.currentTarget.value.length === 6) {
 
-                                           if (e.currentTarget.value.length > 0) {
-                                               setAllowForNextStep(true)
-                                           } else {
-                                               setAllowForNextStep(false)
+                                               verifyReferral({variables: {referenceCode: referenceCode}}).then(e => {
+                                                   console.log(e.data.isReferenceCodeValid.status)
+                                                   if (e.data.isReferenceCodeValid.status === 'SUCCESS') {
+                                                       setRefCodeStatus('SUCCESS')
+                                                       setAllowForNextStep(true)
+
+                                                   } else {
+                                                       setRefCodeStatus('ERROR')
+                                                   }
+                                               })
+
+                                               // setAllowForNextStep(true)
                                            }
+
                                        }}
 
                                 />
@@ -262,28 +273,29 @@ const Login = () => {
                         className={'text-primary'}>شـرایـط</span>  و <br/><span
                         className={'text-primary'}>قوانین حریم ‌خصوصی</span> را می‌ پذیرم</span>
                 </div>
-                <Button loading={sendVCodeResult.loading || verifyVCodeResult.loading} onClick={() => {
-                    if (!vCodeError) {
-                        if (currentStep === 0) {
-                            sendVcode()
-                        }
-                        if (currentStep === 1) {
-                            nextStep()
-                        }
+                <Button loading={sendVCodeResult.loading || verifyVCodeResult.loading || verifyReferralResult.loading}
+                        onClick={() => {
+                            if (!vCodeError) {
+                                if (currentStep === 0) {
+                                    sendVcode()
+                                }
+                                if (currentStep === 1) {
+                                    nextStep()
+                                }
 
-                        if (currentStep === 2 && codeValidation(vCode)) {
-                            verifyVCode()
-                        }
-                    } else {
-                        setVCodeError(false)
-                    }
+                                if (currentStep === 2 && codeValidation(vCode)) {
+                                    verifyVCode()
+                                }
+                            } else {
+                                setVCodeError(false)
+                            }
 
-                }} disabled={!allowForNextStep} rippleColor={'rgba(255,255,255,0.62)'}
-                        className={`${currentStep === 0 ? 'w-2/4' : 'w-full'}  ${allowForNextStep && !vCodeError ? 'bg-primary' :  !vCodeError? 'bg-textDark' : ''} ${vCodeError && currentStep === 2 ? 'bg-errorRed' : ''} transition-all text-md duration-500 h-14 rounded-xl `}>
+                        }} disabled={!allowForNextStep} rippleColor={'rgba(255,255,255,0.62)'}
+                        className={`${currentStep === 0 ? 'w-2/4' : 'w-full'}  ${allowForNextStep && !vCodeError ? 'bg-primary' : !vCodeError ? 'bg-textDark' : ''} ${vCodeError && currentStep === 2 ? 'bg-errorRed' : ''} transition-all text-md duration-500 h-14 rounded-xl `}>
                     <span className={'text-md text-white IranSansMedium'}>
 
                         {
-                            vCodeError && currentStep===2 ? "تلاش مجدد"
+                            vCodeError && currentStep === 2 ? "تلاش مجدد"
                                 :
                                 "تایید"
                         }

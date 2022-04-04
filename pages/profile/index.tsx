@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Link from 'next/link'
 import Image from "next/image";
 import HelpSvg from '../../assets/svgs/help.svg';
@@ -21,6 +21,7 @@ import {gql, useLazyQuery} from "@apollo/client";
 import {getUserQuery} from "../../queries/normal/user";
 import {useRouter} from "next/router";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
+import Head from "next/head";
 
 const Index = () => {
     const router = useRouter()
@@ -28,19 +29,32 @@ const Index = () => {
     console.log(getUserQuery().query);
     const [getUser, {data, loading, error}] = useLazyQuery(gql`${getUserQuery().query}`)
     const [progressPercentage, setProgressPercentage] = useState(0)
+    const editProfButton = useRef<HTMLDivElement>(null)
+    const drawerInitHeight = useState(170)
 
     if (data)
-        console.log(data
-        )
+        console.log(data)
     useEffect(() => {
         if (UserToken())
             getUser()
 
-    }, [])
+        if (data) {
+            if (editProfButton.current) {
+                drawerInitHeight[1](window.innerHeight - editProfButton.current.getBoundingClientRect().top - 50)
+                console.log(editProfButton.current.getBoundingClientRect())
+            }
+
+        }
+
+    }, [data])
 
 
     return (
         <div className={'w-full h-full'}>
+            <Head>
+                <title>Unimun Profile</title>
+                <meta name="description" content="Unimun"/>
+            </Head>
             <div className={'w-full h-full IranSansMedium text-textBlack text-sm overflow-scroll'}>
                 <div className={'w-full px-4 pt-3 flex flex-row justify-between'}>
                     <div className={'IranSansBlack text-md'}>
@@ -95,7 +109,7 @@ const Index = () => {
 
                             </div>
 
-                            <div className={'px-4 w-full mt-4'}>
+                            <div ref={editProfButton} id={'edit-profile'} className={'px-4 w-full mt-4'}>
                                 <Button rippleColor={'rgba(22,155,255,0.5)'}
                                         className={'w-full border-2 border-primary rounded-lg h-10 text-primary'}>
                                     <span>ویرایش نمایه</span>
@@ -104,7 +118,7 @@ const Index = () => {
 
 
                         </div> :
-                        <div>noData</div>
+                        null
                     :
                     <div className={'contents'}>
                         <div className={'w-full flex flex-col justify-center items-center'}>
@@ -127,7 +141,8 @@ const Index = () => {
                 }
                 <div className={'h-96'}/>
 
-                <Drawer closedHeight={170}>
+                <Drawer initHeight={drawerInitHeight[0]}
+                        closedHeight={170}>
                     {
                         UserToken() ?
                             <div className={'mb-4'}>
@@ -233,6 +248,7 @@ const Index = () => {
 
             </div>
         </div>
+
     );
 };
 

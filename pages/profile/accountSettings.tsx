@@ -5,7 +5,7 @@ import SimcardSVG from '../../assets/svgs/simcard.svg';
 import VerifySVG from '../../assets/svgs/verify.svg';
 import LogoutSVG from '../../assets/svgs/logout.svg';
 import {useRouter} from "next/router";
-import {IsLoggedIn, UserToken} from "../../store/user";
+import {UserToken} from "../../store/user";
 import {removeToken} from "../../helpers/TokenHelper";
 
 const AccountSettings = () => {
@@ -14,7 +14,6 @@ const AccountSettings = () => {
 
 
     const logoutOnClickHandler = () => {
-        IsLoggedIn(false)
         removeToken()
         UserToken('')
         router.push('/profile/login')
