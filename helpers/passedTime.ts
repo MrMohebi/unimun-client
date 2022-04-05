@@ -7,7 +7,7 @@ interface IComparisons {
 }
 
 
-export function passedTime(timestamp: number, faNum: boolean = false): string {
+export function passedTime(timestamp: number, faNum: boolean = false): string | undefined {
     const currentStamp = Math.floor(Date.now() / 1000)
     const passedSeconds = currentStamp - timestamp
     console.log(passedSeconds);
