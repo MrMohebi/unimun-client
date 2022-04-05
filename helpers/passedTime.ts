@@ -7,10 +7,10 @@ interface IComparisons {
 }
 
 
-export function passedTime(timestamp: number, faNum: boolean = false): string | undefined {
+export function passedTime(timestamp: number, faNum: boolean = false): string {
     const currentStamp = Math.floor(Date.now() / 1000)
     const passedSeconds = currentStamp - timestamp
-    console.log(passedSeconds);
+
     const comparisons: IComparisons[] = [
         {graterThan: 0, lessThan: 5, action: calNow},
         {graterThan: 0, lessThan: 60, action: calRecently},
@@ -31,6 +31,7 @@ export function passedTime(timestamp: number, faNum: boolean = false): string | 
             }
         }
     }
+    return ""
 
 }
 
@@ -76,11 +77,11 @@ const numberToString = (str: string): string => {
 
     // couldn't find number
 
-    if (isNaN((+firstNum))) return str;
+    if (!firstNum) return str;
 
-    const num = parseInt(firstNum)
+    const num:number = parseInt(firstNum)
 
-    const stringNum = (num) => {
+    const stringNum = (num:number):string => {
         switch (num) {
             case 0:
                 return "صفر";
@@ -138,6 +139,8 @@ const numberToString = (str: string): string => {
                 return "هشتاد";
             case 90:
                 return "نود";
+            default:
+                return num.toString()
         }
     }
 
@@ -151,4 +154,5 @@ const numberToString = (str: string): string => {
         const decimal = parseInt(num.toString()[0]) * 10;
         return str.replace(num.toString(), stringNum(decimal) + " و " + stringNum(unity))
     }
+    return "";
 }
