@@ -16,7 +16,7 @@ const AccountSettings = () => {
     const logoutOnClickHandler = () => {
         removeToken()
         UserToken('')
-        router.push('/profile/login')
+        router.push('/')
     }
 
     useEffect(() => {

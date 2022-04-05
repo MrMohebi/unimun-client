@@ -50,18 +50,10 @@ const Login = () => {
         setStep(0)
     }
     const resendCode = () => {
-        let now = new Date().getTime()
-        //
-        // if (!deadLine) {
-        //     deadLine = now + (60 * 2)
-        // } else {
-        //     console.log(deadLine - now)
-        // }
-        // setAllowToSendVCode(true)
-        // let now = new Date()
-        // let remains = now.setDate(now.getMinutes()+2)
-        // console.log(remains)
-
+        if (elapsedTime > 120) {
+            deadLine.current = Math.floor(Date.now() / 1000)
+            sendVcode()
+        }
     }
 
 
@@ -95,7 +87,6 @@ const Login = () => {
         }
     }
     useEffect(() => {
-        // deadLine.current = (Math.floor(Date.now() / 1000))
         setInterval(() => {
             if (deadLine.current !== 0)
                 setElapsedTime(Math.floor(Date.now() / 1000) - deadLine.current)
@@ -137,27 +128,6 @@ const Login = () => {
             }
         }
 
-
-        //
-        // if (sendVCodeResult.data && currentStep < 1) {
-        //     nextStep()
-        // }
-        // if (sendVCodeResult.data && sendVCodeResult.data.sendVCode.data.isSignup && currentStep < 2)
-        //     nextStep()
-        // else if (sendVCodeResult.data && !sendVCodeResult.data.sendVCode.data.isSignup)
-        //     setStep(2)
-        //
-        // if (verifyVCodeResult.data && currentStep < 3) {
-        //     if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS") {
-        //         Token(verifyVCodeResult.data.verifyVCode.data.token)
-        //         router.push('/')
-        //     }
-        //
-        // }
-        //
-        // if (verifyVCodeResult.data) {
-        //
-        // }
 
     }, [sendVCodeResult, verifyVCodeResult])
 
@@ -277,7 +247,7 @@ const Login = () => {
                 <span onClick={() => {
                 }}>ویرایش شماره</span>
                                         <span onClick={resendCode}
-                                              className={`${allowToSendVCode ? 'text-primary' : 'text-gray-500'}`}>{` ارسال دوباره کد (${120 - elapsedTime + ' ثانیه'})`}</span>
+                                              className={`${elapsedTime > 120 ? 'text-primary' : 'text-gray-500'}`}>{` ارسال دوباره کد (${120 - elapsedTime + ' ثانیه'})`}</span>
                                     </div>
                                     <div className={'IranSansMedium text-textDark text-sm'}>
                                         چرا یکی از عدد ها پیداست ؟
