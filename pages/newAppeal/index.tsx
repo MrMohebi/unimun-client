@@ -34,19 +34,19 @@ const Index = () => {
     const router = useRouter()
     const currentAppealTempId = useRef((Math.random() + 1).toString(36).substring(7))
 
-    let createFiles = ()=>{
+    let createFiles = () => {
 
-        let files=[]as any;
-        uploadedImages.forEach(image=>{
+        let files = [] as any;
+        uploadedImages.forEach(image => {
             files.push(JSON.parse(image))
         })
-        uploadedFiles.forEach(file=>{
+        uploadedFiles.forEach(file => {
             files.push(JSON.parse(file))
         })
-    return files
+        return files
     }
 
-    let query = newAppealQuery(title, lowerPrice, upperPrice, description, hashtags,createFiles())
+    let query = newAppealQuery(title, lowerPrice, upperPrice, description, hashtags, createFiles())
     const [createAppeal, {
         data,
         loading,
@@ -330,7 +330,8 @@ const Index = () => {
                                 uploadedImages.map((uploadedImage, index) => {
                                     return (<div key={`${index}photo`}
                                                  className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative overflow-hidden mt-4'}>
-                                            <img src={`https://dl.unimun.me/${JSON.parse(uploadedImage).thumbnail}`} alt={'Unimun ' + index}
+                                            <img src={`https://dl.unimun.me/${JSON.parse(uploadedImage).thumbnail}`}
+                                                 alt={'Unimun ' + index}
                                                  className={' w-full h-full'}/>
                                             <div dir={'ltr'}
                                                  className={'w-9 h-9  rounded-xl absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col justify-center items-center'}
@@ -391,7 +392,8 @@ const Index = () => {
                                 <div className={'file w-full flex flex-row justify-between items-center my-3'}>
                                     <div className={'file-right flex flex-row justify-center items-center'}>
                                         <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><FileSVG/></div>
-                                        <div className={'IranSansMedium mr-4 opacity-60'}>{(JSON.parse(file).url).split('/').reverse()[0]}</div>
+                                        <div
+                                            className={'IranSansMedium mr-4 opacity-60'}>{(JSON.parse(file).url).split('/').reverse()[0]}</div>
                                     </div>
                                     <div dir={'ltr'} className={'IranSans w-7 h-7 '}><FileUploadSVG/></div>
                                 </div>
@@ -411,8 +413,7 @@ const Index = () => {
                     if (currentStep !== 1)
                         setCurrentStep(currentStep + 1)
                     else {
-                        console.log(createAppeal())
-                        console.log(query)
+                        createAppeal()
                     }
                 }}>
                     <div className={'text-white IranSans w-8 '}/>

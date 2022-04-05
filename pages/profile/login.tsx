@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
 import Button from "../../components/view/Button/Button";
@@ -8,6 +8,7 @@ import {useRouter} from "next/router";
 import {UserToken} from "../../store/user";
 import {isReferenceCodeValid, SendVCodeQuery, VerifyVCode} from "../../queries/normal/login";
 import {setToken} from "../../helpers/TokenHelper";
+import internal from "stream";
 
 const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState('00000000000')
@@ -19,6 +20,11 @@ const Login = () => {
     const [vCode, setVCode] = useState("")
     const [referenceCode, setReferenceCode] = useState("")
     const [refCodeStatus, setRefCodeStatus] = useState("")
+    const [allowToSendVCode, setAllowToSendVCode] = useState(false);
+    const deadLine = useRef(0);
+    const [elapsedTime, setElapsedTime] = useState(0);
+    const resendCodeTimer = useRef(null);
+
     const router = useRouter()
 
 
@@ -43,6 +49,21 @@ const Login = () => {
         sendVCodeResult.reset()
         setStep(0)
     }
+    const resendCode = () => {
+        let now = new Date().getTime()
+        //
+        // if (!deadLine) {
+        //     deadLine = now + (60 * 2)
+        // } else {
+        //     console.log(deadLine - now)
+        // }
+        // setAllowToSendVCode(true)
+        // let now = new Date()
+        // let remains = now.setDate(now.getMinutes()+2)
+        // console.log(remains)
+
+    }
+
 
     const steps = [
         {
@@ -74,7 +95,15 @@ const Login = () => {
         }
     }
     useEffect(() => {
+        // deadLine.current = (Math.floor(Date.now() / 1000))
+        setInterval(() => {
+            if (deadLine.current !== 0)
+                setElapsedTime(Math.floor(Date.now() / 1000) - deadLine.current)
+        }, 1000)
+    }, [])
 
+    //handel query data
+    useEffect(() => {
         if (sendVCodeResult.data) {
             if (sendVCodeResult.data.sendVCode.data.vCode) {
                 setVCodeHint(parseInt(sendVCodeResult.data.sendVCode.data.vCode[0]))
@@ -85,6 +114,9 @@ const Login = () => {
             }
             if (!sendVCodeResult.data.sendVCode.data.isSignup) {
                 setStep(2)
+                if (deadLine.current === 0)
+                    deadLine.current = Math.floor(Date.now() / 1000)
+
             }
         }
         if (verifyVCodeResult.data) {
@@ -219,7 +251,7 @@ const Login = () => {
 
 
                                 <img src="/assets/image/postbox.png" alt="Unimun referral"
-                                     className={'w-full fixed bottom-14 left-1/2 -translate-x-1/2 '}/>
+                                     className={'w-full absolute bottom-14 left-1/2 -translate-x-1/2 '}/>
 
                                 {/*<div dir={'ltr'} className={'max-w-sm   w-full pb-20 IranSans '}>*/}
                                 {/*    <PostSVG/>*/}
@@ -241,6 +273,26 @@ const Login = () => {
                                                         setAllowForNextStep(false)
                                                     }
                                                 }} length={4}/>
+                                    <div
+                                        className={'h-20 w-full mt-4 flex flex-row justify-between items-center IranSans text-primary text-md'}>
+                <span onClick={() => {
+                }}>ویرایش شماره</span>
+                                        <span onClick={resendCode}
+                                              className={`${allowToSendVCode ? 'text-primary' : 'text-gray-500'}`}>{` ارسال دوباره کد (${120 - elapsedTime + ' ثانیه'})`}</span>
+                                    </div>
+                                    <div className={'IranSansMedium text-textDark text-sm'}>
+                                        چرا یکی از عدد ها پیداست ؟
+                                        <br/>
+                                        <br/>
+                                        <div className={'text-justify w-full'}>
+                                            رقم اول کد هایی که براتون ارسال میکنیم همیشه در کادر مشخص هستن تا بتونین از
+                                            درست
+                                            بودن پیامک ارسالی
+                                            مطمعن بشید
+
+                                        </div>
+
+                                    </div>
 
 
                                 </div>
@@ -277,7 +329,11 @@ const Login = () => {
                         onClick={() => {
                             if (!vCodeError) {
                                 if (currentStep === 0) {
-                                    sendVcode()
+                                    sendVcode().then(e => {
+                                        if (e.data.sendVCode.status === 'SUCCESS') {
+                                            console.log('hi')
+                                        }
+                                    })
                                 }
                                 if (currentStep === 1) {
                                     nextStep()

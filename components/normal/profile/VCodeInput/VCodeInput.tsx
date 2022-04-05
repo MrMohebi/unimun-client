@@ -21,9 +21,7 @@ const VCodeInput = (props: Props) => {
     const [numbersHolder, setNumbersHolder] = React.useState("")
     const [err, setErr] = React.useState(props.err)
     const [success, setSuccess] = React.useState(props.success)
-    const [allowToSendVCode, setAllowToSendVCode] = useState(false);
 
-    const deadLine = useRef(0);
     // const [remaining, setRemaining] = useState();
 
     useEffect(() => {
@@ -34,20 +32,7 @@ const VCodeInput = (props: Props) => {
         setErr(props.err)
     }, [code, props.success, props.err])
 
-    const resendCode = () => {
-        let now = new Date().getTime()
 
-        if (!deadLine.current) {
-            deadLine.current = now + (60 * 2)
-        } else {
-            console.log(deadLine.current - now)
-        }
-        // setAllowToSendVCode(true)
-        // let now = new Date()
-        // let remains = now.setDate(now.getMinutes()+2)
-        // console.log(remains)
-
-    }
 
     return (
         <div className={'w-full relative px-3 h-28'}>
@@ -85,24 +70,7 @@ const VCodeInput = (props: Props) => {
 
             </div>
 
-            <div
-                className={'h-20 w-full mt-4 flex flex-row justify-between items-center IranSans text-primary text-md'}>
-                <span onClick={() => {
-                    props.stepBack()
-                }}>ویرایش شماره</span>
-                <span onClick={resendCode} className={`${allowToSendVCode ? 'text-primary' : 'text-gray-500'}`}>{}ارسال دوباره کد</span>
-            </div>
-            <div className={'IranSansMedium text-textDark text-sm'}>
-                چرا یکی از عدد ها پیداست ؟
-                <br/>
-                <br/>
-                <div className={'text-justify w-full'}>
-                    رقم اول کد هایی که براتون ارسال میکنیم همیشه در کادر مشخص هستن تا بتونین از درست بودن پیامک ارسالی
-                    مطمعن بشید
 
-                </div>
-
-            </div>
         </div>
     );
 };
