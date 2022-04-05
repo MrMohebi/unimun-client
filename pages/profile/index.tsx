@@ -16,7 +16,7 @@ import BookSVG from '../../assets/svgs/book.svg'
 import PeopleSVG from '../../assets/svgs/people.svg'
 import SaveSVG from '../../assets/svgs/save.svg'
 import DownloadAppSVG from '../../assets/svgs/downloadApp.svg'
-import {UserToken} from "../../store/user";
+import {UserPhone, UserToken} from "../../store/user";
 import {gql, useLazyQuery} from "@apollo/client";
 import {getUserQuery} from "../../queries/normal/user";
 import {useRouter} from "next/router";
@@ -32,18 +32,18 @@ const Index = () => {
     const editProfButton = useRef<HTMLDivElement>(null)
     const drawerInitHeight = useState(170)
 
-    if (data)
-        console.log(data)
     useEffect(() => {
         if (UserToken())
             getUser()
 
         if (data) {
+            if (data.user.phone) {
+                UserPhone(data.user.phone)
+            }
             if (editProfButton.current) {
                 drawerInitHeight[1](window.innerHeight - editProfButton.current.getBoundingClientRect().top - 50)
                 console.log(editProfButton.current.getBoundingClientRect())
             }
-
         }
 
     }, [data])

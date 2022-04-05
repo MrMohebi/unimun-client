@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Header from "../../components/common/Header/Header";
 import UserOutlineSvg from '../../assets/svgs/useOutliner.svg';
 import SimcardSVG from '../../assets/svgs/simcard.svg';
 import VerifySVG from '../../assets/svgs/verify.svg';
 import LogoutSVG from '../../assets/svgs/logout.svg';
 import {useRouter} from "next/router";
-import {UserToken} from "../../store/user";
+import {UserPhone, UserToken} from "../../store/user";
 import {removeToken} from "../../helpers/TokenHelper";
 
 const AccountSettings = () => {
@@ -18,6 +18,10 @@ const AccountSettings = () => {
         UserToken('')
         router.push('/profile/login')
     }
+
+    useEffect(() => {
+        console.log(UserPhone())
+    }, [])
     return (
         <div>
             <Header title={'حساب کاربری'} back={true} backOnClick={() => {
@@ -31,7 +35,7 @@ const AccountSettings = () => {
                             <UserOutlineSvg/>
                         </div>
                     </div>
-                    <div className={'col-span-2 IranSansBold ml-5 flex items-end'}>09031232531</div>
+                    <div className={'col-span-2 IranSansBold ml-5 flex items-end'}>{UserPhone()}</div>
                     <div className={'col-span-2 IranSansMedium ml-5 flex items-start text-textDark text-sm'}>شماره
                         تلفن
                     </div>
