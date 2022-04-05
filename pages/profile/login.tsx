@@ -252,7 +252,6 @@ const Login = () => {
 
                                 <img src="/assets/image/postbox.png" alt="Unimun referral"
                                      className={'w-full absolute bottom-14 left-1/2 -translate-x-1/2 '}/>
-
                                 {/*<div dir={'ltr'} className={'max-w-sm   w-full pb-20 IranSans '}>*/}
                                 {/*    <PostSVG/>*/}
                                 {/*</div>*/}
