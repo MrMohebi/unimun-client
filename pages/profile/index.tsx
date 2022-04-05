@@ -36,13 +36,14 @@ const Index = () => {
         if (UserToken())
             getUser()
 
+        console.log(data)
+
         if (data) {
-            if (data.user.phone) {
-                UserPhone(data.user.phone)
+            if (data.user.data) {
+                UserPhone(data.user.data.phone)
             }
             if (editProfButton.current) {
                 drawerInitHeight[1](window.innerHeight - editProfButton.current.getBoundingClientRect().top - 50)
-                console.log(editProfButton.current.getBoundingClientRect())
             }
         }
 

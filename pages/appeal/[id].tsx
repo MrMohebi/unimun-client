@@ -17,6 +17,7 @@ import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
 import GalleryImageSVG from "../../assets/svgs/galleryImage.svg";
 import SkeletonElement from "../../components/view/Skeleton/Skeleton";
 import Head from "next/head";
+import {DOWNLOAD_HOST} from "../../Variables/Variables";
 
 const moment = require('moment')
 
@@ -190,7 +191,8 @@ const Item = () => {
                                         {appeal.attachments.map((file: AttachmentFiles) => {
                                             if (file.uploadedAsFile) {
                                                 return (
-                                                    <div key={file.url} className={'contents'}>
+                                                    <a href={DOWNLOAD_HOST + '/' + file.url} rel={'noreferrer'}
+                                                       target={'_blank'} key={file.url} className={'contents'}>
                                                         <div
                                                             className={'file w-full flex flex-row justify-between items-center my-3'}>
                                                             <div
@@ -209,7 +211,7 @@ const Item = () => {
                                                         </div>
                                                         <Divider type={'horizontal'} color={'rgba(0,0,0,0.14)'}/>
 
-                                                    </div>
+                                                    </a>
                                                 )
                                             }
                                         })}
@@ -221,9 +223,10 @@ const Item = () => {
                                         {
                                             appeal.attachments.map((file: AttachmentFiles, index) => {
                                                 if (!file.uploadedAsFile)
-                                                    return (<div key={`${index}photo`}
-                                                                 className={'aspect-square new-photo  cover-fill w-full flex flex-col justify-center items-center border-2  relative overflow-hidden '}>
-                                                            <img src={`https://dl.unimun.me/${file.preview}`}
+                                                    return (<a href={DOWNLOAD_HOST + '/' + file.url} target={'_blank'}
+                                                               rel={'noreferrer'} key={`${index}photo`}
+                                                               className={'aspect-square new-photo  cover-fill w-full flex flex-col justify-center items-center border-2  relative overflow-hidden '}>
+                                                            <img src={`${DOWNLOAD_HOST}/${file.preview}`}
                                                                  alt={'Unimun ' + index}
                                                                  className={' w-full h-full'}/>
                                                             {/*<div dir={'ltr'}*/}
@@ -235,7 +238,7 @@ const Item = () => {
                                                             {/*    /!*    <GalleryImageSVG/>*!/*/}
                                                             {/*    /!*</SVGModifier>*!/*/}
                                                             {/*</div>*/}
-                                                        </div>
+                                                        </a>
                                                     )
                                             })
                                         }
