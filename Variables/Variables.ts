@@ -1,1 +1,1 @@
-export const DOWNLOAD_HOST = 'https://dl.unimun.com'
+export const DOWNLOAD_HOST = 'https://dl.unimun.me'

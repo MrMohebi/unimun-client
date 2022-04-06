@@ -18,8 +18,8 @@ const NewAppealButton = (props: { hidden: boolean }) => {
 
             }}>
                 <Button rippleColor={'rgba(0,0,0,0.26)'}
-                        className={` transition-all duration-150 h-14 bg-white rounded-2xl shadow-lg flex flex-row justify-around items-center px-2 IranSansMedium`}>
-                    <div className={'w-5 h-5 mx-2'}><AddSvg/></div>
+                        className={` transition-all duration-100 h-14 bg-white rounded-2xl shadow-lg flex flex-row justify-around items-center px-2 IranSansMedium`}>
+                    <div className={'w-5 h-5 mx-2.5'}><AddSvg/></div>
                     <span
                         className={`${props.hidden ? 'w-0' : 'w-24'} overflow-hidden whitespace-nowrap transition-all duration-100 `}>
                     افزودن آگهی

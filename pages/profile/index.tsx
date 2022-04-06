@@ -26,18 +26,16 @@ import Head from "next/head";
 const Index = () => {
     const router = useRouter()
 
-    console.log(getUserQuery().query);
     const [getUser, {data, loading, error}] = useLazyQuery(gql`${getUserQuery().query}`)
     const [progressPercentage, setProgressPercentage] = useState(0)
     const editProfButton = useRef<HTMLDivElement>(null)
     const drawerInitHeight = useState(170)
 
     useEffect(() => {
-        if (UserToken())
-            getUser()
 
         console.log(data)
-
+        if (UserToken())
+            getUser()
         if (data) {
             if (data.user.data) {
                 UserPhone(data.user.data.phone)
@@ -142,14 +140,14 @@ const Index = () => {
                 }
                 <div className={'h-96'}/>
 
-                <Drawer initHeight={drawerInitHeight[0]}
+                <Drawer minHeight={100} initHeight={drawerInitHeight[0]}
                         closedHeight={170}>
                     {
                         UserToken() ?
                             <div className={'mb-4'}>
-                                <span className={'IranSansBold text-primary'}>حساب</span>
+                                <span className={' IranSansBold text-primary'}>حساب</span>
                                 <Link passHref={true} href={'/profile/accountSettings'}>
-                                    <div className={'flex flex-col justify-center items-center IranSans'}>
+                                    <div className={'drawer-drag  flex flex-col justify-center items-center IranSans'}>
                                         <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                                             <div className={'profile-drawer-svg'}><SettingsSVG/></div>
                                             <div
@@ -194,7 +192,7 @@ const Index = () => {
                                     <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                                         <div className={'profile-drawer-svg'}><SaveSVG/></div>
                                         <div
-                                            className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>نشان
+                                            className={'text-md IranSansMedium w-full text-right mx-4  pb-4'}>نشان
                                             ها و یاداشت ها
                                         </div>
                                     </button>
@@ -236,7 +234,7 @@ const Index = () => {
                     <div className={'flex flex-col justify-center items-center IranSans'}>
                         <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                             <div className={'profile-drawer-svg'}><DownloadAppSVG/></div>
-                            <div className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>دریافت
+                            <div className={'text-md IranSansMedium w-full text-right mx-4 pb-4'}>دریافت
                                 اپلیکیشن
                             </div>
                         </button>

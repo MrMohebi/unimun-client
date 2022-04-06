@@ -76,9 +76,7 @@ const Index = () => {
 
         axios(config)
             .then(function (response) {
-                console.log((response.data));
                 if (response.data !== 500 && response.data !== 401) {
-                    console.log(response.data.thumbnail)
                     setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
                     // let updatedUploadedImages = uploadedImages
                     // updatedUploadedImages.push(`https://${response.data.thumbnail}`)
@@ -86,18 +84,14 @@ const Index = () => {
             })
 
             .catch(function (error) {
-                console.log('errorrrrr')
-                console.log(error);
             });
 
     }
 
     const uploadFile = (file: any) => {
-        console.log(file)
         let fileName = file.name as string;
         let fileSize = file.size as string;
 
-        console.log(file)
         let data = new FormData();
         data.append('token', UserToken());
         data.append('file', file);
@@ -119,9 +113,7 @@ const Index = () => {
 
         axios(config)
             .then(function (response) {
-                console.log((response));
                 if (response.data.hasOwnProperty('url')) {
-                    console.log(response.data.url)
                     setUpladedFiles([...uploadedFiles, JSON.stringify(response.data)])
                 }
             })

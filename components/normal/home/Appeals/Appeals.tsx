@@ -16,7 +16,7 @@ import {passedTime} from "../../../../helpers/passedTime";
 
 const Appeals = () => {
     const now = Math.floor(Date.now() / 1000);
-    const [newAdHidden, setNewAdHidden] = useState(false);
+    const [scrollingToBottom, setScrollingToBottom] = useState(false);
     const [appeals, setAppeals] = useState([]);
     const [searchedAppeals, setSearchedAppeals] = useState([]);
     const searcheText = useRef('');
@@ -40,14 +40,11 @@ const Appeals = () => {
             getAppeals()
                 .then((e) => {
                     if (e.error === undefined) {
-                        console.log(e)
-
                         if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
                             setAppeals(e.data.appeals.edges)
                             lastGottenAppeals(e.data.appeals.edges)
                         }
                     } else {
-                        console.log('we have error then')
                     }
                 })
         }
@@ -80,17 +77,14 @@ const Appeals = () => {
     }
     const onAdSectionScroll = (event: any) => {
 
-        console.log(event.currentTarget.scrollTop)
-        console.log(event.currentTarget.scrollHeight)
-
         if (event.currentTarget.scrollTop > event.currentTarget.scrollHeight - event.currentTarget.getBoundingClientRect().height - 10)
             getNewerAppeals()
         let scroll = event.currentTarget.scrollTop;
 
-        if (scroll > lastScrollPosition.current) {
-            setNewAdHidden(true);
+        if (scroll > lastScrollPosition.current && scroll > 40) {
+            setScrollingToBottom(true);
         } else {
-            setNewAdHidden(false);
+            setScrollingToBottom(false);
         }
         lastScrollPosition.current = scroll;
     }
@@ -98,17 +92,19 @@ const Appeals = () => {
     const [searchAppeals, searchAppealsResult] = useLazyQuery(gql`${searchQuery.query}`);
 
     const onSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setNothingFound(false)
 
-        searcheText.current = event.target.value
+        _.debounce(() => {
+            setNothingFound(false)
 
-        searchAppeals({variables: {searchText: searcheText.current}}).then((e) => {
-            if (!e.error) {
-                if (e.data.appeals.edges.length === 0)
-                    setNothingFound(true)
-                setSearchedAppeals(e.data.appeals.edges)
-            }
-        })
+            searcheText.current = event.target.value
+            searchAppeals({variables: {searchText: searcheText.current}}).then((e) => {
+                if (!e.error) {
+                    if (e.data.appeals.edges.length === 0)
+                        setNothingFound(true)
+                    setSearchedAppeals(e.data.appeals.edges)
+                }
+            })
+        }, 900)
 
     }
 
@@ -118,18 +114,12 @@ const Appeals = () => {
     }
     const adOnClick = (ad: any) => {
         currentAd(ad)
-        console.log(currentAd())
     }
 
-    if (error) {
-        console.log(error)
-    }
 
-    const appealsSkeleton = () => {
-
-
+    const appealsSkeleton = (count: number) => {
         return (
-            Array(5).fill('').map((skeleton, index) => {
+            Array(count).fill('').map((skeleton, index) => {
                 return (
                     <div key={index + 'appealSkeleton'}
                          className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
@@ -225,8 +215,8 @@ const Appeals = () => {
                         </div>
                         <div
                             className={' flex flex-row-reverse items-center justify-center whitespace-nowrap text-sm'}>
-                                        <span dir={'rtl'}
-                                              className={' IranSans'}>{passedTime(Appeal.createdAt)}</span>
+                            <div style={{width: '60px'}} dir={'rtl'}
+                                 className={' IranSans flex flex-row justify-center items-center'}>{passedTime(Appeal.createdAt)}</div>
 
                             <div className={'h-4 w-0 overflow-hidden border-primary bg-primary  sm:block border mx-2'}/>
                             <div className={'flex flex-row  items-center justify-center'}>
@@ -245,14 +235,13 @@ const Appeals = () => {
         )
     }
     return (
-        <div className={'h-full overflow-hidden'}>
+        <div className={'h-full overflow-hidden relative '}>
 
-            <Search onInputChange={_.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-                onSearchInputChange(e)
-            }, 900)}/>
+            <Search searchLoading={searchAppealsResult.loading} collapse={scrollingToBottom}
+                    onInputChange={onSearchInputChange}/>
             <section onScroll={onAdSectionScroll}
-                     className={'w-full h-full overflow-scroll items-center px-4 pb-20 pt-5'}>
-                <NewAppealButton hidden={newAdHidden}/>
+                     className={'w-full h-full overflow-scroll items-center px-4  pt-32'}>
+                <NewAppealButton hidden={scrollingToBottom}/>
                 {
 
                     searchedAppeals.length ?
@@ -281,21 +270,23 @@ const Appeals = () => {
                 }
                 {
                     loading && !appeals.length ?
-                        appealsSkeleton()
+                        appealsSkeleton(5)
                         : null
                 }
-                {!reachedEndState || loading ?
-                    <div className={'w-full flex flex-col items-center justify-center mt-20'}>
-                        <TailSpin color="black" height={30} width={30}/>
-                    </div>
-                    :
-                    null
+
+                {
+                    !reachedEndState ?
+                        appealsSkeleton(1)
+                        : null
+
                 }
+                <div className={'h-36'}></div>
                 {
                     nothingFound ?
                         <div className={'w-full flex flex-col items-center justify-center mt-20'}>
                             <span className={'IranSansMedium opacity-50'}>نتیجه ای یافت نشد</span>
-                        </div> : null}
+                        </div> : null
+                }
             </section>
         </div>
 

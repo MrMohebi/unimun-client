@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import Header from "../../components/common/Header/Header";
 import UserOutlineSvg from '../../assets/svgs/useOutliner.svg';
 import SimcardSVG from '../../assets/svgs/simcard.svg';
@@ -19,9 +19,6 @@ const AccountSettings = () => {
         router.push('/')
     }
 
-    useEffect(() => {
-        console.log(UserPhone())
-    }, [])
     return (
         <div>
             <Header title={'حساب کاربری'} back={true} backOnClick={() => {

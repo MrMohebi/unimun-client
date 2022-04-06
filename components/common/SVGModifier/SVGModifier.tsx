@@ -15,7 +15,6 @@ const SvgModifier = (props: Props) => {
             try {
                 svgHolder.current.getElementsByClassName(props.SVGName + "_svg__" + props.elementClass)[0].innerHTML = props.value
             } catch (e) {
-                console.log(e)
             }
     })
     return (

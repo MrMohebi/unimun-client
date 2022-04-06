@@ -50,13 +50,7 @@ const Item = () => {
         getAppeal({variables: {id: id}}).then(e => {
             if (e.data) {
                 let appeal = e.data.appeal
-                let a = moment.now()
 
-                let date = moment.unix(appeal.createdAt).add('d', -1).format('YYYY/MM/DD').split('/')
-                let dateNumeric = date.map((item: string) => {
-                    return parseInt(item);
-                })
-                console.log(passedTime(appeal.createdAt))
                 setAppeal({
                     ...appeal,
                     title: appeal.title,
@@ -70,6 +64,8 @@ const Item = () => {
             }
 
         })
+
+        console.log('')
 
     }, [data])
 
@@ -160,7 +156,6 @@ const Item = () => {
             <div className={'px-5 h-2 my-2'}>
 
             </div>
-
             {
                 appeal.attachments ?
                     <section className={'w-full bg-white  pt-4 pb-4 '}>

@@ -111,7 +111,6 @@ const Login = () => {
             }
         }
         if (verifyVCodeResult.data) {
-            console.log(verifyVCodeResult)
             if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && sendVCodeResult.data.sendVCode.data.isSignup) {
                 setStep(3)
             }
@@ -184,20 +183,18 @@ const Login = () => {
                                        wrapperClassName={`mt-5 transition-all h-14 duration-400`}
                                        numOnly={false}
                                        dir={'ltr'}
-                                       inputClassName={`text-center ${refCodeStatus === 'SUCCESS' ? 'text-primary' : refCodeStatus === 'ERROR' ? 'text-errorRed' : ''}`}
+                                       inputClassName={`text-center text-md ${refCodeStatus === 'SUCCESS' ? 'text-primary' : refCodeStatus === 'ERROR' ? 'text-errorRed' : ''}`}
                                        onChange={(e: any) => {
 
                                            setRefCodeStatus('')
                                            e.currentTarget.value = e.currentTarget.value.toUpperCase()
                                            setReferenceCode(e.currentTarget.value)
                                            if (e.currentTarget.value.length === 6) {
-
-                                               verifyReferral({variables: {referenceCode: referenceCode}}).then(e => {
-                                                   console.log(e.data.isReferenceCodeValid.status)
+                                               verifyReferral({variables: {referenceCode: e.target.value.toString()}}).then(e => {
+                                                   console.log(e)
                                                    if (e.data.isReferenceCodeValid.status === 'SUCCESS') {
                                                        setRefCodeStatus('SUCCESS')
                                                        setAllowForNextStep(true)
-
                                                    } else {
                                                        setRefCodeStatus('ERROR')
                                                    }
@@ -220,8 +217,8 @@ const Login = () => {
                                 </div>
 
 
-                                <img src="/assets/image/postbox.png" alt="Unimun referral"
-                                     className={'w-full absolute bottom-14 left-1/2 -translate-x-1/2 '}/>
+                                {/*<img src="/assets/image/postbox.png" alt="Unimun referral"*/}
+                                {/*     className={'w-full absolute bottom-14 left-1/2 -translate-x-1/2 '}/>*/}
                                 {/*<div dir={'ltr'} className={'max-w-sm   w-full pb-20 IranSans '}>*/}
                                 {/*    <PostSVG/>*/}
                                 {/*</div>*/}
@@ -233,7 +230,6 @@ const Login = () => {
                                     <VCodeInput hint={vCodeHint} stepBack={stepBack} success={vCodeSuccess}
                                                 err={vCodeError}
                                                 onChange={(code: string) => {
-                                                    console.log(code)
                                                     setVCodeError(false)
                                                     if (codeValidation(code)) {
                                                         setVCode(code)
@@ -300,7 +296,7 @@ const Login = () => {
                                 if (currentStep === 0) {
                                     sendVcode().then(e => {
                                         if (e.data.sendVCode.status === 'SUCCESS') {
-                                            console.log('hi')
+
                                         }
                                     })
                                 }
