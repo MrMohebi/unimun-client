@@ -2,13 +2,14 @@ import React, {useEffect, useRef, useState} from 'react';
 import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
 import Button from "../../components/view/Button/Button";
-import VCodeInput from "../../components/normal/profile/VCodeInput/VCodeInput";
+import VCodeInput from "../../components/normal/VCodeInput/VCodeInput";
 import {gql, useLazyQuery, useMutation} from "@apollo/client";
 import {useRouter} from "next/router";
 import {UserToken} from "../../store/user";
 import {isReferenceCodeValid, SendVCodeQuery, VerifyVCode} from "../../queries/normal/login";
 import {setToken} from "../../helpers/TokenHelper";
 import internal from "stream";
+import Promoter from "../../components/normal/Promoter/Promoter";
 
 const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState('00000000000')
@@ -20,7 +21,7 @@ const Login = () => {
     const [vCode, setVCode] = useState("")
     const [referenceCode, setReferenceCode] = useState("")
     const [refCodeStatus, setRefCodeStatus] = useState("")
-    const [allowToSendVCode, setAllowToSendVCode] = useState(false);
+    const [showPromoter, setShowPromoter] = useState(true);
     const deadLine = useRef(0);
     const [elapsedTime, setElapsedTime] = useState(0);
     const resendCodeTimer = useRef(null);
@@ -91,6 +92,8 @@ const Login = () => {
             if (deadLine.current !== 0)
                 setElapsedTime(Math.floor(Date.now() / 1000) - deadLine.current)
         }, 1000)
+
+
     }, [])
 
     //handel query data
@@ -179,7 +182,11 @@ const Login = () => {
 
                         : currentStep === 1 ?
                             <div>
-                                <Input maxLength={6} key={'ref'} defaultValue={''} id={'ref-code'}
+                                <Input onFocus={() => {
+                                    setShowPromoter(false)
+                                }} onBlur={() => {
+                                    setShowPromoter(true)
+                                }} maxLength={6} key={'ref'} defaultValue={''} id={'ref-code'}
                                        wrapperClassName={`mt-5 transition-all h-14 duration-400`}
                                        numOnly={false}
                                        dir={'ltr'}
@@ -215,6 +222,15 @@ const Login = () => {
                                     <br/>
 
                                 </div>
+                                {showPromoter ?
+                                    <Promoter icon={'/assets/image/insta.png'} text={'تـوی پـیـج یونیـمـون \n' +
+                                        'یـه پـسـت بـاحـال داریـم که اگـه کـد دعـوت نـداریـد\n' +
+                                        'میتونید از بین کامنت هـاش\n' +
+                                        'یـه دونـه بـرداریــد'} image={'/assets/image/post.png'}
+                                              className={'fixed bottom-20 max-w-sm w-11/12 left-1/2 -translate-x-1/2'}
+                                              buttonText={'مشاهده'}/>
+                                    : null
+                                }
 
 
                                 {/*<img src="/assets/image/postbox.png" alt="Unimun referral"*/}
@@ -290,7 +306,8 @@ const Login = () => {
                         className={'text-primary'}>شـرایـط</span>  و <br/><span
                         className={'text-primary'}>قوانین حریم ‌خصوصی</span> را می‌ پذیرم</span>
                 </div>
-                <Button loading={sendVCodeResult.loading || verifyVCodeResult.loading || verifyReferralResult.loading}
+                <Button id={'verify-phone-button'}
+                        loading={sendVCodeResult.loading || verifyVCodeResult.loading || verifyReferralResult.loading}
                         onClick={() => {
                             if (!vCodeError) {
                                 if (currentStep === 0) {

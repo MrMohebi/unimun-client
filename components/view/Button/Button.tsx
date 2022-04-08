@@ -10,24 +10,26 @@ interface Props {
     disabled?: boolean,
     onClick?: any
     loading?: boolean
+    id: string
 }
 
 const Button = (props: Props) => {
 
     const rippleEffect = (e: any) => {
-        let button = document.getElementById('rButton') as HTMLDivElement
+        let button = document.getElementById(props.id) as HTMLDivElement
         let ripple = document.createElement('div')
         ripple.className = 'ripple absolute'
         ripple.style.backgroundColor = props.rippleColor ?? '#6e6e6e'
         button.appendChild(ripple)
-        ripple.style.top = e.clientY - e.currentTarget.getBoundingClientRect().top + 'px'
+        console.log(e.currentTarget.getBoundingClientRect())
+        ripple.style.top = e.clientY - e.currentTarget.getBoundingClientRect().y + 'px'
         ripple.style.left = e.clientX - e.currentTarget.getBoundingClientRect().left + 'px'
         setTimeout(() => {
             button.removeChild(ripple)
         }, 600)
     }
     return (
-        <button disabled={props.disabled || props.loading} id={'rButton'} onClick={(e) => {
+        <button disabled={props.disabled || props.loading} id={props.id} onClick={(e) => {
             e.preventDefault()
             if (!props.disabled)
                 rippleEffect(e)

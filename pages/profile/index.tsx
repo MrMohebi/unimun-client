@@ -1,9 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import Link from 'next/link'
-import Image from "next/image";
 import HelpSvg from '../../assets/svgs/help.svg';
 import UserOutlineSvg from '../../assets/svgs/useOutliner.svg';
-import BlinkEmoji from '../../assets/images/emojies/blink.png'
 import Button from "../../components/view/Button/Button";
 import Badge from "../../components/view/Badge/Badge";
 import Drawer from "../../components/view/Drawer/Drawer";
@@ -22,18 +20,38 @@ import {getUserQuery} from "../../queries/normal/user";
 import {useRouter} from "next/router";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 import Head from "next/head";
+import VersionSVG from '../../assets/svgs/version.svg'
+
+import TelSVG from '../../assets/svgs/telegran-gray.svg'
+import InstaSVG from '../../assets/svgs/instagram-gray.svg'
+import TwitterSVG from '../../assets/svgs/twitter-gray.svg'
+import {route} from "next/dist/server/router";
 
 const Index = () => {
     const router = useRouter()
 
-    const [getUser, {data, loading, error}] = useLazyQuery(gql`${getUserQuery().query}`)
+    const [getUser, {data}] = useLazyQuery(gql`${getUserQuery().query}`)
     const [progressPercentage, setProgressPercentage] = useState(0)
     const editProfButton = useRef<HTMLDivElement>(null)
     const drawerInitHeight = useState(170)
+    const drawerMinHeight = useState(100)
+    const loginRegisterBtn = useRef<HTMLDivElement>(null)
+
+
+    const redirectTo = (path: string) => {
+        router.push(path).then()
+    }
 
     useEffect(() => {
-
-        console.log(data)
+        if (editProfButton.current) {
+            console.log(editProfButton.current.getBoundingClientRect().top - 50)
+            drawerInitHeight[1](editProfButton.current.getBoundingClientRect().top + 50)
+        }
+        if (loginRegisterBtn.current && loginRegisterBtn.current.firstChild) {
+            drawerInitHeight[1]((loginRegisterBtn.current.firstChild.firstChild as HTMLDivElement).getBoundingClientRect().top + 50)
+        }
+    }, [])
+    useEffect(() => {
         if (UserToken())
             getUser()
         if (data) {
@@ -41,8 +59,13 @@ const Index = () => {
                 UserPhone(data.user.data.phone)
             }
             if (editProfButton.current) {
-                drawerInitHeight[1](window.innerHeight - editProfButton.current.getBoundingClientRect().top - 50)
+                drawerInitHeight[1](editProfButton.current.getBoundingClientRect().top + 50)
             }
+            if (loginRegisterBtn.current && loginRegisterBtn.current.firstChild) {
+                console.log((loginRegisterBtn.current.firstChild.firstChild as HTMLDivElement).getBoundingClientRect().top)
+                drawerInitHeight[1]((loginRegisterBtn.current.firstChild.firstChild as HTMLDivElement).getBoundingClientRect().top)
+            }
+
         }
 
     }, [data])
@@ -54,198 +77,227 @@ const Index = () => {
                 <title>Unimun Profile</title>
                 <meta name="description" content="Unimun"/>
             </Head>
-            <div className={'w-full h-full IranSansMedium text-textBlack text-sm overflow-scroll'}>
-                <div className={'w-full px-4 pt-3 flex flex-row justify-between'}>
-                    <div className={'IranSansBlack text-md'}>
-                        <span>پرو <span className={'text-primary -mr-1'}>فایل</span></span>
-                    </div>
-                    <div className={'h-6 w-6'} onClick={() => {
-                        //help on click
-                    }}>
-                        <HelpSvg/>
-                    </div>
-                </div>
-                <div className={'w-full flex flex-col justify-center items-center'}>
-                    <div
-                        className={'w-28 h-28 bg-white shadow-lg rounded-3xl mt-10 flex flex-col justify-center items-center'}>
-                        <div className={'w-12 h-12'}>
-                            <UserOutlineSvg/>
+
+            <Drawer minHeight={drawerMinHeight[0]} initHeight={drawerInitHeight[0]}
+                    closedHeight={170} wrap={
+                <div className={'w-full h-full IranSansMedium text-textBlack text-sm overflow-scroll '}>
+                    <div className={'w-full px-4 pt-3 flex flex-row justify-between'}>
+                        <div className={'IranSansBlack text-md'}>
+                            <span>پرو <span className={'text-primary -mr-1'}>فایل</span></span>
+                        </div>
+                        <div className={'h-6 w-6'} onClick={() => {
+                            //help on click
+                        }}>
+                            <HelpSvg/>
                         </div>
                     </div>
-                </div>
+                    <div className={'w-full flex flex-col justify-center items-center'}>
+                        <div
+                            className={'w-28 h-28 bg-white shadow-lg rounded-3xl mt-10 flex flex-col justify-center items-center'}>
+                            <div className={'w-12 h-12'}>
+                                <UserOutlineSvg/>
+                            </div>
+                        </div>
+                    </div>
 
-                {UserToken() ?
-                    data ?
+                    {UserToken() ?
+                        data ?
+                            <div className={'contents'}>
+                                <div className={'w-full flex flex-col justify-center items-center'}>
+                                    <span className={'mt-3 IranSansBold text-lg'}>{data.name ?? "بدون نام"}</span>
+                                    <span
+                                        className={'mt-1 IranSans text-sm text-textDark'}>{data.name ?? "بدون نام"}</span>
+                                </div>
+
+
+                                <div className={'w-full flex flex-row justify-between items-center px-4 mt-4'}>
+                                    <div
+                                        className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
+                                        <span className={'text-primary IranSansBold text-xl'}>0</span>
+                                        <span className={'text-primary IranSansBold text-tiny'}>آگهی</span>
+                                        <span className={'text-textBlack IranSansBold text-sm'}>انجام شده</span>
+                                    </div>
+                                    <div
+                                        className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
+                                        {/*<span className={'text-primary IranSansBold text-xl'}>0</span>*/}
+                                        {/*<span className={'text-primary IranSansBold text-tiny'}>آگهی</span>*/}
+                                        <CircularProgressBar sqSize={60} strokeWidth={2} percentage={progressPercentage}
+                                                             color={'#1da1f2'}/>
+                                        <span className={'text-textBlack IranSansBold text-sm mt-3'}>سطح</span>
+
+                                    </div>
+                                    <div
+                                        className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
+                                        <span className={'text-primary IranSansBold text-xl'}>0</span>
+                                        <span className={'text-primary IranSansBold text-tiny'}>سوال</span>
+                                        <span className={'text-textBlack IranSansBold text-sm'}>پاسخ داده</span>
+                                    </div>
+
+                                </div>
+
+                                <div ref={editProfButton} id={'edit-profile'} className={'px-4 w-full mt-4'}>
+                                    <Button onClick={() => {
+                                        router.push('/profile/editProfile')
+                                    }} id={'edit-profile-button'} rippleColor={'rgba(22,155,255,0.5)'}
+                                            className={'w-full border-2 border-primary rounded-lg h-10 text-primary'}>
+                                        <span>ویرایش نمایه</span>
+                                    </Button>
+
+                                </div>
+
+
+                            </div> :
+                            null
+                        :
                         <div className={'contents'}>
                             <div className={'w-full flex flex-col justify-center items-center'}>
-                                <span className={'mt-3 IranSansBold text-lg'}>{data.name ?? "بدون نام"}</span>
-                                <span className={'mt-1 IranSans text-sm text-textDark'}>{data.name ?? "بدون نام"}</span>
-                            </div>
-
-
-                            <div className={'w-full flex flex-row justify-between items-center px-4 mt-4'}>
-                                <div
-                                    className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
-                                    <span className={'text-primary IranSansBold text-xl'}>0</span>
-                                    <span className={'text-primary IranSansBold text-tiny'}>آگهی</span>
-                                    <span className={'text-textBlack IranSansBold text-sm'}>انجام شده</span>
+                                <span className={'mt-5'}>وقتشه وارد دنیای جذاب یونیمون بشید</span>
+                                <div className={'flex flex-row justify-center items-center mt-5'}>
+                                    <span className={'mx-2'}>کلی اتفاق خوب منتظر شماست</span>
+                                    <img className={'w-6 h-6'} src={'/assets/image/blink-emoji.png'} alt={''}/>
                                 </div>
-                                <div
-                                    className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
-                                    {/*<span className={'text-primary IranSansBold text-xl'}>0</span>*/}
-                                    {/*<span className={'text-primary IranSansBold text-tiny'}>آگهی</span>*/}
-                                    <CircularProgressBar sqSize={60} strokeWidth={2} percentage={progressPercentage}
-                                                         color={'#1da1f2'}/>
-                                    <span className={'text-textBlack IranSansBold text-sm mt-3'}>سطح</span>
-
-                                </div>
-                                <div
-                                    className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
-                                    <span className={'text-primary IranSansBold text-xl'}>0</span>
-                                    <span className={'text-primary IranSansBold text-tiny'}>سوال</span>
-                                    <span className={'text-textBlack IranSansBold text-sm'}>پاسخ داده</span>
+                                <div ref={loginRegisterBtn}>
+                                    <Badge className={'mt-5'}>
+                                        <Button id={'login-register'} onClick={() => {
+                                            router.push('/profile/login')
+                                        }} rippleColor={'rgba(255,255,255,0.58)'}
+                                                className={'bg-primary w-36 h-11 rounded-xl text-white '}>
+                                            <span>ورود | ثبت نام</span>
+                                        </Button>
+                                    </Badge>
                                 </div>
 
                             </div>
 
-                            <div ref={editProfButton} id={'edit-profile'} className={'px-4 w-full mt-4'}>
-                                <Button rippleColor={'rgba(22,155,255,0.5)'}
-                                        className={'w-full border-2 border-primary rounded-lg h-10 text-primary'}>
-                                    <span>ویرایش نمایه</span>
-                                </Button>
-                            </div>
-
-
-                        </div> :
-                        null
-                    :
-                    <div className={'contents'}>
-                        <div className={'w-full flex flex-col justify-center items-center'}>
-                            <span className={'mt-5'}>وقتشه وارد دنیای جذاب یونیمون بشید</span>
-                            <div className={'flex flex-row justify-center items-center mt-5'}>
-                                <span className={'mx-2'}>کلی اتفاق خوب منتظر شماست</span>
-                                <Image src={BlinkEmoji} alt={''}/>
-                            </div>
-                            <Badge className={'mt-5'}>
-                                <Button onClick={() => {
-                                    router.push('/profile/login')
-                                }} rippleColor={'rgba(255,255,255,0.58)'}
-                                        className={'bg-primary w-36 h-11 rounded-xl text-white '}>
-                                    <span>ورود | ثبت نام</span>
-                                </Button>
-                            </Badge>
                         </div>
-
-                    </div>
-                }
-                <div className={'h-96'}/>
-
-                <Drawer minHeight={100} initHeight={drawerInitHeight[0]}
-                        closedHeight={170}>
-                    {
-                        UserToken() ?
-                            <div className={'mb-4'}>
-                                <span className={' IranSansBold text-primary'}>حساب</span>
-                                <Link passHref={true} href={'/profile/accountSettings'}>
-                                    <div className={'drawer-drag  flex flex-col justify-center items-center IranSans'}>
-                                        <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
-                                            <div className={'profile-drawer-svg'}><SettingsSVG/></div>
-                                            <div
-                                                className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>تنظیمات
-                                            </div>
-                                        </button>
-                                    </div>
-                                </Link>
-
-
-                                <div className={'flex flex-col justify-center items-center IranSans'}>
-                                    <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
-                                        <div className={'profile-drawer-svg'}><MyAppealsSVG/></div>
-                                        <div
-                                            className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>اگهی
-                                            های من
-                                        </div>
-                                    </button>
-                                </div>
-
-                                <div className={'flex flex-col justify-center items-center IranSans'}>
-                                    <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
-                                        <div className={'profile-drawer-svg'}><BookSVG/></div>
-                                        <div
-                                            className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>کتاب
-                                            های من
-                                        </div>
-                                    </button>
-                                </div>
-
-                                <div className={'flex flex-col justify-center items-center IranSans'}>
-                                    <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
-                                        <div className={'profile-drawer-svg'}><PeopleSVG/></div>
-                                        <div
-                                            className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>دعوت
-                                            از دوستان
-                                        </div>
-                                    </button>
-                                </div>
-
-                                <div className={'flex flex-col justify-center items-center IranSans'}>
-                                    <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
-                                        <div className={'profile-drawer-svg'}><SaveSVG/></div>
-                                        <div
-                                            className={'text-md IranSansMedium w-full text-right mx-4  pb-4'}>نشان
-                                            ها و یاداشت ها
-                                        </div>
-                                    </button>
-                                </div>
-
-                            </div>
-                            : null
                     }
+                </div>
+            }>
 
-                    <span className={'IranSansBold text-primary '}>دربارمون</span>
-                    <div className={'flex flex-col justify-center items-center IranSans'}>
+
+                <div>
+
+                    {UserToken() ?
+                        <div className={'mb-4'}>
+                            <span className={' IranSansBold text-primary mr-4'}>حساب</span>
+                            <Link passHref={true} href={'/profile/accountSettings'}>
+                                <Button rippleColor={"rgba(0,0,0,0.15)"} onClick={() => {
+                                    redirectTo('/profile/accountSettings')
+                                }} id={'acc-settings'} className={'drawer-drag  drawer-buttons'}>
+                                    <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
+                                        <div className={'profile-drawer-svg'}><SettingsSVG/></div>
+                                        <div
+                                            className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>تنظیمات
+                                        </div>
+                                    </button>
+                                </Button>
+                            </Link>
+
+
+                            <Button id={'my-appeals'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
+                                <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
+                                    <div className={'profile-drawer-svg'}><MyAppealsSVG/></div>
+                                    <div
+                                        className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>اگهی
+                                        های من
+                                    </div>
+                                </button>
+                            </Button>
+
+                            <Button id={'my-books'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
+                                <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
+                                    <div className={'profile-drawer-svg'}><BookSVG/></div>
+                                    <div
+                                        className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>کتاب
+                                        های من
+                                    </div>
+                                </button>
+                            </Button>
+
+                            <Button id={'invite-friends'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
+                                <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
+                                    <div className={'profile-drawer-svg'}><PeopleSVG/></div>
+                                    <div
+                                        className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>دعوت
+                                        از دوستان
+                                    </div>
+                                </button>
+                            </Button>
+
+                            <Button id={'saved'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
+                                <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
+                                    <div className={'profile-drawer-svg'}><SaveSVG/></div>
+                                    <div
+                                        className={'text-md IranSansMedium w-full text-right mx-4  pb-4'}>نشان
+                                        ها و یاداشت ها
+                                    </div>
+                                </button>
+                            </Button>
+
+                        </div>
+                        : null}
+
+
+                    <span className={'IranSansBold text-primary mr-4'}>دربارمون</span>
+                    <Button id={'rules'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
                         <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                             <div className={'profile-drawer-svg'}><JudgeSVG/></div>
                             <div className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>قوانین و
                                 مقررات
                             </div>
                         </button>
-                    </div>
+                    </Button>
 
-                    <div className={'flex flex-col justify-center items-center IranSans'}>
+                    <Button id={'about-us'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
                         <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                             <div className={'profile-drawer-svg'}><InfoSVG/></div>
                             <div className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>درباره
                                 یونیمون
                             </div>
                         </button>
-                    </div>
+                    </Button>
 
-                    <div className={'flex flex-col justify-center items-center IranSans'}>
+                    <Button id={'backup-btn'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
                         <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                             <div className={'profile-drawer-svg'}><SupportSVG/></div>
-                            <div className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>پشتیبانی 24
+                            <div className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>پشتیبانی
+                                24
                                 ساعته
                             </div>
                         </button>
-                    </div>
-
-
-                    <div className={'flex flex-col justify-center items-center IranSans'}>
+                    </Button>
+                    <Button id={'get-app'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
                         <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                             <div className={'profile-drawer-svg'}><DownloadAppSVG/></div>
                             <div className={'text-md IranSansMedium w-full text-right mx-4 pb-4'}>دریافت
                                 اپلیکیشن
                             </div>
                         </button>
+                    </Button>
+                </div>
+                <div className={'h-48 flex flex-col justify-start items-center mt-10'}>
+                    <div className={'flex flex-row justify-center items-center'}>
+
+                        <div className={'w-5 h-5 mx-3'}>
+                            <TelSVG/>
+                        </div>
+                        <div className={'w-5 h-5 mx-3'}>
+                            <InstaSVG/>
+                        </div>
+                        <div className={'w-5 h-5 mx-3'}>
+                            <TwitterSVG/>
+                        </div>
+
                     </div>
+                    <div className={'w-20 scale-90 mt-5'}>
+                        <VersionSVG/>
+                    </div>
+                </div>
 
 
-                    <div className={'h-44'}></div>
+            </Drawer>
 
-                </Drawer>
 
-            </div>
         </div>
 
     );

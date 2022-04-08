@@ -53,27 +53,27 @@ const Navbar = () => {
 
 
     return (
-        <div className={'navbar '}>
+        <div className={'navbar z-40 '}>
             <Tab indicatorSizeDivider={2} activeIndex={active}>
                 {
                     navbarIcons.map((item, index) => {
-                            let active: boolean = false;
-                            if (item.path !== '/') {
-                                active = router.pathname.includes(item.path) && router.pathname.length > 2
-                            }
-                            if (router.pathname === '/' && item.path === '/') {
-                                active = true;
-                            }
-                            return (
-                                <Link passHref={true} key={item.path} href={item.path}>
-                                    <div onClick={() => {
-                                        setActive(index)
-                                    }} id={'nav-' + index} key={item.name}
-                                         className={'navbar-Button relative w-20 m-0 flex flex-col justify-center items-center ' + (active ? 'nav-active' : '')}>
-                                        <Icon w={1.7} h={1.7} unit={'rem'} fill={active}
-                                              svg={'/assets/svgs/navbar/' + item.svg + '-' + (active ? 'bold' : 'outline') + '.svg'}/>
-                                        <span className={'IranSansMedium text-tiny mt-1'}>{item.name}</span>
-                                    </div>
+                        let active: boolean = false;
+                        if (item.path !== '/') {
+                            active = router.pathname.includes(item.path) && router.pathname.length > 2
+                        }
+                        if (router.pathname === '/' && item.path === '/') {
+                            active = true;
+                        }
+                        return (
+                            <Link passHref={true} key={item.path} href={item.path}>
+                                <div onClick={() => {
+                                    setActive(index)
+                                }} id={'nav-' + index} key={item.name}
+                                     className={'navbar-Button relative w-20 m-0 flex flex-col justify-center items-center ' + (active ? 'nav-active' : '')}>
+                                    <Icon w={1.7} h={1.7} unit={'rem'} fill={active}
+                                          svg={'/assets/svgs/navbar/' + item.svg + '-' + (active ? 'bold' : 'outline') + '.svg'}/>
+                                    <span className={'IranSansMedium text-tiny mt-1'}>{item.name}</span>
+                                </div>
                                 </Link>
                             )
                         }

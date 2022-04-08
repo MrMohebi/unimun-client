@@ -1,6 +1,6 @@
 import type {NextPage} from 'next'
 import Head from 'next/head'
-import Appeals from "../components/normal/home/Appeals/Appeals";
+import Appeals from "../components/normal/Appeals/Appeals";
 import React, {useEffect} from "react";
 import {getToken} from "../helpers/TokenHelper";
 import {UserToken} from "../store/user";

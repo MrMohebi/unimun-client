@@ -1,17 +1,17 @@
 import React, {useEffect, useRef, useState} from 'react';
-import Eye from "../../../../assets/svgCodes/Eye";
+import Eye from "../../../assets/svgCodes/Eye";
 import {gql, useLazyQuery, useReactiveVar} from "@apollo/client";
 import Link from 'next/link'
 import {useRouter} from "next/router";
-import {currentAd, lastGottenAppeals} from "../../../../store/appeals";
-import {getAppealsQuery} from "../../../../queries/normal/appeals";
+import {currentAd, lastGottenAppeals} from "../../../store/appeals";
+import {getAppealsQuery} from "../../../queries/normal/appeals";
 import NewAppealButton from "../NewAppealButton/NewAppealButton";
-import ThousandTomans from '../../../../assets/svgs/thousandTomans.svg'
+import ThousandTomans from '../../../assets/svgs/thousandTomans.svg'
 import {TailSpin} from "react-loader-spinner";
 import Search from "../Search/Search";
 import _ from 'lodash';
-import SkeletonElement from "../../../view/Skeleton/Skeleton";
-import {passedTime} from "../../../../helpers/passedTime";
+import SkeletonElement from "../../view/Skeleton/Skeleton";
+import {passedTime} from "../../../helpers/passedTime";
 
 
 const Appeals = () => {

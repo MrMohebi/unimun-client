@@ -15,7 +15,9 @@ interface Props {
     multiLine?: boolean,
     autoFocus?: boolean,
     defaultValue?: string,
-    textAlignment?: string
+    textAlignment?: string,
+    onFocus?: any
+    onBlur?: any
 }
 
 const Input = ({
@@ -29,14 +31,17 @@ const Input = ({
                    onChange,
                    multiLine,
                    autoFocus,
-                   defaultValue
+                   defaultValue,
+                   onFocus,
+                   onBlur
                }: Props) => {
 
 
     return (
         !multiLine ?
             <div className={wrapperClassName ?? ''}>
-                <input type={numOnly ? '' : ''} defaultValue={defaultValue} autoFocus={autoFocus}
+                <input onBlur={onBlur} onFocus={onFocus} type={numOnly ? 'number' : ''} defaultValue={defaultValue}
+                       autoFocus={autoFocus}
                        onChange={(e) => {
 
                            if (numOnly) {

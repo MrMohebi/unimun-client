@@ -16,7 +16,7 @@ const AccountSettings = () => {
     const logoutOnClickHandler = () => {
         removeToken()
         UserToken('')
-        router.push('/')
+        window.location.pathname = '/'
     }
 
     return (

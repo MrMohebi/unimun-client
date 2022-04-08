@@ -399,7 +399,7 @@ const Index = () => {
             </StepperFragment>
 
             <div className={'w-full bottom-2 fixed flex flex-row items-center justify-center po'}>
-                <Button loading={loading}
+                <Button id={'new-appeal-submit'} loading={loading}
                         className={'w-11/12 h-14  bg-primary rounded-xl flex flex-row justify-between items-center px-4'}
                         rippleColor={'rgba(255,255,255,0.49)'} onClick={() => {
                     if (currentStep !== 1)

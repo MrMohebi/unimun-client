@@ -1,7 +1,7 @@
 import React from 'react';
-import AddSvg from "../../../../assets/svgs/add.svg";
-import Button from "../../../view/Button/Button";
-import {UserToken} from "../../../../store/user";
+import AddSvg from "../../../assets/svgs/add.svg";
+import Button from "../../view/Button/Button";
+import {UserToken} from "../../../store/user";
 import {useRouter} from "next/router";
 
 const NewAppealButton = (props: { hidden: boolean }) => {
@@ -17,7 +17,7 @@ const NewAppealButton = (props: { hidden: boolean }) => {
                 }
 
             }}>
-                <Button rippleColor={'rgba(0,0,0,0.26)'}
+                <Button id={'add-appeal'} rippleColor={'rgba(0,0,0,0.26)'}
                         className={` transition-all duration-100 h-14 bg-white rounded-2xl shadow-lg flex flex-row justify-around items-center px-2 IranSansMedium`}>
                     <div className={'w-5 h-5 mx-2.5'}><AddSvg/></div>
                     <span

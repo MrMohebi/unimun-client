@@ -8,7 +8,7 @@ import UserAuthenticationCheck from "../middlewareComponents/UserAuthenticationC
 
 const Layouts = [
     {
-        routes: ['', 'profile'],
+        routes: ['', 'profile', 'ask', 'library'],
         except: ['login'],
         component: <Navbar/>
     },

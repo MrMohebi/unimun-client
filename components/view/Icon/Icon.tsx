@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from "next/image";
+// import Image from "next/image";
 
 interface Props {
     w: number,
@@ -22,7 +22,7 @@ const Icon = ({w, h, unit, svg, img, alt, fill}: Props) => {
                 }}
 
             >
-                <Image src={img} alt={alt}/>
+                <img src={img} alt={alt}/>
             </div>
             :
             <div className={"transition-all " + (fill ? 'icon-background' : 'bg-black')}

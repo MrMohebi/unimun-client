@@ -1,8 +1,9 @@
 .ripple {
   border-radius: 50%;
   animation: ripple .5s forwards;
-  width: 1px;
-  height: 1px;
+  width: 1%;
+
+  aspect-ratio: 1;
   transform-origin: center;
 }
 
@@ -11,7 +12,7 @@
     transform:scale(0);
   }
   to {
-    transform:scale(150);
+    transform: scale(100);
     opacity: 0;
   }
 }

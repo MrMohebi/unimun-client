@@ -1,6 +1,5 @@
-import React, {useEffect, useState, useRef} from 'react';
-import Input from "../../../view/Input/Input";
-import {useRouter} from "next/router";
+import React, {useEffect} from 'react';
+import Input from "../../view/Input/Input";
 
 interface Props {
     length: number,
@@ -22,12 +21,8 @@ const VCodeInput = (props: Props) => {
     const [err, setErr] = React.useState(props.err)
     const [success, setSuccess] = React.useState(props.success)
 
-    // const [remaining, setRemaining] = useState();
 
     useEffect(() => {
-        if (props.onChange) {
-            // props.onChange(code)
-        }
         setSuccess(props.success)
         setErr(props.err)
     }, [code, props.success, props.err])

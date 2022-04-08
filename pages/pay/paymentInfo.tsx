@@ -72,8 +72,10 @@ const PaymentInfo = () => {
                 <span>کمتر از 2 ساعت دیگر به حسابتان باز میگردد</span>
 
             </div>
-            <div className={'w-full absolute -translate-x-1/2 left-1/2 bottom-4 flex flex-col justify-center items-center'}>
-                <Button className={'w-11/12 rounded-2xl mx-3 bg-primary text-white p-4 bottom-0'} rippleColor={'white'}>
+            <div
+                className={'w-full absolute -translate-x-1/2 left-1/2 bottom-4 flex flex-col justify-center items-center'}>
+                <Button id={'paymentInfo-button'}
+                        className={'w-11/12 rounded-2xl mx-3 bg-primary text-white p-4 bottom-0'} rippleColor={'white'}>
                     <span className={'IranSansMedium'}>بازگشت به یونیمون</span>
                 </Button>
             </div>
