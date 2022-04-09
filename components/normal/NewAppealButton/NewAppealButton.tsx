@@ -7,7 +7,7 @@ import {useRouter} from "next/router";
 const NewAppealButton = (props: { hidden: boolean }) => {
     const router = useRouter()
     return (
-        <div className={`fixed bottom-20 right-5  transition-all duration-300`}
+        <div className={`fixed bottom-20 right-5  transition-all duration-300 z-10`}
         >
             <div onClick={() => {
                 if (UserToken().length) {

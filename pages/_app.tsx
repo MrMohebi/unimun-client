@@ -5,10 +5,10 @@ import Navbar from "../components/common/Navbar/Navbar";
 import {ApolloProvider} from "@apollo/client";
 import client from "../apollo-client";
 import UserAuthenticationCheck from "../middlewareComponents/UserAuthenticationCheck";
-
+import 'react-toastify/dist/ReactToastify.css'
 const Layouts = [
     {
-        routes: ['', 'profile', 'ask', 'library'],
+        routes: ['', 'profile', 'ask', 'library', 'wallet'],
         except: ['login'],
         component: <Navbar/>
     },

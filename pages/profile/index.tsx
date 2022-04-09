@@ -14,9 +14,9 @@ import BookSVG from '../../assets/svgs/book.svg'
 import PeopleSVG from '../../assets/svgs/people.svg'
 import SaveSVG from '../../assets/svgs/save.svg'
 import DownloadAppSVG from '../../assets/svgs/downloadApp.svg'
-import {UserPhone, UserToken} from "../../store/user";
+import {UserData, UserPhone, UserToken} from "../../store/user";
 import {gql, useLazyQuery} from "@apollo/client";
-import {getUserQuery} from "../../queries/normal/user";
+import {getUserQuery} from "../../Requests/normal/user";
 import {useRouter} from "next/router";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 import Head from "next/head";
@@ -30,13 +30,16 @@ import {route} from "next/dist/server/router";
 const Index = () => {
     const router = useRouter()
 
-    const [getUser, {data}] = useLazyQuery(gql`${getUserQuery().query}`)
+    const [getUser, {data}] = useLazyQuery(gql`${getUserQuery(['id', 'name', 'created_at', 'phone', 'referenceCode','username','bio']).query}`)
     const [progressPercentage, setProgressPercentage] = useState(0)
     const editProfButton = useRef<HTMLDivElement>(null)
     const drawerInitHeight = useState(170)
     const drawerMinHeight = useState(100)
     const loginRegisterBtn = useRef<HTMLDivElement>(null)
 
+
+    if (data)
+        console.log(data)
 
     const redirectTo = (path: string) => {
         router.push(path).then()
@@ -50,6 +53,7 @@ const Index = () => {
         if (loginRegisterBtn.current && loginRegisterBtn.current.firstChild) {
             drawerInitHeight[1]((loginRegisterBtn.current.firstChild.firstChild as HTMLDivElement).getBoundingClientRect().top + 50)
         }
+
     }, [])
     useEffect(() => {
         if (UserToken())
@@ -57,6 +61,8 @@ const Index = () => {
         if (data) {
             if (data.user.data) {
                 UserPhone(data.user.data.phone)
+                UserData(data.user.data)
+                console.log(UserData())
             }
             if (editProfButton.current) {
                 drawerInitHeight[1](editProfButton.current.getBoundingClientRect().top + 50)
@@ -85,7 +91,7 @@ const Index = () => {
                         <div className={'IranSansBlack text-md'}>
                             <span>پرو <span className={'text-primary -mr-1'}>فایل</span></span>
                         </div>
-                        <div className={'h-6 w-6'} onClick={() => {
+                        <div className={'h-6 w-6 opacity-0'} onClick={() => {
                             //help on click
                         }}>
                             <HelpSvg/>
@@ -93,8 +99,8 @@ const Index = () => {
                     </div>
                     <div className={'w-full flex flex-col justify-center items-center'}>
                         <div
-                            className={'w-28 h-28 bg-white shadow-lg rounded-3xl mt-10 flex flex-col justify-center items-center'}>
-                            <div className={'w-12 h-12'}>
+                            className={'w-24 h-24 bg-white shadow-lg rounded-3xl mt-10 flex flex-col justify-center items-center'}>
+                            <div className={'w-10 h-10'}>
                                 <UserOutlineSvg/>
                             </div>
                         </div>
@@ -104,9 +110,10 @@ const Index = () => {
                         data ?
                             <div className={'contents'}>
                                 <div className={'w-full flex flex-col justify-center items-center'}>
-                                    <span className={'mt-3 IranSansBold text-lg'}>{data.name ?? "بدون نام"}</span>
                                     <span
-                                        className={'mt-1 IranSans text-sm text-textDark'}>{data.name ?? "بدون نام"}</span>
+                                        className={'mt-3 IranSansBold text-lg'}>{data.user.data.name ?? "بدون نام"}</span>
+                                    <span
+                                        className={'mt-1 IranSans text-sm text-textDark'}>{"اخیرا پیوسته به یونیمون"}</span>
                                 </div>
 
 
@@ -179,7 +186,7 @@ const Index = () => {
 
                     {UserToken() ?
                         <div className={'mb-4'}>
-                            <span className={' IranSansBold text-primary mr-4'}>حساب</span>
+                            <span className={' IranSansBold text-sm text-primary mr-4'}>حساب</span>
                             <Link passHref={true} href={'/profile/accountSettings'}>
                                 <Button rippleColor={"rgba(0,0,0,0.15)"} onClick={() => {
                                     redirectTo('/profile/accountSettings')
@@ -238,7 +245,7 @@ const Index = () => {
                         : null}
 
 
-                    <span className={'IranSansBold text-primary mr-4'}>دربارمون</span>
+                    <span className={'IranSansBold text-primary text-sm mr-4'}>دربارمون</span>
                     <Button id={'rules'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
                         <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                             <div className={'profile-drawer-svg'}><JudgeSVG/></div>

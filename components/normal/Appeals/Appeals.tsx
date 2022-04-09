@@ -4,7 +4,7 @@ import {gql, useLazyQuery, useReactiveVar} from "@apollo/client";
 import Link from 'next/link'
 import {useRouter} from "next/router";
 import {currentAd, lastGottenAppeals} from "../../../store/appeals";
-import {getAppealsQuery} from "../../../queries/normal/appeals";
+import {getAppealsQuery} from "../../../Requests/normal/appeals";
 import NewAppealButton from "../NewAppealButton/NewAppealButton";
 import ThousandTomans from '../../../assets/svgs/thousandTomans.svg'
 import {TailSpin} from "react-loader-spinner";
@@ -165,7 +165,7 @@ const Appeals = () => {
 
     const appealUI = (Appeal: any, index: number) => {
         return (
-            <Link href={`/appeal/${Appeal.id}`}>
+            <Link passHref={true} href={`/appeal/${Appeal.id}`}>
 
                 <div key={Appeal.title + index}
                      className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
@@ -173,7 +173,7 @@ const Appeals = () => {
                     <div className={'item-left w-1/2 h-full items-start flex flex-col justify-between'}>
                         <div className={'flex-col flex text-right'}>
                                             <span
-                                                className={'IranSansBold text-textBlack text-lg pt-1 whitespace-nowrap'}>{Appeal.title}</span>
+                                                className={'IranSansBold text-textBlack text-l pt-1 whitespace-nowrap'}>{Appeal.title}</span>
                             <span
                                 style={{
                                     width: '200px',
@@ -188,12 +188,12 @@ const Appeals = () => {
 
                         </div>
                         <div
-                            className={'IranSansMedium text-textBlack whitespace-nowrap text-lg pt-2  flex flex-row items-end'}>
+                            className={'IranSansMedium text-textBlack whitespace-nowrap text-lg  flex flex-row items-end'}>
                             <span className={'mx-0.5  flex flex-row items-end'}>از</span>
                             <span className={'mx-0.5  flex flex-row items-end'}>{Appeal.priceStart / 1000}</span>
                             <span className={'mx-0.5  flex flex-row items-end'}>تا</span>
                             <span className={'mx-0.5  flex flex-row items-end'}>{Appeal.priceEnd / 1000}</span>
-                            <div dir={'ltr'} className={'w-10 h-10 flex flex-row mb-1 items-end'}>
+                            <div dir={'ltr'} className={'w-10 h-10 flex flex-row mb-1.5 items-end opacity-90 '}>
                                 <ThousandTomans/>
                             </div>
                         </div>
@@ -215,7 +215,7 @@ const Appeals = () => {
                         </div>
                         <div
                             className={' flex flex-row-reverse items-center justify-center whitespace-nowrap text-sm'}>
-                            <div style={{width: '60px'}} dir={'rtl'}
+                            <div dir={'rtl'}
                                  className={' IranSans flex flex-row justify-center items-center'}>{passedTime(Appeal.createdAt)}</div>
 
                             <div className={'h-4 w-0 overflow-hidden border-primary bg-primary  sm:block border mx-2'}/>

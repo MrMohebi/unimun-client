@@ -24,7 +24,7 @@ const Search = (props: Props) => {
 
     return (
         <div
-            className={`absolute top-0 left-0 px-4 w-full bg-white pt-3 ${props.collapse && !manualSearch[0] ? 'pb-1 ' : 'pb-4'} rounded-br-xl rounded-bl-xl shadow`}>
+            className={`absolute top-0 left-0 px-4 w-full bg-white pt-3 ${props.collapse && !manualSearch[0] ? 'pb-1 ' : 'pb-4'} rounded-br-xl rounded-bl-xl z-10 shadow`}>
             <div className={'search-upper flex flex-row justify-between items-center'}>
                 <div className={'IranSansBlack'}><span dir={'ltr'} className={'text-primary'}><span
                     className={'text-textBlack'}>یونیـ</span>مـون</span></div>
@@ -41,8 +41,6 @@ const Search = (props: Props) => {
                         </div>
                     </Badge>
                 </div>
-
-
             </div>
             <div
                 className={`bg-background px-3 w-full flex flex-row items-center justify-between  rounded-xl mt-3 transition-all overflow-hidden duration-200 origin-top h-12 ${props.collapse && !manualSearch[0] ? 'h-0' : 'h-12'}`}>

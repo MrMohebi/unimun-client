@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useRouter} from "next/router";
 import {gql, useLazyQuery} from "@apollo/client";
-import {getAppealQuery} from "../../queries/normal/appeals";
+import {getAppealQuery} from "../../Requests/normal/appeals";
 import Header from "../../components/common/Header/Header";
 import Skeleton from "react-loading-skeleton";
 
@@ -31,15 +31,15 @@ interface Appeal {
     hashtags: []
 }
 
-interface AttachmentFiles{
-    uploadedAsFile:boolean
-    url:string
-    preview:string
+interface AttachmentFiles {
+    uploadedAsFile: boolean
+    url: string
+    preview: string
 }
 
 const Item = () => {
     const router = useRouter();
-    const {id} = router.query;
+    // const {id} = router.query;
 
 
     const [currentMediaPart, setCurrentMediaPart] = useState('files')
@@ -47,6 +47,9 @@ const Item = () => {
 
     const [getAppeal, {data, loading, error}] = useLazyQuery(gql`${getAppealQuery().query}`)
     useEffect(() => {
+
+
+        let id = window.location.pathname.split('/').reverse()[0]
         getAppeal({variables: {id: id}}).then(e => {
             if (e.data) {
                 let appeal = e.data.appeal
@@ -65,7 +68,8 @@ const Item = () => {
 
         })
 
-        console.log('')
+        console.log(appeal)
+
 
     }, [data])
 
@@ -87,14 +91,14 @@ const Item = () => {
 
                 <h1 className={'IranSansBold text-xl '}>{appeal.title ??
                     <SkeletonElement className={'w-40 h-8'}/>}</h1>
-                <div className={'IranSans text-textDark mt-3'}>{appeal.createdAt ? appeal.createdAt :
+                <div className={'IranSans text-textDark mt-2'}>{appeal.createdAt ? appeal.createdAt :
                     <SkeletonElement className={'w-40 h-5'}/>}</div>
-                <div className={'flex flex-wrap items-center justify-start mt-4'}>
+                <div className={'flex flex-wrap items-center justify-start mt-2 mb-4'}>
 
                     {
                         appeal.hashtags ?
                             appeal.hashtags.map(item => <div key={item}
-                                                             className={' mx-2 mt-4 hashtag px-3 h-8 border border-gray-300 rounded-xl  flex flex-col justify-center items-center text-primary IranSansMedium text-sm'}>
+                                                             className={' mx-2 mt-2 hashtag px-3 h-8 border border-gray-300 rounded-xl  flex flex-col justify-center items-center text-primary IranSansMedium text-sm'}>
                                 <span># <span>{item}</span></span>
                             </div>)
                             :
@@ -105,42 +109,47 @@ const Item = () => {
                     }
 
                 </div>
-                <div className={'mt-4'}/>
+                <div className={'mt-1'}/>
                 <Divider type={'horizontal'} color={'#E1E8ED'}/>
-                <div className={'w-full flex flex-row justify-between items-center IranSansMedium mt-5 text-lg pb-5'}>
-                    <div className={'text-textDarker'}>بودجه</div>
+                <div
+                    className={'w-full flex flex-row mt-3 justify-between items-baseline  IranSansMedium  text-lg pb-5'}>
+                    {
+                        appeal.priceStart ?
+                            <div className={'text-textDarker'}>بودجه</div>
+                            :
+                            <SkeletonElement className={'w-20 mt-2 h-5'}/>
+                    }
                     {
                         appeal.priceStart ?
                             <div
-                                className={'IranSansMedium text-textBlack whitespace-nowrap text-xl pt-2  flex flex-row items-end'}>
+                                className={'IranSansMedium text-textBlack whitespace-nowrap text-md pt-2  flex flex-row items-end'}>
                                 <span className={'mx-0.5  flex flex-row items-end'}>از</span>
                                 <span className={'mx-0.5  flex flex-row items-end'}>{appeal.priceStart / 1000}</span>
                                 <span className={'mx-0.5  flex flex-row items-end'}>تا</span>
                                 <span className={'mx-0.5  flex flex-row items-end'}>{appeal.priceEnd / 1000}</span>
-                                <div dir={'ltr'} className={'w-12 h-12 flex flex-row mb-1 items-end'}>
+                                <div className={'w-12 mb-1 mr-0.5 '}>
                                     <ThousandTomans/>
                                 </div>
                             </div>
-                            : <Skeleton/>
+                            : <SkeletonElement className={'w-20 mt-2 h-5'}/>
                     }
 
                 </div>
             </section>
-            <div className={'px-5 my-2'}>
+            {
+                appeal.title ?
+                    <div className={'px-5 my-2'}>
                 <span
-                    className={'IranSansMedium text-textDark text-sm'}>شما باید پیشنهاد خود را در این بازه مطرح کنید</span>
-            </div>
+                    className={'IranSans text-textDark text-sm'}>شما باید پیشنهاد خود را در این بازه مطرح کنید</span>
+                    </div> :
+                    null}
 
-            <section className={'w-full bg-white px-5 pt-5 pb-5'}>
-                <div className={'w-full flex flex-row justify-between items-center IranSansMedium mt-2 text-lg pb-5'}>
-                    <div className={'text-textDarker'}>دانشگاه</div>
-                    <div>نام دانشگاه</div>
-                </div>
-
-                <div className={'mt-2'}/>
-                <Divider type={'horizontal'} color={'#E1E8ED'}/>
-                <div className={'text-textDarker IranSansMedium mt-5'}>توضیحات</div>
-                <div className={'px-5 mt-2'}>
+            {
+                appeal.details ?
+                    <div>
+                        <section className={'w-full bg-white px-5 pt-2 pb-5'}>
+                            <div className={'text-textDarker IranSansMedium mt-2'}>توضیحات</div>
+                            <div className={'px-5 mt-2'}>
                     <span className={'IranSansMedium'}>
                         {
                             appeal.details ?? <div className={'w-full flex flex-col justify-center items-start'}>
@@ -151,13 +160,20 @@ const Item = () => {
 
                         }
                 </span>
-                </div>
-            </section>
-            <div className={'px-5 h-2 my-2'}>
+                            </div>
 
-            </div>
+                        </section>
+                        <div className={'px-5 h-2 my-2'}/>
+
+                    </div>
+
+                    :
+                    null
+            }
+
+
             {
-                appeal.attachments ?
+                appeal.attachments && appeal.attachments.length ?
                     <section className={'w-full bg-white  pt-4 pb-4 '}>
                         <div className={'w-full'}>
                             <div
@@ -245,7 +261,9 @@ const Item = () => {
                         </div>
 
                     </section>
-                    : null
+                    :
+                    // <div className={'w-full bg-white h-3/5'}/>
+                    null
             }
 
 

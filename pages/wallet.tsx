@@ -1,6 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import lottie from "lottie-web";
 import books from "../assets/animations/books.json";
+import WalletSVG from '../assets/svgs/wallet.svg'
 
 const Library = () => {
 
@@ -19,22 +20,21 @@ const Library = () => {
 
     return (
         <div className={'w-full h-full overflow-hidden flex flex-col justify-start items-center'}>
-            <div ref={lottieRef} className={'w-60'}/>
+            <div className={'w-full mt-10'}>
+                <WalletSVG/>
+            </div>
 
-            <span className={'IranSansBold'}> کــتابخـونـه</span>
+            <span className={'IranSansBold'}> کــیــف پـول</span>
             <div className={'text-center IranSans text-textDarker text-sm px-10 mt-5 leading-6'}>
                 توی
+                <span> </span>
                 <span className={'text-black IranSansBold'}> یونیـ<span
-                    className={'text-primary'}>مـون </span></span>
-
-
-                یه کتابخونه هم قراره احداث بشه که همین روزا کلی کتاب و جزوه از دانشگاه های مختلف توش قرار میگیره که
-                میتونین ازشون استفاده کنید
+                    className={'text-primary'}>مـون </span></span>ممکنه پول لازمت بشه
+                یه کیف پول خیلی باحال برات قراره به زودی فعال بشه تا بتونی پولاتو اینجا نگه داری
             </div>
             <div className={'h-full w-full flex pb-40 flex-col justify-center items-center'}>
                 <img src="/assets/stamps/soon.png" className={'w-32 mx-auto'} alt=""/>
             </div>
-
         </div>
     );
 };

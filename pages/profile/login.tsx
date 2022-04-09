@@ -6,10 +6,10 @@ import VCodeInput from "../../components/normal/VCodeInput/VCodeInput";
 import {gql, useLazyQuery, useMutation} from "@apollo/client";
 import {useRouter} from "next/router";
 import {UserToken} from "../../store/user";
-import {isReferenceCodeValid, SendVCodeQuery, VerifyVCode} from "../../queries/normal/login";
+import {isReferenceCodeValid, SendVCodeQuery, VerifyVCode} from "../../Requests/normal/login";
 import {setToken} from "../../helpers/TokenHelper";
 import internal from "stream";
-import Promoter from "../../components/normal/Promoter/Promoter";
+import Promoter from "../../assets/svgs/postbox.svg";
 
 const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState('00000000000')
@@ -123,7 +123,7 @@ const Login = () => {
                     UserToken(verifyVCodeResult.data.verifyVCode.data.token)
                     setToken(verifyVCodeResult.data.verifyVCode.data.token)
                     router.push('/')
-                }, 1000)
+                }, 300)
 
             } else {
                 setVCodeError(true)
@@ -134,7 +134,7 @@ const Login = () => {
     }, [sendVCodeResult, verifyVCodeResult])
 
     return (
-        <div dir={'rtl'} className={'w-full'}>
+        <div dir={'rtl'} className={'w-full h-full'}>
             <Header backOnClick={() => {
 
                 setVCodeError(false)
@@ -154,7 +154,7 @@ const Login = () => {
                 }
 
             }} alignment={'rtl'} title={'ورود به یونیمون'} back={true}/>
-            <div className={'w-full px-5 pt-4'}>
+            <div className={'w-full px-5 pt-4 h-full'}>
                 <span id={'login-title'} className={'IranSansMedium text-l'}>{steps[currentStep]?.title}</span>
                 <br/>
                 <div className={'px-2 mt-2'}>
@@ -181,7 +181,7 @@ const Login = () => {
                         </div>
 
                         : currentStep === 1 ?
-                            <div>
+                            <div className={'h-full'}>
                                 <Input onFocus={() => {
                                     setShowPromoter(false)
                                 }} onBlur={() => {
@@ -222,22 +222,11 @@ const Login = () => {
                                     <br/>
 
                                 </div>
-                                {showPromoter ?
-                                    <Promoter icon={'/assets/image/insta.png'} text={'تـوی پـیـج یونیـمـون \n' +
-                                        'یـه پـسـت بـاحـال داریـم که اگـه کـد دعـوت نـداریـد\n' +
-                                        'میتونید از بین کامنت هـاش\n' +
-                                        'یـه دونـه بـرداریــد'} image={'/assets/image/post.png'}
-                                              className={'fixed bottom-20 max-w-sm w-11/12 left-1/2 -translate-x-1/2'}
-                                              buttonText={'مشاهده'}/>
-                                    : null
-                                }
+                                <div className={'w-full mt-10 mx-auto flex flex-col justify-center items-center '}
+                                     style={{maxWidth: '420px'}}>
+                                    <Promoter/>
+                                </div>
 
-
-                                {/*<img src="/assets/image/postbox.png" alt="Unimun referral"*/}
-                                {/*     className={'w-full absolute bottom-14 left-1/2 -translate-x-1/2 '}/>*/}
-                                {/*<div dir={'ltr'} className={'max-w-sm   w-full pb-20 IranSans '}>*/}
-                                {/*    <PostSVG/>*/}
-                                {/*</div>*/}
                             </div>
 
 

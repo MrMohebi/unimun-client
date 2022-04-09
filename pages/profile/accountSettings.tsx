@@ -7,6 +7,7 @@ import LogoutSVG from '../../assets/svgs/logout.svg';
 import {useRouter} from "next/router";
 import {UserPhone, UserToken} from "../../store/user";
 import {removeToken} from "../../helpers/TokenHelper";
+import Button from "../../components/view/Button/Button";
 
 const AccountSettings = () => {
 
@@ -44,8 +45,8 @@ const AccountSettings = () => {
                     <VerifySVG/>
                 </div>
                 <div
-                    className={'text-sm h-10 flex justify-start items-center ml-10 mr-4 border-b border-gray-200 py-6 w-full'}> درخواست
-                    تیک آبی
+                    className={'text-sm opacity-50 h-10 flex justify-start items-center ml-10 mr-4 border-b border-gray-200 py-6 w-full select-none'}> درخواست
+                    تیک آبی <span className={'text-sm  scale-75 mt-1'}> (به زودی)</span>
                 </div>
             </div>
 
@@ -54,19 +55,23 @@ const AccountSettings = () => {
                     <SimcardSVG/>
                 </div>
                 <div
-                    className={'text-sm h-10 flex justify-start items-center ml-10 mr-4 border-b border-gray-200 py-6 w-full'}>تغیر
-                    شماره تلفن
+                    className={'text-sm opacity-50 h-10 flex justify-start items-center ml-10 mr-4 border-b border-gray-200 py-6 w-full select-none'}>تغیر
+                    شماره تلفن<span className={'text-sm  scale-75 mt-1'}> (به زودی)</span>
                 </div>
             </div>
 
-            <div className={'flex flex-row items-center justify-start w-full IranSansMedium px-4'} onClick={logoutOnClickHandler}>
+            <div className={'flex flex-row items-center justify-start w-full IranSansMedium px-4'}
+                 onClick={logoutOnClickHandler}>
                 <div className={'h-8 w-8 flex justify-center items-center'}>
                     <LogoutSVG/>
                 </div>
-                <div
-                    className={'text-sm h-10 flex justify-start items-center ml-10 mr-4  py-6 w-full text-errorRed'}>خروج
-                    از حساب کاربری
-                </div>
+                <Button id={'log-Out'}>
+                    <div
+                        className={'text-sm h-10 flex justify-start items-center ml-10 mr-4  py-6 w-full text-errorRed select-none'}>خروج
+                        از حساب کاربری
+                    </div>
+                </Button>
+
             </div>
 
         </div>

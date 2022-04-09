@@ -10,7 +10,7 @@ import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import {useMutation} from "@apollo/client";
 import {gql} from "@apollo/client";
-import {newAppealQuery} from "../../queries/withAuthentication/appeals";
+import {newAppealQuery} from "../../Requests/withAuthentication/appeals";
 import GallerySVG from '../../assets/svgs/gallery.svg'
 import FileUploadSVG from '../../assets/svgs/fileUpload.svg'
 import GalleryImageSVG from '../../assets/svgs/galleryImage.svg'
@@ -20,6 +20,9 @@ import axios, {AxiosRequestConfig} from "axios";
 import FileSVG from "../../assets/svgs/file.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
 import {UserToken} from "../../store/user";
+import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
+import {toast, ToastContainer} from "react-toastify";
+import {uploadImage} from "../../Requests/uploadRequests";
 
 
 const Index = () => {
@@ -31,9 +34,28 @@ const Index = () => {
     const [uploadedImages, setUploadedImages] = useState([] as string[])
     const [uploadedFiles, setUpladedFiles] = useState([] as string[])
     const [currentStep, setCurrentStep] = useState(0)
+    const [uploadingProgress, setUploadingProgress] = useState([] as number[])
     const router = useRouter()
     const currentAppealTempId = useRef((Math.random() + 1).toString(36).substring(7))
 
+    const fileUploadError = (text: string) => {
+        toast.error(text, {
+            position: "bottom-center",
+            autoClose: 3000,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            rtl: true,
+        });
+    }
+
+    const removeEmptyProgresses = () => {
+        let updateUploadingProgress = [...uploadingProgress];
+        updateUploadingProgress.filter(item => {
+            return item !== 100 && item !== 0;
+        })
+        setUploadingProgress(updateUploadingProgress)
+    }
     let createFiles = () => {
 
         let files = [] as any;
@@ -53,40 +75,6 @@ const Index = () => {
         error
     }] = useMutation(gql`${query.query}`, {variables: query.variables})
 
-
-    const uploadImage = (image: any) => {
-        let data = new FormData();
-        data.append('token', UserToken());
-        data.append('file', image);
-        data.append('appealID', currentAppealTempId.current);
-        data.append('uploadedAsFile', '0');
-
-        let config: AxiosRequestConfig = {
-            method: 'post',
-            url: 'https://apidl.unimun.me/appealUpload.php',
-            headers: {},
-            data: data,
-            onUploadProgress: (progressEvent: any) => {
-                let percentCompleted = Math.round(
-                    (progressEvent.loaded * 100) / progressEvent.total
-                );
-                console.log(percentCompleted)
-            }
-        };
-
-        axios(config)
-            .then(function (response) {
-                if (response.data !== 500 && response.data !== 401) {
-                    setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
-                    // let updatedUploadedImages = uploadedImages
-                    // updatedUploadedImages.push(`https://${response.data.thumbnail}`)
-                }
-            })
-
-            .catch(function (error) {
-            });
-
-    }
 
     const uploadFile = (file: any) => {
         let fileName = file.name as string;
@@ -126,7 +114,6 @@ const Index = () => {
 
 
     useEffect(() => {
-        // currentAppealTempId.current = Math.floor(Math.random() * 9999999999)
 
 
         if (data && data.createAppeal.status === 'SUCCESS') {
@@ -137,6 +124,8 @@ const Index = () => {
 
     return (
         <div className={'h-full'}>
+            <ToastContainer/>
+
             <Header backOnClick={() => {
                 if (currentStep > 0)
                     setCurrentStep(currentStep - 1)
@@ -170,7 +159,7 @@ const Index = () => {
                                     <span className={'mx-0.5'}>{lowerPrice}</span>
                                     <span className={'mx-0.5'}>تا</span>
                                     <span className={'mx-0.5'}>{upperPrice}</span>
-                                    <div dir={'ltr'} className={'w-10 h-10'}>
+                                    <div dir={'ltr'} className={'w-10 mb-1.5'}>
                                         <ThousandTomans/>
                                     </div>
                                 </div>
@@ -309,7 +298,32 @@ const Index = () => {
                                                className={'opacity-0 absolute top-0 left-0 w-full h-full '}
                                                accept={'.png,.jpeg,.jpg'} onInput={(e) => {
                                             if (e.currentTarget && e.currentTarget.files && e.currentTarget.files.length)
-                                                uploadImage(e.currentTarget.files[0])
+                                                uploadImage(e.currentTarget.files[0], removeEmptyProgresses, currentAppealTempId, (response: any) => {
+                                                        if (response.data !== 500 && response.data !== 401) {
+                                                            setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
+                                                            let updateUploadingProgress = [...uploadingProgress]
+                                                            updateUploadingProgress[uploadingProgress.length] = 0;
+                                                            setUploadingProgress(updateUploadingProgress)
+                                                            removeEmptyProgresses()
+                                                        }
+                                                    }, (error: any) => {
+                                                        // console.log(error)
+                                                        fileUploadError('خطا در آپلود فایل، دوبره تلاش کنید')
+
+                                                        let updateUploadingProgress = [...uploadingProgress]
+                                                        updateUploadingProgress[uploadingProgress.length] = 0;
+                                                        setUploadingProgress(updateUploadingProgress)
+                                                        removeEmptyProgresses()
+                                                    },
+                                                    (progressEvent: any) => {
+                                                        let percentCompleted = Math.round(
+                                                            (progressEvent.loaded * 100) / progressEvent.total
+                                                        );
+                                                        let updatedUploadedProgress = [...uploadingProgress]
+                                                        updatedUploadedProgress[uploadingProgress.length] = percentCompleted
+                                                        setUploadingProgress(updatedUploadedProgress)
+                                                    }
+                                                )
                                         }}/> : null
                                 }
 
@@ -340,11 +354,26 @@ const Index = () => {
                             {Array(5 - uploadedImages.length).fill('').map((photos, index) => {
                                 return (
                                     <div key={`${index}photo`}
-                                         className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-dashed border-2 mx-3 relative mt-4'}>
-                                        <div className={'flex flex-col items-center justify-center opacity-60'}>
-                                            <div className={'h-7 w-7'}><GallerySVG/></div>
-                                            <span className={'text-sm IranSansMedium'}>عکس</span>
-                                        </div>
+                                         className={'new-photo relative h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-dashed border-2 mx-3 relative mt-4'}>
+                                        {
+                                            uploadingProgress[index] ?
+                                                <div
+                                                    className={'relative '}>
+                                                    <CircularProgressBar sqSize={40} strokeWidth={1.5}
+                                                                         percentage={uploadingProgress[index]}
+                                                                         color={'#0080ff'}/>
+                                                    <div
+                                                        className={'absolute left-1/2 top-1/2 -translate-y-1/2 IranSans text-primary -translate-x-1/2'}>
+                                                        {`${uploadingProgress[index]}%`}
+                                                    </div>
+                                                </div>
+
+                                                :
+                                                <div className={'flex flex-col items-center justify-center opacity-60'}>
+                                                    <div className={'h-7 w-7'}><GallerySVG/></div>
+                                                    <span className={'text-sm IranSansMedium'}>عکس</span>
+                                                </div>
+                                        }
                                     </div>
                                 )
                             })}
@@ -382,7 +411,7 @@ const Index = () => {
                             return (<div key={index + 'file'}
                                          className={'new-file flex flex-col justify-center items-center mt-3 max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
                                 <div className={'file w-full flex flex-row justify-between items-center my-3'}>
-                                    <div className={'file-right flex flex-row justify-center items-center'}>
+                                    <div className={'file-right flex flex-row justify-start items-center'}>
                                         <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><FileSVG/></div>
                                         <div
                                             className={'IranSansMedium mr-4 opacity-60'}>{(JSON.parse(file).url).split('/').reverse()[0]}</div>
@@ -392,7 +421,7 @@ const Index = () => {
                             </div>)
                         })}
 
-                        <div className={'h-32'}></div>
+                        <div className={'h-32'}/>
 
                     </div>
                 </Step>
