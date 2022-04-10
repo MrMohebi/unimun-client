@@ -137,6 +137,7 @@ const Item = () => {
                 </div>
             </section>
             {
+                
                 appeal.title ?
                     <div className={'px-5 my-2'}>
                 <span
