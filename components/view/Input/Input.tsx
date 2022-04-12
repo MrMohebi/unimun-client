@@ -18,6 +18,7 @@ interface Props {
     textAlignment?: string,
     onFocus?: any
     onBlur?: any
+    inputRef?: React.Ref<any>
 }
 
 const Input = ({
@@ -33,14 +34,16 @@ const Input = ({
                    autoFocus,
                    defaultValue,
                    onFocus,
-                   onBlur
+                   onBlur,
+                   inputRef
                }: Props) => {
 
 
     return (
         !multiLine ?
             <div className={wrapperClassName ?? ''}>
-                <input onBlur={onBlur} onFocus={onFocus} type={numOnly ? 'number' : ''} defaultValue={defaultValue}
+                <input ref={inputRef ?? null} onBlur={onBlur} onFocus={onFocus} type={numOnly ? 'number' : ''}
+                       defaultValue={defaultValue}
                        autoFocus={autoFocus}
                        onChange={(e) => {
 

@@ -26,6 +26,11 @@ import {uploadImage} from "../../Requests/uploadRequests";
 
 
 const Index = () => {
+
+
+    console.log(import('../../assets/svgs/postbox.svg').then(e => {
+        console.log(e.default())
+    }))
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [lowerPrice, setLower] = useState(10)
@@ -241,19 +246,19 @@ const Index = () => {
                             <span>با اضافه کردن حداقل 1 تا 5 هشتگ به آکهی خود به فرآیند انجام شدن اگهی سرعت ببخشید.</span>
                         </div>
 
-                        <div className={'w-full h-40 bg-white mt-1 px-4 pt-3 new-section'}>
-                            <span
-                                className={'text-textDark text-md IranSansMedium text-primary '}>اطلاعات اختیاری</span>
-                            <div className={'w-full flex flex-row justify-between px-4 IranSans mt-5'}>
-                                <span>دانشگاه</span>
-                                <span>نام دانشگاه</span>
-                            </div>
-                            <Divider type={'horizontal'} color={'#d7d7d7'} className={'mt-4 mb-4'}/>
-                            <div className={'w-full flex flex-row justify-between px-4 IranSans'}>
-                                <span>دانشگاه</span>
-                                <span>نام دانشگاه</span>
-                            </div>
-                        </div>
+                        {/*<div className={'w-full h-40 bg-white mt-1 px-4 pt-3 new-section'}>*/}
+                        {/*    <span*/}
+                        {/*        className={'text-textDark text-md IranSansMedium text-primary '}>اطلاعات اختیاری</span>*/}
+                        {/*    <div className={'w-full flex flex-row justify-between px-4 IranSans mt-5'}>*/}
+                        {/*        <span>دانشگاه</span>*/}
+                        {/*        <span>نام دانشگاه</span>*/}
+                        {/*    </div>*/}
+                        {/*    <Divider type={'horizontal'} color={'#d7d7d7'} className={'mt-4 mb-4'}/>*/}
+                        {/*    <div className={'w-full flex flex-row justify-between px-4 IranSans'}>*/}
+                        {/*        <span>دانشگاه</span>*/}
+                        {/*        <span>نام دانشگاه</span>*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
                     </section>
                 </Step>
 

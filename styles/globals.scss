@@ -9,6 +9,7 @@
 @import 'components/doubleSlider';
 @import 'components/VCodeInput';
 @import "components/circularProgressBar";
+@import "components/loadingDialog";
 @import "skeleton";
 @import "components/skeleton";
 @import "pages/profile";
@@ -62,7 +63,3 @@ body,
 * {
   user-select: none;
 }
-
-
-
-

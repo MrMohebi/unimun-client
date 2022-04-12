@@ -43,11 +43,16 @@ const Appeals = () => {
                         if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
                             setAppeals(e.data.appeals.edges)
                             lastGottenAppeals(e.data.appeals.edges)
+                            reachedEnd.current = true;
+                            setReachedEndState(true)
                         }
                     } else {
                     }
+
                 })
         }
+
+
         if (lastCursor) {
 
         }
@@ -55,25 +60,28 @@ const Appeals = () => {
 
     }, [appeals, data, loading, error, lastCursor])
 
+    const checkLastCursor = (res: any) => {
+        if (res.data.appeals.edges[res.data.appeals.edges.length - 1]['cursor'] !== lastCursor.current) {
+            let updatedAppeals = appeals
+            updatedAppeals = updatedAppeals.concat(res.data.appeals.edges)
+            lastCursor.current = updatedAppeals[updatedAppeals.length - 1]['cursor']
+            setAppeals(updatedAppeals)
+        } else {
+            reachedEnd.current = true;
+            setReachedEndState(true)
+        }
+
+    }
     const getNewerAppeals = () => {
+        setReachedEndState(false)
         if (!reachedEnd.current && !loading) {
             if (lastCursor != appeals[appeals.length - 1]['cursor']) {
                 lastCursor.current = (appeals[appeals.length - 1]['cursor'])
                 getAppeals({variables: {after: lastCursor.current}}).then((e) => {
-                    if (e.data.appeals.edges[e.data.appeals.edges.length - 1]['cursor'] !== lastCursor.current) {
-                        let updatedAppeals = appeals
-                        updatedAppeals = updatedAppeals.concat(e.data.appeals.edges)
-                        lastCursor.current = updatedAppeals[updatedAppeals.length - 1]['cursor']
-                        setAppeals(updatedAppeals)
-                    } else {
-                        reachedEnd.current = true;
-                        setReachedEndState(true)
-                    }
+                    checkLastCursor(e)
                 })
             }
         }
-
-
     }
     const onAdSectionScroll = (event: any) => {
 
@@ -163,9 +171,9 @@ const Appeals = () => {
         )
     }
 
-    const appealUI = (Appeal: any, index: number) => {
+    const appealUI = (Appeal: any, index: number, key: string) => {
         return (
-            <Link passHref={true} href={`/appeal/${Appeal.id}`}>
+            <Link key={key} passHref={true} href={`/appeal/${Appeal.id}`}>
 
                 <div key={Appeal.title + index}
                      className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
@@ -247,7 +255,7 @@ const Appeals = () => {
                     searchedAppeals.length ?
                         searchedAppeals.map((ad: any, index: number) => {
                                 let Appeal = ad.node
-                                return (appealUI(Appeal, index)
+                                return (appealUI(Appeal, index, index + 'i')
                                 )
                             }
                         )
@@ -255,14 +263,14 @@ const Appeals = () => {
                         appeals.length && !nothingFound ?
                             appeals.map((ad: any, index: number) => {
                                     let Appeal = ad.node
-                                    return (appealUI(Appeal, index)
+                                    return (appealUI(Appeal, index, index + 'i1')
                                     )
                                 }
                             )
                             : lastGottenAppealsState ?
                                 lastGottenAppealsState.map((ad: any, index: number) => {
                                         let Appeal = ad.node
-                                        return (appealUI(Appeal, index)
+                                        return (appealUI(Appeal, index, index + 'i2')
                                         )
                                     }
                                 ) : null

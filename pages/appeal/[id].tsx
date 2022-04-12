@@ -17,7 +17,7 @@ import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
 import GalleryImageSVG from "../../assets/svgs/galleryImage.svg";
 import SkeletonElement from "../../components/view/Skeleton/Skeleton";
 import Head from "next/head";
-import {DOWNLOAD_HOST} from "../../Variables/Variables";
+import {DOWNLOAD_HOST} from "../../LocalVariables/LocalVariables";
 
 const moment = require('moment')
 
@@ -137,7 +137,7 @@ const Item = () => {
                 </div>
             </section>
             {
-                
+
                 appeal.title ?
                     <div className={'px-5 my-2'}>
                 <span

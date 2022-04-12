@@ -11,16 +11,17 @@ import {UserData} from "../../store/user";
 import {updateUser} from "../../Requests/withAuthentication/user";
 import {gql, useMutation} from "@apollo/client";
 import {TailSpin} from "react-loader-spinner";
+import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 
 const EditProfile = () => {
-
     const router = useRouter()
     const lastSeenDialog = useState(false)
+    const usernameError = useState(false)
     const requestDialog = useState(false)
     const userUpdatedInfo = useRef({
         username: UserData().username ?? '',
-        name: UserData().name,
-        bio: UserData().bio
+        name: UserData().name ?? '',
+        bio: UserData().bio ?? ''
     })
 
 
@@ -29,6 +30,7 @@ const EditProfile = () => {
         loading,
     }] = useMutation(gql`${updateUser(userUpdatedInfo.current).query}`, {variables: updateUser(userUpdatedInfo.current).variables})
 
+    const usernameReg = /^[a-z0-9_.]+$/
     if (data)
         console.log(data)
 
@@ -38,18 +40,16 @@ const EditProfile = () => {
                 router.back()
             }}>
                 <div onClick={() => {
-                    console.log(userUpdatedInfo.current)
-                    if (userUpdatedInfo.current.username || userUpdatedInfo.current.name || userUpdatedInfo.current.bio) {
-                        updateQuery({variables: userUpdatedInfo.current}).then(res => {
-                            if (res.data.updateUser.status === "SUCCESS") {
-                                router.push('/profile')
-                            }
-                        })
-
-                    } else {
-                        router.push('/profile')
-
-                    }
+                    if (!usernameError[0])
+                        if (userUpdatedInfo.current.username || userUpdatedInfo.current.name || userUpdatedInfo.current.bio) {
+                            updateQuery({variables: userUpdatedInfo.current}).then(res => {
+                                if (res.data.updateUser.status === "SUCCESS") {
+                                    router.push('/profile')
+                                }
+                            })
+                        } else {
+                            router.push('/profile')
+                        }
 
 
                 }} className={'w-6 h-6 absolute left-4 top-1/2 -translate-y-1/2'}>
@@ -58,7 +58,6 @@ const EditProfile = () => {
                             <TailSpin height={20} width={20} color={'#22a2ff'}/>
                             :
                             <CheckSVG/>
-
                     }
                 </div>
             </Header>
@@ -174,9 +173,21 @@ const EditProfile = () => {
                 }} wrapperClassName={'w-full h-10 '} defaultValue={UserData().name ?? ''}
                                placeHolder={'نام'}/>
                 <MaterialInput onChange={(e: any) => {
+                    // e.currentTarget.value = e.currentTarget.value.match(usernameReg)
+                    if (!usernameReg.test(e.currentTarget.value) && e.currentTarget.value.length > 3) {
+                        usernameError[1](true)
+                    } else {
+                        usernameError[1](false)
+
+                    }
                     userUpdatedInfo.current.username = e.currentTarget.value
                 }} wrapperClassName={'w-full h-10 mt-6 '} defaultValue={UserData().username ?? ''}
                                placeHolder={'نام کاربری'}/>
+                {
+                    usernameError[0] ?
+                        <div className={'text-tiny mt-1 mb-3 text-errorRed IranSansMedium'}>نام کاربری نا معتبر</div> :
+                        null
+                }
                 <MaterialInput onChange={(e: any) => {
                     userUpdatedInfo.current.bio = e.currentTarget.value
                 }} wrapperClassName={'w-full h-10 mt-4 m'} defaultValue={UserData().bio ?? ''}

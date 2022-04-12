@@ -25,6 +25,7 @@ const Login = () => {
     const deadLine = useRef(0);
     const [elapsedTime, setElapsedTime] = useState(0);
     const resendCodeTimer = useRef(null);
+    const refCodeInputRef = useRef<HTMLInputElement>(null)
 
     const router = useRouter()
 
@@ -129,14 +130,11 @@ const Login = () => {
                 setVCodeError(true)
             }
         }
-
-
     }, [sendVCodeResult, verifyVCodeResult])
 
     return (
         <div dir={'rtl'} className={'w-full h-full'}>
             <Header backOnClick={() => {
-
                 setVCodeError(false)
                 if (currentStep === 0)
                     router.push('/')
@@ -178,11 +176,13 @@ const Login = () => {
                                        }
                                    }}
                                    dir={'ltr'} labelText={'مثل 09123456789'} maxLength={11}/>
+
                         </div>
+
 
                         : currentStep === 1 ?
                             <div className={'h-full'}>
-                                <Input onFocus={() => {
+                                <Input inputRef={refCodeInputRef} onFocus={() => {
                                     setShowPromoter(false)
                                 }} onBlur={() => {
                                     setShowPromoter(true)
@@ -213,6 +213,20 @@ const Login = () => {
                                        }}
 
                                 />
+                                <div className={'mt-3 mr-1'}>
+                                        <span className={'IranSansMedium text-primary  text-sm mt-3'} onClick={() => {
+                                            if (refCodeInputRef.current) {
+                                                if (refCodeInputRef.current.value.toString().length > 3) {
+                                                    console.log(refCodeInputRef.current.value.toString())
+                                                    verifyReferral({variables: {referenceCode: refCodeInputRef.current.value.toString()}}).then((e: any) => {
+
+                                                    })
+                                                }
+                                            }
+                                        }}>بررسی کد</span>
+                                </div>
+
+
                                 <div className={'mt-6 IranSans text-sm px-3 text-textDark'}>
                                     خب اگه کد دعوت نداشتیم چیکار کنیم ؟
                                     <br/>

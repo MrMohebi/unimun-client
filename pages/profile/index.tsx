@@ -26,11 +26,15 @@ import TelSVG from '../../assets/svgs/telegran-gray.svg'
 import InstaSVG from '../../assets/svgs/instagram-gray.svg'
 import TwitterSVG from '../../assets/svgs/twitter-gray.svg'
 import {route} from "next/dist/server/router";
+import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 
 const Index = () => {
     const router = useRouter()
 
-    const [getUser, {data}] = useLazyQuery(gql`${getUserQuery(['id', 'name', 'created_at', 'phone', 'referenceCode','username','bio']).query}`)
+    const [getUser, {
+        data,
+        loading
+    }] = useLazyQuery(gql`${getUserQuery(['id', 'name', 'created_at', 'phone', 'referenceCode','username','bio']).query}`)
     const [progressPercentage, setProgressPercentage] = useState(0)
     const editProfButton = useRef<HTMLDivElement>(null)
     const drawerInitHeight = useState(170)
@@ -83,6 +87,18 @@ const Index = () => {
                 <title>Unimun Profile</title>
                 <meta name="description" content="Unimun"/>
             </Head>
+
+            {
+                UserToken() && loading ?
+                    <div className={'fixed top-0 left-0 w-full h-full z-50 '} style={{background: 'rgba(0,0,0,0.4)'}}>
+                        <div
+                            className={'top-1/2 left-1/2 fixed bg-white rounded-3xl shadow p-4 -translate-x-1/2 -translate-y-1/2'}>
+                            <LoadingDialog wrapperClassName={' w-16 h-16  '} color={'blue'}/>
+
+                        </div>
+                    </div> :
+                    null
+            }
 
             <Drawer minHeight={drawerMinHeight[0]} initHeight={drawerInitHeight[0]}
                     closedHeight={170} wrap={
