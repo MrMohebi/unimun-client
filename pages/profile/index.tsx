@@ -57,11 +57,11 @@ const Index = () => {
         if (loginRegisterBtn.current && loginRegisterBtn.current.firstChild) {
             drawerInitHeight[1]((loginRegisterBtn.current.firstChild.firstChild as HTMLDivElement).getBoundingClientRect().top + 50)
         }
-
-    }, [])
-    useEffect(() => {
         if (UserToken())
             getUser()
+    }, [])
+    useEffect(() => {
+
         if (data) {
             if (data.user.data) {
                 UserPhone(data.user.data.phone)

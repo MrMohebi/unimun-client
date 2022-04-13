@@ -24,6 +24,7 @@ const Appeals = () => {
     const reachedEnd = useRef(false);
     const [reachedEndState, setReachedEndState] = useState(false);
     const [nothingFound, setNothingFound] = useState(false);
+    const [searchLoading, setSearchLoading] = useState(false);
     const lastScrollPosition = useRef(0);
 
 
@@ -35,19 +36,28 @@ const Appeals = () => {
     }] = useLazyQuery(gql`${AppealsQuery.query}`);
 
     const lastGottenAppealsState = useReactiveVar(lastGottenAppeals)
+
+
     useEffect(() => {
         if (!data && !loading) {
             getAppeals()
                 .then((e) => {
-                    if (e.error === undefined) {
-                        if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
-                            setAppeals(e.data.appeals.edges)
-                            lastGottenAppeals(e.data.appeals.edges)
-                            reachedEnd.current = true;
-                            setReachedEndState(true)
-                        }
+                    console.log(e)
+                    if (e.data.appeals === null) {
+
                     } else {
+                        if (e.error === undefined) {
+                            if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
+                                setAppeals(e.data.appeals.edges)
+                                lastGottenAppeals(e.data.appeals.edges)
+                                reachedEnd.current = true;
+                                setReachedEndState(true)
+                            }
+                        } else {
+                        }
+
                     }
+
 
                 })
         }
@@ -99,7 +109,12 @@ const Appeals = () => {
     const searchQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen'], 'test')
     const [searchAppeals, searchAppealsResult] = useLazyQuery(gql`${searchQuery.query}`);
 
+
+    useEffect(() => {
+        setSearchLoading(searchAppealsResult.loading)
+    }, [searchAppealsResult.loading])
     const onSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        console.log('a')
 
         _.debounce(() => {
             setNothingFound(false)
@@ -115,7 +130,6 @@ const Appeals = () => {
         }, 900)
 
     }
-
 
     const dateConverter = (timestamp: number) => {
         return Math.floor((now - timestamp) / 3600) > 24 ? Math.floor((now - timestamp) / 8640) + ' روز پیش ' : Math.floor((now - timestamp) / 8640) + ' ساعت پیش '
@@ -242,11 +256,44 @@ const Appeals = () => {
 
         )
     }
+
+    const debounceFunction = (input: any, timeout: number) => {
+        return _.debounce((e = input) => {
+            console.log('up')
+            setNothingFound(false)
+            searcheText.current = e.target.value
+            searchAppeals({variables: {searchText: searcheText.current}}).then((e) => {
+                if (!e.error) {
+                    if (e.data.appeals.edges.length === 0)
+                        setNothingFound(true)
+                    setSearchedAppeals(e.data.appeals.edges)
+                }
+            })
+        }, timeout)
+    }
+
+
+    let searchInput = (e: React.BaseSyntheticEvent) => {
+        console.log(e)
+        setNothingFound(false)
+        searcheText.current = e.target.value
+        searchAppeals({variables: {searchText: searcheText.current}}).then((e) => {
+            if (!e.error) {
+                if (e.data.appeals.edges.length === 0)
+                    setNothingFound(true)
+                setSearchedAppeals(e.data.appeals.edges)
+            }
+        })
+    }
+    let searchDeb = _.debounce(searchInput, 1000)
     return (
         <div className={'h-full overflow-hidden relative '}>
 
-            <Search searchLoading={searchAppealsResult.loading} collapse={scrollingToBottom}
-                    onInputChange={onSearchInputChange}/>
+            <Search searchLoading={searchLoading} collapse={scrollingToBottom}
+                    onInputChange={(e) => {
+                        setSearchLoading(true)
+                        searchDeb(e)
+                    }}/>
             <section onScroll={onAdSectionScroll}
                      className={'w-full h-full overflow-scroll items-center px-4  pt-32'}>
                 <NewAppealButton hidden={scrollingToBottom}/>

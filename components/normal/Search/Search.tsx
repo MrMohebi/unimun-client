@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {ChangeEventHandler, useEffect, useRef, useState} from 'react';
 import NotifSVG from '../../../assets/svgs/notif.svg'
 import SearchSVG from '../../../assets/svgs/search.svg'
 import CitySVG from '../../../assets/svgs/city.svg'
@@ -7,7 +7,8 @@ import Badge from "../../view/Badge/Badge";
 import {TailSpin} from "react-loader-spinner";
 
 interface Props {
-    onInputChange?: any
+    onInputChange: ChangeEventHandler
+    debounceOnChange?: Function
     collapse: boolean
     searchLoading: boolean
 }
@@ -45,24 +46,20 @@ const Search = (props: Props) => {
             <div
                 className={`bg-background px-3 w-full flex flex-row items-center justify-between  rounded-xl mt-3 transition-all overflow-hidden duration-200 origin-top h-12 ${props.collapse && !manualSearch[0] ? 'h-0' : 'h-12'}`}>
                 <div className={'w-8 h-full  relative flex flex-col justify-center items-center p-1'}>
-                    <div style={{transform: inputText[0].length ? 'scale(0)' : 'scale(1)'}}
-                         className={`'${inputText[0].length ? 'scale-0 ' : 'scale-100 '} overflow-hidden origin-center transition-all  duration-300 flex flex-col justify-center items-center w-full h-full '`}>
+                    <div style={{transform: props.searchLoading ? 'scale(0)' : 'scale(1)'}}
+                         className={`'${props.searchLoading ? 'scale-0 ' : 'scale-100 '} overflow-hidden origin-center transition-all  duration-300 flex flex-col justify-center items-center w-full h-full '`}>
                         <SearchSVG/>
                     </div>
-                    <div style={{transform: inputText[0].length ? 'scale(1)' : 'scale(0)'}}
+                    <div style={{transform: props.searchLoading ? 'scale(1)' : 'scale(0)'}}
                          className={`origin-center transition-all duration-300  w-full absolute top-0 left-0 h-full flex flex-col items-center justify-center `}>
                         <TailSpin color="#42b0f3" height={25} width={25}/>
                     </div>
                 </div>
                 <input ref={inputRef} id={'search-input'}
                        className={'w-full h-full bg-transparent outline-0 px-2 text-sm IranSansMedium'}
-                       placeholder={'جستجو'} type="text" onInput={(e) => {
-                    inputText[1](e.currentTarget.value.toString())
-
-                    props.onInputChange(e)
-                }}/>
-                <div
-                    className={`w-5 h-5 flex flex-col justify-center transition-all duration-100 items-center p-0.5 ${inputText[0].length ? "scale-100" : 'scale-0'}`}
+                       placeholder={'جستجو'} type="text" onChange={props.onInputChange}/>
+                < div
+                    className={`w-5 h-5 flex flex-col justify-center transition-all duration-100 items-center p-0.5 ${props.searchLoading ? "scale-100" : 'scale-0'}`}
                     onClick={() => {
                         if (inputRef.current)
                             inputRef.current.value = ''
