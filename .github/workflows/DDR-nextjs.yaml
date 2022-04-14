@@ -17,9 +17,7 @@ jobs:
         uses: fifsky/ssh-action@master
         with:
           command: |
-            pwd
             cd ${{env.FRONT_DEPLOY_PATH}}
-            pwd
             rm -rf ..?* .[!.]* *
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
