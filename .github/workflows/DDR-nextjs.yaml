@@ -47,7 +47,7 @@ jobs:
           command: |
             cd ${{env.FRONT_DEPLOY_PATH}}
             cd ../
-            docker-compose up -d --build
+            docker compose up -d --build
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY}}
@@ -95,7 +95,7 @@ jobs:
           command: |
             cd ${{env.FRONT_DEPLOY_PATH}}
             cd ../
-            docker-compose up -d --build
+            docker compose up -d --build
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY}}
