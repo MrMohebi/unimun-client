@@ -19,7 +19,8 @@ jobs:
           command: |
             pwd
             cd ${{env.FRONT_DEPLOY_PATH}}
-            rm -rf *
+            pwd
+            rm -rf ..?* .[!.]* *
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY}}
@@ -66,7 +67,7 @@ jobs:
         with:
           command: |
             cd ${{env.FRONT_DEPLOY_PATH}}
-            rm -rf *
+            rm -rf ..?* .[!.]* *
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY}}
