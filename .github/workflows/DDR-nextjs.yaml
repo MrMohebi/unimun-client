@@ -23,6 +23,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY}}
+          args: "-tt -vvv"
           
       - uses: actions/checkout@v2
       - name: Deploy to Staging server
