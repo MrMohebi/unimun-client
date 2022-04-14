@@ -17,12 +17,12 @@ jobs:
         uses: fifsky/ssh-action@master
         with:
           command: |
+            pwd
             cd ${{env.FRONT_DEPLOY_PATH}}
             rm -rf *
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY}}
-          args: "-vvv"
           
       - uses: actions/checkout@v2
       - name: Deploy to Staging server
