@@ -6,11 +6,58 @@ on:
         - master
 
 jobs:
+  dev-deploy:
+    if: github.event.head_commit.message == 'dev deploy'
+    runs-on: ubuntu-latest
+    env:
+      FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEV_DEPLOY_PATH }}
+    name: dev-deploy
+    steps:
+      - name: remove previous files
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            cd ${{env.FRONT_DEPLOY_PATH}}
+            rm -rf *
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
+          
+      - uses: actions/checkout@v2
+      - name: Deploy to Staging server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: "."
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          TARGET: ${{ secrets.FRONT_DEV_DEPLOY_PATH }}
+  
+  dev-dockerize-and-run:
+    needs: dev-deploy
+    if: github.event.head_commit.message == 'dev deploy'
+    runs-on: ubuntu-latest
+    name: 'dev dockerize and run'
+    env:
+      FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEV_DEPLOY_PATH }}
+    steps:
+      - name: run ducker
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            cd ${{env.FRONT_DEPLOY_PATH}}
+            cd ../
+            docker-compose up -d --build
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
+          
+          
   deploy:
     if: github.event.head_commit.message == 'deploy'
     runs-on: ubuntu-latest
     env:
-      FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEPLOY_PATH }}
+      FRONT_DEPLOY_PATH: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
     name: deploy
     steps:
       - name: remove previous files
@@ -31,7 +78,7 @@ jobs:
           SOURCE: "."
           REMOTE_HOST: ${{ secrets.SSH_HOST }}
           REMOTE_USER: ${{ secrets.SSH_USER }}
-          TARGET: ${{ secrets.FRONT_DEPLOY_PATH }}
+          TARGET: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
   
   dockerize-and-run:
     needs: deploy
@@ -39,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     name: 'dockerize and run'
     env:
-      FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEPLOY_PATH }}
+      FRONT_DEPLOY_PATH: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
     steps:
       - name: run ducker
         uses: fifsky/ssh-action@master
