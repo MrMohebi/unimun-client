@@ -17,7 +17,7 @@ jobs:
         uses: fifsky/ssh-action@master
         with:
           command: |
-            cd ls -la
+            ls -la
             cd ${{env.FRONT_DEPLOY_PATH}}
             rm -rf *
           host: ${{ secrets.SSH_HOST }}
