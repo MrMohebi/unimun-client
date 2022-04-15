@@ -18,6 +18,9 @@ import GalleryImageSVG from "../../assets/svgs/galleryImage.svg";
 import SkeletonElement from "../../components/view/Skeleton/Skeleton";
 import Head from "next/head";
 import {DOWNLOAD_HOST} from "../../LocalVariables/LocalVariables";
+import Button from "../../components/view/Button/Button";
+import {lastAppealSubmitSuccess} from "../../store/appeals";
+import Dialog from "../../components/view/Dialog/Dialog";
 
 const moment = require('moment')
 
@@ -29,6 +32,7 @@ interface Appeal {
     createdAt: number
     attachments: []
     hashtags: []
+    connectWay: string
 }
 
 interface AttachmentFiles {
@@ -44,11 +48,12 @@ const Item = () => {
 
     const [currentMediaPart, setCurrentMediaPart] = useState('files')
     const [appeal, setAppeal] = useState({} as Appeal)
+    const [connectWayDialogOpen, setConnectWayDialogOpen] = useState(false)
 
     const [getAppeal, {data, loading, error}] = useLazyQuery(gql`${getAppealQuery().query}`)
+
+
     useEffect(() => {
-
-
         let id = window.location.pathname.split('/').reverse()[0]
         getAppeal({variables: {id: id}}).then(e => {
             if (e.data) {
@@ -62,13 +67,12 @@ const Item = () => {
                     details: appeal.details,
                     createdAt: passedTime(appeal.createdAt),
                     hashtags: appeal.hashtags.length ? (JSON.parse(appeal.hashtags[0])) : [],
-                    attachments: appeal.attachments
+                    attachments: appeal.attachments,
+                    connectWay: appeal.connectWay
                 })
             }
 
         })
-
-        console.log(appeal)
 
 
     }, [data])
@@ -267,7 +271,38 @@ const Item = () => {
                     null
             }
 
+            <Dialog open={connectWayDialogOpen} closable={true} afterClosed={() => {
+                setConnectWayDialogOpen(false)
+            }}>
 
+                <div className={'h-44 w-44'}>
+                    <div className={'mt-3 mr-3 IranSansMedium text-textDark'}> اطلاعات تماس</div>
+
+                </div>
+
+            </Dialog>
+
+            <div className={'w-full bottom-2 fixed flex flex-row items-center justify-center '}>
+                {appeal.connectWay ?
+                    <Button id={'connect-appeal'}
+                            className={`w-11/12 h-14 transition-all duration-300 bg-primary rounded-xl flex flex-row justify-center items-center px-4`}
+                            onClick={() => {
+                                if (/[^0-9]/.test(appeal.connectWay)) {
+                                    window.location.replace(`https://t.me/${appeal.connectWay.replace('@', '')}`)
+                                } else {
+                                    window.open(`tel:${appeal.connectWay ?? ''}`, '_blank')
+                                }
+                            }}
+                            rippleColor={'rgba(255,255,255,0.49)'}>
+                        <div className={'text-white IranSans '}>پیشنهاد دادن</div>
+
+                    </Button>
+                    :
+                    <SkeletonElement
+                        className={'w-11/12 h-14 transition-all duration-300 bg-primary rounded-xl flex flex-row justify-center items-center '}/>
+                }
+
+            </div>
         </div>
     );
 };

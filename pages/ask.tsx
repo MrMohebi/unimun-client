@@ -24,7 +24,7 @@ const Ask = () => {
             <div ref={lottieRef} className={'  w-60'}/>
 
             <span className={'IranSansBold'}> بـپــرس!</span>
-            <div className={'text-center IranSans text-textDarker text-sm px-6 mt-5 leading-6'}>
+            <div className={'text-center IranSans text-textDarker text-sm px-4 mt-5 leading-6'}>
                 یه بخش خیلی جذابه که به زودی به <span className={'text-black IranSansBold'}>یونیـ<span
                 className={'text-primary'}>مـون</span></span> اضافه میشه <br/>
                 تو این بخش میتونی سوالایی که داری رو بپرسی تا اونایی که بلدن بهت جواب بدن

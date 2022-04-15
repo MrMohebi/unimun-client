@@ -13,6 +13,7 @@ const NewAppealButton = (props: { hidden: boolean }) => {
                 if (UserToken().length) {
                     router.push('/newAppeal')
                 } else {
+                    // router.push('/newAppeal')
                     router.push('/profile/login')
                 }
 

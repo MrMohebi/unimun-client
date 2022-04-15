@@ -25,7 +25,8 @@
     "react-loader-spinner": "^6.0.0-0",
     "react-loading": "^2.0.3",
     "react-loading-skeleton": "^3.0.3",
-    "react-toastify": "^8.2.0"
+    "react-toastify": "^8.2.0",
+    "tippy.js": "^6.3.7"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.181",

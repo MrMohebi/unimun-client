@@ -19,6 +19,6 @@ export const getAppealQuery = () => {
     return queryBuilder.query({
         operation: 'appeal',
         variables: {id: {name:'id',type:'ID!',value:''}},
-        fields: ['title', 'details','createdAt', 'priceStart', 'priceEnd', 'hashtags', {attachments: ['preview', 'url', 'uploadedAsFile']}]
+        fields: ['title', 'connectWay', 'details', 'createdAt', 'priceStart', 'priceEnd', 'hashtags', {attachments: ['preview', 'url', 'uploadedAsFile']}]
     }, null, {operationName: 'getAppeal'})
 }

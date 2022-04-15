@@ -104,11 +104,11 @@ const Login = () => {
                 setVCodeHint(parseInt(sendVCodeResult.data.sendVCode.data.vCode[0]))
             }
             if (sendVCodeResult.data.sendVCode.data.isSignup && !referenceCode) {
-                setStep(1)
+                // setStep(1)
                 setAllowForNextStep(false)
             }
             if (!sendVCodeResult.data.sendVCode.data.isSignup) {
-                setStep(2)
+                // setStep(2)
                 if (deadLine.current === 0)
                     deadLine.current = Math.floor(Date.now() / 1000)
 
@@ -116,9 +116,9 @@ const Login = () => {
         }
         if (verifyVCodeResult.data) {
             if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && sendVCodeResult.data.sendVCode.data.isSignup) {
-                setStep(3)
+                // setStep(3)
             }
-            if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && !sendVCodeResult.data.sendVCode.data.isSignup) {
+            if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS") {
                 setVcodeSuccess(true)
                 setTimeout(() => {
                     UserToken(verifyVCodeResult.data.verifyVCode.data.token)
@@ -217,9 +217,15 @@ const Login = () => {
                                         <span className={'IranSansMedium text-primary  text-sm mt-3'} onClick={() => {
                                             if (refCodeInputRef.current) {
                                                 if (refCodeInputRef.current.value.toString().length > 3) {
-                                                    console.log(refCodeInputRef.current.value.toString())
                                                     verifyReferral({variables: {referenceCode: refCodeInputRef.current.value.toString()}}).then((e: any) => {
-
+                                                        verifyReferral({variables: {referenceCode: e.target.value.toString()}}).then(e => {
+                                                            if (e.data.isReferenceCodeValid.status === 'SUCCESS') {
+                                                                setRefCodeStatus('SUCCESS')
+                                                                setAllowForNextStep(true)
+                                                            } else {
+                                                                setRefCodeStatus('ERROR')
+                                                            }
+                                                        })
                                                     })
                                                 }
                                             }
@@ -316,7 +322,11 @@ const Login = () => {
                                 if (currentStep === 0) {
                                     sendVcode().then(e => {
                                         if (e.data.sendVCode.status === 'SUCCESS') {
-
+                                            if (e.data.sendVCode.data.isSignup) {
+                                                setStep(1)
+                                            } else {
+                                                setStep(2)
+                                            }
                                         }
                                     })
                                 }

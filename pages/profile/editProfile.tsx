@@ -31,8 +31,6 @@ const EditProfile = () => {
     }] = useMutation(gql`${updateUser(userUpdatedInfo.current).query}`, {variables: updateUser(userUpdatedInfo.current).variables})
 
     const usernameReg = /^[a-z0-9_.]+$/
-    if (data)
-        console.log(data)
 
     return (
         <div className={'w-full'}>

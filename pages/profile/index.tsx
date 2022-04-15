@@ -42,9 +42,6 @@ const Index = () => {
     const loginRegisterBtn = useRef<HTMLDivElement>(null)
 
 
-    if (data)
-        console.log(data)
-
     const redirectTo = (path: string) => {
         router.push(path).then()
     }
@@ -123,7 +120,7 @@ const Index = () => {
                     </div>
 
                     {UserToken() ?
-                        data ?
+                        data && data.user && data.user.data ?
                             <div className={'contents'}>
                                 <div className={'w-full flex flex-col justify-center items-center'}>
                                     <span

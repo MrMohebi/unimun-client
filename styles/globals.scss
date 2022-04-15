@@ -45,6 +45,10 @@ body,
   height: 100%;
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .hide-scrollbars {
   .example::-webkit-scrollbar {
     display: none;
@@ -62,4 +66,5 @@ body,
 
 * {
   user-select: none;
+  scroll-behavior: smooth;
 }

@@ -25,7 +25,7 @@ const Library = () => {
             </div>
 
             <span className={'IranSansBold'}> کــیــف پـول</span>
-            <div className={'text-center IranSans text-textDarker text-sm px-10 mt-5 leading-6'}>
+            <div className={'text-center IranSans text-textDarker text-sm px-4 mt-5 leading-6'}>
                 توی
                 <span> </span>
                 <span className={'text-black IranSansBold'}> یونیـ<span

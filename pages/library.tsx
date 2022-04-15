@@ -22,7 +22,7 @@ const Library = () => {
             <div ref={lottieRef} className={'w-60'}/>
 
             <span className={'IranSansBold'}> کــتابخـونـه</span>
-            <div className={'text-center IranSans text-textDarker text-sm px-10 mt-5 leading-6'}>
+            <div className={'text-center IranSans text-textDarker text-sm px-4 mt-5 leading-6'}>
                 توی
                 <span className={'text-black IranSansBold'}> یونیـ<span
                     className={'text-primary'}>مـون </span></span>

@@ -15,6 +15,9 @@ import GallerySVG from '../../assets/svgs/gallery.svg'
 import FileUploadSVG from '../../assets/svgs/fileUpload.svg'
 import GalleryImageSVG from '../../assets/svgs/galleryImage.svg'
 import NewPhotoSVG from '../../assets/svgs/newPhoto.svg'
+import TelInputSVG from '../../assets/svgs/telInput.svg'
+import BoldMobile from '../../assets/svgs/boldMobile.svg'
+import RightSquareSVG from '../../assets/svgs/rightSquare.svg'
 import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
 import axios, {AxiosRequestConfig} from "axios";
 import FileSVG from "../../assets/svgs/file.svg";
@@ -23,27 +26,36 @@ import {UserToken} from "../../store/user";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 import {toast, ToastContainer} from "react-toastify";
 import {uploadImage} from "../../Requests/uploadRequests";
+import {number} from "prop-types";
+import tippy from "tippy.js";
+import CloseSVG from "../../assets/svgs/close.svg";
+import {lastAppealSubmitSuccess} from "../../store/appeals";
+import BottomSheet from "../../components/view/BottomSheet/BottomSheet";
 
 
 const Index = () => {
 
 
-    console.log(import('../../assets/svgs/postbox.svg').then(e => {
-        console.log(e.default())
-    }))
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [lowerPrice, setLower] = useState(10)
+    const [connectWay, setConnectWay] = useState('')
     const [upperPrice, setUpper] = useState(300)
     const [hashtags, setHashtags] = useState([] as string[])
     const [uploadedImages, setUploadedImages] = useState([] as string[])
     const [uploadedFiles, setUpladedFiles] = useState([] as string[])
     const [currentStep, setCurrentStep] = useState(0)
     const [uploadingProgress, setUploadingProgress] = useState([] as number[])
+    const [imageBottomSheetOpened, setImageBottomSheetOpened] = useState(false)
+    const [contactType, setContactType] = useState('')
+    const [contactAddress, setContactAddress] = useState('')
     const router = useRouter()
+    const currentSelectedImage = useRef('')
+    const newAppealMainSection = useRef<HTMLDivElement>(null)
+    const [titleLimit, setTitleLimit] = useState(0)
     const currentAppealTempId = useRef((Math.random() + 1).toString(36).substring(7))
 
-    const fileUploadError = (text: string) => {
+    const showError = (text: string) => {
         toast.error(text, {
             position: "bottom-center",
             autoClose: 3000,
@@ -53,6 +65,10 @@ const Index = () => {
             rtl: true,
         });
     }
+
+    useEffect(() => {
+        setImageBottomSheetOpened(true)
+    }, [])
 
     const removeEmptyProgresses = () => {
         let updateUploadingProgress = [...uploadingProgress];
@@ -73,7 +89,7 @@ const Index = () => {
         return files
     }
 
-    let query = newAppealQuery(title, lowerPrice, upperPrice, description, hashtags, createFiles())
+    let query = newAppealQuery(title, lowerPrice, upperPrice, description, hashtags, createFiles(), connectWay)
     const [createAppeal, {
         data,
         loading,
@@ -100,7 +116,6 @@ const Index = () => {
                 let percentCompleted = Math.round(
                     (progressEvent.loaded * 100) / progressEvent.total
                 );
-                console.log(percentCompleted)
             }
         };
 
@@ -120,15 +135,39 @@ const Index = () => {
 
     useEffect(() => {
 
-
         if (data && data.createAppeal.status === 'SUCCESS') {
             router.push('/')
+            // toast.success('آگهی شا ثبت شد و  در انتظار بررسی است', {
+            //     position: "bottom-center",
+            //     autoClose: 5000,
+            //     pauseOnHover: true,
+            //     style: {
+            //         bottom: '10px'
+            //     }
+            // });
         }
     }, [data, loading, error])
 
 
     return (
-        <div className={'h-full'}>
+        <div className={'h-full '} ref={newAppealMainSection}>
+
+            <BottomSheet onClose={() => {
+                setImageBottomSheetOpened(false)
+            }} open={imageBottomSheetOpened}>
+                <div className={'w-full px-4 pt-5 IranSansMedium text-md text-textDark'}>تنظیمات عکس</div>
+                <Button id={'removeImage'} onClick={() => {
+                    if (currentSelectedImage.current.length) {
+                        let uploadedImagesArray = [...uploadedImages]
+                        uploadedImagesArray.filter((image, index) => {
+                            return image !== currentSelectedImage.current;
+                        })
+                    }
+                    setImageBottomSheetOpened(false)
+                }} rippleColor={'#969696'}
+                        className={'w-full px-4  IranSansMedium text-sm text-textBlack h-10 mb-2 mt-2 text-right'}>حذف
+                    عکس</Button>
+            </BottomSheet>
             <ToastContainer/>
 
             <Header backOnClick={() => {
@@ -142,23 +181,39 @@ const Index = () => {
                 </div>
             </Header>
             <StepperFragment step={currentStep}>
-
                 <Step step={0}>
                     <section className={'pb-20'}>
                         <div className={'w-full h-40 bg-white mt-1 px-4 pt-3 new-section'}>
-                            <span className={'text-textDark text-lg IranSansMedium  '}>عنوان آگهی</span>
-                            <div className={'w-full flex items-center justify-center mt-4'}>
-                                <Input id={'title'} numOnly={false} wrapperClassName={'w-11/12 h-12'}
+                            <div className={'absolute  left-4 top-4  h-6 w-6'}>
+                                <div
+                                    className={`h-full text-primary text-sm IranSans absolute w-full flex flex-col justify-center items-center ${30 - title.length > 21 ? 'scale-0' : 'scale-100'} transition-all duration-300 ease-in-out`}
+                                    style={{
+                                        color: 30 - title.length > 21 ? '#4eb3f1' : 30 - title.length > 5 ? '#FF8800' : '#ff3333'
+                                    }}>
+                                    {30 - title.length}
+                                </div>
+
+                                <CircularProgressBar emptyColor={'#f6f8fa'} sqSize={25}
+                                                     strokeWidth={30 - title.length > 21 ? 4 : 3}
+                                                     percentage={titleLimit}
+                                                     color={30 - title.length > 21 ? '#4eb3f1' : 30 - title.length > 5 ? '#FF8800' : '#ff3333'}/>
+                            </div>
+                            <span className={'text-textDark text-md IranSansMedium  '}>عنوان آگهی</span>
+                            <div className={'w-full flex items-center justify-center relative mt-4'}>
+                                <Input placeHolder={'عنوان'} maxLength={30} id={'title'} numOnly={false}
+                                       wrapperClassName={'w-11/12 h-14'}
                                        onChange={(e: any) => {
+                                           e.currentTarget.value = e.currentTarget.value.slice(0, 30)
                                            setTitle(e.currentTarget.value)
+                                           setTitleLimit(Math.floor((e.currentTarget.value.length * 100) / 30))
                                        }}
                                        labelText={'در عنوان اگهی به موارد مهم اشاره کنید'}/>
                             </div>
                             <Divider type={'horizontal'} color={'#d7d7d7'} className={'mt-10'}/>
                         </div>
-                        <div className={'w-full bg-white px-4 pt-3 new-section'}>
+                        <div className={'w-full bg-white px-4 new-section'}>
                             <div className={'w-full flex flex-row justify-between'}>
-                                <span className={'text-textDark text-lg IranSansMedium  '}>بودجه</span>
+                                <span className={'text-textDark text-md IranSansMedium  '}>بودجه</span>
                                 <div className={'IranSansMedium flex flex-row items-center justify-center'}>
                                     <span className={'mx-0.5'}>از</span>
                                     <span className={'mx-0.5'}>{lowerPrice}</span>
@@ -170,7 +225,7 @@ const Index = () => {
                                 </div>
                             </div>
                             <div className={'w-full flex items-center justify-center'}>
-                                <div dir={'rtl'} className={'w-10/12'}>
+                                <div dir={'rtl'} className={'w-10/12 pt-5'}>
                                     <DoubleSlider sliderColor={'#E1E8ED'} sliderSize={'5px'} defaultLower={lowerPrice}
                                                   defaultUpper={upperPrice} max={500} min={10}
                                                   steps={10} onChange={(lower: number, upper: number) => {
@@ -181,18 +236,16 @@ const Index = () => {
                             </div>
 
                         </div>
-
-
                         <div className={'IranSans text-textDark text-sm mx-4 my-2'}>
-                            <span>کاربران مجاز خواهند بود در این بازه قیمت به شما پیشنهاد دهند</span>
+                            <span>کاربران مجاز خواهند بود در این بازه قیمت به شما پیشنهاد بدهند</span>
                         </div>
 
                         <div className={'w-full bg-white px-4 pt-3 new-section pb-5'}>
                             <div className={'w-full flex flex-row justify-between'}>
-                        <span className={'text-textDark text-lg IranSansMedium  '}>هَشـ <span
+                        <span className={'text-textDark text-md IranSansMedium  '}>هَشـ<span
                             className={'text-primary'}>#</span>تگ ها</span>
                                 <div className={'IranSansMedium flex flex-row items-center justify-center'}>
-                                    <span className={'mx-0.5 text-primary text-xl'}>{hashtags.length}/{5}</span>
+                                    <span className={'mx-0.5 text-primary text-sm'}>{hashtags.length}/{5}</span>
                                 </div>
                             </div>
 
@@ -200,16 +253,40 @@ const Index = () => {
                             <div className={'flex flex-wrap justify-start items-center mt-4'}>
                                 {
                                     Array(hashtags.length).fill('').map((hashtag: string, index) => (
-                                        <div key={hashtag + index} id={'hashtag-' + index}
+                                        <div key={index + 'div'}
                                              className={`IranSansMedium text-primary text-sm w-auto h-9 border border-gray-300 rounded-xl flex flex-row justify-center items-center mx-1 cursor-pointer mt-2 px-2 transition-all`}>
                                             <span id={'hashtag-tag-' + index}>#</span>
-                                            <input autoFocus={true} maxLength={20} onChange={(e) => {
+                                            <input autoFocus={true} onFocus={(e) => {
+                                                setTimeout(() => {
+                                                    window.scrollBy(0, 200)
+                                                    document.body.scrollBy(0, 200)
+                                                    if (newAppealMainSection.current)
+                                                        newAppealMainSection.current.scrollBy(0, 200)
+                                                }, 200)
+
+                                            }} maxLength={20} onChange={(e) => {
                                                 let updatedHashtags = hashtags
+                                                e.currentTarget.value = e.currentTarget.value.replaceAll(/[@;!.# ]/g, '')
+                                                e.currentTarget.value = e.currentTarget.value.slice(0, 20)
                                                 updatedHashtags[index] = e.currentTarget.value
                                                 setHashtags([...updatedHashtags])
-                                                e.currentTarget.style.width = e.currentTarget.value.length + 2 + "ch"
-                                            }} defaultValue={hashtag}
-                                                   className={'mr-1 w-5 outline-0 transition-all focus:outline-4'}/>
+                                                e.currentTarget.style.width = e.currentTarget.value.length + 4 + "ch"
+                                            }} value={hashtags[index]}
+                                                   className={'mr-1 w-5 outline-0 focus:outline-0 transition-all focus:outline-0'}/>
+                                            <div onClick={() => {
+                                                let filterHashtag = [...hashtags]
+                                                filterHashtag = filterHashtag.filter((fhashtag, filterIndex) => {
+                                                    if (fhashtag === hashtags[index])
+                                                        return false
+                                                    else
+                                                        return true
+                                                })
+                                                setHashtags(filterHashtag)
+                                                console.log(filterHashtag)
+                                                console.log(hashtags)
+                                            }} className={'h-2 w-2'}>
+                                                <CloseSVG/>
+                                            </div>
                                         </div>
                                     ))
                                 }
@@ -243,29 +320,70 @@ const Index = () => {
                             </div>
                         </div>
                         <div className={'IranSans text-textDark text-sm mx-4 my-2'}>
-                            <span>با اضافه کردن حداقل 1 تا 5 هشتگ به آکهی خود به فرآیند انجام شدن اگهی سرعت ببخشید.</span>
+                            <span>با اضافه کردن حداقل 1 تا 5 هشتگ به آگهی خود به فرآیند انجام شدن آگهی سرعت ببخشید.</span>
                         </div>
 
-                        {/*<div className={'w-full h-40 bg-white mt-1 px-4 pt-3 new-section'}>*/}
-                        {/*    <span*/}
-                        {/*        className={'text-textDark text-md IranSansMedium text-primary '}>اطلاعات اختیاری</span>*/}
-                        {/*    <div className={'w-full flex flex-row justify-between px-4 IranSans mt-5'}>*/}
-                        {/*        <span>دانشگاه</span>*/}
-                        {/*        <span>نام دانشگاه</span>*/}
-                        {/*    </div>*/}
-                        {/*    <Divider type={'horizontal'} color={'#d7d7d7'} className={'mt-4 mb-4'}/>*/}
-                        {/*    <div className={'w-full flex flex-row justify-between px-4 IranSans'}>*/}
-                        {/*        <span>دانشگاه</span>*/}
-                        {/*        <span>نام دانشگاه</span>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
+                        <div className={'w-full h-40 bg-white mt-1 px-4 pt-3 new-section'}>
+
+                            <span className={'text-textDark text-md IranSansMedium  '}>اطلاعات تماس</span>
+                            <div className={'w-full flex items-center justify-center relative mt-4'}>
+                                <div
+                                    className={`absolute  left-6 top-1/2 -translate-y-1/2 flex flex-col justify-center items-center w-8 h-8`}>
+
+                                    <div
+                                        className={`w-full relative  h-full bg-background rounded-md p-2 flex flex-col justify-center items-center `}>
+                                        <div
+                                            className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'telegram' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
+                                            <TelInputSVG/>
+                                        </div>
+                                        <div
+                                            className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'phone' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
+                                            <BoldMobile/>
+                                        </div>
+                                        <div
+                                            className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === '' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
+                                            <RightSquareSVG/>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <Input dir={'ltr'} placeHolder={''} inputClassName={'text-left pl-12'} maxLength={30}
+                                       id={'title'} numOnly={false}
+                                       wrapperClassName={'w-11/12 h-14 '}
+                                       onChange={(e: any) => {
+                                           if (e.currentTarget.value.length > 0) {
+                                               if (contactType === 'phone') {
+                                                   e.currentTarget.value = e.currentTarget.value.replaceAll(/[^0-9]/g, '')
+                                               }
+                                               if (/[^0-9]/.test(e.currentTarget.value)) {
+                                                   setContactType('telegram')
+                                                   e.currentTarget.value = '@' + e.currentTarget.value.replaceAll(/[^a-zA-z0-9]/g, '')
+                                                   // e.currentTarget.value =  e.currentTarget.value.replaceAll(/[^0-9]/g, '')
+
+                                               } else {
+                                                   setContactType('phone')
+                                               }
+                                           } else
+                                               setContactType('')
+                                           setContactAddress(e.currentTarget.value)
+
+                                           setConnectWay(e.currentTarget.value)
+                                       }}
+
+                                       labelText={'شماره تلفن یا آیدی تلگرام'}/>
+                            </div>
+
+                        </div>
+
                     </section>
+
                 </Step>
 
 
                 <Step step={1}>
                     <div className={'w-full bg-white mt-1 px-4 pb-10 pt-3 new-section '}>
-                        <span className={'text-textDark text-lg IranSansMedium  '}>توضیحات اضافه</span>
+                        <span className={'text-textDark text-md IranSansMedium  '}>توضیحات اضافه</span>
                         <div className={'w-full flex items-center justify-center mt-4 h-40'}>
                             <Input onChange={(e: any) => {
                                 setDescription(e.currentTarget.value)
@@ -290,7 +408,7 @@ const Index = () => {
                             </div>
 
                             <span
-                                className={'text-primary IranSansMedium text-md'}>{`${uploadedImages.length}/5`}</span>
+                                className={'text-primary IranSansMedium text-sm'}>{`${uploadedImages.length}/5`}</span>
                         </div>
 
                         <div
@@ -313,7 +431,7 @@ const Index = () => {
                                                         }
                                                     }, (error: any) => {
                                                         // console.log(error)
-                                                        fileUploadError('خطا در آپلود فایل، دوبره تلاش کنید')
+                                                        showError('خطا در آپلود فایل، دوبره تلاش کنید')
 
                                                         let updateUploadingProgress = [...uploadingProgress]
                                                         updateUploadingProgress[uploadingProgress.length] = 0;
@@ -339,7 +457,10 @@ const Index = () => {
                             </div>
                             {
                                 uploadedImages.map((uploadedImage, index) => {
-                                    return (<div key={`${index}photo`}
+                                    return (<div onClick={(e) => {
+                                            setImageBottomSheetOpened(true)
+                                            currentSelectedImage.current = uploadedImage
+                                        }} key={`${index}photo`}
                                                  className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative overflow-hidden mt-4'}>
                                             <img src={`https://dl.unimun.me/${JSON.parse(uploadedImage).thumbnail}`}
                                                  alt={'Unimun ' + index}
@@ -393,7 +514,7 @@ const Index = () => {
                                 <span className={'IranSans mr-2'}>فایل</span>
                             </div>
                             <span
-                                className={'text-primary IranSansMedium text-md'}>{`${uploadedFiles.length}/5`}</span>
+                                className={'text-primary IranSansMedium text-sm'}>{`${uploadedFiles.length}/5`}</span>
                         </div>
                         <div
                             className={'new-file flex flex-col justify-center items-center mt-3 max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
@@ -432,14 +553,29 @@ const Index = () => {
                 </Step>
             </StepperFragment>
 
+
             <div className={'w-full bottom-2 fixed flex flex-row items-center justify-center po'}>
-                <Button id={'new-appeal-submit'} loading={loading}
-                        className={'w-11/12 h-14  bg-primary rounded-xl flex flex-row justify-between items-center px-4'}
+                <Button disabled={title.length < 3 || contactAddress.length < 3} id={'new-appeal-submit'}
+                        loading={loading}
+                        className={`w-11/12 h-14 ${title.length < 3 || contactAddress.length < 3 ? "bg-gray-400" : 'bg-primary'} transition-all duration-300  rounded-xl flex flex-row justify-between items-center px-4`}
                         rippleColor={'rgba(255,255,255,0.49)'} onClick={() => {
                     if (currentStep !== 1)
                         setCurrentStep(currentStep + 1)
                     else {
-                        createAppeal()
+                        createAppeal().then(e => {
+                            console.log(e)
+                            try {
+                                if (e.data.createAppeal.status === "SUCCESS") {
+                                    lastAppealSubmitSuccess(e.data.createAppeal.data.id)
+                                    router.push('/')
+                                } else {
+                                    showError('خطا در ساخت آگهی، لطفاا دوباره تلاش کنید')
+                                }
+                            } catch (e) {
+
+                            }
+
+                        })
                     }
                 }}>
                     <div className={'text-white IranSans w-8 '}/>

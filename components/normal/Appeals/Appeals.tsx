@@ -3,7 +3,7 @@ import Eye from "../../../assets/svgCodes/Eye";
 import {gql, useLazyQuery, useReactiveVar} from "@apollo/client";
 import Link from 'next/link'
 import {useRouter} from "next/router";
-import {currentAd, lastGottenAppeals} from "../../../store/appeals";
+import {currentAd, lastAppealSubmitSuccess, lastGottenAppeals} from "../../../store/appeals";
 import {getAppealsQuery} from "../../../Requests/normal/appeals";
 import NewAppealButton from "../NewAppealButton/NewAppealButton";
 import ThousandTomans from '../../../assets/svgs/thousandTomans.svg'
@@ -12,6 +12,7 @@ import Search from "../Search/Search";
 import _ from 'lodash';
 import SkeletonElement from "../../view/Skeleton/Skeleton";
 import {passedTime} from "../../../helpers/passedTime";
+import {toast, ToastContainer} from "react-toastify";
 
 
 const Appeals = () => {
@@ -39,10 +40,24 @@ const Appeals = () => {
 
 
     useEffect(() => {
+        console.log(lastAppealSubmitSuccess())
+        if (lastAppealSubmitSuccess().length) {
+            toast.success('آگهی شا ثبت شد و  در انتظار بررسی است', {
+                position: "bottom-center",
+                autoClose: 5000,
+                pauseOnHover: true,
+                style: {
+                    bottom: '10px'
+                }
+            });
+            lastAppealSubmitSuccess('')
+        }
+
+    }, [])
+    useEffect(() => {
         if (!data && !loading) {
             getAppeals()
                 .then((e) => {
-                    console.log(e)
                     if (e.data.appeals === null) {
 
                     } else {
@@ -114,7 +129,6 @@ const Appeals = () => {
         setSearchLoading(searchAppealsResult.loading)
     }, [searchAppealsResult.loading])
     const onSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log('a')
 
         _.debounce(() => {
             setNothingFound(false)
@@ -259,7 +273,6 @@ const Appeals = () => {
 
     const debounceFunction = (input: any, timeout: number) => {
         return _.debounce((e = input) => {
-            console.log('up')
             setNothingFound(false)
             searcheText.current = e.target.value
             searchAppeals({variables: {searchText: searcheText.current}}).then((e) => {
@@ -274,7 +287,6 @@ const Appeals = () => {
 
 
     let searchInput = (e: React.BaseSyntheticEvent) => {
-        console.log(e)
         setNothingFound(false)
         searcheText.current = e.target.value
         searchAppeals({variables: {searchText: searcheText.current}}).then((e) => {
@@ -288,6 +300,7 @@ const Appeals = () => {
     let searchDeb = _.debounce(searchInput, 1000)
     return (
         <div className={'h-full overflow-hidden relative '}>
+            <ToastContainer/>
 
             <Search searchLoading={searchLoading} collapse={scrollingToBottom}
                     onInputChange={(e) => {

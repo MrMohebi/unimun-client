@@ -57,9 +57,13 @@ const Search = (props: Props) => {
                 </div>
                 <input ref={inputRef} id={'search-input'}
                        className={'w-full h-full bg-transparent outline-0 px-2 text-sm IranSansMedium'}
-                       placeholder={'جستجو'} type="text" onChange={props.onInputChange}/>
+                       placeholder={'جستجو'} type="text" onChange={(e) => {
+                    inputText[1](e.currentTarget.value)
+                    if (props.onInputChange)
+                        props.onInputChange(e)
+                }}/>
                 < div
-                    className={`w-5 h-5 flex flex-col justify-center transition-all duration-100 items-center p-0.5 ${props.searchLoading ? "scale-100" : 'scale-0'}`}
+                    className={`w-5 h-5 flex flex-col justify-center transition-all duration-100 items-center p-0.5 ${inputText[0].length ? "scale-100" : 'scale-0'}`}
                     onClick={() => {
                         if (inputRef.current)
                             inputRef.current.value = ''

@@ -21,7 +21,6 @@ const Button = (props: Props) => {
         ripple.className = 'ripple absolute'
         ripple.style.backgroundColor = props.rippleColor ?? '#6e6e6e'
         button.appendChild(ripple)
-        console.log(e.currentTarget.getBoundingClientRect())
         ripple.style.top = e.clientY - e.currentTarget.getBoundingClientRect().y + 'px'
         ripple.style.left = e.clientX - e.currentTarget.getBoundingClientRect().left + 'px'
         setTimeout(() => {

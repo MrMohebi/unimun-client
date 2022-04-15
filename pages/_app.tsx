@@ -6,6 +6,8 @@ import {ApolloProvider} from "@apollo/client";
 import client from "../apollo-client";
 import UserAuthenticationCheck from "../middlewareComponents/UserAuthenticationCheck";
 import 'react-toastify/dist/ReactToastify.css'
+import 'tippy.js/dist/tippy.css';
+
 const Layouts = [
     {
         routes: ['', 'profile', 'ask', 'library', 'wallet'],

@@ -19,6 +19,7 @@ interface Props {
     onFocus?: any
     onBlur?: any
     inputRef?: React.Ref<any>
+    placeHolder?: string
 }
 
 const Input = ({
@@ -35,14 +36,16 @@ const Input = ({
                    defaultValue,
                    onFocus,
                    onBlur,
-                   inputRef
+                   inputRef,
+                   placeHolder
                }: Props) => {
 
 
     return (
         !multiLine ?
             <div className={wrapperClassName ?? ''}>
-                <input ref={inputRef ?? null} onBlur={onBlur} onFocus={onFocus} type={numOnly ? 'number' : ''}
+                <input placeholder={placeHolder ?? ''} ref={inputRef ?? null} onBlur={onBlur} onFocus={onFocus}
+                       type={numOnly ? 'number' : ''}
                        defaultValue={defaultValue}
                        autoFocus={autoFocus}
                        onChange={(e) => {

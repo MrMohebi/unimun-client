@@ -4,7 +4,8 @@ interface Props{
     sqSize:number
     strokeWidth:number
     percentage:number
-    color:string
+    color: string
+    emptyColor?: string
 }
 const CircularProgressBar = (props:Props) => {
 
@@ -28,9 +29,10 @@ const CircularProgressBar = (props:Props) => {
                 cx={props.sqSize / 2}
                 cy={props.sqSize / 2}
                 r={radius}
+                style={{stroke: props.emptyColor ?? ''}}
                 strokeWidth={`${props.strokeWidth}px`} />
             <circle
-                className="circle-progress"
+                className="circle-progress transition-all"
                 cx={props.sqSize / 2}
                 cy={props.sqSize / 2}
                 r={radius}

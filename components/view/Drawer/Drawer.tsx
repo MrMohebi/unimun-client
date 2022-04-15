@@ -37,7 +37,7 @@ const Drawer = (props: Props) => {
             }}
 
                  className={'pointer-events-auto bottom-0 relative bg-white w-full d overflow-hidden  rounded-tr-2xl rounded-tl-2xl'}
-                 style={{boxShadow: "0px 0px 20px 0px #1817172b", pointerEvents: 'all', minHeight: '100%'}}>
+                 style={{boxShadow: "0px 0px 20px 0px #1817172b", pointerEvents: 'all'}}>
 
                 <div ref={drawerInner}
                      className={'w-full relative h-full relative pt-10  overflow-hidden scroll-smooth'}>
