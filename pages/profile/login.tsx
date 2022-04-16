@@ -8,7 +8,6 @@ import {useRouter} from "next/router";
 import {UserToken} from "../../store/user";
 import {isReferenceCodeValid, SendVCodeQuery, VerifyVCode} from "../../Requests/normal/login";
 import {setToken} from "../../helpers/TokenHelper";
-import internal from "stream";
 import Promoter from "../../assets/svgs/postbox.svg";
 import {updateUser} from "../../Requests/withAuthentication/user";
 
@@ -26,7 +25,6 @@ const Login = () => {
     const deadLine = useRef(0);
     const nameInputRef = useRef<HTMLInputElement>(null);
     const [elapsedTime, setElapsedTime] = useState(0);
-    const resendCodeTimer = useRef(null);
     const refCodeInputRef = useRef<HTMLInputElement>(null)
     const clearCodeFunc = useRef<Function>(null)
     const router = useRouter()
@@ -250,7 +248,9 @@ const Login = () => {
                                     <br/>
 
                                 </div>
-                                <div className={'w-full mt-10 mx-auto flex flex-col justify-center items-center '}
+                                <div onClick={() => {
+                                    window.open('https://www.instagram.com/unimun.me/', '_blank')
+                                }} className={'w-full mt-10 mx-auto flex flex-col justify-center items-center '}
                                      style={{maxWidth: '420px'}}>
                                     <Promoter/>
                                 </div>
@@ -327,7 +327,7 @@ const Login = () => {
                         className={'text-primary'}>قوانین حریم ‌خصوصی</span> را می‌ پذیرم</span>
                 </div>
                 <Button id={'verify-phone-button'}
-                        loading={sendVCodeResult.loading || verifyVCodeResult.loading || verifyReferralResult.loading}
+                        loading={sendVCodeResult.loading || verifyVCodeResult.loading || verifyReferralResult.loading || setNameResult.loading}
                         onClick={() => {
                             if (!vCodeError) {
                                 if (currentStep === 0) {

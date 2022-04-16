@@ -2,12 +2,10 @@ import React, {useEffect, useRef, useState} from 'react';
 import Eye from "../../../assets/svgCodes/Eye";
 import {gql, useLazyQuery, useReactiveVar} from "@apollo/client";
 import Link from 'next/link'
-import {useRouter} from "next/router";
 import {currentAd, lastAppealSubmitSuccess, lastGottenAppeals} from "../../../store/appeals";
 import {getAppealsQuery} from "../../../Requests/normal/appeals";
 import NewAppealButton from "../NewAppealButton/NewAppealButton";
 import ThousandTomans from '../../../assets/svgs/thousandTomans.svg'
-import {TailSpin} from "react-loader-spinner";
 import Search from "../Search/Search";
 import _ from 'lodash';
 import SkeletonElement from "../../view/Skeleton/Skeleton";
@@ -42,7 +40,7 @@ const Appeals = () => {
     useEffect(() => {
         console.log(lastAppealSubmitSuccess())
         if (lastAppealSubmitSuccess().length) {
-            toast.success('آگهی شا ثبت شد و  در انتظار بررسی است', {
+            toast.success('آگهی شما ثبت شد و  در انتظار بررسی است', {
                 position: "bottom-center",
                 autoClose: 5000,
                 pauseOnHover: true,
@@ -145,12 +143,6 @@ const Appeals = () => {
 
     }
 
-    const dateConverter = (timestamp: number) => {
-        return Math.floor((now - timestamp) / 3600) > 24 ? Math.floor((now - timestamp) / 8640) + ' روز پیش ' : Math.floor((now - timestamp) / 8640) + ' ساعت پیش '
-    }
-    const adOnClick = (ad: any) => {
-        currentAd(ad)
-    }
 
 
     const appealsSkeleton = (count: number) => {
@@ -271,20 +263,6 @@ const Appeals = () => {
         )
     }
 
-    const debounceFunction = (input: any, timeout: number) => {
-        return _.debounce((e = input) => {
-            setNothingFound(false)
-            searcheText.current = e.target.value
-            searchAppeals({variables: {searchText: searcheText.current}}).then((e) => {
-                if (!e.error) {
-                    if (e.data.appeals.edges.length === 0)
-                        setNothingFound(true)
-                    setSearchedAppeals(e.data.appeals.edges)
-                }
-            })
-        }, timeout)
-    }
-
 
     let searchInput = (e: React.BaseSyntheticEvent) => {
         setNothingFound(false)
@@ -348,7 +326,7 @@ const Appeals = () => {
                         : null
 
                 }
-                <div className={'h-36'}></div>
+                <div className={'h-36'}/>
                 {
                     nothingFound ?
                         <div className={'w-full flex flex-col items-center justify-center mt-20'}>
