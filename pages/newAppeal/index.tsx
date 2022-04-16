@@ -67,7 +67,7 @@ const Index = () => {
     }
 
     useEffect(() => {
-        setImageBottomSheetOpened(true)
+        setImageBottomSheetOpened(false)
     }, [])
 
     const removeEmptyProgresses = () => {

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import Input from "../../view/Input/Input";
 
 interface Props {
@@ -8,6 +8,7 @@ interface Props {
     err: boolean,
     stepBack: any,
     hint?: number
+    clearCodeFunction: any
 }
 
 
@@ -20,6 +21,7 @@ const VCodeInput = (props: Props) => {
     const [numbersHolder, setNumbersHolder] = React.useState("")
     const [err, setErr] = React.useState(props.err)
     const [success, setSuccess] = React.useState(props.success)
+    const InputRef = useRef<HTMLInputElement>(null)
 
 
     useEffect(() => {
@@ -27,13 +29,23 @@ const VCodeInput = (props: Props) => {
         setErr(props.err)
     }, [code, props.success, props.err])
 
+    useEffect(() => {
+        props.clearCodeFunction.current = clearCode
+    }, [])
 
+    const clearCode = () => {
+        console.log('run')
+        setCode('')
+        setNumbersHolder('')
+        if (InputRef.current)
+            InputRef.current.value = ''
+    }
 
     return (
         <div className={'w-full relative px-3 h-28'}>
             <div className={'h-full w-full  flex flex-row-reverse justify-around items-center'}>
 
-                <Input autoFocus={true} id={'Vcode'} inputClassName={'user-select-none'}
+                <Input inputRef={InputRef} autoFocus={true} id={'Vcode'} inputClassName={'user-select-none'}
                        wrapperClassName={'w-100 h-full text-tiny  absolute w-full opacity-0'} maxLength={props.length}
                        numOnly={true} onChange={(e: any) => {
                     let text = e.currentTarget.value

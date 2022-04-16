@@ -10,6 +10,7 @@ import {isReferenceCodeValid, SendVCodeQuery, VerifyVCode} from "../../Requests/
 import {setToken} from "../../helpers/TokenHelper";
 import internal from "stream";
 import Promoter from "../../assets/svgs/postbox.svg";
+import {updateUser} from "../../Requests/withAuthentication/user";
 
 const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState('00000000000')
@@ -23,17 +24,18 @@ const Login = () => {
     const [refCodeStatus, setRefCodeStatus] = useState("")
     const [showPromoter, setShowPromoter] = useState(true);
     const deadLine = useRef(0);
+    const nameInputRef = useRef<HTMLInputElement>(null);
     const [elapsedTime, setElapsedTime] = useState(0);
     const resendCodeTimer = useRef(null);
     const refCodeInputRef = useRef<HTMLInputElement>(null)
-
+    const clearCodeFunc = useRef<Function>(null)
     const router = useRouter()
 
 
     const [sendVcode, sendVCodeResult] = useMutation(gql`${SendVCodeQuery(phoneNumber).query}`, {variables: SendVCodeQuery(phoneNumber).variables})
     const [verifyVCode, verifyVCodeResult] = useMutation(gql`${VerifyVCode(phoneNumber,vCode,referenceCode).query}`, {variables: VerifyVCode(phoneNumber, vCode, referenceCode).variables})
     const [verifyReferral, verifyReferralResult] = useLazyQuery(gql`${isReferenceCodeValid().query}`, {variables: isReferenceCodeValid().variables})
-    // const [setName, setNameResult] = useMutation(gql`${VerifyVCode.query}`, {variables: VerifyVCode.variables})
+    const [setName, setNameResult] = useMutation(gql`${updateUser({name:''}).query}`, {variables: updateUser({name: ''}).variables})
 
     let phoneNumberValidation = (phone: string) => {
         if (phone[0] === '0' && phone[1] === '9') {
@@ -116,9 +118,13 @@ const Login = () => {
         }
         if (verifyVCodeResult.data) {
             if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && sendVCodeResult.data.sendVCode.data.isSignup) {
-                // setStep(3)
+                setStep(3)
+                setAllowForNextStep(false)
+                UserToken(verifyVCodeResult.data.verifyVCode.data.token)
+                setToken(verifyVCodeResult.data.verifyVCode.data.token)
+                verifyVCodeResult.reset()
             }
-            if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS") {
+            if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && !sendVCodeResult.data.sendVCode.data.isSignup) {
                 setVcodeSuccess(true)
                 setTimeout(() => {
                     UserToken(verifyVCodeResult.data.verifyVCode.data.token)
@@ -144,10 +150,12 @@ const Login = () => {
                 }
                 if (currentStep === 2 && sendVCodeResult.data.sendVCode.data.isSignup) {
                     sendVCodeResult.reset()
+                    verifyVCodeResult.reset()
                     setStep(1)
                 }
                 if (currentStep === 2 && !sendVCodeResult.data.sendVCode.data.isSignup) {
                     sendVCodeResult.reset()
+                    verifyVCodeResult.reset()
                     setStep(0)
                 }
 
@@ -252,7 +260,8 @@ const Login = () => {
 
                             : currentStep === 2 ?
                                 <div>
-                                    <VCodeInput hint={vCodeHint} stepBack={stepBack} success={vCodeSuccess}
+                                    <VCodeInput clearCodeFunction={clearCodeFunc} hint={vCodeHint} stepBack={stepBack}
+                                                success={vCodeSuccess}
                                                 err={vCodeError}
                                                 onChange={(code: string) => {
                                                     setVCodeError(false)
@@ -289,13 +298,15 @@ const Login = () => {
 
                                 :
                                 currentStep === 3 ?
-                                    <Input id={'1'}
+                                    <Input inputRef={nameInputRef} id={'1'}
                                            wrapperClassName={`mt-5 transition-all h-14 duration-400`}
                                            numOnly={false}
                                            dir={'rtl'} labelText={'نام و نام خانوادگی یا هر چیزی که صلاح میدونین'}
                                            onChange={(e: any) => {
+
                                                if (e.currentTarget.value.length > 0) {
                                                    setAllowForNextStep(true)
+                                                   console.log(allowForNextStep)
                                                } else {
                                                    setAllowForNextStep(false)
                                                }
@@ -341,8 +352,27 @@ const Login = () => {
                                 setVCodeError(false)
                             }
 
+                            if (vCodeError) {
+                                setVCodeError(false)
+                                verifyVCodeResult.reset()
+                                if (clearCodeFunc.current)
+                                    clearCodeFunc.current()
+                            }
+                            if (currentStep === 3) {
+
+                                if (nameInputRef.current)
+                                    setName({variables: {name: nameInputRef.current.value}}).then(e => {
+                                        console.log(e)
+                                        if (e.data) {
+                                            if (e.data.updateUser.status === 'SUCCESS') {
+                                                router.push('/')
+                                            }
+                                        }
+                                    })
+                            }
+
                         }} disabled={!allowForNextStep} rippleColor={'rgba(255,255,255,0.62)'}
-                        className={`${currentStep === 0 ? 'w-2/4' : 'w-full'}  ${allowForNextStep && !vCodeError ? 'bg-primary' : !vCodeError ? 'bg-textDark' : ''} ${vCodeError && currentStep === 2 ? 'bg-errorRed' : ''} transition-all text-md duration-500 h-14 rounded-xl `}>
+                        className={`${currentStep === 0 ? 'w-2/4' : 'w-full'} ${currentStep === 3 && allowForNextStep ? ' bg-primary ' : ''}${allowForNextStep ? 'bg-primary' : 'bg-textDark'}  ${allowForNextStep && !vCodeError ? 'bg-primary' : !vCodeError ? 'bg-textDark' : ''} ${vCodeError && currentStep === 2 ? 'bg-errorRed' : ''} transition-all text-md duration-500 h-14 rounded-xl `}>
                     <span className={'text-md text-white IranSansMedium'}>
 
                         {
