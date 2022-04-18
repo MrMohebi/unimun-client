@@ -34,7 +34,6 @@ const VCodeInput = (props: Props) => {
     }, [])
 
     const clearCode = () => {
-        console.log('run')
         setCode('')
         setNumbersHolder('')
         if (InputRef.current)

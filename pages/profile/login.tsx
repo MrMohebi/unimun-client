@@ -204,7 +204,6 @@ const Login = () => {
                                            setReferenceCode(e.currentTarget.value)
                                            if (e.currentTarget.value.length === 6) {
                                                verifyReferral({variables: {referenceCode: e.target.value.toString()}}).then(e => {
-                                                   console.log(e)
                                                    if (e.data.isReferenceCodeValid.status === 'SUCCESS') {
                                                        setRefCodeStatus('SUCCESS')
                                                        setAllowForNextStep(true)
@@ -306,7 +305,6 @@ const Login = () => {
 
                                                if (e.currentTarget.value.length > 0) {
                                                    setAllowForNextStep(true)
-                                                   console.log(allowForNextStep)
                                                } else {
                                                    setAllowForNextStep(false)
                                                }
@@ -362,7 +360,6 @@ const Login = () => {
 
                                 if (nameInputRef.current)
                                     setName({variables: {name: nameInputRef.current.value}}).then(e => {
-                                        console.log(e)
                                         if (e.data) {
                                             if (e.data.updateUser.status === 'SUCCESS') {
                                                 router.push('/')

@@ -26,14 +26,14 @@ import {UserToken} from "../../store/user";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 import {toast, ToastContainer} from "react-toastify";
 import {uploadImage} from "../../Requests/uploadRequests";
-import {number} from "prop-types";
-import tippy from "tippy.js";
 import CloseSVG from "../../assets/svgs/close.svg";
 import {lastAppealSubmitSuccess} from "../../store/appeals";
 import BottomSheet from "../../components/view/BottomSheet/BottomSheet";
 
 
 const Index = () => {
+
+    //states
 
 
     const [title, setTitle] = useState("")
@@ -78,7 +78,14 @@ const Index = () => {
         })
         setUploadingProgress(updateUploadingProgress)
     }
-    let createFiles = () => {
+    const removeEmptyHashtags = () => {
+        let _hashtags = [...hashtags]
+        _hashtags = _hashtags.filter((tag) => {
+            return tag.length;
+        })
+        setHashtags(_hashtags)
+    }
+    const createFiles = () => {
 
         let files = [] as any;
         uploadedImages.forEach(image => {
@@ -138,14 +145,6 @@ const Index = () => {
 
         if (data && data.createAppeal.status === 'SUCCESS') {
             router.push('/')
-            // toast.success('آگهی شا ثبت شد و  در انتظار بررسی است', {
-            //     position: "bottom-center",
-            //     autoClose: 5000,
-            //     pauseOnHover: true,
-            //     style: {
-            //         bottom: '10px'
-            //     }
-            // });
         }
     }, [data, loading, error])
 
@@ -429,7 +428,6 @@ const Index = () => {
                                                             removeEmptyProgresses()
                                                         }
                                                     }, (error: any) => {
-                                                        // console.log(error)
                                                         showError('خطا در آپلود فایل، دوبره تلاش کنید')
 
                                                         let updateUploadingProgress = [...uploadingProgress]
@@ -559,26 +557,27 @@ const Index = () => {
                     id={'new-appeal-submit'}
                     loading={loading}
                     className={`w-11/12 h-14 ${title.length < 3 || contactType === '' || (contactType === 'phone' && contactAddress.length < 11) ? "bg-gray-400" : 'bg-primary'} transition-all duration-300  rounded-xl flex flex-row justify-between items-center px-4`}
-                    rippleColor={'rgba(255,255,255,0.49)'} onClick={() => {
-                    if (currentStep !== 1)
-                        setCurrentStep(currentStep + 1)
-                    else {
-                        createAppeal().then(e => {
-                            console.log(e)
-                            try {
-                                if (e.data.createAppeal.status === "SUCCESS") {
-                                    lastAppealSubmitSuccess(e.data.createAppeal.data.id)
-                                    router.push('/')
-                                } else {
-                                    showError('خطا در ساخت آگهی، لطفاا دوباره تلاش کنید')
+                    rippleColor={'rgba(255,255,255,0.49)'}
+                    onClick={() => {
+                        removeEmptyHashtags()
+                        if (currentStep !== 1)
+                            setCurrentStep(currentStep + 1)
+                        else {
+                            createAppeal().then(e => {
+                                try {
+                                    if (e.data.createAppeal.status === "SUCCESS") {
+                                        lastAppealSubmitSuccess(e.data.createAppeal.data.id)
+                                        router.push('/')
+                                    } else {
+                                        showError('خطا در ساخت آگهی، لطفاا دوباره تلاش کنید')
+                                    }
+                                } catch (e) {
+
                                 }
-                            } catch (e) {
 
-                            }
-
-                        })
-                    }
-                }}>
+                            })
+                        }
+                    }}>
                     <div className={'text-white IranSans w-8 '}/>
                     <div className={'text-white IranSans  '}>{`${currentStep == 1 ? 'ثبت' : 'بعدی'}`}</div>
                     <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25"

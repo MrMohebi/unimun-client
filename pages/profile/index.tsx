@@ -25,7 +25,6 @@ import VersionSVG from '../../assets/svgs/version.svg'
 import TelSVG from '../../assets/svgs/telegran-gray.svg'
 import InstaSVG from '../../assets/svgs/instagram-gray.svg'
 import TwitterSVG from '../../assets/svgs/twitter-gray.svg'
-import {route} from "next/dist/server/router";
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 
 const Index = () => {
@@ -48,7 +47,6 @@ const Index = () => {
 
     useEffect(() => {
         if (editProfButton.current) {
-            console.log(editProfButton.current.getBoundingClientRect().top - 50)
             drawerInitHeight[1](editProfButton.current.getBoundingClientRect().top + 50)
         }
         if (loginRegisterBtn.current && loginRegisterBtn.current.firstChild) {
@@ -63,13 +61,11 @@ const Index = () => {
             if (data.user.data) {
                 UserPhone(data.user.data.phone)
                 UserData(data.user.data)
-                console.log(UserData())
             }
             if (editProfButton.current) {
                 drawerInitHeight[1](editProfButton.current.getBoundingClientRect().top + 50)
             }
             if (loginRegisterBtn.current && loginRegisterBtn.current.firstChild) {
-                console.log((loginRegisterBtn.current.firstChild.firstChild as HTMLDivElement).getBoundingClientRect().top)
                 drawerInitHeight[1]((loginRegisterBtn.current.firstChild.firstChild as HTMLDivElement).getBoundingClientRect().top)
             }
 

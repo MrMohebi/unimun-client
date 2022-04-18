@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import Eye from "../../../assets/svgCodes/Eye";
 import {gql, useLazyQuery, useReactiveVar} from "@apollo/client";
 import Link from 'next/link'
-import {currentAd, lastAppealSubmitSuccess, lastGottenAppeals} from "../../../store/appeals";
+import {lastAppealSubmitSuccess, lastGottenAppeals} from "../../../store/appeals";
 import {getAppealsQuery} from "../../../Requests/normal/appeals";
 import NewAppealButton from "../NewAppealButton/NewAppealButton";
 import ThousandTomans from '../../../assets/svgs/thousandTomans.svg'
@@ -14,7 +14,6 @@ import {toast, ToastContainer} from "react-toastify";
 
 
 const Appeals = () => {
-    const now = Math.floor(Date.now() / 1000);
     const [scrollingToBottom, setScrollingToBottom] = useState(false);
     const [appeals, setAppeals] = useState([]);
     const [searchedAppeals, setSearchedAppeals] = useState([]);
@@ -38,7 +37,6 @@ const Appeals = () => {
 
 
     useEffect(() => {
-        console.log(lastAppealSubmitSuccess())
         if (lastAppealSubmitSuccess().length) {
             toast.success('آگهی شما ثبت شد و  در انتظار بررسی است', {
                 position: "bottom-center",
@@ -126,23 +124,6 @@ const Appeals = () => {
     useEffect(() => {
         setSearchLoading(searchAppealsResult.loading)
     }, [searchAppealsResult.loading])
-    const onSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-
-        _.debounce(() => {
-            setNothingFound(false)
-
-            searcheText.current = event.target.value
-            searchAppeals({variables: {searchText: searcheText.current}}).then((e) => {
-                if (!e.error) {
-                    if (e.data.appeals.edges.length === 0)
-                        setNothingFound(true)
-                    setSearchedAppeals(e.data.appeals.edges)
-                }
-            })
-        }, 900)
-
-    }
-
 
     const appealsSkeleton = (count: number) => {
         return (
