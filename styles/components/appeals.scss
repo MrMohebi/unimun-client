@@ -1,0 +1,10 @@
+.appeal-details {
+  width: 205px;
+  height: 40px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+
+  /* <integer> values */
+  -webkit-line-clamp: 2;
+}

@@ -10,8 +10,9 @@
 @import 'components/VCodeInput';
 @import "components/circularProgressBar";
 @import "components/loadingDialog";
-@import "skeleton";
 @import "components/skeleton";
+@import "components/appeals";
+@import "skeleton";
 @import "pages/profile";
 
 
@@ -26,7 +27,7 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
   Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  overscroll-behavior-y: contain;
+  overscroll-behavior-y: auto;
 
 }
 
@@ -67,4 +68,8 @@ body,
 * {
   user-select: none;
   scroll-behavior: smooth;
+}
+
+.english {
+  font-family: Serif, serif;
 }

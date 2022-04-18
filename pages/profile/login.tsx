@@ -196,7 +196,7 @@ const Login = () => {
                                        wrapperClassName={`mt-5 transition-all h-14 duration-400`}
                                        numOnly={false}
                                        dir={'ltr'}
-                                       inputClassName={`text-center text-md ${refCodeStatus === 'SUCCESS' ? 'text-primary' : refCodeStatus === 'ERROR' ? 'text-errorRed' : ''}`}
+                                       inputClassName={`text-center english text-md ${refCodeStatus === 'SUCCESS' ? 'text-primary' : refCodeStatus === 'ERROR' ? 'text-errorRed' : ''}`}
                                        onChange={(e: any) => {
 
                                            setRefCodeStatus('')

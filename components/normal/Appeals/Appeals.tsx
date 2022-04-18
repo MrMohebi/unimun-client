@@ -144,7 +144,6 @@ const Appeals = () => {
     }
 
 
-
     const appealsSkeleton = (count: number) => {
         return (
             Array(count).fill('').map((skeleton, index) => {
@@ -202,17 +201,11 @@ const Appeals = () => {
                         <div className={'flex-col flex text-right'}>
                                             <span
                                                 className={'IranSansBold text-textBlack text-l pt-1 whitespace-nowrap'}>{Appeal.title}</span>
-                            <span
-                                style={{
-                                    width: '200px',
-                                    height: '40px',
-                                    whiteSpace: 'break-spaces',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis'
-                                }}
+                            <div
+
                                 // style={{height:'50px', display: 'block', overflow: 'hidden', wordWrap:'break-word', textOverflow:'ellipsis'}}
 
-                                className={'IranSans text-textDarker mt-2 text-sm'}>{Appeal.details ? Appeal.details : "بدون توضیح"}</span>
+                                className={'IranSans text-textDarker mt-2 text-sm appeal-details'}>{Appeal.details ? Appeal.details : "بدون توضیح"}</div>
 
                         </div>
                         <div

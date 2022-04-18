@@ -1,0 +1,12 @@
+.appeal-details {
+    width: 205px;
+    height: 40px;
+    background-color: gainsboro;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    /* <integer> values */
+    -webkit-line-clamp: 2;
+}
+
+/*# sourceMappingURL=appeals.css.map */

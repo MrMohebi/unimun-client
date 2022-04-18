@@ -59,6 +59,7 @@ const Index = () => {
         toast.error(text, {
             position: "bottom-center",
             autoClose: 3000,
+
             closeOnClick: true,
             pauseOnHover: true,
             draggable: true,
@@ -282,8 +283,6 @@ const Index = () => {
                                                         return true
                                                 })
                                                 setHashtags(filterHashtag)
-                                                console.log(filterHashtag)
-                                                console.log(hashtags)
                                             }} className={'h-2 w-2'}>
                                                 <CloseSVG/>
                                             </div>
@@ -555,10 +554,12 @@ const Index = () => {
 
 
             <div className={'w-full bottom-2 fixed flex flex-row items-center justify-center po'}>
-                <Button disabled={title.length < 3 || contactAddress.length < 3} id={'new-appeal-submit'}
-                        loading={loading}
-                        className={`w-11/12 h-14 ${title.length < 3 || contactAddress.length < 3 ? "bg-gray-400" : 'bg-primary'} transition-all duration-300  rounded-xl flex flex-row justify-between items-center px-4`}
-                        rippleColor={'rgba(255,255,255,0.49)'} onClick={() => {
+                <Button
+                    disabled={title.length < 3 || contactType === '' || (contactType === 'phone' && contactAddress.length < 11)}
+                    id={'new-appeal-submit'}
+                    loading={loading}
+                    className={`w-11/12 h-14 ${title.length < 3 || contactType === '' || (contactType === 'phone' && contactAddress.length < 11) ? "bg-gray-400" : 'bg-primary'} transition-all duration-300  rounded-xl flex flex-row justify-between items-center px-4`}
+                    rippleColor={'rgba(255,255,255,0.49)'} onClick={() => {
                     if (currentStep !== 1)
                         setCurrentStep(currentStep + 1)
                     else {
