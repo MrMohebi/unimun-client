@@ -53,7 +53,7 @@ const Index = () => {
             drawerInitHeight[1]((loginRegisterBtn.current.firstChild.firstChild as HTMLDivElement).getBoundingClientRect().top + 50)
         }
         if (UserToken())
-            getUser()
+            getUser().then()
     }, [])
     useEffect(() => {
 
@@ -220,17 +220,19 @@ const Index = () => {
                                 </button>
                             </Button>
 
-                            <Button id={'my-books'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
-                                <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
-                                    <div className={'profile-drawer-svg'}><BookSVG/></div>
-                                    <div
-                                        className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>کتاب
-                                        های من
-                                    </div>
-                                </button>
-                            </Button>
+                            {/*<Button id={'my-books'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>*/}
+                            {/*    <button className={'flex flex-row justify-start mt-4 items-center w-full'}>*/}
+                            {/*        <div className={'profile-drawer-svg'}><BookSVG/></div>*/}
+                            {/*        <div*/}
+                            {/*            className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>کتاب*/}
+                            {/*            های من*/}
+                            {/*        </div>*/}
+                            {/*    </button>*/}
+                            {/*</Button>*/}
 
-                            <Button id={'invite-friends'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
+                            <Button onClick={() => {
+                                router.push('/invite')
+                            }} id={'invite-friends'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
                                 <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                                     <div className={'profile-drawer-svg'}><PeopleSVG/></div>
                                     <div
@@ -240,15 +242,15 @@ const Index = () => {
                                 </button>
                             </Button>
 
-                            <Button id={'saved'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
-                                <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
-                                    <div className={'profile-drawer-svg'}><SaveSVG/></div>
-                                    <div
-                                        className={'text-md IranSansMedium w-full text-right mx-4  pb-4'}>نشان
-                                        ها و یاداشت ها
-                                    </div>
-                                </button>
-                            </Button>
+                            {/*<Button id={'saved'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>*/}
+                            {/*    <button className={'flex flex-row justify-start mt-4 items-center w-full'}>*/}
+                            {/*        <div className={'profile-drawer-svg'}><SaveSVG/></div>*/}
+                            {/*        <div*/}
+                            {/*            className={'text-md IranSansMedium w-full text-right mx-4  pb-4'}>نشان*/}
+                            {/*            ها و یاداشت ها*/}
+                            {/*        </div>*/}
+                            {/*    </button>*/}
+                            {/*</Button>*/}
 
                         </div>
                         : null}
