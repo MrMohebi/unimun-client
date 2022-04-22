@@ -157,7 +157,8 @@ const Item = () => {
                             <div className={'px-5 mt-2'}>
                     <span className={'IranSansMedium'}>
                         {
-                            appeal.details ?? <div className={'w-full flex flex-col justify-center items-start'}>
+                            appeal.details.replace('<br/>', '\n') ??
+                            <div className={'w-full flex flex-col justify-center items-start'}>
                                 <SkeletonElement className={'w-full mt-2 h-5'}/>
                                 <SkeletonElement className={'w-full mt-2 h-5'}/>
                                 <SkeletonElement className={'w-full mt-2 h-5'}/>
