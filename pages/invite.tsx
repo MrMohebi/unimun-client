@@ -77,7 +77,9 @@ const Invite = () => {
                     <CopySVG/>
                 </div>
             </div>
-            <div className={'max-w-sm w-full h-full'}>
+            <div className={'max-w-sm w-full h-full '} onClick={() => {
+                window.open('https://www.instagram.com/p/CcqW8BHr2yD/?utm_source=ig_web_copy_link', '_blank')
+            }}>
                 <PostBox/>
             </div>
         </div>
