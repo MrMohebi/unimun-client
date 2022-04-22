@@ -52,7 +52,7 @@ const Login = () => {
         setStep(0)
     }
     const resendCode = () => {
-        if (elapsedTime > 120) {
+        if (elapsedTime > 45) {
             deadLine.current = Math.floor(Date.now() / 1000)
             sendVcode()
         }
@@ -276,7 +276,7 @@ const Login = () => {
                 <span onClick={() => {
                 }}>ویرایش شماره</span>
                                         <span onClick={resendCode}
-                                              className={`${elapsedTime > 120 ? 'text-primary' : 'text-gray-500'}`}>{` ارسال دوباره کد (${120 - elapsedTime + ' ثانیه'})`}</span>
+                                              className={`${elapsedTime > 45 ? 'text-primary' : 'text-gray-500'}`}>{` ارسال دوباره کد (${(45 - elapsedTime) > 0 ? (45 - elapsedTime) + ' ثانیه' : ""}`}</span>
                                     </div>
                                     <div className={'IranSansMedium text-textDark text-sm'}>
                                         چرا یکی از عدد ها پیداست ؟

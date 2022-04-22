@@ -1,5 +1,6 @@
 import React from 'react';
-import {TailSpin} from 'react-loader-spinner'
+import {InfinitySpin, TailSpin} from 'react-loader-spinner'
+import LoadingDialog from "../LoadingDialog/LoadingDialog";
 
 
 interface Props {
@@ -39,7 +40,7 @@ const Button = (props: Props) => {
                 className={`${props.loading ? 'relative ' : ''}${props.className}  ${props.disabled ? 'pointer-events-none' : ''} relative outline-0 overflow-hidden select-none   outline-0`}>
             {props.loading ?
                 <div className={'absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2'}>
-                    <TailSpin color="white" height={30} width={30}/>
+                    <LoadingDialog color={'white'} wrapperClassName={'w-10 h-10'}/>
                 </div>
 
                 :

@@ -95,9 +95,10 @@ const Appeals = () => {
     }
     const getNewerAppeals = () => {
         setReachedEndState(false)
-        if (!reachedEnd.current && !loading) {
+        if (!loading && appeals.length > 19) {
             if (lastCursor != appeals[appeals.length - 1]['cursor']) {
                 lastCursor.current = (appeals[appeals.length - 1]['cursor'])
+
                 getAppeals({variables: {after: lastCursor.current}}).then((e) => {
                     checkLastCursor(e)
                 })

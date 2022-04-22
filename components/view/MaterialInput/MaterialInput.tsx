@@ -6,6 +6,7 @@ interface Props {
     placeHolder?: string
     onChange?: Function
     defaultValue?: string
+    maxLen?: number
 }
 
 const MaterialInput = (props: Props) => {
@@ -16,7 +17,7 @@ const MaterialInput = (props: Props) => {
     }, [])
     return (
         <div className={`relative ${props.wrapperClassName} `}>
-            <input defaultValue={props.defaultValue ?? ''} onChange={(e) => {
+            <input maxLength={props.maxLen} defaultValue={props.defaultValue ?? ''} onChange={(e) => {
 
                 text[1](e.currentTarget.value)
                 if (props.onChange)

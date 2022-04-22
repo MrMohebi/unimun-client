@@ -24,7 +24,7 @@ function MyApp({Component, pageProps}: AppProps) {
         <ApolloProvider client={client}>
             <UserAuthenticationCheck>
                 <div className={'hidden lg:block md:block absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2'}>
-                    <h3 className={'IranSansMedium'}>برای استفاده از وبسات با موبایل وارد شوید</h3>
+                    <h3 className={'IranSansMedium'}>برای استفاده از وبسایت با موبایل وارد شوید</h3>
                 </div>
                 <div className={'contents lg:hidden md:hidden '}>
 

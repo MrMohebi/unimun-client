@@ -26,6 +26,7 @@ import TelSVG from '../../assets/svgs/telegran-gray.svg'
 import InstaSVG from '../../assets/svgs/instagram-gray.svg'
 import TwitterSVG from '../../assets/svgs/twitter-gray.svg'
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
+import SkeletonElement from "../../components/view/Skeleton/Skeleton";
 
 const Index = () => {
     const router = useRouter()
@@ -39,6 +40,7 @@ const Index = () => {
     const drawerInitHeight = useState(170)
     const drawerMinHeight = useState(100)
     const loginRegisterBtn = useRef<HTMLDivElement>(null)
+    const telContainer = useRef<HTMLDivElement>(null)
 
 
     const redirectTo = (path: string) => {
@@ -86,7 +88,7 @@ const Index = () => {
                     <div className={'fixed top-0 left-0 w-full h-full z-50 '} style={{background: 'rgba(0,0,0,0.4)'}}>
                         <div
                             className={'top-1/2 left-1/2 fixed bg-white rounded-3xl shadow p-4 -translate-x-1/2 -translate-y-1/2'}>
-                            <LoadingDialog wrapperClassName={' w-16 h-16  '} color={'blue'}/>
+                            <LoadingDialog wrapperClassName={' w-16 h-16 '} color={'#009dff'}/>
 
                         </div>
                     </div> :
@@ -162,8 +164,37 @@ const Index = () => {
                                 </div>
 
 
-                            </div> :
-                            null
+                            </div>
+
+                            :
+
+                            <div className={'contents'}>
+                                <div className={'w-full flex flex-col justify-center items-center'}>
+                                    <SkeletonElement className={'mt-3 IranSansBold h-5 w-20 text-lg '}/>
+                                    <SkeletonElement className={'mt-3 IranSansBold h-5 w-32 text-lg '}/>
+                                </div>
+
+
+                                <div className={'w-full flex flex-row justify-between items-center px-4 mt-4'}>
+                                    <SkeletonElement className={'mt-3 IranSansBold h-24 w-20 text-lg '}/>
+                                    <SkeletonElement className={'mt-3 IranSansBold h-28 w-24 text-lg '}/>
+                                    <SkeletonElement className={'mt-3 IranSansBold h-24 w-20 text-lg '}/>
+
+
+                                </div>
+
+                                <div ref={editProfButton} id={'edit-profile'} className={'px-4 w-full mt-4'}>
+                                    <Button onClick={() => {
+                                        router.push('/profile/editProfile')
+                                    }} id={'edit-profile-button'} rippleColor={'rgba(22,155,255,0.5)'}
+                                            className={'w-full border-2 border-primary rounded-lg h-10 text-primary'}>
+                                        <span>ویرایش نمایه</span>
+                                    </Button>
+
+                                </div>
+
+
+                            </div>
                         :
                         <div className={'contents'}>
                             <div className={'w-full flex flex-col justify-center items-center'}>
@@ -287,8 +318,9 @@ const Index = () => {
                     <Button id={'get-app'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
                         <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                             <div className={'profile-drawer-svg'}><DownloadAppSVG/></div>
-                            <div className={'text-md IranSansMedium w-full text-right mx-4 pb-4'}>دریافت
+                            <div className={'text-md IranSansMedium text-textDark w-full text-right mx-4 pb-4'}>دریافت
                                 اپلیکیشن
+                                <span className={'text-sm  scale-75 mt-1'}> (به زودی)</span>
                             </div>
                         </button>
                     </Button>
@@ -296,13 +328,21 @@ const Index = () => {
                 <div className={'h-48 flex flex-col justify-start items-center mt-10'}>
                     <div className={'flex flex-row justify-center items-center'}>
 
-                        <div className={'w-5 h-5 mx-3'}>
+                        <div ref={telContainer} className={'w-5 h-5 mx-3 transition-all'} onClick={() => {
+                            window.open('https://t.me/unimun_me', '_blank')
+                        }}>
                             <TelSVG/>
                         </div>
-                        <div className={'w-5 h-5 mx-3'}>
+                        <div className={'w-5 h-5 mx-3'} onClick={() => {
+                            window.open('https://www.instagram.com/unimun.me/', '_blank')
+                        }}>
                             <InstaSVG/>
                         </div>
-                        <div className={'w-5 h-5 mx-3'}>
+                        <div className={'w-5 h-5 mx-3 transition-all '} onClick={(e) => {
+                            e.currentTarget.classList.toggle('translate-x-24')
+                            if (telContainer.current)
+                                telContainer.current.classList.toggle('-translate-x-24')
+                        }}>
                             <TwitterSVG/>
                         </div>
 

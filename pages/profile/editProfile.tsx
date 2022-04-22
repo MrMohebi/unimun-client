@@ -12,11 +12,14 @@ import {updateUser} from "../../Requests/withAuthentication/user";
 import {gql, useMutation} from "@apollo/client";
 import {TailSpin} from "react-loader-spinner";
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
+import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 
 const EditProfile = () => {
     const router = useRouter()
     const lastSeenDialog = useState(false)
     const usernameError = useState(false)
+    const [bio, sBio] = useState('')
+    const [showBC, sShowBC] = useState(false)
     const requestDialog = useState(false)
     const userUpdatedInfo = useRef({
         username: UserData().username ?? '',
@@ -30,7 +33,7 @@ const EditProfile = () => {
         loading,
     }] = useMutation(gql`${updateUser(userUpdatedInfo.current).query}`, {variables: updateUser(userUpdatedInfo.current).variables})
 
-    const usernameReg = /^[a-z0-9_.]+$/
+    const usernameReg = /[0-9][^a-zA-Z0-9_]/g
 
     return (
         <div className={'w-full'}>
@@ -166,13 +169,14 @@ const EditProfile = () => {
                 <span className={'IranSansMedium select-none text-primary text-md mt-5'}>ویرایش عکس نمایه</span>
             </div>
             <div className={'w-full justify-start items-start px-4 mt-10'}>
-                <MaterialInput onChange={(e: any) => {
+                <MaterialInput maxLen={32} onChange={(e: any) => {
                     userUpdatedInfo.current.name = e.currentTarget.value
                 }} wrapperClassName={'w-full h-10 '} defaultValue={UserData().name ?? ''}
                                placeHolder={'نام'}/>
-                <MaterialInput onChange={(e: any) => {
-                    // e.currentTarget.value = e.currentTarget.value.match(usernameReg)
-                    if (!usernameReg.test(e.currentTarget.value) && e.currentTarget.value.length > 3) {
+                <MaterialInput maxLen={32} onChange={(e: any) => {
+                    e.currentTarget.value = e.currentTarget.value.replace(/[0-9][^0-9a-zA-Z]/g, '')
+                    console.log(e.currentTarget.value.test(/[0-9][^0-9a-zA-Z]/g));
+                    if (usernameReg.test(e.currentTarget.value)) {
                         usernameError[1](true)
                     } else {
                         usernameError[1](false)
@@ -186,10 +190,28 @@ const EditProfile = () => {
                         <div className={'text-tiny mt-1 mb-3 text-errorRed IranSansMedium'}>نام کاربری نا معتبر</div> :
                         null
                 }
-                <MaterialInput onChange={(e: any) => {
-                    userUpdatedInfo.current.bio = e.currentTarget.value
-                }} wrapperClassName={'w-full h-10 mt-4 m'} defaultValue={UserData().bio ?? ''}
-                               placeHolder={'بیوگرافی'}/>
+                <div className={'relative w-full'}>
+                    <MaterialInput maxLen={70} onChange={(e: any) => {
+
+                        userUpdatedInfo.current.bio = e.currentTarget.value
+                        sBio(e.currentTarget.value)
+                    }} wrapperClassName={'w-full h-10 mt-4 pl-8'} defaultValue={UserData().bio ?? ''}
+                                   placeHolder={'بیوگرافی'}/>
+                    <div className={'absolute left-2 top-1/2 -translate-y-1/2 scale-75  h-6 w-6 z-50'}>
+                        <div
+                            className={`h-full text-primary text-sm IranSans absolute w-full flex flex-col justify-center items-center ${30 - bio.length > 21 ? 'scale-0' : 'scale-100'} transition-all duration-300 ease-in-out`}
+                            style={{
+                                color: 70 - bio.length > 50 ? '#4eb3f1' : 70 - bio.length > 30 ? '#FF8800' : '#ff3333'
+                            }}>
+                            {70 - bio.length}
+                        </div>
+
+                        <CircularProgressBar emptyColor={'#f6f8fa'} sqSize={25}
+                                             strokeWidth={30 - bio.length > 21 ? 4 : 3}
+                                             percentage={(bio.length * 100) / 70}
+                                             color={70 - bio.length > 50 ? '#4eb3f1' : 70 - bio.length > 30 ? '#FF8800' : '#ff3333'}/>
+                    </div>
+                </div>
 
 
                 <div className={'mt-7'}>
