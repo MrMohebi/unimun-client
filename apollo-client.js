@@ -3,11 +3,12 @@ import {setContext} from "@apollo/client/link/context";
 import {UserToken} from "./store/user";
 
 const env = process.env.NODE_ENV
-let uri = env === "development" ? 'https://tttapi.unimun.me/graphql' : 'https://api.unimun.me/graphql'
+let uri = env === "development" || window.location.href.includes('dev.unimun') ? 'https://tttapi.unimun.me/graphql' : 'https://api.unimun.me/graphql'
 const httpLink = createHttpLink({
     uri: uri,
 });
 
+console.log(window.location.href.includes('dev.unimun'))
 
 const authLink = setContext((_, {headers}) => {
     // get the authentication token from local storage if it exists
