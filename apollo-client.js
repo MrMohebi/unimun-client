@@ -8,8 +8,6 @@ const httpLink = createHttpLink({
     uri: uri,
 });
 
-console.log(window.location.href.includes('dev.unimun'))
-
 const authLink = setContext((_, {headers}) => {
     // get the authentication token from local storage if it exists
     const token = UserToken()
