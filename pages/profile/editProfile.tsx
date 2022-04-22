@@ -157,6 +157,7 @@ const EditProfile = () => {
                 </div>
 
             </Dialog>
+            
             <div className={'w-full flex flex-col justify-center items-center'}>
                 <div className={'w-full flex flex-col justify-center items-center'}>
                     <div
