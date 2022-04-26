@@ -1,11 +1,11 @@
 import React from 'react';
 import Header from "../components/common/Header/Header";
-import {router} from "next/client";
 import {passedTime} from "../helpers/passedTime";
+import {useRouter} from "next/router";
 
 const Notifications = () => {
 
-
+    const router = useRouter();
     return (
         <div className={'overflow-y-scroll h-full'}>
             <Header title={'اعلان ها'} back={true} backOnClick={() => {
