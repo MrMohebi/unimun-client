@@ -318,7 +318,6 @@ body {
     background-position: 315px 0, 0 0, 0 190px, 50px 195px;
   }
 }
-
 .profile-drawer-svg {
   @apply h-7 w-7 pb-10;
 }
@@ -355,10 +354,11 @@ body,
   -webkit-tap-highlight-color: transparent;
 }
 
-.hide-scrollbars .example::-webkit-scrollbar {
+.hide-scrollbars *::-webkit-scrollbar {
   display: none;
 }
-.hide-scrollbars .example {
+
+.hide-scrollbars * {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -374,6 +374,24 @@ body,
 
 .english {
   font-family: Serif, serif;
+}
+
+.Toastify__toast-body {
+  display: flex !important;
+  flex-flow: row-reverse;
+  text-align: center;
+  justify-content: center;
+  align-items: center !important;
+}
+
+.no-font {
+  font-family: unset;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 /*# sourceMappingURL=globals.css.map */

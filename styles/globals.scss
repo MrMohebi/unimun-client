@@ -51,11 +51,11 @@ body,
 }
 
 .hide-scrollbars {
-  .example::-webkit-scrollbar {
+  *::-webkit-scrollbar {
     display: none;
   }
 
-  .example {
+  * {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
@@ -72,4 +72,26 @@ body,
 
 .english {
   font-family: Serif, serif;
+}
+
+
+// toastify
+
+.Toastify__toast-body {
+  display: flex !important;
+  flex-flow: row-reverse;
+  text-align: center;
+  justify-content: center;
+  align-items: center !important;
+}
+
+.no-font {
+  font-family: unset;
+}
+
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden
 }

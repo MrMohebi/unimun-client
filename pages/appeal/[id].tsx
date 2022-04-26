@@ -155,9 +155,9 @@ const Item = () => {
                         <section className={'w-full bg-white px-5 pt-2 pb-5'}>
                             <div className={'text-textDarker IranSansMedium mt-2'}>توضیحات</div>
                             <div className={'px-5 mt-2'}>
-                    <span className={'IranSansMedium'}>
+                    <span style={{whiteSpace: 'pre-line'}} className={'IranSansMedium'}>
                         {
-                            appeal.details.replace('<br/>', '\n') ??
+                            appeal.details ??
                             <div className={'w-full flex flex-col justify-center items-start'}>
                                 <SkeletonElement className={'w-full mt-2 h-5'}/>
                                 <SkeletonElement className={'w-full mt-2 h-5'}/>

@@ -384,7 +384,7 @@ const Index = () => {
                         <span className={'text-textDark text-md IranSansMedium  '}>توضیحات اضافه</span>
                         <div className={'w-full flex items-center justify-center mt-4 h-40'}>
                             <Input onChange={(e: any) => {
-                                setDescription(e.currentTarget.value.replace(/\n/g, '<br/>'))
+                                setDescription(e.currentTarget.value)
                             }} multiLine={true} id={'title'} numOnly={false}
                                    inputClassName={'bg-transparent h-full w-full IranSans border-2 border-primary rounded-lg bg-pri h-26  outline-0 px-3 py-4 '}
                                    wrapperClassName={'w-11/12 h-full'}
@@ -563,21 +563,20 @@ const Index = () => {
                         if (currentStep !== 1)
                             setCurrentStep(currentStep + 1)
                         else {
-                            console.log(createAppeal())
-                            
-                            // createAppeal().then(e => {
-                            //     try {
-                            //         if (e.data.createAppeal.status === "SUCCESS") {
-                            //             lastAppealSubmitSuccess(e.data.createAppeal.data.id)
-                            //             router.push('/')
-                            //         } else {
-                            //             showError('خطا در ساخت آگهی، لطفا دوباره تلاش کنید')
-                            //         }
-                            //     } catch (e) {
-                            //         showError('خطا در ساخت آگهی، لطفا دوباره تلاش کنید')
-                            //     }
-                            //
-                            // })
+
+                            createAppeal().then(e => {
+                                try {
+                                    if (e.data.createAppeal.status === "SUCCESS") {
+                                        lastAppealSubmitSuccess(e.data.createAppeal.data.id)
+                                        router.push('/')
+                                    } else {
+                                        showError('خطا در ساخت آگهی، لطفا دوباره تلاش کنید')
+                                    }
+                                } catch (e) {
+                                    showError('خطا در ساخت آگهی، لطفا دوباره تلاش کنید')
+                                }
+
+                            })
                         }
                     }}>
                     <div className={'text-white IranSans w-8 '}/>

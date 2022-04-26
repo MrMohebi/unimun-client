@@ -11,6 +11,8 @@ import _ from 'lodash';
 import SkeletonElement from "../../view/Skeleton/Skeleton";
 import {passedTime} from "../../../helpers/passedTime";
 import {toast, ToastContainer} from "react-toastify";
+import {cssTransition} from 'react-toastify';
+import {Slide, Zoom, Flip, Bounce} from 'react-toastify';
 
 
 const Appeals = () => {
@@ -36,20 +38,50 @@ const Appeals = () => {
     const lastGottenAppealsState = useReactiveVar(lastGottenAppeals)
 
 
-    useEffect(() => {
-        if (lastAppealSubmitSuccess().length) {
-            toast.success('آگهی شما ثبت شد و  در انتظار بررسی است', {
-                position: "bottom-center",
-                autoClose: 5000,
-                pauseOnHover: true,
-                style: {
-                    bottom: '10px'
-                }
-            });
-            lastAppealSubmitSuccess('')
-        }
+    // useEffect(() => {
+    //     console.log(lastAppealSubmitSuccess())
+    //     console.log('was last')
+    //     toast.info('آگهی شما ثبت شد و  در انتظار بررسی است', {
+    //         position: "bottom-center",
+    //         autoClose: 2000,
+    //         pauseOnHover: true,
+    //         hideProgressBar: true,
+    //         closeButton: <div/>,
+    //         style: {
+    //             bottom: '10px',
+    //             width: '95%',
+    //             borderRadius: ' 20px',
+    //             padding: '10px',
+    //             display: 'flex',
+    //             flexFlow: 'row-reverse',
+    //             alignItems: 'center',
+    //             justifyContent: 'center',
+    //             margin: 'auto'
+    //         }
+    //     });
+    //     if (lastAppealSubmitSuccess().length) {
+    //         toast.info('آگهی شما ثبت شد و  در انتظار بررسی است', {
+    //             position: "bottom-center",
+    //             autoClose: 2000,
+    //             pauseOnHover: true,
+    //             closeButton: <div/>,
+    //             style: {
+    //                 bottom: '10px',
+    //                 width: '95%',
+    //                 borderRadius: ' 20px',
+    //                 padding: '10px',
+    //                 display: 'flex',
+    //                 flexFlow: 'row-reverse',
+    //                 alignItems: 'center',
+    //                 justifyContent: 'center',
+    //                 margin: 'auto'
+    //             }
+    //         });
+    //         lastAppealSubmitSuccess('')
+    //     }
+    //
+    // }, [])
 
-    }, [])
     useEffect(() => {
         if (!data && !loading) {
             getAppeals()
@@ -253,7 +285,7 @@ const Appeals = () => {
     let searchDeb = _.debounce(searchInput, 1000)
     return (
         <div className={'h-full overflow-hidden relative '}>
-            <ToastContainer/>
+            <ToastContainer transition={Slide}/>
 
             <Search searchLoading={searchLoading} collapse={scrollingToBottom}
                     onInputChange={(e) => {

@@ -5,6 +5,7 @@ import CitySVG from '../../../assets/svgs/city.svg'
 import CloseSVG from '../../../assets/svgs/close.svg'
 import Badge from "../../view/Badge/Badge";
 import {TailSpin} from "react-loader-spinner";
+import {useRouter} from "next/router";
 
 interface Props {
     onInputChange: ChangeEventHandler
@@ -17,6 +18,7 @@ const Search = (props: Props) => {
     const manualSearch = useState(false)
     const inputText = useState('')
     const inputRef = useRef<HTMLInputElement>(null)
+    const router = useRouter()
 
     useEffect(() => {
         manualSearch[1](false)
@@ -37,7 +39,9 @@ const Search = (props: Props) => {
                         <SearchSVG/></div>
 
                     <Badge color={'#ff1a1a'}>
-                        <div className={'chat rounded-lg bg-background p-1.5 w-9 h-9'}>
+                        <div className={'chat rounded-lg bg-background p-1.5 w-9 h-9'} onClick={() => {
+                            router.push('/notifications')
+                        }}>
                             <NotifSVG/>
                         </div>
                     </Badge>
