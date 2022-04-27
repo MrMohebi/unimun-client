@@ -4,7 +4,6 @@ import {passedTime} from "../helpers/passedTime";
 import {useRouter} from "next/router";
 
 const Notifications = () => {
-
     const router = useRouter();
     return (
         <div className={'overflow-y-scroll h-full'}>
