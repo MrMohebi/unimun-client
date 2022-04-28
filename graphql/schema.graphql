@@ -11,21 +11,17 @@ directive @userAuth(token: String) on FIELD_DEFINITION | ARGUMENT_DEFINITION | I
 
 directive @userIdAuth(token: String) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
-type Ad {
+type Appeal {
+    attachments: [UploadedFile]
     categoryID: String
-    completedAt: Int
+    connectWay: String
     createdAt: Int
-    creator: User
-    deletedAt: Int
     details: String
-    doerID: String
-    fileIDs: [ID]
     hashtagIDs: [ID]
     hashtags: [String]
     id: ID
     link: String
     modifiedContentAt: Int
-    photoIDs: [ID]
     priceEnd: Int
     priceStart: Int
     publishedAt: Int
@@ -35,23 +31,22 @@ type Ad {
     universityID: String
     verifiedAt: Int
     verifierID: String
-    voiceIDs: [ID]
 }
 
-"A paginated list of Ad edges."
-type AdConnection {
-    "A list of Ad edges."
-    edges: [AdEdge!]!
+"A paginated list of Appeal edges."
+type AppealConnection {
+    "A list of Appeal edges."
+    edges: [AppealEdge!]!
     "Pagination information about the list of edges."
     pageInfo: PageInfo!
 }
 
-"An edge that contains a node of type Ad and a cursor."
-type AdEdge {
+"An edge that contains a node of type Appeal and a cursor."
+type AppealEdge {
     "A unique cursor that can be used for pagination."
     cursor: String!
-    "The Ad node."
-    node: Ad!
+    "The Appeal node."
+    node: Appeal!
 }
 
 type CreatePayment {
@@ -69,13 +64,40 @@ type Login {
 
 type Mutation {
     addSubscriber(age: String, email: String, name: String, phone: String): Int
-    chargeWallet(amount: Int!, walletID: String!): Response_chargeWallet_twyj
-    createAd(categoryID: String, details: String, hashtags: [String], priceEnd: Int!, priceStart: Int!, title: String!): Response_createAd_ptvg
-    seen(list: [Seen], type: String!): Response_seen_oxjv
-    sendVCode(phone: String!, userAgent: String): Response_sendVCode_xkmx
-    updateUser(bio: String, birthAt: Int, email: String, hasAdsHistory: Boolean, hasAskHistory: Boolean, hasBookHistory: Boolean, hasLastSeen: Boolean, lastname: String, name: String, universityID: ID, username: String): Response_updateUser_psht
-    uploadPublicFileAccess(adID: String, bookID: String, fileMime: String!, fileName: String!, filePath: String!, type: String!): Response_uploadPublicFileAccess_qlii
-    verifyVCode(phone: String!, referenceCode: String, vCode: String!): Response_verifyVCode_zxlm
+    appealConnectClick(appealID: ID!, userID: ID): Response_appealConnectClick_wpls
+    chargeWallet(amount: Int!, walletID: String!): Response_chargeWallet_hqqi
+    createAppeal(categoryID: String, connectWay: String!, details: String, files: [UploadedFileInput], hashtags: [String], priceEnd: Int!, priceStart: Int!, title: String!): Response_createAppeal_fmkv
+    seen(list: [Seen], type: String!): Response_seen_uogb
+    sendVCode(phone: String!, userAgent: String): Response_sendVCode_cugz
+    updateUser(bio: String, birthAt: Int, email: String, hasAppealsHistory: Boolean, hasAskHistory: Boolean, hasBookHistory: Boolean, hasLastSeen: Boolean, lastname: String, name: String, universityID: ID, username: String): Response_updateUser_velh
+    uploadPublicFileAccess(appealID: String, bookID: String, fileMime: String!, fileName: String!, filePath: String!, fileType: String!, previewPath: String, thumbnailPath: String, type: String!, uploadedAsFile: Boolean): Response_uploadPublicFileAccess_hyqc
+    verifyAppeal(adminToken: String!, id: ID!, status: String!): Boolean
+    verifyVCode(phone: String!, referenceCode: String, vCode: String!): Response_verifyVCode_cccp
+}
+
+type Notification {
+    appeal: Appeal
+    created_at: String
+    id: ID
+    sender: User
+    type: String!
+    user: User
+}
+
+"A paginated list of Notification edges."
+type NotificationConnection {
+    "A list of Notification edges."
+    edges: [NotificationEdge!]!
+    "Pagination information about the list of edges."
+    pageInfo: PageInfo!
+}
+
+"An edge that contains a node of type Notification and a cursor."
+type NotificationEdge {
+    "A unique cursor that can be used for pagination."
+    cursor: String!
+    "The Notification node."
+    node: Notification!
 }
 
 "Information about pagination using a Relay style cursor connection."
@@ -119,91 +141,104 @@ type PaginatorInfo {
 }
 
 type Query {
-    ad(id: ID!): Ad
-    ads(
+    appeal(id: ID!): Appeal
+    appeals(
         "A cursor after which elements are returned."
         after: String,
         "Limits number of fetched items. Maximum allowed value: 100."
         first: Int = 20,
         searchText: String
-    ): AdConnection
-    isReferenceCodeValid(referenceCode: String): Response_isReferenceCodeValid_egss
-    test(x: String): Response_test_dtmz
-    user: Response_user_rfjx
-    wallet: Response_wallet_qrcd
+    ): AppealConnection
+    isReferenceCodeValid(referenceCode: String): Response_isReferenceCodeValid_zwre
+    notifications(
+        "A cursor after which elements are returned."
+        after: String,
+        "Limits number of fetched items. Maximum allowed value: 100."
+        first: Int = 20
+    ): NotificationConnection
+    test(x: String): Response_test_pecu
+    user: Response_user_ifes
+    wallet: Response_wallet_egej
 }
 
-type Response_chargeWallet_twyj {
+type Response_appealConnectClick_wpls {
+    data: Boolean
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_chargeWallet_hqqi {
     data: CreatePayment
     errors: String
     message: String
     status: Status!
 }
 
-type Response_createAd_ptvg {
-    data: Ad
+type Response_createAppeal_fmkv {
+    data: Appeal
     errors: String
     message: String
     status: Status!
 }
 
-type Response_isReferenceCodeValid_egss {
+type Response_isReferenceCodeValid_zwre {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_seen_oxjv {
+type Response_seen_uogb {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_sendVCode_xkmx {
+type Response_sendVCode_cugz {
     data: VCode
     errors: String
     message: String
     status: Status!
 }
 
-type Response_test_dtmz {
+type Response_test_pecu {
     data: TTT
     errors: String
     message: String
     status: Status!
 }
 
-type Response_updateUser_psht {
+type Response_updateUser_velh {
     data: User
     errors: String
     message: String
     status: Status!
 }
 
-type Response_uploadPublicFileAccess_qlii {
+type Response_uploadPublicFileAccess_hyqc {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_user_rfjx {
+type Response_user_ifes {
     data: User
     errors: String
     message: String
     status: Status!
 }
 
-type Response_verifyVCode_zxlm {
+type Response_verifyVCode_cccp {
     data: Login
     errors: String
     message: String
     status: Status!
 }
 
-type Response_wallet_qrcd {
+type Response_wallet_egej {
     data: Wallet
     errors: String
     message: String
@@ -232,15 +267,25 @@ type TTT {
     tf3: String
 }
 
+type UploadedFile {
+    mime: String!
+    preview: String
+    thumbnail: String
+    type: String!
+    uploadedAsFile: Boolean
+    url: String!
+}
+
 type User {
     bannerID: ID
     bio: String
     birthAt: Int
     code: String
+    created_at: String
     email: String
     expertiseIDs: [ID]
     friendIDs: [ID]
-    hasAdsHistory: Boolean
+    hasAppealsHistory: Boolean
     hasAskHistory: Boolean
     hasBookHistory: Boolean
     hasLastSeen: Boolean
@@ -249,6 +294,7 @@ type User {
     isEmailActivated: Boolean
     isPhoneActivated: Boolean
     lastname: String
+    level: Int
     link: String
     linkTag: String
     name: String
@@ -256,13 +302,15 @@ type User {
     profileIDs: [ID]
     referenceCode: String
     referenceCodeLeft: Int
-    savedAdsIDs: [ID]
+    savedAppealsIDs: [ID]
     savedAskIDs: [ID]
     savedBookIDs: [ID]
     universityID: ID
     username: String
     verifiedAt: Int
     wallet: Wallet
+    xp: Int
+    xpLevelPercentage: Int
 }
 
 type VCode {
@@ -339,4 +387,13 @@ input Seen {
     id: ID!
     times: Int!
     type: String
+}
+
+input UploadedFileInput {
+    mime: String!
+    preview: String
+    thumbnail: String
+    type: String!
+    uploadedAsFile: Boolean
+    url: String!
 }
