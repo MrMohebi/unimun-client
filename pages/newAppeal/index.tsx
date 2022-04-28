@@ -266,6 +266,7 @@ const Index = () => {
 
                                             }} maxLength={20} onChange={(e) => {
                                                 let updatedHashtags = hashtags
+                                                e.currentTarget.value = e.currentTarget.value.replaceAll(/[ ]/g, '_')
                                                 e.currentTarget.value = e.currentTarget.value.replaceAll(/[@;!.# ]/g, '')
                                                 e.currentTarget.value = e.currentTarget.value.slice(0, 20)
                                                 updatedHashtags[index] = e.currentTarget.value

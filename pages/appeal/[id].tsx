@@ -87,7 +87,7 @@ const Item = () => {
             </Head>
 
             <Header title={'آگهی'} back={true} backOnClick={() => {
-                router.back()
+                window.location.replace(window.location.href.replace(window.location.pathname, ''));
             }}>
             </Header>
 
