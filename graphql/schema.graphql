@@ -64,15 +64,15 @@ type Login {
 
 type Mutation {
     addSubscriber(age: String, email: String, name: String, phone: String): Int
-    appealConnectClick(appealID: ID!, userID: ID): Response_appealConnectClick_wpls
-    chargeWallet(amount: Int!, walletID: String!): Response_chargeWallet_hqqi
-    createAppeal(categoryID: String, connectWay: String!, details: String, files: [UploadedFileInput], hashtags: [String], priceEnd: Int!, priceStart: Int!, title: String!): Response_createAppeal_fmkv
-    seen(list: [Seen], type: String!): Response_seen_uogb
-    sendVCode(phone: String!, userAgent: String): Response_sendVCode_cugz
-    updateUser(bio: String, birthAt: Int, email: String, hasAppealsHistory: Boolean, hasAskHistory: Boolean, hasBookHistory: Boolean, hasLastSeen: Boolean, lastname: String, name: String, universityID: ID, username: String): Response_updateUser_velh
-    uploadPublicFileAccess(appealID: String, bookID: String, fileMime: String!, fileName: String!, filePath: String!, fileType: String!, previewPath: String, thumbnailPath: String, type: String!, uploadedAsFile: Boolean): Response_uploadPublicFileAccess_hyqc
+    appealConnectClick(appealID: ID!, userID: ID): Response_appealConnectClick_gcep
+    chargeWallet(amount: Int!, walletID: String!): Response_chargeWallet_nsip
+    createAppeal(categoryID: String, connectWay: String!, details: String, files: [UploadedFileInput], hashtags: [String], priceEnd: Int!, priceStart: Int!, title: String!): Response_createAppeal_ldxk
+    seen(list: [Seen], type: String!): Response_seen_ppaq
+    sendVCode(phone: String!, userAgent: String): Response_sendVCode_zese
+    updateUser(bio: String, birthAt: Int, email: String, hasAppealsHistory: Boolean, hasAskHistory: Boolean, hasBookHistory: Boolean, hasLastSeen: Boolean, lastname: String, name: String, universityID: ID, username: String): Response_updateUser_pnzr
+    uploadPublicFileAccess(appealID: String, bookID: String, fileMime: String!, fileName: String!, filePath: String!, fileType: String!, previewPath: String, thumbnailPath: String, type: String!, uploadedAsFile: Boolean): Response_uploadPublicFileAccess_hpjm
     verifyAppeal(adminToken: String!, id: ID!, status: String!): Boolean
-    verifyVCode(phone: String!, referenceCode: String, vCode: String!): Response_verifyVCode_cccp
+    verifyVCode(phone: String!, referenceCode: String, vCode: String!): Response_verifyVCode_irfs
 }
 
 type Notification {
@@ -149,96 +149,96 @@ type Query {
         first: Int = 20,
         searchText: String
     ): AppealConnection
-    isReferenceCodeValid(referenceCode: String): Response_isReferenceCodeValid_zwre
+    isReferenceCodeValid(referenceCode: String): Response_isReferenceCodeValid_xdfr
     notifications(
         "A cursor after which elements are returned."
         after: String,
         "Limits number of fetched items. Maximum allowed value: 100."
         first: Int = 20
     ): NotificationConnection
-    test(x: String): Response_test_pecu
-    user: Response_user_ifes
-    wallet: Response_wallet_egej
+    test(x: String): Response_test_nqfl
+    user: Response_user_nhio
+    wallet: Response_wallet_wnbr
 }
 
-type Response_appealConnectClick_wpls {
+type Response_appealConnectClick_gcep {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_chargeWallet_hqqi {
+type Response_chargeWallet_nsip {
     data: CreatePayment
     errors: String
     message: String
     status: Status!
 }
 
-type Response_createAppeal_fmkv {
+type Response_createAppeal_ldxk {
     data: Appeal
     errors: String
     message: String
     status: Status!
 }
 
-type Response_isReferenceCodeValid_zwre {
+type Response_isReferenceCodeValid_xdfr {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_seen_uogb {
+type Response_seen_ppaq {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_sendVCode_cugz {
+type Response_sendVCode_zese {
     data: VCode
     errors: String
     message: String
     status: Status!
 }
 
-type Response_test_pecu {
+type Response_test_nqfl {
     data: TTT
     errors: String
     message: String
     status: Status!
 }
 
-type Response_updateUser_velh {
+type Response_updateUser_pnzr {
     data: User
     errors: String
     message: String
     status: Status!
 }
 
-type Response_uploadPublicFileAccess_hyqc {
+type Response_uploadPublicFileAccess_hpjm {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_user_ifes {
+type Response_user_nhio {
     data: User
     errors: String
     message: String
     status: Status!
 }
 
-type Response_verifyVCode_cccp {
+type Response_verifyVCode_irfs {
     data: Login
     errors: String
     message: String
     status: Status!
 }
 
-type Response_wallet_egej {
+type Response_wallet_wnbr {
     data: Wallet
     errors: String
     message: String
