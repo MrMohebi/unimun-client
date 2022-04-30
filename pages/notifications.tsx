@@ -59,8 +59,11 @@ const Notifications = () => {
 
     let fetchNew = () => {
 
+        let lastNotification = (notifications[notifications.length - 2]) as { cursor: string }
 
-        refetch({after: (notifications[notifications.length - 2].cursor), first: 5}).then(e => {
+
+        let vars = {after: lastNotification.cursor, first: 5}
+        refetch(vars).then(e => {
             if (e.data.notifications.edges.length < 5) {
                 sScrollEnd(true)
             }
@@ -87,8 +90,8 @@ const Notifications = () => {
                 {notifications.map((notification, index) => {
 
 
-                    let node = notification as { node: { created_at: string } }
-                    node = node.node
+                    let notificationLocal = notification as { node: any }
+                    let node = notificationLocal.node as { created_at: string, appeal: { title: string, details: string } }
 
                     let myDateArr = node.created_at.toString().split(' ')[0].split('-')
                     let newDate = new Date(parseInt(myDateArr[0]), parseInt(myDateArr[1]) - 1, parseInt(myDateArr[2]));
