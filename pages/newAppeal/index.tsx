@@ -569,6 +569,7 @@ const Index = () => {
                                 try {
                                     if (e.data.createAppeal.status === "SUCCESS") {
                                         lastAppealSubmitSuccess(e.data.createAppeal.data.id)
+
                                         router.push('/')
                                     } else {
                                         showError('خطا در ساخت آگهی، لطفا دوباره تلاش کنید')

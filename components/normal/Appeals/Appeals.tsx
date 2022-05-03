@@ -13,6 +13,8 @@ import {passedTime} from "../../../helpers/passedTime";
 import {toast, ToastContainer} from "react-toastify";
 import {cssTransition} from 'react-toastify';
 import {Slide, Zoom, Flip, Bounce} from 'react-toastify';
+import InfiniteScroll from "react-infinite-scroll-component";
+import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 
 
 const Appeals = () => {
@@ -25,6 +27,8 @@ const Appeals = () => {
     const [reachedEndState, setReachedEndState] = useState(false);
     const [nothingFound, setNothingFound] = useState(false);
     const [searchLoading, setSearchLoading] = useState(false);
+    const [hasMore, ShasMore] = useState(true);
+    const [ta, sta] = useState(["", '', '', ''] as string[]);
     const lastScrollPosition = useRef(0);
 
 
@@ -38,49 +42,28 @@ const Appeals = () => {
     const lastGottenAppealsState = useReactiveVar(lastGottenAppeals)
 
 
-    // useEffect(() => {
-    //     console.log(lastAppealSubmitSuccess())
-    //     console.log('was last')
-    //     toast.info('آگهی شما ثبت شد و  در انتظار بررسی است', {
-    //         position: "bottom-center",
-    //         autoClose: 2000,
-    //         pauseOnHover: true,
-    //         hideProgressBar: true,
-    //         closeButton: <div/>,
-    //         style: {
-    //             bottom: '10px',
-    //             width: '95%',
-    //             borderRadius: ' 20px',
-    //             padding: '10px',
-    //             display: 'flex',
-    //             flexFlow: 'row-reverse',
-    //             alignItems: 'center',
-    //             justifyContent: 'center',
-    //             margin: 'auto'
-    //         }
-    //     });
-    //     if (lastAppealSubmitSuccess().length) {
-    //         toast.info('آگهی شما ثبت شد و  در انتظار بررسی است', {
-    //             position: "bottom-center",
-    //             autoClose: 2000,
-    //             pauseOnHover: true,
-    //             closeButton: <div/>,
-    //             style: {
-    //                 bottom: '10px',
-    //                 width: '95%',
-    //                 borderRadius: ' 20px',
-    //                 padding: '10px',
-    //                 display: 'flex',
-    //                 flexFlow: 'row-reverse',
-    //                 alignItems: 'center',
-    //                 justifyContent: 'center',
-    //                 margin: 'auto'
-    //             }
-    //         });
-    //         lastAppealSubmitSuccess('')
-    //     }
-    //
-    // }, [])
+    useEffect(() => {
+        if (lastAppealSubmitSuccess().length) {
+            toast.info('آگهی شما ثبت شد و  در انتظار بررسی است', {
+                position: "bottom-center",
+                autoClose: 2000,
+                pauseOnHover: true,
+                closeButton: <div/>,
+                style: {
+                    bottom: '10px',
+                    width: '95%',
+                    borderRadius: ' 20px',
+                    padding: '10px',
+                    display: 'flex',
+                    flexFlow: 'row-reverse',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: 'auto'
+                }
+            });
+            lastAppealSubmitSuccess('')
+        }
+    }, [])
 
     useEffect(() => {
         if (!data && !loading) {
@@ -126,13 +109,20 @@ const Appeals = () => {
 
     }
     const getNewerAppeals = () => {
-        setReachedEndState(false)
+        console.log(appeals)
+        console.log('getting more')
+        // setReachedEndState(false)
         if (!loading && appeals.length > 19) {
             if (lastCursor != appeals[appeals.length - 1]['cursor']) {
                 lastCursor.current = (appeals[appeals.length - 1]['cursor'])
-
                 getAppeals({variables: {after: lastCursor.current}}).then((e) => {
                     checkLastCursor(e)
+                    if (e.data) {
+                        if (e.data.appeals.edges.length < 19) {
+                            ShasMore(false)
+                        }
+                    }
+                    console.log(e)
                 })
             }
         }
@@ -274,17 +264,22 @@ const Appeals = () => {
     let searchInput = (e: React.BaseSyntheticEvent) => {
         setNothingFound(false)
         searcheText.current = e.target.value
-        searchAppeals({variables: {searchText: searcheText.current}}).then((e) => {
-            if (!e.error) {
-                if (e.data.appeals.edges.length === 0)
-                    setNothingFound(true)
-                setSearchedAppeals(e.data.appeals.edges)
-            }
-        })
+        if (searcheText.current.length)
+            searchAppeals({variables: {searchText: searcheText.current}}).then((e) => {
+                if (!e.error) {
+                    if (e.data.appeals.edges.length === 0)
+                        setNothingFound(true)
+                    setSearchedAppeals(e.data.appeals.edges)
+                }
+            })
+        else {
+            setSearchLoading(false)
+            setNothingFound(false)
+        }
     }
     let searchDeb = _.debounce(searchInput, 1000)
     return (
-        <div className={'h-full overflow-hidden relative '}>
+        <div className={'h-full relative '}>
             <ToastContainer transition={Slide}/>
 
             <Search searchLoading={searchLoading} collapse={scrollingToBottom}
@@ -292,55 +287,62 @@ const Appeals = () => {
                         setSearchLoading(true)
                         searchDeb(e)
                     }}/>
-            <section onScroll={onAdSectionScroll}
-                     className={'w-full h-full overflow-scroll items-center px-4  pt-32'}>
+            <div>
                 <NewAppealButton hidden={scrollingToBottom}/>
-                {
 
-                    searchedAppeals.length ?
-                        searchedAppeals.map((ad: any, index: number) => {
-                                let Appeal = ad.node
-                                return (appealUI(Appeal, index, index + 'i')
-                                )
-                            }
-                        )
-                        :
-                        appeals.length && !nothingFound ?
-                            appeals.map((ad: any, index: number) => {
-                                    let Appeal = ad.node
-                                    return (appealUI(Appeal, index, index + 'i1')
-                                    )
-                                }
-                            )
-                            : lastGottenAppealsState ?
-                                lastGottenAppealsState.map((ad: any, index: number) => {
+                {nothingFound ?
+                    <div className={'w-full flex flex-col items-center justify-center mt-44'}>
+                        <span className={'IranSansMedium opacity-50'}>نتیجه ای یافت نشد</span>
+                    </div> :
+                    <InfiniteScroll
+                        next={getNewerAppeals}
+                        hasMore={hasMore}
+                        dataLength={appeals.length}
+                        loader={
+                            appealsSkeleton(1)
+                        }
+                        className={'h-full pt-32 pb-32'}>
+                        {
+                            searchedAppeals.length ?
+                                searchedAppeals.map((ad: any, index: number) => {
                                         let Appeal = ad.node
-                                        return (appealUI(Appeal, index, index + 'i2')
+                                        return (appealUI(Appeal, index, index + 'i')
                                         )
                                     }
-                                ) : null
+                                )
+                                :
+                                appeals.length && !nothingFound ?
+                                    appeals.map((ad: any, index: number) => {
+                                            let Appeal = ad.node
+                                            return (appealUI(Appeal, index, index + 'i1')
+                                            )
+                                        }
+                                    )
+                                    : lastGottenAppealsState ?
+                                        lastGottenAppealsState.map((ad: any, index: number) => {
+                                                let Appeal = ad.node
+                                                return (appealUI(Appeal, index, index + 'i2')
+                                                )
+                                            }
+                                        ) : null
 
-                }
-                {
-                    loading && !appeals.length ?
-                        appealsSkeleton(5)
-                        : null
-                }
+                        }
+                        {
+                            loading && !appeals.length ?
+                                appealsSkeleton(5)
+                                : null
+                        }
 
-                {
-                    !reachedEndState ?
-                        appealsSkeleton(1)
-                        : null
+                    </InfiniteScroll>
+                }
+                {/*{*/}
+                {/*    nothingFound ?*/}
+                {/*        <div className={'w-full flex flex-col items-center justify-center mt-20'}>*/}
+                {/*            <span className={'IranSansMedium opacity-50'}>نتیجه ای یافت نشد</span>*/}
+                {/*        </div> : null*/}
+                {/*}*/}
+            </div>
 
-                }
-                <div className={'h-36'}/>
-                {
-                    nothingFound ?
-                        <div className={'w-full flex flex-col items-center justify-center mt-20'}>
-                            <span className={'IranSansMedium opacity-50'}>نتیجه ای یافت نشد</span>
-                        </div> : null
-                }
-            </section>
         </div>
 
     );

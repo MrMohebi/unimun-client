@@ -274,9 +274,11 @@ const Login = () => {
                                     <div
                                         className={'h-20 w-full mt-4 flex flex-row justify-between items-center IranSans text-primary text-md'}>
                 <span onClick={() => {
+                    sendVCodeResult.reset()
+                    setStep(0)
                 }}>ویرایش شماره</span>
                                         <span onClick={resendCode}
-                                              className={`${elapsedTime > 45 ? 'text-primary' : 'text-gray-500'}`}>{` ارسال دوباره کد (${(45 - elapsedTime) > 0 ? (45 - elapsedTime) + ' ثانیه' : ""}`}</span>
+                                              className={`${elapsedTime > 45 ? 'text-primary' : 'text-gray-500'}`}>{(45 - elapsedTime) > 0 ? ` ارسال دوباره کد (${(45 - elapsedTime) > 0 ? (45 - elapsedTime) + ' ثانیه' : ""} )` : 'ارسال دوباره کد'}</span>
                                     </div>
                                     <div className={'IranSansMedium text-textDark text-sm'}>
                                         چرا یکی از عدد ها پیداست ؟
