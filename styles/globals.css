@@ -39,7 +39,7 @@
 
 .navbar {
   @apply bg-white w-full fixed bottom-0  h-nav;
-  box-shadow: #d1d1d145 0 -8px 10px 0px;
+  box-shadow: rgba(209, 209, 209, 0.2705882353) 0 -8px 10px 0px;
 }
 
 .nav-active {
@@ -71,7 +71,7 @@
     transform: scale(0);
   }
   to {
-    transform: scale(100);
+    transform: scale(200);
     opacity: 0;
   }
 }
@@ -86,7 +86,7 @@ input[type=range] {
   border: 0;
   border-radius: 1px;
   outline: none;
-  background: linear-gradient(#1da1f2, #1da1f2) no-repeat center;
+  background: linear-gradient(rgb(29, 161, 242), rgb(29, 161, 242)) no-repeat center;
   /* Use a linear gradient to generate only the 2px height background */
   background-size: 100% 2px;
   pointer-events: none;
@@ -100,7 +100,7 @@ input[type=range]::-webkit-slider-thumb {
   height: 18px;
   width: 18px;
   border-radius: 28px;
-  background-color: #1da1f2;
+  background-color: rgb(29, 161, 242);
   position: relative;
   margin: 5px 0;
   /* Add some margin to ensure box shadow is shown */
@@ -350,6 +350,11 @@ body,
   height: 100%;
 }
 
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
 * {
   -webkit-tap-highlight-color: transparent;
 }
@@ -375,6 +380,10 @@ body,
   font-family: Serif, serif;
 }
 
+.no-font {
+  font-family: unset;
+}
+
 .Toastify__toast-body {
   display: flex !important;
   flex-flow: row-reverse;
@@ -383,13 +392,26 @@ body,
   align-items: center !important;
 }
 
-.no-font {
-  font-family: unset;
+.new-divider {
+  height: 1px;
+  width: 80%;
+  margin: 0 auto;
+  @apply bg-gray-300;
 }
 
-html, body {
-  margin: 0;
-  height: 100%;
+.center-placeholder::-webkit-input-placeholder {
+  text-align: center;
+}
+.center-placeholder:-moz-placeholder {
+  /* Firefox 18- */
+  text-align: center;
+}
+.center-placeholder::-moz-placeholder {
+  /* Firefox 19+ */
+  text-align: center;
+}
+.center-placeholder:-ms-input-placeholder {
+  text-align: center;
 }
 
 /*# sourceMappingURL=globals.css.map */

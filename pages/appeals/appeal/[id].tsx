@@ -1,26 +1,26 @@
 import React, {useEffect, useState} from 'react';
 import {useRouter} from "next/router";
 import {gql, useLazyQuery} from "@apollo/client";
-import {getAppealQuery} from "../../Requests/normal/appeals";
-import Header from "../../components/common/Header/Header";
+import {getAppealQuery} from "../../../Requests/normal/appeals";
+import Header from "../../../components/common/Header/Header";
 import Skeleton from "react-loading-skeleton";
 
-import Divider from "../../components/view/Divider/Divider";
-import Tab from "../../components/view/Tab/Tab";
-import FileSVG from "../../assets/svgs/file.svg";
-import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
-import ThousandTomans from '../../assets/svgs/thousandTomans.svg'
+import Divider from "../../../components/view/Divider/Divider";
+import Tab from "../../../components/view/Tab/Tab";
+import FileSVG from "../../../assets/svgs/file.svg";
+import DownloadFileSVG from "../../../assets/svgs/downloadFile.svg";
+import ThousandTomans from '../../../assets/svgs/thousandTomans.svg'
 
-import {passedTime} from "../../helpers/passedTime";
+import {passedTime} from "../../../helpers/passedTime";
 import 'moment/locale/fa'
-import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
-import GalleryImageSVG from "../../assets/svgs/galleryImage.svg";
-import SkeletonElement from "../../components/view/Skeleton/Skeleton";
+import SVGModifier from "../../../components/common/SVGModifier/SVGModifier";
+import GalleryImageSVG from "../../../assets/svgs/galleryImage.svg";
+import SkeletonElement from "../../../components/view/Skeleton/Skeleton";
 import Head from "next/head";
-import {DOWNLOAD_HOST} from "../../LocalVariables/LocalVariables";
-import Button from "../../components/view/Button/Button";
-import {lastAppealSubmitSuccess} from "../../store/appeals";
-import Dialog from "../../components/view/Dialog/Dialog";
+import {DOWNLOAD_HOST} from "../../../LocalVariables/LocalVariables";
+import Button from "../../../components/view/Button/Button";
+import {lastAppealSubmitSuccess} from "../../../store/appeals";
+import Dialog from "../../../components/view/Dialog/Dialog";
 
 const moment = require('moment')
 

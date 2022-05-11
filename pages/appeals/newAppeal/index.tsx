@@ -1,34 +1,34 @@
 import React, {useEffect, useRef, useState} from 'react';
-import Header from "../../components/common/Header/Header";
-import Input from "../../components/view/Input/Input";
-import Divider from "../../components/view/Divider/Divider";
-import ThousandTomans from '../../assets/svgs/thousandTomans.svg'
-import DoubleSlider from "../../components/view/DoubleSlider/DoubleSlider";
-import StepperFragment from "../../components/view/StepperFtagment/StepperFragment";
-import Step from "../../components/view/StepperFtagment/Step/Step";
-import Button from "../../components/view/Button/Button";
+import Header from "../../../components/common/Header/Header";
+import Input from "../../../components/view/Input/Input";
+import Divider from "../../../components/view/Divider/Divider";
+import ThousandTomans from '../../../assets/svgs/thousandTomans.svg'
+import DoubleSlider from "../../../components/view/DoubleSlider/DoubleSlider";
+import StepperFragment from "../../../components/view/StepperFtagment/StepperFragment";
+import Step from "../../../components/view/StepperFtagment/Step/Step";
+import Button from "../../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import {useMutation} from "@apollo/client";
 import {gql} from "@apollo/client";
-import {newAppealQuery} from "../../Requests/withAuthentication/appeals";
-import GallerySVG from '../../assets/svgs/gallery.svg'
-import FileUploadSVG from '../../assets/svgs/fileUpload.svg'
-import GalleryImageSVG from '../../assets/svgs/galleryImage.svg'
-import NewPhotoSVG from '../../assets/svgs/newPhoto.svg'
-import TelInputSVG from '../../assets/svgs/telInput.svg'
-import BoldMobile from '../../assets/svgs/boldMobile.svg'
-import RightSquareSVG from '../../assets/svgs/rightSquare.svg'
-import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
+import {newAppealQuery} from "../../../Requests/withAuthentication/appeals";
+import GallerySVG from '../../../assets/svgs/gallery.svg'
+import FileUploadSVG from '../../../assets/svgs/fileUpload.svg'
+import GalleryImageSVG from '../../../assets/svgs/galleryImage.svg'
+import NewPhotoSVG from '../../../assets/svgs/newPhoto.svg'
+import TelInputSVG from '../../../assets/svgs/telInput.svg'
+import BoldMobile from '../../../assets/svgs/boldMobile.svg'
+import RightSquareSVG from '../../../assets/svgs/rightSquare.svg'
+import SVGModifier from "../../../components/common/SVGModifier/SVGModifier";
 import axios, {AxiosRequestConfig} from "axios";
-import FileSVG from "../../assets/svgs/file.svg";
-import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
-import {UserToken} from "../../store/user";
-import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
+import FileSVG from "../../../assets/svgs/file.svg";
+import EmptyFileSVG from "../../../assets/svgs/emptyFile.svg";
+import {UserToken} from "../../../store/user";
+import CircularProgressBar from "../../../components/view/CircularProgressBar/CircularProgressBar";
 import {toast, ToastContainer} from "react-toastify";
-import {uploadImage} from "../../Requests/uploadRequests";
-import CloseSVG from "../../assets/svgs/close.svg";
-import {lastAppealSubmitSuccess} from "../../store/appeals";
-import BottomSheet from "../../components/view/BottomSheet/BottomSheet";
+import {uploadImage} from "../../../Requests/uploadRequests";
+import CloseSVG from "../../../assets/svgs/close.svg";
+import {lastAppealSubmitSuccess} from "../../../store/appeals";
+import BottomSheet from "../../../components/view/BottomSheet/BottomSheet";
 
 
 const Index = () => {

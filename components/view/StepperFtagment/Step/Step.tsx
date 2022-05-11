@@ -8,7 +8,7 @@ interface Props{
 
 const Step = (props:Props) => {
     return (
-        <div id={`stepperFragment-step-${props.step}`} className={'transition-all opacity-100 scale-100 duration-1000'}>
+        <div id={`stepperFragment-step-${props.step}`} className={'transition-all opacity-100 scale-100 duration-500'}>
             {
                 props.children
             }

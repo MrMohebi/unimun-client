@@ -15,6 +15,8 @@ import {cssTransition} from 'react-toastify';
 import {Slide, Zoom, Flip, Bounce} from 'react-toastify';
 import InfiniteScroll from "react-infinite-scroll-component";
 import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
+import Toast from "../Toast/Toast";
+import {lastBookSubmitSuccess} from "../../../store/books";
 
 
 const Appeals = () => {
@@ -43,26 +45,31 @@ const Appeals = () => {
 
 
     useEffect(() => {
+
+        // const Toast = (text:string) => {
+        //     toast.info(text, {
+        //         position: "bottom-center",
+        //         autoClose: 2000,
+        //         pauseOnHover: true,
+        //         closeButton: <div/>,
+        //         style: {
+        //             bottom: '10px',
+        //             width: '95%',
+        //             borderRadius: ' 20px',
+        //             padding: '10px',
+        //             display: 'flex',
+        //             flexFlow: 'row-reverse',
+        //             alignItems: 'center',
+        //             justifyContent: 'center',
+        //             margin: 'auto'
+        //         }
+        //     });
+        // }
         if (lastAppealSubmitSuccess().length) {
-            toast.info('آگهی شما ثبت شد و  در انتظار بررسی است', {
-                position: "bottom-center",
-                autoClose: 2000,
-                pauseOnHover: true,
-                closeButton: <div/>,
-                style: {
-                    bottom: '10px',
-                    width: '95%',
-                    borderRadius: ' 20px',
-                    padding: '10px',
-                    display: 'flex',
-                    flexFlow: 'row-reverse',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: 'auto'
-                }
-            });
+            Toast('آگهی شما ثبت شد و  در انتظار بررسی است')
             lastAppealSubmitSuccess('')
         }
+
     }, [])
 
     useEffect(() => {
@@ -196,7 +203,7 @@ const Appeals = () => {
 
     const appealUI = (Appeal: any, index: number, key: string) => {
         return (
-            <Link key={key} passHref={true} href={`/appeal/${Appeal.id}`}>
+            <Link key={key} passHref={true} href={`/appeals/appeal/${Appeal.id}`}>
 
                 <div key={Appeal.title + index}
                      className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>

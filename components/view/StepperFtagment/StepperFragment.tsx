@@ -9,16 +9,16 @@ const StepperFragment = (props: Props) => {
     useEffect(() => {
         let steps = Array.from(document.getElementsByClassName('stepper')[0].children)
         steps.forEach((s, i) => {
+            let styleOfStep = (s as HTMLDivElement).style;
             if (i !== props.step) {
-                let styleOfStep = (s as HTMLDivElement).style;
-                styleOfStep.opacity = "0";
-                styleOfStep.maxHeight = "0vh";
-                styleOfStep.overflow = "hidden";
+                styleOfStep.setProperty('opacity', '0', 'important');
+                styleOfStep.setProperty('max-height', '0vh', 'important');
+                styleOfStep.setProperty('overflow', 'hidden', 'important');
             } else {
-                let styleOfStep = (s as HTMLDivElement).style;
-                styleOfStep.opacity = "1";
-                styleOfStep.maxHeight = "100vh";
-                styleOfStep.overflow = "";
+                styleOfStep.setProperty('opacity', '1', 'important');
+                styleOfStep.setProperty('max-height', '100vh', 'important');
+                styleOfStep.setProperty('overflow', '', 'important');
+
             }
         })
     }, [props.step])

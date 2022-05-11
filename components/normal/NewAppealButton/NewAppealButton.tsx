@@ -11,9 +11,8 @@ const NewAppealButton = (props: { hidden: boolean }) => {
         >
             <div onClick={() => {
                 if (UserToken().length) {
-                    router.push('/newAppeal')
+                    router.push('/appeals/newAppeal')
                 } else {
-                    // router.push('/newAppeal')
                     router.push('/profile/login')
                 }
 

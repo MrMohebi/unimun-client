@@ -11,7 +11,7 @@ import 'tippy.js/dist/tippy.css';
 const Layouts = [
     {
         routes: ['', 'profile', 'ask', 'library', 'wallet'],
-        except: ['login'],
+        except: ['login', 'newBook'],
         component: <Navbar/>
     },
 
@@ -31,7 +31,8 @@ function MyApp({Component, pageProps}: AppProps) {
                     <Component {...pageProps} />
                     {
                         Layouts.map((ui, index) => {
-                            if (ui.routes.includes(router.pathname.split('/')[1]) && !router.pathname.includes(ui.except[0])) {
+                            if (ui.routes.includes(router.pathname.split('/')[1]) && !ui.except.includes(router.pathname.split('/')[router.pathname.split('/').length - 1])
+                            ) {
                                 return (
                                     <div key={index}>
                                         {ui.component}

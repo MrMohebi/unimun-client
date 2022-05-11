@@ -11,7 +11,8 @@ interface Props {
     onInputChange: ChangeEventHandler
     debounceOnChange?: Function
     collapse: boolean
-    searchLoading: boolean
+    searchLoading: boolean,
+    lib?: boolean
 }
 
 const Search = (props: Props) => {
@@ -29,22 +30,32 @@ const Search = (props: Props) => {
         <div
             className={`fixed top-0 left-0 px-4 w-full bg-white pt-3 ${props.collapse && !manualSearch[0] ? 'pb-1 ' : 'pb-4'} rounded-br-xl rounded-bl-xl z-10 shadow`}>
             <div className={'search-upper flex flex-row justify-between items-center'}>
-                <div className={'IranSansBlack'}><span dir={'ltr'} className={'text-primary'}><span
-                    className={'text-textBlack'}>یونیـ</span>مـون</span></div>
-                <div className={'flex flex-row justify-center items-center'}>
-                    <div onClick={() => {
-                        manualSearch[1](true)
-                    }}
-                         className={`chat rounded-lg bg-background w-9 h-9 ml-2 p-2 h-full flex flex-col justify-center items-center  transition-all ${props.collapse && !manualSearch[0] ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
-                        <SearchSVG/></div>
 
-                    <Badge color={'#ff1a1a'}>
-                        <div className={'chat rounded-lg bg-background p-1.5 w-9 h-9'} onClick={() => {
-                            router.push('/notifications')
-                        }}>
-                            <NotifSVG/>
-                        </div>
-                    </Badge>
+
+                <div className={'IranSansBlack'}><span dir={'ltr'} className={'text-primary'}><span
+                    className={'text-textBlack'}>{props.lib ? 'کتاب' : 'یونیـ'}</span>{props.lib ? 'خونه' : 'مـون'}</span>
+                </div>
+
+                <div className={'flex flex-row justify-center items-center'}>
+                    <div
+                        onClick={() => {
+                            manualSearch[1](true)
+                        }}
+                        className={`chat rounded-lg bg-background w-9 h-9 ml-2 p-2 h-full flex flex-col justify-center items-center  transition-all ${props.collapse && !manualSearch[0] ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
+                        <SearchSVG/></div>
+                    {
+                        props.lib ?
+                            null
+                            :
+                            <Badge color={'#ff1a1a'}>
+                                <div className={'chat rounded-lg bg-background p-1.5 w-9 h-9'} onClick={() => {
+                                    router.push('/notifications')
+                                }}>
+                                    <NotifSVG/>
+                                </div>
+                            </Badge>
+                    }
+
                 </div>
             </div>
             <div

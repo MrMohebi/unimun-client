@@ -49,6 +49,76 @@ type AppealEdge {
     node: Appeal!
 }
 
+type Book {
+    ISBN: String
+    appearance: BookAppearance
+    appearanceID: ID
+    attachments: [UploadedFile]
+    bookFiles: [UploadedFile]
+    category: BookCategory
+    categoryID: ID
+    city: String
+    cityID: ID
+    createdAt: Int
+    creator: UserProtected
+    details: String
+    edition: Int
+    id: ID
+    isBook: Boolean
+    isDownloadable: Boolean
+    isPurchasable: Boolean
+    language: String
+    lessen: String
+    modifiedContentAt: Int
+    pages: Int
+    price: Int
+    publishedAt: Int
+    publishedDate: Int
+    publisher: String
+    seen: Int
+    sizeMB: Int
+    teacher: String
+    term: String
+    title: String
+    university: String
+    universityID: ID
+    verifiedAt: Int
+    writer: String
+    wroteYear: Int
+}
+
+type BookAppearance {
+    details: String
+    id: ID
+    score: Int
+    title: String
+}
+
+type BookCategory {
+    hasChild: Boolean
+    id: ID
+    order: Int
+    parentID: ID
+    phrase: String
+    title: String
+}
+
+"A paginated list of Book edges."
+type BookConnection {
+    "A list of Book edges."
+    edges: [BookEdge!]!
+    "Pagination information about the list of edges."
+    pageInfo: PageInfo!
+}
+
+"An edge that contains a node of type Book and a cursor."
+type BookEdge {
+    "A unique cursor that can be used for pagination."
+    cursor: String!
+    "The Book node."
+    node: Book!
+}
+
 type CreatePayment {
     url: String
 }
@@ -64,15 +134,16 @@ type Login {
 
 type Mutation {
     addSubscriber(age: String, email: String, name: String, phone: String): Int
-    appealConnectClick(appealID: ID!, userID: ID): Response_appealConnectClick_gcep
-    chargeWallet(amount: Int!, walletID: String!): Response_chargeWallet_nsip
-    createAppeal(categoryID: String, connectWay: String!, details: String, files: [UploadedFileInput], hashtags: [String], priceEnd: Int!, priceStart: Int!, title: String!): Response_createAppeal_ldxk
-    seen(list: [Seen], type: String!): Response_seen_ppaq
-    sendVCode(phone: String!, userAgent: String): Response_sendVCode_zese
-    updateUser(bio: String, birthAt: Int, email: String, hasAppealsHistory: Boolean, hasAskHistory: Boolean, hasBookHistory: Boolean, hasLastSeen: Boolean, lastname: String, name: String, universityID: ID, username: String): Response_updateUser_pnzr
-    uploadPublicFileAccess(appealID: String, bookID: String, fileMime: String!, fileName: String!, filePath: String!, fileType: String!, previewPath: String, thumbnailPath: String, type: String!, uploadedAsFile: Boolean): Response_uploadPublicFileAccess_hpjm
+    appealConnectClick(appealID: ID!, userID: ID): Response_appealConnectClick_eqqv
+    chargeWallet(amount: Int!, walletID: String!): Response_chargeWallet_symt
+    createAppeal(categoryID: String, connectWay: String!, details: String, files: [UploadedFileInput], hashtags: [String], priceEnd: Int!, priceStart: Int!, title: String!): Response_createAppeal_zzai
+    createBook(ISBN: String, appearanceID: ID, attachments: [UploadedFileInput], bookFiles: [UploadedFileInput], categoryID: ID!, city: String, cityID: ID, details: String, edition: Int, isBook: Boolean!, isDownloadable: Boolean!, isPurchasable: Boolean!, language: String, lessen: String, pages: Int, price: Int, publishedDate: Int, publisher: String, sizeMB: Int, teacher: String, term: String, title: String, university: String, universityID: ID, writer: String, wroteYear: Int): Response_createBook_ltrs
+    seen(list: [Seen], type: String!): Response_seen_rpqy
+    sendVCode(phone: String!, userAgent: String): Response_sendVCode_bucs
+    updateUser(bio: String, birthAt: Int, email: String, hasAppealsHistory: Boolean, hasAskHistory: Boolean, hasBookHistory: Boolean, hasLastSeen: Boolean, lastname: String, name: String, universityID: ID, username: String): Response_updateUser_gqrp
+    uploadPublicFileAccess(appealID: String, bookID: String, fileMime: String!, fileName: String!, filePath: String!, fileType: String!, previewPath: String, sizeMB: Int, thumbnailPath: String, type: String!, uploadedAsFile: Boolean): Response_uploadPublicFileAccess_nifx
     verifyAppeal(adminToken: String!, id: ID!, status: String!): Boolean
-    verifyVCode(phone: String!, referenceCode: String, vCode: String!): Response_verifyVCode_irfs
+    verifyVCode(phone: String!, referenceCode: String, vCode: String!): Response_verifyVCode_pgqf
 }
 
 type Notification {
@@ -149,96 +220,134 @@ type Query {
         first: Int = 20,
         searchText: String
     ): AppealConnection
-    isReferenceCodeValid(referenceCode: String): Response_isReferenceCodeValid_xdfr
+    book(id: ID!): Response_book_isuq
+    bookAppearances: Response_bookAppearances_wztf
+    bookCategories(searchText: String): Response_bookCategories_gbgz
+    books(
+        "A cursor after which elements are returned."
+        after: String,
+        "Limits number of fetched items. Maximum allowed value: 100."
+        first: Int = 20,
+        searchText: String
+    ): BookConnection
+    isReferenceCodeValid(referenceCode: String): Response_isReferenceCodeValid_whfr
     notifications(
         "A cursor after which elements are returned."
         after: String,
         "Limits number of fetched items. Maximum allowed value: 100."
         first: Int = 20
     ): NotificationConnection
-    test(x: String): Response_test_nqfl
-    user: Response_user_nhio
-    wallet: Response_wallet_wnbr
+    test(x: String): Response_test_uzay
+    user: Response_user_kghj
+    wallet: Response_wallet_cvgp
 }
 
-type Response_appealConnectClick_gcep {
+type Response_appealConnectClick_eqqv {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_chargeWallet_nsip {
+type Response_bookAppearances_wztf {
+    data: [BookAppearance]
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_bookCategories_gbgz {
+    data: [BookCategory]
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_book_isuq {
+    data: Book
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_chargeWallet_symt {
     data: CreatePayment
     errors: String
     message: String
     status: Status!
 }
 
-type Response_createAppeal_ldxk {
+type Response_createAppeal_zzai {
     data: Appeal
     errors: String
     message: String
     status: Status!
 }
 
-type Response_isReferenceCodeValid_xdfr {
+type Response_createBook_ltrs {
+    data: Book
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_isReferenceCodeValid_whfr {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_seen_ppaq {
+type Response_seen_rpqy {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_sendVCode_zese {
+type Response_sendVCode_bucs {
     data: VCode
     errors: String
     message: String
     status: Status!
 }
 
-type Response_test_nqfl {
+type Response_test_uzay {
     data: TTT
     errors: String
     message: String
     status: Status!
 }
 
-type Response_updateUser_pnzr {
+type Response_updateUser_gqrp {
     data: User
     errors: String
     message: String
     status: Status!
 }
 
-type Response_uploadPublicFileAccess_hpjm {
+type Response_uploadPublicFileAccess_nifx {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_user_nhio {
+type Response_user_kghj {
     data: User
     errors: String
     message: String
     status: Status!
 }
 
-type Response_verifyVCode_irfs {
+type Response_verifyVCode_pgqf {
     data: Login
     errors: String
     message: String
     status: Status!
 }
 
-type Response_wallet_wnbr {
+type Response_wallet_cvgp {
     data: Wallet
     errors: String
     message: String
@@ -289,7 +398,7 @@ type User {
     hasAskHistory: Boolean
     hasBookHistory: Boolean
     hasLastSeen: Boolean
-    id: ID!
+    id: ID
     introducerID: ID
     isEmailActivated: Boolean
     isPhoneActivated: Boolean
@@ -311,6 +420,13 @@ type User {
     wallet: Wallet
     xp: Int
     xpLevelPercentage: Int
+}
+
+type UserProtected {
+    id: ID
+    name: String
+    username: String
+    verifiedAt: Int
 }
 
 type VCode {
@@ -392,6 +508,7 @@ input Seen {
 input UploadedFileInput {
     mime: String!
     preview: String
+    sizeMB: Int
     thumbnail: String
     type: String!
     uploadedAsFile: Boolean

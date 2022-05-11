@@ -46,10 +46,17 @@ body,
   height: 100%;
 }
 
+html, body {
+  margin: 0;
+  height: 100%;
+  //overflow: hidden
+}
+
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
+//hide scrollbars class
 .hide-scrollbars {
   *::-webkit-scrollbar {
     display: none;
@@ -75,8 +82,11 @@ body,
 }
 
 
-// toastify
+.no-font {
+  font-family: unset;
+}
 
+// toastify
 .Toastify__toast-body {
   display: flex !important;
   flex-flow: row-reverse;
@@ -85,13 +95,27 @@ body,
   align-items: center !important;
 }
 
-.no-font {
-  font-family: unset;
+.new-divider {
+  height: 1px;
+  width: 80%;
+  margin: 0 auto;
+  @apply bg-gray-300
 }
 
+.center-placeholder {
+  &::-webkit-input-placeholder {
+    text-align: center;
+  }
 
-html, body {
-  margin: 0;
-  height: 100%;
-  //overflow: hidden
+  &:-moz-placeholder { /* Firefox 18- */
+    text-align: center;
+  }
+
+  &::-moz-placeholder { /* Firefox 19+ */
+    text-align: center;
+  }
+
+  &:-ms-input-placeholder {
+    text-align: center;
+  }
 }
