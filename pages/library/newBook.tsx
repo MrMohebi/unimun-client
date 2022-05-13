@@ -24,7 +24,7 @@ import BookAppearance from "../../components/normal/BookAppearance/BookAppearanc
 import {DOWNLOAD_HOST} from "../../LocalVariables/LocalVariables";
 import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
 import Divider from "../../components/view/Divider/Divider";
-import {lastBookSubmitSuccess} from "../../store/books";
+import {isBrochure, lastBookSubmitSuccess} from "../../store/books";
 import {strict} from "assert";
 import {analyze} from "@typescript-eslint/scope-manager";
 
@@ -66,6 +66,7 @@ const NewBook = () => {
 
         const router = useRouter()
         const [currentStep, ScurrentStep] = useState(0)
+        const [isBook, _isBook] = useState(false)
         const [loading, Sloading] = useState(false)
         const [dimmer, Sdimmer] = useState(false)
         const [langDropDown, SlangDropDown] = useState(false)
@@ -87,6 +88,7 @@ const NewBook = () => {
             files: [],
             fileNames: []
         } as {
+            isBook: boolean
             title: string
             writer: string
             language: string
@@ -104,6 +106,14 @@ const NewBook = () => {
             attachments: []
             fileNames: []
         })
+
+
+        useEffect(() => {
+            if (isBrochure()) {
+                updateBookData('isBook', false);
+                console.log(BookData)
+            }
+        }, [])
 
 
         const submitBook = () => {

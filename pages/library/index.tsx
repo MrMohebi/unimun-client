@@ -4,7 +4,7 @@ import Search from "../../components/normal/Search/Search";
 import Add from '../../assets/svgs/add.svg'
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
-import {lastBookSubmitSuccess} from "../../store/books";
+import {isBrochure, lastBookSubmitSuccess} from "../../store/books";
 import Toast from "../../components/normal/Toast/Toast";
 import {gql, useLazyQuery} from "@apollo/client";
 import {ToastContainer} from "react-toastify";
@@ -29,6 +29,7 @@ const Index = () => {
                     cursor
                     node {
                         title
+                        id
                         details
                         price
                         category {
@@ -120,13 +121,17 @@ const Index = () => {
                         isDownloadable: boolean
                         attachments: []
                         price: string
+                        id: string
                     }, index) => {
+                        console.log(book.id)
 
-                        // @ts-ignore
-                        // @ts-ignore
-                        // @ts-ignore
+
                         return (
                             <div key={'book' + index}
+                                 onClick={() => {
+                                     // console.log(book.id)
+                                     router.push('/library/book/' + book.id)
+                                 }}
                                  className={'bg-white h-44 mt-4 grid grid-cols-2 w-full max-w-xl shadow-sm rounded-2xl relative'}>
                                 <div className={'absolute right-3 bottom-3  w-16'}>
                                     <Unimun/>
@@ -226,7 +231,11 @@ const Index = () => {
                         className={'h-14 bg-white rounded-2xl flex flex-col justify-center items-center px-3 IranSansMedium'}>
                     افزودن کتاب
                 </Button>
-                <Button id={'new-note-option'} rippleColor={'rgba(0,0,0,0.24)'}
+                <Button id={'new-note-option'} rippleColor={'rgba(0,0,0,0.24)'} onClick={() => {
+                    // isBrochure(true)
+                    // router.push('library/newBook')
+
+                }}
                         className={'h-14 mt-3 bg-white rounded-2xl flex flex-col justify-center items-center px-3 IranSansMedium'}>
                     افزودن جزوه
                 </Button>
