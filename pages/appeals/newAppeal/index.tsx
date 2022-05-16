@@ -150,7 +150,7 @@ const Index = () => {
 
 
     return (
-        <div className={'h-full '} ref={newAppealMainSection}>
+        <div className={'h-full  overflow-scroll'} ref={newAppealMainSection}>
 
             <BottomSheet onClose={() => {
                 setImageBottomSheetOpened(false)

@@ -32,6 +32,7 @@ const Appeals = () => {
     const [hasMore, ShasMore] = useState(true);
     const [ta, sta] = useState(["", '', '', ''] as string[]);
     const lastScrollPosition = useRef(0);
+    const scrollerRef = useRef(null);
 
 
     const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen', 'id'])
@@ -134,18 +135,23 @@ const Appeals = () => {
             }
         }
     }
+
     const onAdSectionScroll = (event: any) => {
+        try {
+            let scroll = event.target.scrollTop
 
-        if (event.currentTarget.scrollTop > event.currentTarget.scrollHeight - event.currentTarget.getBoundingClientRect().height - 10)
-            getNewerAppeals()
-        let scroll = event.currentTarget.scrollTop;
+            if (scroll > lastScrollPosition.current) {
+                setScrollingToBottom(true)
+                console.log('going down')
+            }else{
+                setScrollingToBottom(false)
 
-        if (scroll > lastScrollPosition.current && scroll > 40) {
-            setScrollingToBottom(true);
-        } else {
-            setScrollingToBottom(false);
+            }
+            lastScrollPosition.current = scroll;
         }
-        lastScrollPosition.current = scroll;
+        catch (e){
+            console.log(e)
+        }
     }
     const searchQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen'], 'test')
     const [searchAppeals, searchAppealsResult] = useLazyQuery(gql`${searchQuery.query}`);
@@ -250,7 +256,8 @@ const Appeals = () => {
                             <div dir={'rtl'}
                                  className={' IranSans flex flex-row justify-center items-center'}>{passedTime(Appeal.createdAt)}</div>
 
-                            <div className={'h-4 w-0 overflow-hidden border-primary bg-primary  sm:block border mx-2'}/>
+                            <div
+                                className={'h-4 w-0 overflow-hidden border-primary bg-primary  sm:block border mx-2'}/>
                             <div className={'flex flex-row  items-center justify-center'}>
                                 <span className={'IranSans ml-1'}>{Appeal.seen ?? 0}</span>
 
@@ -286,7 +293,7 @@ const Appeals = () => {
     }
     let searchDeb = _.debounce(searchInput, 1000)
     return (
-        <div className={'h-full relative '}>
+        <div  className={'h-full relative overflow-scroll '} onScroll={onAdSectionScroll}>
             <ToastContainer transition={Slide}/>
 
             <Search searchLoading={searchLoading} collapse={scrollingToBottom}
@@ -294,21 +301,29 @@ const Appeals = () => {
                         setSearchLoading(true)
                         searchDeb(e)
                     }}/>
-            <div>
-                <NewAppealButton hidden={scrollingToBottom}/>
-
+            <NewAppealButton hidden={scrollingToBottom}/>
+            <div className={'h-full overflow-scroll pb-32 pt-32'} id={'scrollable'}>
                 {nothingFound ?
                     <div className={'w-full flex flex-col items-center justify-center mt-44'}>
                         <span className={'IranSansMedium opacity-50'}>نتیجه ای یافت نشد</span>
                     </div> :
                     <InfiniteScroll
+                        pullDownToRefresh={true}
+                        pullDownToRefreshContent={<h1 className={'h-20'}>Hola</h1>}
+                        pullDownToRefreshThreshold={90}
+                        refreshFunction={() => {
+                            console.log('refresh')
+                        }}
+                        ref={scrollerRef}
+                        onScroll={onAdSectionScroll}
                         next={getNewerAppeals}
                         hasMore={hasMore}
                         dataLength={appeals.length}
                         loader={
                             appealsSkeleton(1)
                         }
-                        className={'h-full pt-32 pb-32'}>
+                        scrollableTarget={'scrollable'}
+                        className={''}>
                         {
                             searchedAppeals.length ?
                                 searchedAppeals.map((ad: any, index: number) => {
@@ -334,12 +349,11 @@ const Appeals = () => {
                                         ) : null
 
                         }
-                        {
-                            loading && !appeals.length ?
-                                appealsSkeleton(5)
-                                : null
-                        }
-
+                        {/*{*/}
+                        {/*    loading && !appeals.length ?*/}
+                        {/*        appealsSkeleton(5)*/}
+                        {/*        : null*/}
+                        {/*}*/}
                     </InfiniteScroll>
                 }
                 {/*{*/}

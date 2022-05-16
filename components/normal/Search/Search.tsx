@@ -6,6 +6,8 @@ import CloseSVG from '../../../assets/svgs/close.svg'
 import Badge from "../../view/Badge/Badge";
 import {TailSpin} from "react-loader-spinner";
 import {useRouter} from "next/router";
+import MyBooks from '../../../assets/svgs/mybook.svg'
+import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 
 interface Props {
     onInputChange: ChangeEventHandler
@@ -33,7 +35,7 @@ const Search = (props: Props) => {
 
 
                 <div className={'IranSansBlack'}><span dir={'ltr'} className={'text-primary'}><span
-                    className={'text-textBlack'}>{props.lib ? 'کتاب' : 'یونیـ'}</span>{props.lib ? 'خونه' : 'مـون'}</span>
+                    className={'text-textBlack'}>{props.lib ? 'کتابـ' : 'یونیـ'}</span>{props.lib ? 'خونه' : 'مـون'}</span>
                 </div>
 
                 <div className={'flex flex-row justify-center items-center'}>
@@ -45,7 +47,15 @@ const Search = (props: Props) => {
                         <SearchSVG/></div>
                     {
                         props.lib ?
-                            null
+
+
+                            <Badge color={'#ff1a1a'}>
+                                <div className={'chat rounded-lg bg-background p-1.5 w-9 h-9'} onClick={() => {
+                                    // router.push('/notifications')
+                                }}>
+                                    <MyBooks/>
+                                </div>
+                            </Badge>
                             :
                             <Badge color={'#ff1a1a'}>
                                 <div className={'chat rounded-lg bg-background p-1.5 w-9 h-9'} onClick={() => {
@@ -59,7 +69,7 @@ const Search = (props: Props) => {
                 </div>
             </div>
             <div
-                className={`bg-background px-3 w-full flex flex-row items-center justify-between  rounded-xl mt-3 transition-all overflow-hidden duration-200 origin-top h-12 ${props.collapse && !manualSearch[0] ? 'h-0' : 'h-12'}`}>
+                className={`bg-background px-3 w-full flex flex-row items-center justify-between  rounded-xl mt-3 transition-all overflow-hidden duration-200 origin-top ${props.collapse && !manualSearch[0] ? 'h-0' : 'h-12'}`}>
                 <div className={'w-8 h-full  relative flex flex-col justify-center items-center p-1'}>
                     <div style={{transform: props.searchLoading ? 'scale(0)' : 'scale(1)'}}
                          className={`'${props.searchLoading ? 'scale-0 ' : 'scale-100 '} overflow-hidden origin-center transition-all  duration-300 flex flex-col justify-center items-center w-full h-full '`}>
@@ -67,7 +77,8 @@ const Search = (props: Props) => {
                     </div>
                     <div style={{transform: props.searchLoading ? 'scale(1)' : 'scale(0)'}}
                          className={`origin-center transition-all duration-300  w-full absolute top-0 left-0 h-full flex flex-col items-center justify-center `}>
-                        <TailSpin color="#42b0f3" height={25} width={25}/>
+                        {/*<TailSpin color="#42b0f3" height={25} width={25}/>*/}
+                        <LoadingDialog wrapperClassName={'w-7 h-7'} color={'#2aa0ff'} />
                     </div>
                 </div>
                 <input ref={inputRef} id={'search-input'}
