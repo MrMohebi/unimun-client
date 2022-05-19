@@ -52,15 +52,15 @@ const BookAppearance = (props: { onAppearanceSelected: Function }) => {
             {
                 appearances.map((appearance:{title:string,details:string},index) => {
                     return (
-                        <div key={'app'+index}
-                             className={'w-full flex flex-col justify-start items-center pt-10'}
+                        <div key={'app' + index}
+                             className={'w-full flex flex-col justify-start items-center pt-5'}
                              onClick={() => {
                                  console.log(appearance)
                                  props.onAppearanceSelected(appearance)
                              }}
                         >
                             <div
-                                className={'w-11/12 rounded-xl h-auto py-4 bg-white shadow max-w-sm flex flex-col justify-center items-start px-4'}>
+                                className={'w-11/12 rounded-xl h-auto py-4 bg-white  max-w-sm flex flex-col justify-center items-start px-4'}>
                                 <span className={'IranSansMedium'}>{appearance.title}</span>
                                 <p className={'IranSans mt-2'}>{appearance.details}</p>
 

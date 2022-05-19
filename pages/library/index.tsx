@@ -18,13 +18,11 @@ import InfiniteScroll from "react-infinite-scroll-component";
 const Index = () => {
 
     const router = useRouter();
-    const lottieRef = useRef<HTMLDivElement>(null);
     const [newBookButtonOpened, SnewBookButtonOpened] = useState(false);
     const [books, _books] = useState([]);
     const [scrollingToBottom, _scrollingToBottom] = useState(false);
     const lastScrollPosition = useRef(0);
     const [hasMore,_hasMore] = useState(false);
-    const lastGottenBooksState = useReactiveVar(lastGottenBooks)
 
 
     const getBooksQuery = gql`

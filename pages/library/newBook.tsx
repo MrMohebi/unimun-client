@@ -27,40 +27,45 @@ import Divider from "../../components/view/Divider/Divider";
 import {isBrochure, lastBookSubmitSuccess} from "../../store/books";
 import {strict} from "assert";
 import {analyze} from "@typescript-eslint/scope-manager";
+import TelInputSVG from "../../assets/svgs/telInput.svg";
+import BoldMobile from "../../assets/svgs/boldMobile.svg";
+import RightSquareSVG from "../../assets/svgs/rightSquare.svg";
+import Toast from "../../components/normal/Toast/Toast";
+import {ToastContainer} from "react-toastify";
 
 const NewBook = () => {
 
 
-        //queries
+    //queries
 
-        const createBookMutation = gql`
-            mutation createBook($isBook:Boolean! $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput]){
-                createBook(
-                    isBook:$isBook,
-                    isDownloadable: $isDownloadable,
-                    isPurchasable: $isPurchasable,
-                    categoryID: $categoryID,
-                    title: $title,
-                    details: $details,
-                    price: $price,
-                    language: $language,
-                    writer: $writer,
-                    publisher: $publisher,
-                    publishedDate: $publishedDate,
-                    appearanceID: $appearanceID
-                    bookFiles: $bookFiles,
-                    attachments: $attachments
-
-                ){
-                    status
-                    data {
-                        title
-                        id
-                    }
-                    message
+    const createBookMutation = gql`
+        mutation createBook($isBook:Boolean! $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
+            createBook(
+                isBook:$isBook,
+                isDownloadable: $isDownloadable,
+                isPurchasable: $isPurchasable,
+                categoryID: $categoryID,
+                title: $title,
+                details: $details,
+                price: $price,
+                language: $language,
+                writer: $writer,
+                publisher: $publisher,
+                publishedDate: $publishedDate,
+                appearanceID: $appearanceID
+                bookFiles: $bookFiles,
+                attachments: $attachments,
+                connectWay:$connectWay
+            ){
+                status
+                data {
+                    title
+                    id
                 }
+                message
             }
-        `
+        }
+    `
         const [createBook, createBookResult] = useMutation(createBookMutation)
 
 
@@ -69,26 +74,29 @@ const NewBook = () => {
         const [isBook, _isBook] = useState(false)
         const [loading, Sloading] = useState(false)
         const [dimmer, Sdimmer] = useState(false)
-        const [langDropDown, SlangDropDown] = useState(false)
-        const [uploadedImages, setUploadedImages] = useState([] as string[])
-        const [uploadingProgress, setUploadingProgress] = useState([] as number[])
-        const [loadingDialog, setLoadingDialog] = useState(false)
-        const priceInputRef = useRef(null)
-        const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
-        const [categoryComponent, _categoryComponent] = useState(false)
-        const [appearanceComponent, _appearanceComponent] = useState(false)
-        const [uploadedFile, _uploadedFile] = useState('')
-        const [fileUploadingPercentage, _fileUploadingPercentage] = useState('')
+    const [langDropDown, SlangDropDown] = useState(false)
+    const [uploadedImages, setUploadedImages] = useState([] as string[])
+    const [uploadingProgress, setUploadingProgress] = useState([] as number[])
+    const [loadingDialog, setLoadingDialog] = useState(false)
+    const priceInputRef = useRef(null)
+    const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
+    const [categoryComponent, _categoryComponent] = useState(false)
+    const [appearanceComponent, _appearanceComponent] = useState(false)
+    const [uploadedFile, _uploadedFile] = useState('')
+    const [fileUploadingPercentage, _fileUploadingPercentage] = useState('')
+    const [contactType, setContactType] = useState('')
+    const [contactAddress, setContactAddress] = useState('')
+    const [connectWay, setConnectWay] = useState('')
 
 
-        const [BookData, setBookData] = useState({
-            type: 'physical',
-            price: '20000',
-            attachments: [],
-            files: [],
-            fileNames: []
-        } as {
-            isBook: boolean
+    const [BookData, setBookData] = useState({
+        type: 'physical',
+        price: '20000',
+        attachments: [],
+        files: [],
+        fileNames: []
+    } as {
+        isBook: boolean
             title: string
             writer: string
             language: string
@@ -109,6 +117,8 @@ const NewBook = () => {
 
 
         useEffect(() => {
+
+
             if (isBrochure()) {
                 updateBookData('isBook', false);
                 console.log(BookData)
@@ -125,7 +135,8 @@ const NewBook = () => {
                     isDownloadable: BookData.type === 'pdf',
                     isBook: true,
                     bookFiles: BookData.files,
-                    attachments: BookData.attachments
+                    attachments: BookData.attachments,
+                    connectWay: connectWay
                 }
             }).then((e) => {
                 try {
@@ -165,13 +176,20 @@ const NewBook = () => {
             if (currentStep === 1 && BookData.appearance)
                 return true
             if (currentStep === 2 && BookData.price) {
-                return true
+                if (contactType === 'phone' && connectWay.length === 11) {
+                    return true
+                }
+                if (contactType === 'telegram' && connectWay.length > 3) {
+                    return true
+                }
             }
+
             return false
         }
 
         return (
-            <div className={'pb-20'}>
+            <div className={'pb-20 overflow-scroll h-full'}>
+                <ToastContainer/>
 
                 <Dimmer onClose={() => {
                     Sdimmer(false)
@@ -269,7 +287,7 @@ const NewBook = () => {
                             <div className={'new-divider mt-5'}/>
                             <div className={'IranSansMedium text-textDarker pt-5'}>نام کتاب</div>
 
-                            <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 '}
+                            <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl  '}
                                    wrapperClassName={'px-3 h-14'}
                                    placeHolder={'کتابِ...'}
                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -284,7 +302,7 @@ const NewBook = () => {
 
                         <section className={'bg-white w-full px-3 pb-10'}>
                             <div className={'IranSansMedium text-textDarker pt-5'}>نویسنده</div>
-                            <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 '}
+                            <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
                                    wrapperClassName={'px-3 h-14'}
                                    placeHolder={'کی نوشته کتابو ؟'}
                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -301,12 +319,12 @@ const NewBook = () => {
                                     Sdimmer(true)
                                     SlangDropDown(true)
                                 }}
-                                      className={'text-textDark'}>{!BookData.language ? "انتخاب  زبان" : BookData.language === "persian" ? "فارسی" : "اینگلیسی"}</span>
+                                      className={'text-textDark'}>{!BookData.language ? "انتخاب  زبان" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
                             </div>
                             <div className={'new-divider mt-5'}/>
                             <div className={'IranSansMedium text-textDarker pt-5'}>مترجم <span
                                 className={'text-textDark text-tiny '}>اختیاری</span></div>
-                            <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 '}
+                            <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
                                    wrapperClassName={'px-3 h-14'}
                                    placeHolder={'کی ترجمه کرده ؟'}/>
                         </section>
@@ -345,13 +363,16 @@ const NewBook = () => {
                                                    accept={'.png,.jpeg,.jpg'} onInput={(e) => {
                                                 if (e.currentTarget && e.currentTarget.files && e.currentTarget.files.length)
                                                     uploadBookImages(e.currentTarget.files[0], removeEmptyProgresses, currentBookId, (response: any) => {
-                                                            console.log(response)
-                                                            if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
+                                                            console.log(response.data)
+                                                            if (typeof response.data !== "number") {
                                                                 updateBookData('attachments', [...uploadedImages, response.data])
                                                                 setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
                                                                 let updateUploadingProgress = [...uploadingProgress]
                                                                 updateUploadingProgress[uploadingProgress.length] = 0;
                                                                 setUploadingProgress(updateUploadingProgress)
+                                                                removeEmptyProgresses()
+                                                            } else {
+                                                                Toast("خطا در هنگام آپلود")
                                                                 removeEmptyProgresses()
                                                             }
                                                         }, (error: any) => {
@@ -432,13 +453,14 @@ const NewBook = () => {
                             </div>
                             <div className={'new-divider mt-5'}/>
                             <div
-                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
-                                <span>وضعیت ظاهری کتاب </span>
-                                <span onClick={() => {
+                                onClick={() => {
                                     _appearanceComponent(true)
                                 }}
+                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
+                                <span>وضعیت ظاهری کتاب </span>
+                                <span
 
-                                      className={'text-textDark'}>{!BookData.appearance ? "انتخاب  کنید" : BookData.appearance}</span>
+                                    className={'text-textDark'}>{!BookData.appearance ? "انتخاب  کنید" : BookData.appearance}</span>
                             </div>
                             <div className={'new-divider mt-5'}/>
 
@@ -446,8 +468,8 @@ const NewBook = () => {
                                 className={'text-tiny text-textDarker'}>اختیاری</span></div>
 
                             <Input multiLine={true} id={'input'} numOnly={false}
-                                   inputClassName={'IranSans h-32 mt-5  border-primary border-2 py-1 px-2 rounded w-full outline-0 '}
-                                   wrapperClassName={'px-3'}
+                                   inputClassName={'IranSans rounded-xl h-32 mt-5  border-primary border-2 py-1 px-2  w-full outline-0 '}
+                                   wrapperClassName={''}
                                    placeHolder={'کتابِ...'}
                                    onChange={(e: InputEvent) => {
                                        let el = e.currentTarget as HTMLTextAreaElement
@@ -463,7 +485,7 @@ const NewBook = () => {
                                     // Sdimmer(true)
                                     // SlangDropDown(true)
                                 }}
-                                      className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "اینگلیسی"}</span>
+                                      className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
                             </div>
                             <div className={'new-divider mt-5'}/>
                             <div
@@ -473,7 +495,7 @@ const NewBook = () => {
                                     // Sdimmer(true)
                                     // SlangDropDown(true)
                                 }}
-                                      className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "اینگلیسی"}</span>
+                                      className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
                             </div>
                             <div className={'new-divider mt-5'}/>
 
@@ -482,8 +504,9 @@ const NewBook = () => {
 
                             <div className={'w-full grid grid-cols-5 gap-10'}>
                                 <div className={'col-span-3'}></div>
-                                <Input id={'author'} numOnly={false} wrapperClassName={'col-span-3 h-14'}
+                                <Input id={'author'} numOnly={false} wrapperClassName={'col-span-3 h-12'}
                                        placeHolder={'اسم انتشارات'}
+                                       inputClassName={"rounded-xl"}
                                        onChange={(e: InputEvent) => {
                                            let el = e.currentTarget as HTMLTextAreaElement
                                            updateBookData('publisher', el.value)
@@ -491,8 +514,8 @@ const NewBook = () => {
                                 />
 
                                 <Input id={'author'} numOnly={true} maxLength={4}
-                                       inputClassName={'center-placeholder px-3 text-center'}
-                                       wrapperClassName={'col-span-2 h-14'} placeHolder={'سال'}
+                                       inputClassName={'center-placeholder rounded-xl px-3 text-center'}
+                                       wrapperClassName={'col-span-2 h-12'} placeHolder={'سال'}
                                        onChange={(e: InputEvent) => {
                                            let el = e.currentTarget as HTMLTextAreaElement
                                            updateBookData('publishedDate', el.value)
@@ -501,7 +524,10 @@ const NewBook = () => {
                             </div>
                         </div>
                         <div className={'w-full h-10 IranSans text-textDarker text-sm px-3 mt-3 mb-3 '}>
-                            لطفا نام روی جلد کتاب یا یک نام دقیق که برای جستجو مناسب باشد را وارد کنید
+
+                            برا خیلی ها مهمه که کتاب مال چه سالیه و انتشاراتش چیه
+                            <br/>
+                            اختیاریه ولی بنویسی بهتره
                         </div>
                         <div className={'h-32'}/>
 
@@ -519,10 +545,15 @@ const NewBook = () => {
                                     onClick={() => {
                                         updateBookData('type', 'pdf')
                                     }}>
-                                    <div className={'block relative mx-auto overflow-hidden'}> کتابِ دیـجیتـال
-                                        <span className={'text-tiny inline-block absolute '}>
+                                    <div
+                                        className={'block relative mx-auto overflow-hidden flex flex-col justify-center items-center'}>
+                                        <div>
+                                            کتابِ دیـجیتـال
+                                            <span className={'text-tiny inline-block -translate-y-2 '}>
                 PDF
                 </span>
+                                        </div>
+
                                     </div>
                                 </div>
                                 <div
@@ -556,7 +587,7 @@ const NewBook = () => {
                                                        Sdimmer(false)
                                                        _fileUploadingPercentage('')
                                                        if (response.data.validMimes) {
-                                                           alert('فایل ولید نیست')
+                                                           Toast("فرمت فایل معتبر نیست")
                                                        }
                                                        if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
                                                            // setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
@@ -674,8 +705,9 @@ const NewBook = () => {
                         <section className={'bg-white w-full px-3 pt-5 pb-5 '}>
                             <div className={'flex flex-row justify-between items-center'}>
                                 <span className={'IranSansMedium'}>تغداد صفحه</span>
-                                <Input id={'page-count'} numOnly={true} maxLength={5} wrapperClassName={'w-20 h-14'}
-                                       inputClassName={'center-placeholder IranSans text-center'} placeHolder={'تعداد'}
+                                <Input id={'page-count'} numOnly={true} maxLength={5} wrapperClassName={'w-20 h-10'}
+                                       inputClassName={'center-placeholder IranSans text-center rounded-xl'}
+                                       placeHolder={'تعداد'}
                                        onChange={(e: InputEvent) => {
                                            let el = e.currentTarget as HTMLTextAreaElement
                                            updateBookData('pages', el.value)
@@ -709,7 +741,7 @@ const NewBook = () => {
                                 <div className={'h-3/5 bg-gray-400 w-0 border'}/>
                                 <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'} defaultValue={'20,000'}
                                        numOnly={false}
-                                       inputClassName={'border-0 text-left IranSansMedium'}
+                                       inputClassName={'border-0 text-left IranSansMedium rounded-xl'}
                                        wrapperClassName={'w-full h-full '}
                                        onChange={(e: InputEvent) => {
                                            let el = e.currentTarget as HTMLInputElement
@@ -718,6 +750,61 @@ const NewBook = () => {
                                 />
                             </div>
                         </section>
+
+                        <div className={'w-full h-40 bg-white mt-4 px-4 pt-3 new-section'}>
+
+                            <span className={'text-textDark text-md IranSansMedium  '}>اطلاعات تماس</span>
+                            <div className={'w-full flex items-center justify-center relative mt-4'}>
+                                <div
+                                    className={`absolute  left-6 top-1/2 -translate-y-1/2 flex flex-col justify-center items-center w-8 h-8`}>
+
+                                    <div
+                                        className={`w-full relative  h-full bg-background rounded-md p-2 flex flex-col justify-center items-center `}>
+                                        <div
+                                            className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'telegram' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
+                                            <TelInputSVG/>
+                                        </div>
+                                        <div
+                                            className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'phone' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
+                                            <BoldMobile/>
+                                        </div>
+                                        <div
+                                            className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === '' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
+                                            <RightSquareSVG/>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <Input dir={'ltr'} placeHolder={''}
+                                       inputClassName={'text-left pl-12 rounded-xl border-2'} maxLength={30}
+                                       id={'title'} numOnly={false}
+                                       wrapperClassName={'w-11/12 h-14 '}
+                                       onChange={(e: any) => {
+                                           if (e.currentTarget.value.length > 0) {
+                                               if (contactType === 'phone') {
+                                                   e.currentTarget.value = e.currentTarget.value.replaceAll(/[^0-9]/g, '')
+                                               }
+                                               if (/[^0-9]/.test(e.currentTarget.value)) {
+                                                   setContactType('telegram')
+                                                   e.currentTarget.value = '@' + e.currentTarget.value.replaceAll(/[^a-zA-z0-9]/g, '')
+                                                   // e.currentTarget.value =  e.currentTarget.value.replaceAll(/[^0-9]/g, '')
+
+                                               } else {
+                                                   setContactType('phone')
+                                               }
+                                           } else
+                                               setContactType('')
+                                           setContactAddress(e.currentTarget.value)
+
+                                           setConnectWay(e.currentTarget.value)
+                                       }}
+
+                                       labelText={'شماره تلفن یا آیدی تلگرام'}/>
+                            </div>
+
+                        </div>
+
 
                         <div className={'h-32'}></div>
                     </Step>

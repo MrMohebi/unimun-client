@@ -96,18 +96,17 @@ const BookCategories = (props: { onCatSelected: Function }) => {
                 tree.map((cat: { hasChild: string, title: string, id: never }, index) => {
                     return (
                         <div key={'cat' + index}
-                             className={'w-full flex flex-col justify-start items-center pt-10'}
+                             className={'w-full flex flex-col justify-start items-center pt-3'}
                              onClick={() => {
                                  if (!cat.hasChild) {
                                      props.onCatSelected(cat)
                                  }
                                  createCategoryTree(data.current as any, cat.id)
                                  lastClicked.current.push(cat.id)
-                                 console.log(lastClicked.current)
                              }}
                         >
                             <div
-                                className={'w-11/12 rounded-xl h-14 bg-white shadow max-w-sm flex flex-row justify-between items-center px-4'}>
+                                className={'w-11/12 rounded-xl h-14 bg-white max-w-sm flex flex-row justify-between items-center px-4'}>
 
                                 <span className={'IranSansMedium'}>{cat.title}</span>
                                 <div className={`w-5 h-5 ${cat.hasChild ? '' : 'opacity-0'}`}>
