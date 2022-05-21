@@ -8,6 +8,7 @@ import {TailSpin} from "react-loader-spinner";
 import {useRouter} from "next/router";
 import MyBooks from '../../../assets/svgs/mybook.svg'
 import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
+import {UserToken} from "../../../store/user";
 
 interface Props {
     onInputChange: ChangeEventHandler
@@ -51,7 +52,13 @@ const Search = (props: Props) => {
 
                             <Badge color={'#ff1a1a'}>
                                 <div className={'chat rounded-lg bg-background p-1.5 w-9 h-9'} onClick={() => {
-                                    // router.push('/notifications')
+                                    if (UserToken()) {
+                                        router.push('/profile/myBooks')
+
+                                    } else {
+                                        router.push('/profile/login')
+
+                                    }
                                 }}>
                                     <MyBooks/>
                                 </div>

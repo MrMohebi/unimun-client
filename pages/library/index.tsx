@@ -318,7 +318,7 @@ const Index = () => {
                 </Button>
                 <Button id={'new-note-option'} rippleColor={'rgba(0,0,0,0.24)'} onClick={() => {
                     // isBrochure(true)
-                    // router.push('library/newBook')
+                    router.push('library/newBrochure')
 
                 }}
                         className={`h-14 mt-4 bg-white rounded-2xl flex flex-col justify-center items-center px-5 IranSansMedium transition-all  ease-in-out duration-200 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>

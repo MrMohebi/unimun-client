@@ -10,6 +10,7 @@ import {isReferenceCodeValid, SendVCodeQuery, VerifyVCode} from "../../Requests/
 import {setToken} from "../../helpers/TokenHelper";
 import Promoter from "../../assets/svgs/postbox.svg";
 import {updateUser} from "../../Requests/withAuthentication/user";
+import {currentNavActiveIndex} from "../../store/navbar";
 
 const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState('00000000000')
@@ -127,7 +128,9 @@ const Login = () => {
                 setTimeout(() => {
                     UserToken(verifyVCodeResult.data.verifyVCode.data.token)
                     setToken(verifyVCodeResult.data.verifyVCode.data.token)
-                    router.push('/')
+                    router.push('/').then(() => {
+                        currentNavActiveIndex(2)
+                    })
                 }, 300)
 
             } else {
@@ -141,7 +144,9 @@ const Login = () => {
             <Header backOnClick={() => {
                 setVCodeError(false)
                 if (currentStep === 0)
-                    router.push('/')
+                    router.push('/').then(() => {
+                        currentNavActiveIndex(2)
+                    })
                 if (currentStep === 1) {
                     sendVCodeResult.reset()
                     setStep(0)
@@ -364,7 +369,9 @@ const Login = () => {
                                     setName({variables: {name: nameInputRef.current.value}}).then(e => {
                                         if (e.data) {
                                             if (e.data.updateUser.status === 'SUCCESS') {
-                                                router.push('/')
+                                                router.push('/').then(() => {
+                                                    currentNavActiveIndex(2)
+                                                })
                                             }
                                         }
                                     })

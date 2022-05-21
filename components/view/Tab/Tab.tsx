@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 
 interface Props {
@@ -13,10 +13,13 @@ const Tab = ({children, activeIndex, indicatorAtBottom, indicatorSizeDivider}: P
 
     const indicatorRef = React.useRef(null);
     const container = React.useRef<HTMLDivElement>(null);
+    const [initialized, _initialized] = useState(false)
+    const componentId = useRef(Math.random() * 99999999);
 
 
     const moveIndicator = () => {
-        let children = document.getElementById('children')?.children;
+        let children = document.getElementById('children' + componentId.current)?.children;
+        console.log(children)
         let child = children![activeIndex].getBoundingClientRect()
         let leftOffset = 0;
         if (container.current)
@@ -47,12 +50,16 @@ const Tab = ({children, activeIndex, indicatorAtBottom, indicatorSizeDivider}: P
         };
 
     }, [activeIndex])
-
+    useEffect(() => {
+        setTimeout(() => {
+            _initialized(true)
+        }, 100)
+    }, [])
     return (
         <div ref={container} className="w-full h-full flex flex-row justify-between relative">
             <div ref={indicatorRef} id={'nav-indicator'}
-                 className={`nav-indicator transition-all ${indicatorAtBottom ? 'bottom-0 rounded-t-md' : 'top-0 rounded-b-md'}`}/>
-            <div id={'children'} className={'contents'}>
+                 className={`nav-indicator ${initialized ? ' transition-all' : 'h-0'} ${indicatorAtBottom ? 'bottom-0 rounded-t-md' : 'top-0 rounded-b-md'}`}/>
+            <div id={'children' + componentId.current} className={'contents'}>
                 {
                     children
                 }

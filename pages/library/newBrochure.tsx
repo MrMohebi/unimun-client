@@ -33,39 +33,39 @@ import RightSquareSVG from "../../assets/svgs/rightSquare.svg";
 import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
 
-const NewBook = () => {
+const NewBrochure = () => {
 
 
-    //queries
+        //queries
 
-    const createBookMutation = gql`
-        mutation createBook($isBook:Boolean! $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
-            createBook(
-                isBook:$isBook,
-                isDownloadable: $isDownloadable,
-                isPurchasable: $isPurchasable,
-                categoryID: $categoryID,
-                title: $title,
-                details: $details,
-                price: $price,
-                language: $language,
-                writer: $writer,
-                publisher: $publisher,
-                publishedDate: $publishedDate,
-                appearanceID: $appearanceID
-                bookFiles: $bookFiles,
-                attachments: $attachments,
-                connectWay:$connectWay
-            ){
-                status
-                data {
-                    title
-                    id
+        const createBookMutation = gql`
+            mutation createBook($isBook:Boolean! $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
+                createBook(
+                    isBook:$isBook,
+                    isDownloadable: $isDownloadable,
+                    isPurchasable: $isPurchasable,
+                    categoryID: $categoryID,
+                    title: $title,
+                    details: $details,
+                    price: $price,
+                    language: $language,
+                    writer: $writer,
+                    publisher: $publisher,
+                    publishedDate: $publishedDate,
+                    appearanceID: $appearanceID
+                    bookFiles: $bookFiles,
+                    attachments: $attachments,
+                    connectWay:$connectWay
+                ){
+                    status
+                    data {
+                        title
+                        id
+                    }
+                    message
                 }
-                message
             }
-        }
-    `
+        `
         const [createBook, createBookResult] = useMutation(createBookMutation)
 
 
@@ -74,29 +74,29 @@ const NewBook = () => {
         const [isBook, _isBook] = useState(false)
         const [loading, Sloading] = useState(false)
         const [dimmer, Sdimmer] = useState(false)
-    const [langDropDown, SlangDropDown] = useState(false)
-    const [uploadedImages, setUploadedImages] = useState([] as string[])
-    const [uploadingProgress, setUploadingProgress] = useState([] as number[])
-    const [loadingDialog, setLoadingDialog] = useState(false)
-    const priceInputRef = useRef(null)
-    const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
-    const [categoryComponent, _categoryComponent] = useState(false)
-    const [appearanceComponent, _appearanceComponent] = useState(false)
-    const [uploadedFile, _uploadedFile] = useState('')
-    const [fileUploadingPercentage, _fileUploadingPercentage] = useState('')
-    const [contactType, setContactType] = useState('')
-    const [contactAddress, setContactAddress] = useState('')
-    const [connectWay, setConnectWay] = useState('')
+        const [langDropDown, SlangDropDown] = useState(false)
+        const [uploadedImages, setUploadedImages] = useState([] as string[])
+        const [uploadingProgress, setUploadingProgress] = useState([] as number[])
+        const [loadingDialog, setLoadingDialog] = useState(false)
+        const priceInputRef = useRef(null)
+        const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
+        const [categoryComponent, _categoryComponent] = useState(false)
+        const [appearanceComponent, _appearanceComponent] = useState(false)
+        const [uploadedFile, _uploadedFile] = useState('')
+        const [fileUploadingPercentage, _fileUploadingPercentage] = useState('')
+        const [contactType, setContactType] = useState('')
+        const [contactAddress, setContactAddress] = useState('')
+        const [connectWay, setConnectWay] = useState('')
 
 
-    const [BookData, setBookData] = useState({
-        type: 'physical',
-        price: '20000',
-        attachments: [],
-        files: [],
-        fileNames: []
-    } as {
-        isBook: boolean
+        const [BookData, setBookData] = useState({
+            type: 'physical',
+            price: '20000',
+            attachments: [],
+            files: [],
+            fileNames: []
+        } as {
+            isBook: boolean
             title: string
             writer: string
             language: string
@@ -113,6 +113,7 @@ const NewBook = () => {
             files: []
             attachments: []
             fileNames: []
+            term: string
         })
 
 
@@ -133,7 +134,7 @@ const NewBook = () => {
                     categoryID: BookData.categoryID,
                     isPurchasable: BookData.price ? BookData.price !== 'free' : false,
                     isDownloadable: BookData.type === 'pdf',
-                    isBook: true,
+                    isBook: false,
                     bookFiles: BookData.files,
                     attachments: BookData.attachments,
                     connectWay: connectWay
@@ -173,7 +174,7 @@ const NewBook = () => {
             if (currentStep === 0 && BookData.title && BookData.title.length > 2 && BookData.categoryID) {
                 return true
             }
-            if (currentStep === 1 && BookData.appearance)
+            if (currentStep === 1)
                 return true
             if (currentStep === 2 && BookData.price) {
                 if (contactType === 'phone' && connectWay.length === 11) {
@@ -202,7 +203,7 @@ const NewBook = () => {
                     else
                         router.push('/library')
 
-                }} back={true} title={'افزودن کتاب'}/>
+                }} back={true} title={'افزودن جزوه'}/>
 
                 {
                     categoryComponent ?
@@ -285,11 +286,11 @@ const NewBook = () => {
                             </div>
 
                             <div className={'new-divider mt-5'}/>
-                            <div className={'IranSansMedium text-textDarker pt-5'}>نام کتاب</div>
+                            <div className={'IranSansMedium text-textDarker pt-5'}>نام درس</div>
 
                             <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl  '}
                                    wrapperClassName={'px-3 h-14'}
-                                   placeHolder={'کتابِ...'}
+                                   placeHolder={'جـزوه ی چه درسیه ؟'}
                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                        updateBookData('title', e.currentTarget.value)
                                    }}
@@ -297,14 +298,16 @@ const NewBook = () => {
                         </section>
 
                         <div className={'w-full h-10 IranSans text-textDarker text-sm px-3 mt-3 mb-3 '}>
-                            لطفا نام روی جلد کتاب یا یک نام دقیق که برای جستجو مناسب باشد را وارد کنید
+                            لطفا فقط نام درس را بنویسید . مثل : <span className={'font-bold'}>ریاضی 2</span>
+                            <br/>
+                            عنوان جزوه با توجه به نام درس جزوه نوشته خواهد شد
                         </div>
 
                         <section className={'bg-white w-full px-3 pb-10'}>
-                            <div className={'IranSansMedium text-textDarker pt-5'}>نویسنده</div>
+                            <div className={'IranSansMedium text-textDarker pt-5'}>نام استاد</div>
                             <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
                                    wrapperClassName={'px-3 h-14'}
-                                   placeHolder={'کی نوشته کتابو ؟'}
+                                   placeHolder={'مال کدوم استاده ؟'}
                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                        updateBookData('writer', e.currentTarget.value)
                                    }}
@@ -312,26 +315,31 @@ const NewBook = () => {
 
                             <div className={'new-divider mt-5'}/>
 
-                            <div
-                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
-                                <span>زبان <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
-                                <span onClick={() => {
-                                    Sdimmer(true)
-                                    SlangDropDown(true)
-                                }}
-                                      className={'text-textDark'}>{!BookData.language ? "انتخاب  زبان" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
-                            </div>
                             <div className={'new-divider mt-5'}/>
-                            <div className={'IranSansMedium text-textDarker pt-5'}>مترجم <span
+                            <div className={'IranSansMedium text-textDarker pt-5'}>دانشگاه ارائه درس <span
                                 className={'text-textDark text-tiny '}>اختیاری</span></div>
                             <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
                                    wrapperClassName={'px-3 h-14'}
-                                   placeHolder={'کی ترجمه کرده ؟'}/>
+                                   placeHolder={'کدوم دانشگاه ؟'}/>
+
+
+                            <div className={'new-divider mt-10'}></div>
+                            <div
+                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
+                                <span>ترم ارائه درس <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
+                                <span onClick={() => {
+                                    // Sdimmer(true)
+                                    // SlangDropDown(true)
+                                }}
+                                      className={'text-textDark'}>{BookData.term ?? "انتخاب کنید"}</span>
+                            </div>
+
                         </section>
                         <div className={'w-full h-10 IranSans text-textDarker text-sm px-3 mt-3 mb-3 '}>اگه کتاب ترجمه
                             شده
                             از زبان دیگه ای هست اسم مترجمش رو بهمون بگو
                         </div>
+                        <div className={'h-32'}></div>
 
                     </Step>
 
@@ -451,20 +459,13 @@ const NewBook = () => {
                                 })}
 
                             </div>
-                            <div className={'new-divider mt-5'}/>
-                            <div
-                                onClick={() => {
-                                    _appearanceComponent(true)
-                                }}
-                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
-                                <span>وضعیت ظاهری کتاب </span>
-                                <span
-
-                                    className={'text-textDark'}>{!BookData.appearance ? "انتخاب  کنید" : BookData.appearance}</span>
+                            <div className={'text-sm  IranSans w-full text-center'}> لطفا چند عکس نمونه از جزوه خود به صورت
+                                عمودی و واضح قرار دهید
                             </div>
                             <div className={'new-divider mt-5'}/>
 
-                            <div className={'IranSansMedium text-textDarker pt-5'}>درباره کتاب <span
+
+                            <div className={'IranSansMedium text-textDarker pt-5'}>توضیحات <span
                                 className={'text-tiny text-textDarker'}>اختیاری</span></div>
 
                             <Input multiLine={true} id={'input'} numOnly={false}
@@ -497,44 +498,16 @@ const NewBook = () => {
                                 }}
                                       className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
                             </div>
-                            <div className={'new-divider mt-5'}/>
 
-                            <div className={'IranSansMedium text-textDarker pt-5'}>ناشر - نوبت چاپ <span
-                                className={'text-tiny text-textDarker'}>اختیاری</span></div>
 
-                            <div className={'w-full grid grid-cols-5 gap-10'}>
-                                <div className={'col-span-3'}></div>
-                                <Input id={'author'} numOnly={false} wrapperClassName={'col-span-3 h-12'}
-                                       placeHolder={'اسم انتشارات'}
-                                       inputClassName={"rounded-xl"}
-                                       onChange={(e: InputEvent) => {
-                                           let el = e.currentTarget as HTMLTextAreaElement
-                                           updateBookData('publisher', el.value)
-                                       }}
-                                />
-
-                                <Input id={'author'} numOnly={true} maxLength={4}
-                                       inputClassName={'center-placeholder rounded-xl px-3 text-center'}
-                                       wrapperClassName={'col-span-2 h-12'} placeHolder={'سال'}
-                                       onChange={(e: InputEvent) => {
-                                           let el = e.currentTarget as HTMLTextAreaElement
-                                           updateBookData('publishedDate', el.value)
-                                       }}
-                                />
-                            </div>
                         </div>
-                        <div className={'w-full h-10 IranSans text-textDarker text-sm px-3 mt-3 mb-3 '}>
 
-                            برا خیلی ها مهمه که کتاب مال چه سالیه و انتشاراتش چیه
-                            <br/>
-                            اختیاریه ولی بنویسی بهتره
-                        </div>
-                        <div className={'h-32'}/>
+                        <div className={'h-40'}/>
 
                     </Step>
                     <Step step={2}>
                         <section className={'bg-white w-full px-3 pb-10'}>
-                            <div className={'IranSansMedium text-textDarker pt-5'}>نوع کتاب</div>
+                            <div className={'IranSansMedium text-textDarker pt-5'}>نوع جزوه</div>
 
                             <div
                                 className={'w-4/5 mx-auto p-0 flex flex-row mt-3 items-center justify-between overflow-hidden rounded-lg relative border border-primary h-10'}>
@@ -548,7 +521,7 @@ const NewBook = () => {
                                     <div
                                         className={'block relative mx-auto overflow-hidden flex flex-col justify-center items-center'}>
                                         <div>
-                                            کتابِ دیـجیتـال
+                                            جـزوه دیـجیتـال
                                             <span className={'text-tiny inline-block -translate-y-2 '}>
                 PDF
                 </span>
@@ -560,7 +533,7 @@ const NewBook = () => {
                                     className={`IranSansMedium transition-all h-full leading-9 ${BookData.type === 'physical' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                     onClick={() => {
                                         updateBookData('type', 'physical')
-                                    }}>کتابِ فیـزیکـی
+                                    }}>جـزوه فیـزیکـی
                                 </div>
                             </div>
                         </section>
@@ -813,7 +786,6 @@ const NewBook = () => {
 
                 <div className={'w-full bottom-2 fixed flex flex-row items-center justify-center po'}>
                     <Button
-
                         onClick={() => {
                             if (currentStep === 2) {
                                 submitBook()
@@ -858,4 +830,4 @@ const NewBook = () => {
     }
 ;
 
-export default NewBook;
+export default NewBrochure;

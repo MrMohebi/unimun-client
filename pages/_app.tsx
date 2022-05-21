@@ -8,14 +8,7 @@ import UserAuthenticationCheck from "../middlewareComponents/UserAuthenticationC
 import 'react-toastify/dist/ReactToastify.css'
 import 'tippy.js/dist/tippy.css';
 
-const Layouts = [
-    {
-        routes: ['', 'profile', 'ask', 'library', 'wallet'],
-        except: ['login', 'newBook'],
-        component: <Navbar/>
-    },
 
-]
 
 function MyApp({Component, pageProps}: AppProps) {
     const router = useRouter()
@@ -27,20 +20,9 @@ function MyApp({Component, pageProps}: AppProps) {
                     <h3 className={'IranSansMedium'}>برای استفاده از وبسایت با موبایل وارد شوید</h3>
                 </div>
                 <div className={'contents lg:hidden md:hidden '}>
-
-                    <Component {...pageProps} />
-                    {
-                        Layouts.map((ui, index) => {
-                            if (ui.routes.includes(router.pathname.split('/')[1]) && !ui.except.includes(router.pathname.split('/')[router.pathname.split('/').length - 1])
-                            ) {
-                                return (
-                                    <div key={index}>
-                                        {ui.component}
-                                    </div>
-                                )
-                            }
-                        })
-                    }
+                    <Navbar>
+                        <Component {...pageProps} />
+                    </Navbar>
                 </div>
             </UserAuthenticationCheck>
         </ApolloProvider>
