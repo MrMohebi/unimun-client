@@ -39,12 +39,18 @@ const VCodeInput = (props: Props) => {
         if (InputRef.current)
             InputRef.current.value = ''
     }
+    const focusOnInput = () => {
+        if (InputRef.current)
+            InputRef.current.focus()
+    }
 
     return (
-        <div className={'w-full relative px-3 h-28'}>
-            <div className={'h-full w-full  flex flex-row-reverse justify-around items-center'}>
+        <div className={'w-full relative px-3 h-28'} onClick={focusOnInput}>
+            <div className={'h-full w-full  flex flex-row-reverse justify-around items-center pointer-events-none'}
+                 onClick={focusOnInput}>
 
-                <Input inputRef={InputRef} autoFocus={true} id={'Vcode'} inputClassName={'user-select-none'}
+                <Input inputRef={InputRef} autoFocus={true} id={'Vcode'}
+                       inputClassName={`user-select-none ${props.err ? 'pointer-events-none' : ''}`}
                        wrapperClassName={'w-100 h-full text-tiny  absolute w-full opacity-0'} maxLength={props.length}
                        numOnly={true} onChange={(e: any) => {
                     let text = e.currentTarget.value

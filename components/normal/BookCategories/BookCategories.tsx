@@ -6,12 +6,17 @@ import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 import {useRouter} from "next/router";
 import {prop} from "styled-tools";
 import {analyze} from "@typescript-eslint/scope-manager";
+import {UserToken} from "../../../store/user";
+import SearchSVG from "../../../assets/svgs/search.svg";
+import CloseSVG from "../../../assets/svgs/close.svg";
 
 const BookCategories = (props: { onCatSelected: Function }) => {
 
-    const [tree, setTree] = useState([] as [])
+    const [tree, _tree] = useState([] as [])
     const data = useRef(null)
     const lastClicked = useRef([])
+    const [searchText, _searchText] = useState('')
+    const inputRef = useRef<HTMLInputElement>(null)
     const BookCategoriesQuery = gql`
         query bookCategories {
             bookCategories {
@@ -43,7 +48,9 @@ const BookCategories = (props: { onCatSelected: Function }) => {
                     })
                 }
             })
-            setTree(tree)
+
+            _tree(tree)
+
             return;
         }
 
@@ -58,8 +65,13 @@ const BookCategories = (props: { onCatSelected: Function }) => {
             }
 
         })
-        // @ts-ignore
-        setTree([...tree])
+        _tree([])
+
+        setTimeout(() => {
+            // @ts-ignore
+            _tree([...tree])
+        }, 50)
+
     }
 
     useEffect(() => {
@@ -68,6 +80,28 @@ const BookCategories = (props: { onCatSelected: Function }) => {
             data.current = e.data.bookCategories.data
         })
     }, [])
+
+
+    const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.currentTarget.value !== '') {
+            if (data.current) {
+                let searchedData = (data.current as []).map((item: { hasChild: boolean, title: string }) => {
+                    if (!item.hasChild && (item.title as string).includes(e.currentTarget.value)) {
+                        return item
+                    }
+                    return null
+                }).filter(item => item)
+                _tree(searchedData as [])
+            }
+        } else {
+
+            if (data.current)
+                createCategoryTree(data.current, '')
+        }
+        _searchText(e.currentTarget.value)
+
+
+    }
 
 
     const router = useRouter();
@@ -86,17 +120,68 @@ const BookCategories = (props: { onCatSelected: Function }) => {
                 }
             }}/>
 
+            <div className={'h-20 rounded-b-xl w-full bg-white px-4 pt-5'}>
+
+                <div
+                    className={`bg-background px-3 h-10 w-full flex flex-row items-center justify-between  rounded-xl  transition-all overflow-hidden duration-200 origin-top `}>
+                    <div className={'w-8 h-full  relative flex flex-col justify-center items-center p-1'}>
+                        <div
+                            className={`'overflow-hidden origin-center transition-all  duration-300 flex flex-col justify-center items-center w-full h-full '`}>
+                            <SearchSVG/>
+                        </div>
+
+                    </div>
+                    <input ref={inputRef} id={'search-input'}
+                           className={'w-full h-full bg-transparent outline-0 px-2 text-sm IranSansMedium'}
+                           placeholder={'جستجو'} type="text" onChange={onSearchInputChange}/>
+                    <div
+                        className={`w-5 h-5 flex flex-col justify-center transition-all duration-100 items-center p-0.5 ${searchText ? "scale-100" : 'scale-0'}`}
+                        onClick={() => {
+                            if (inputRef.current)
+                                inputRef.current.value = ''
+
+                            createCategoryTree(data.current as any, '')
+                            _searchText('')
+                        }}><CloseSVG/></div>
+
+                    {/*<div className={'flex flex-row items-center justify-center grayscale opacity-0'}>*/}
+                    {/*    <div className={'w-8 h-full flex flex-col justify-center items-center p-1'}><CitySVG/></div>*/}
+                    {/*    <span className={'IranSansMedium ml-2'}>همه</span>*/}
+                    {/*</div>*/}
+                </div>
+
+
+            </div>
+
+            {
+                lastClicked.current.length > 0 && searchText === '' ?
+                    <div className={'w-full IranSansMedium text-sm px-3 pt-2 text-textDark scale-95 mb-2'}>
+                        کتاب ها و جزوه هامونو تو این 3 تا دسته ی اصلی قرار دادیم تا راحت تر بتونی چیزی که میخوای رو پیدا
+                        کنی
+                    </div> : null
+            }
+
+
             {
                 getBookCategoriesResult.loading ?
-                    <LoadingDialog color={'#2aa0ff'} wrapperClassName={' w-20 h-20  mx-auto rounded-xl mt-10'}/>
-                    :
+                    <div className={'fixed top-0 left-0 w-full h-full z-50 '}
+                         style={{background: 'rgba(0,0,0,0.4)'}}>
+                        <div
+                            className={'top-1/2 left-1/2 fixed bg-white rounded-3xl shadow p-4 -translate-x-1/2 -translate-y-1/2'}>
+                            <LoadingDialog wrapperClassName={' w-16 h-16 '} color={'#009dff'}/>
+
+                        </div>
+                    </div> :
                     null
             }
+
+
             {
                 tree.map((cat: { hasChild: string, title: string, id: never }, index) => {
                     return (
                         <div key={'cat' + index}
-                             className={'w-full flex flex-col justify-start items-center pt-3'}
+                             className={'w-full flex flex-col justify-start items-center pt-3 animate__animated animate__fadeInUp '}
+                             style={{animationDelay: index * 100 + 'ms', animationDuration: '.25s'}}
                              onClick={() => {
                                  if (!cat.hasChild) {
                                      props.onCatSelected(cat)
@@ -109,7 +194,7 @@ const BookCategories = (props: { onCatSelected: Function }) => {
                                 className={'w-11/12 rounded-xl h-14 bg-white max-w-sm flex flex-row justify-between items-center px-4'}>
 
                                 <span className={'IranSansMedium'}>{cat.title}</span>
-                                <div className={`w-5 h-5 ${cat.hasChild ? '' : 'opacity-0'}`}>
+                                <div className={`w-6 h-6 ${cat.hasChild ? '' : 'opacity-0'}`}>
                                     <Back/>
                                 </div>
                             </div>

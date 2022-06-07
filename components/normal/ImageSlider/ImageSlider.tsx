@@ -63,7 +63,7 @@ const ImageSlider = (props: Props) => {
             {
                 images.map((image, index) => {
                     return (
-                        <div key={'image' + index} className={'h-32 w-32 bg-primary mx-5 mt-10 snap-center'}
+                        <div key={'image' + index} className={'h-36 w-32 bg-primary mx-5 mt-10 snap-center'}
                              ref={(el) => {
                                  if (el)
                                      bookImages.current[index] = el

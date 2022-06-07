@@ -1,10 +1,9 @@
-import React, {ChangeEvent, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
 import StepperFragment from "../../components/view/StepperFtagment/StepperFragment";
 import Step from "../../components/view/StepperFtagment/Step/Step";
 import Button from "../../components/view/Button/Button";
-import {lastAppealSubmitSuccess} from "../../store/appeals";
 import {useRouter} from "next/router";
 import Dimmer from "../../components/view/Dimmer/Dimmer";
 import GallerySVG from "../../assets/svgs/gallery.svg";
@@ -16,22 +15,18 @@ import CircularProgressBar from "../../components/view/CircularProgressBar/Circu
 import FileUploadSVG from "../../assets/svgs/fileUpload.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
 import FileSVG from "../../assets/svgs/file.svg";
-import Book from "./book/[id]";
-import {gql, useLazyQuery, useMutation} from "@apollo/client";
+import {gql, useMutation} from "@apollo/client";
 import Toman from '../../assets/svgs/toman.svg'
 import BookCategories from "../../components/normal/BookCategories/BookCategories";
 import BookAppearance from "../../components/normal/BookAppearance/BookAppearance";
-import {DOWNLOAD_HOST} from "../../LocalVariables/LocalVariables";
 import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
-import Divider from "../../components/view/Divider/Divider";
 import {isBrochure, lastBookSubmitSuccess} from "../../store/books";
-import {strict} from "assert";
-import {analyze} from "@typescript-eslint/scope-manager";
 import TelInputSVG from "../../assets/svgs/telInput.svg";
 import BoldMobile from "../../assets/svgs/boldMobile.svg";
 import RightSquareSVG from "../../assets/svgs/rightSquare.svg";
 import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
+import Semesters from "../../components/normal/Semesters/Semesters";
 
 const NewBrochure = () => {
 
@@ -66,64 +61,66 @@ const NewBrochure = () => {
                 }
             }
         `
-        const [createBook, createBookResult] = useMutation(createBookMutation)
+    const [createBook, createBookResult] = useMutation(createBookMutation)
 
 
-        const router = useRouter()
-        const [currentStep, ScurrentStep] = useState(0)
-        const [isBook, _isBook] = useState(false)
-        const [loading, Sloading] = useState(false)
-        const [dimmer, Sdimmer] = useState(false)
-        const [langDropDown, SlangDropDown] = useState(false)
-        const [uploadedImages, setUploadedImages] = useState([] as string[])
-        const [uploadingProgress, setUploadingProgress] = useState([] as number[])
-        const [loadingDialog, setLoadingDialog] = useState(false)
-        const priceInputRef = useRef(null)
-        const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
-        const [categoryComponent, _categoryComponent] = useState(false)
-        const [appearanceComponent, _appearanceComponent] = useState(false)
-        const [uploadedFile, _uploadedFile] = useState('')
-        const [fileUploadingPercentage, _fileUploadingPercentage] = useState('')
-        const [contactType, setContactType] = useState('')
-        const [contactAddress, setContactAddress] = useState('')
-        const [connectWay, setConnectWay] = useState('')
+    const router = useRouter()
+    const [currentStep, ScurrentStep] = useState(0)
+    const [isBook, _isBook] = useState(false)
+    const [loading, Sloading] = useState(false)
+    const [dimmer, Sdimmer] = useState(false)
+    const [langDropDown, SlangDropDown] = useState(false)
+    const [uploadedImages, setUploadedImages] = useState([] as string[])
+    const [uploadingProgress, setUploadingProgress] = useState([] as number[])
+    const [loadingDialog, setLoadingDialog] = useState(false)
+    const priceInputRef = useRef(null)
+    const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
+    const [categoryComponent, _categoryComponent] = useState(false)
+    const [appearanceComponent, _appearanceComponent] = useState(false)
+    const [uploadedFile, _uploadedFile] = useState('')
+    const [fileUploadingPercentage, _fileUploadingPercentage] = useState('')
+    const [contactType, setContactType] = useState('')
+    const [contactAddress, setContactAddress] = useState('')
+    const [connectWay, setConnectWay] = useState('')
+    const [showSemester, setShowSemester] = useState(false);
+    const [chosenSemester, setChosenSemester] = useState("");
 
-
-        const [BookData, setBookData] = useState({
-            type: 'physical',
-            price: '20000',
-            attachments: [],
-            files: [],
-            fileNames: []
-        } as {
-            isBook: boolean
-            title: string
-            writer: string
-            language: string
-            appearance: string
-            appearanceID: string
-            details: string
-            type: string
-            price: string
-            pages: string
-            categoryID: string
-            categoryPersian: string
-            publisher: string
-            publishedDate: string
-            files: []
-            attachments: []
-            fileNames: []
-            term: string
-        })
+    const [BookData, setBookData] = useState({
+        type: 'physical',
+        price: '20000',
+        attachments: [],
+        files: [],
+        fileNames: [],
+        term: ''
+    } as {
+        isBook: boolean
+        title: string
+        writer: string
+        language: string
+        appearance: string
+        appearanceID: string
+        details: string
+        type: string
+        price: string
+        pages: string
+        categoryID: string
+        categoryPersian: string
+        publisher: string
+        publishedDate: string
+        files: []
+        attachments: []
+        fileNames: []
+        term: string
+    })
 
 
         useEffect(() => {
-
-
             if (isBrochure()) {
                 updateBookData('isBook', false);
                 console.log(BookData)
             }
+
+            _categoryComponent(true)
         }, [])
 
 
@@ -148,9 +145,7 @@ const NewBrochure = () => {
                     }
                 } catch (e) {
                     console.log(e)
-
                 }
-                console.log(e.data.createBook.status)
             })
 
         }
@@ -192,6 +187,7 @@ const NewBrochure = () => {
             <div className={'pb-20 overflow-scroll h-full'}>
                 <ToastContainer/>
 
+
                 <Dimmer onClose={() => {
                     Sdimmer(false)
                     SlangDropDown(false)
@@ -204,6 +200,19 @@ const NewBrochure = () => {
                         router.push('/library')
 
                 }} back={true} title={'افزودن جزوه'}/>
+
+                {
+                    showSemester ?
+                        <Semesters onCatSelected={(e: string) => {
+                            setShowSemester(false)
+                            if (e.length) {
+                                setChosenSemester(e)
+                                updateBookData('term', e)
+                            }
+                        }}/>
+                        :
+                        null
+                }
 
                 {
                     categoryComponent ?
@@ -325,13 +334,15 @@ const NewBrochure = () => {
 
                             <div className={'new-divider mt-10'}></div>
                             <div
-                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
-                                <span>ترم ارائه درس <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
-                                <span onClick={() => {
-                                    // Sdimmer(true)
-                                    // SlangDropDown(true)
+                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}
+                                onClick={() => {
+                                    setShowSemester(true)
+
                                 }}
-                                      className={'text-textDark'}>{BookData.term ?? "انتخاب کنید"}</span>
+                            >
+                                <span>ترم ارائه درس <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
+                                <span dir={'ltr'}
+                                      className={'text-textDark'}>{BookData.term.length ? BookData.term : "انتخاب کنید"}</span>
                             </div>
 
                         </section>
@@ -344,24 +355,21 @@ const NewBrochure = () => {
                     </Step>
 
                     <Step step={1}>
-                        <div className={'w-full bg-white px-5 pt-3 new-section pb-5 mt-4'}>
-                            <div className={'w-full flex flex-row justify-between'}>
-                                <span className={' text-lg IranSansMedium text-primary '}>عکس</span>
-                            </div>
+                        <div className={'w-full bg-white px-5 pt-3 new-section pb-5 '}>
+
                             <div className={'flex flex-row justify-between items-center'}>
-                                <div className={'flex flex-row items-center justify-start mt-3'}>
-                                    <div className={'h-6 w-6'}>
-                                        <GallerySVG/>
-                                    </div>
-                                    <span className={'IranSans mr-2'}>عکس</span>
+                                <div className={'flex flex-row items-center justify-start mt-1'}>
+
+                                    <span className={'IranSans mr-2'}>عکس جزوه</span>
                                 </div>
 
                                 <span
                                     className={'text-primary IranSansMedium text-sm'}>{`${uploadedImages.length}/5`}</span>
                             </div>
 
+
                             <div
-                                className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-3 max-w-sm mx-auto'}>
+                                className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-1س max-w-sm mx-auto'}>
                                 <div
                                     className={'new-photo h-36 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative mt-4'}>
                                     {
@@ -459,17 +467,17 @@ const NewBrochure = () => {
                                 })}
 
                             </div>
-                            <div className={'text-sm  IranSans w-full text-center'}> لطفا چند عکس نمونه از جزوه خود به صورت
-                                عمودی و واضح قرار دهید
-                            </div>
-                            <div className={'new-divider mt-5'}/>
+
+                            <span style={{fontSize: '0.7rem'}}
+                                  className={'block w-full text-center IranSansMedium text-textDark mt-3'}>در صورت امکان عکس را به صورت عمودی و واضح قرار دهید</span>
+                            <div className={'new-divider mt-4'}/>
 
 
-                            <div className={'IranSansMedium text-textDarker pt-5'}>توضیحات <span
+                            <div className={'IranSansMedium text-textDarker pt-4'}>توضیحات <span
                                 className={'text-tiny text-textDarker'}>اختیاری</span></div>
 
                             <Input multiLine={true} id={'input'} numOnly={false}
-                                   inputClassName={'IranSans rounded-xl h-32 mt-5  border-primary border-2 py-1 px-2  w-full outline-0 '}
+                                   inputClassName={'IranSans rounded-xl h-32 mt-5  border-primary border-2  pt-2 px-3 w-full outline-0 '}
                                    wrapperClassName={''}
                                    placeHolder={'کتابِ...'}
                                    onChange={(e: InputEvent) => {
@@ -478,29 +486,28 @@ const NewBrochure = () => {
                                    }}
 
                             />
-                            <div className={'new-divider mt-5'}/>
-                            <div
-                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
-                                <span>شهر <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
-                                <span onClick={() => {
-                                    // Sdimmer(true)
-                                    // SlangDropDown(true)
-                                }}
-                                      className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
-                            </div>
-                            <div className={'new-divider mt-5'}/>
-                            <div
-                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
-                                <span>دانشگاه <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
-                                <span onClick={() => {
-                                    // Sdimmer(true)
-                                    // SlangDropDown(true)
-                                }}
-                                      className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
-                            </div>
-
-
+                            {/*<div className={'new-divider mt-5'}/>*/}
+                            {/*<div*/}
+                            {/*    className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>*/}
+                            {/*    <span>شهر <span className={'text-tiny text-textDarker'}>اختیاری</span></span>*/}
+                            {/*    <span onClick={() => {*/}
+                            {/*        // Sdimmer(true)*/}
+                            {/*        // SlangDropDown(true)*/}
+                            {/*    }}*/}
+                            {/*          className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
+                            {/*</div>*/}
+                            {/*<div className={'new-divider mt-5'}/>*/}
+                            {/*<div*/}
+                            {/*    className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>*/}
+                            {/*    <span>دانشگاه <span className={'text-tiny text-textDarker'}>اختیاری</span></span>*/}
+                            {/*    <span onClick={() => {*/}
+                            {/*        // Sdimmer(true)*/}
+                            {/*        // SlangDropDown(true)*/}
+                            {/*    }}*/}
+                            {/*          className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
+                            {/*</div>*/}
                         </div>
+
 
                         <div className={'h-40'}/>
 
@@ -677,9 +684,9 @@ const NewBrochure = () => {
 
                         <section className={'bg-white w-full px-3 pt-5 pb-5 '}>
                             <div className={'flex flex-row justify-between items-center'}>
-                                <span className={'IranSansMedium'}>تعداد صفحه</span>
+                                <span className={'IranSansMedium '}>تعداد صفحه</span>
                                 <Input id={'page-count'} numOnly={true} maxLength={5} wrapperClassName={'w-20 h-10'}
-                                       inputClassName={'center-placeholder IranSans text-center rounded-xl'}
+                                       inputClassName={' center-placeholder center-placeholder IranSans text-center rounded-xl place'}
                                        placeHolder={'تعداد'}
                                        onChange={(e: InputEvent) => {
                                            let el = e.currentTarget as HTMLTextAreaElement
@@ -706,15 +713,16 @@ const NewBrochure = () => {
                                 </div>
                             </div>
 
+
                             <div
-                                className={`${BookData.price === 'free' ? 'grayscale pointer-events-none' : ''} border-primary border-2 w-4/5 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
-                                <div className={'w-10 h-10 p-2'}>
+                                className={`${BookData.price === 'free' ? 'grayscale pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
+                                <div className={'w-10 h-10 mx-2 p-2'}>
                                     <Toman/>
                                 </div>
                                 <div className={'h-3/5 bg-gray-400 w-0 border'}/>
                                 <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'} defaultValue={'20,000'}
                                        numOnly={false}
-                                       inputClassName={'border-0 border-transparent text-left IranSansMedium rounded-xl'}
+                                       inputClassName={'border-0 border-transparent text-left text-lg IranSansBold rounded-xl'}
                                        wrapperClassName={'w-full h-full '}
                                        onChange={(e: InputEvent) => {
                                            let el = e.currentTarget as HTMLInputElement
@@ -722,6 +730,8 @@ const NewBrochure = () => {
                                        }}
                                 />
                             </div>
+
+
                         </section>
 
                         <div className={'w-full h-40 bg-white mt-4 px-4 pt-3 new-section'}>

@@ -34,7 +34,9 @@ const Index = () => {
     const [getUser, {
         data,
         loading
-    }] = useLazyQuery(gql`${getUserQuery(['id', 'name', 'created_at', 'phone', 'referenceCode','username','bio']).query}`)
+    }] = useLazyQuery(gql`${getUserQuery(['id', 'name', 'created_at', 'phone', 'referenceCode','username','bio','level','xpLevelPercentage']).query}`)
+
+
     const [progressPercentage, setProgressPercentage] = useState(0)
     const editProfButton = useRef<HTMLDivElement>(null)
     const drawerInitHeight = useState(170)
@@ -55,7 +57,9 @@ const Index = () => {
             drawerInitHeight[1]((loginRegisterBtn.current.firstChild.firstChild as HTMLDivElement).getBoundingClientRect().top + 50)
         }
         if (UserToken())
-            getUser().then()
+            getUser().then((e) => {
+                console.log(e)
+            })
     }, [])
     useEffect(() => {
 
@@ -136,12 +140,15 @@ const Index = () => {
                                         <span className={'text-textBlack IranSansBold text-sm'}>انجام شده</span>
                                     </div>
                                     <div
-                                        className={'bg-white  flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
+                                        className={'bg-white relative flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
                                         {/*<span className={'text-primary IranSansBold text-xl'}>0</span>*/}
                                         {/*<span className={'text-primary IranSansBold text-tiny'}>آگهی</span>*/}
-                                        <CircularProgressBar sqSize={60} strokeWidth={2} percentage={progressPercentage}
+                                        <CircularProgressBar sqSize={60} strokeWidth={2}
+                                                             percentage={data.user.data.xpLevelPercentage ?? 0}
                                                              color={'#1da1f2'}/>
                                         <span className={'text-textBlack IranSansBold text-sm mt-3'}>سطح</span>
+                                        <div
+                                            className={'fixed top-1/2 left-1/2 -translate-y-12 -translate-x-1/2 IranSansMedium text-primary text-xl'}>{data.user.data.level ?? 0}</div>
 
                                     </div>
                                     <div

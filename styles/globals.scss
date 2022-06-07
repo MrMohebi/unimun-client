@@ -51,6 +51,19 @@ body,
   height: 100%;
 }
 
+//hide spinners
+* {
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+}
+
 html, body {
   margin: 0;
   height: 100%;
@@ -63,6 +76,17 @@ html, body {
 
 //hide scrollbars class
 .hide-scrollbars {
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+body {
   *::-webkit-scrollbar {
     display: none;
   }

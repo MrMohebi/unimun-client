@@ -19,7 +19,6 @@ const Tab = ({children, activeIndex, indicatorAtBottom, indicatorSizeDivider}: P
 
     const moveIndicator = () => {
         let children = document.getElementById('children' + componentId.current)?.children;
-        console.log(children)
         let child = children![activeIndex].getBoundingClientRect()
         let leftOffset = 0;
         if (container.current)

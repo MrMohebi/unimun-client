@@ -20,6 +20,7 @@ interface Props {
     onBlur?: any
     inputRef?: React.Ref<any>
     placeHolder?: string
+    onClick?: Function
 }
 
 const Input = ({
@@ -37,14 +38,18 @@ const Input = ({
                    onFocus,
                    onBlur,
                    inputRef,
-                   placeHolder
+                   placeHolder,
+                   onClick
                }: Props) => {
 
 
     return (
         !multiLine ?
             <div className={wrapperClassName ?? ''}>
-                <input placeholder={placeHolder ?? ''} ref={inputRef ?? null} onBlur={onBlur} onFocus={onFocus}
+                <input placeholder={placeHolder ?? ''} onClick={(e) => {
+                    if (onClick)
+                        onClick(e)
+                }} ref={inputRef ?? null} onBlur={onBlur} onFocus={onFocus}
                        type={numOnly ? 'number' : ''}
                        defaultValue={defaultValue}
                        autoFocus={autoFocus}
@@ -62,7 +67,7 @@ const Input = ({
                                onChange(e)
                            }
                        }} dir={dir ? dir : 'rtl'} id={id}
-                       className={inputClassName + ` bg-transparent h-full w-full IranSans border-3 border-primary rounded-xl bg-pri outline-0 px-3`}/>
+                       className={inputClassName + ` bg-transparent h-full w-full IranSans border-2 border-primary rounded-xl bg-pri outline-0 px-3`}/>
                 {labelText ?
                     <label dir={'rtl'} className={'IranSans text-textDark text-sm mr-3 mt-2'}
                            htmlFor={id}>{labelText}</label>

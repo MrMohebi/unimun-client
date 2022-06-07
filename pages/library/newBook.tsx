@@ -66,14 +66,14 @@ const NewBook = () => {
             }
         }
     `
-        const [createBook, createBookResult] = useMutation(createBookMutation)
+    const [createBook, createBookResult] = useMutation(createBookMutation)
 
 
-        const router = useRouter()
-        const [currentStep, ScurrentStep] = useState(0)
-        const [isBook, _isBook] = useState(false)
-        const [loading, Sloading] = useState(false)
-        const [dimmer, Sdimmer] = useState(false)
+    const router = useRouter()
+    const [currentStep, ScurrentStep] = useState(0)
+    const [isBook, _isBook] = useState(false)
+    const [loading, Sloading] = useState(false)
+    const [dimmer, Sdimmer] = useState(false)
     const [langDropDown, SlangDropDown] = useState(false)
     const [uploadedImages, setUploadedImages] = useState([] as string[])
     const [uploadingProgress, setUploadingProgress] = useState([] as number[])
@@ -87,6 +87,9 @@ const NewBook = () => {
     const [contactType, setContactType] = useState('')
     const [contactAddress, setContactAddress] = useState('')
     const [connectWay, setConnectWay] = useState('')
+    const [langPosition, _langPosition] = useState([1000, 1000]);
+    const selectLangRef = useRef<HTMLSpanElement>(null);
+    const mainScroller = useRef<HTMLDivElement>(null);
 
 
     const [BookData, setBookData] = useState({
@@ -97,23 +100,23 @@ const NewBook = () => {
         fileNames: []
     } as {
         isBook: boolean
-            title: string
-            writer: string
-            language: string
-            appearance: string
-            appearanceID: string
-            details: string
-            type: string
-            price: string
-            pages: string
-            categoryID: string
-            categoryPersian: string
-            publisher: string
-            publishedDate: string
-            files: []
-            attachments: []
-            fileNames: []
-        })
+        title: string
+        writer: string
+        language: string
+        appearance: string
+        appearanceID: string
+        details: string
+        type: string
+        price: string
+        pages: string
+        categoryID: string
+        categoryPersian: string
+        publisher: string
+        publishedDate: string
+        files: []
+        attachments: []
+        fileNames: []
+    })
 
 
         useEffect(() => {
@@ -121,8 +124,9 @@ const NewBook = () => {
 
             if (isBrochure()) {
                 updateBookData('isBook', false);
-                console.log(BookData)
             }
+
+            _categoryComponent(true)
         }, [])
 
 
@@ -144,6 +148,8 @@ const NewBook = () => {
                     if (e.data.createBook.status === 'SUCCESS') {
                         lastBookSubmitSuccess(e.data.createBook.data.id)
                         router.push('/library')
+                    } else {
+                        Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
                     }
                 } catch (e) {
                     console.log(e)
@@ -188,7 +194,7 @@ const NewBook = () => {
         }
 
         return (
-            <div className={'pb-20 overflow-scroll h-full'}>
+            <div ref={mainScroller} className={'pb-20 overflow-scroll h-full'}>
                 <ToastContainer/>
 
                 <Dimmer onClose={() => {
@@ -201,13 +207,15 @@ const NewBook = () => {
                         ScurrentStep(currentStep - 1)
                     else
                         router.push('/library')
+                    if (mainScroller.current)
+                        mainScroller.current.scroll(0, 0)
+
 
                 }} back={true} title={'افزودن کتاب'}/>
 
                 {
                     categoryComponent ?
                         <BookCategories onCatSelected={(category: { id: string, title: string }) => {
-                            console.log(category)
                             updateBookData('categoryID', category.id)
                             updateBookData('categoryPersian', category.title)
                             _categoryComponent(false)
@@ -233,6 +241,7 @@ const NewBook = () => {
                 {
                     fileUploadingPercentage && dimmer ?
                         <div
+
                             className={'fixed top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-50 bg-white  rounded-3xl p-5'}>
                             <CircularProgressBar sqSize={100} strokeWidth={2} percentage={parseInt(fileUploadingPercentage)}
                                                  color={'#0095ff'}/>
@@ -247,7 +256,11 @@ const NewBook = () => {
 
 
                 <div
-                    className={`overflow-hidden new-book-dropdown fixed top-1/2 left-1/2 transition-all -translate-x-1/2 -translate-y-1/2  bg-white z-50 flex flex-col justify-center items-center rounded-2xl w-36 ${langDropDown ? 'opacity-100 scale-100 ' : 'opacity-0 scale-0'} `}>
+                    style={{
+                        top: langPosition[0] + 80 + 'px',
+                        left: langPosition[1] + 80 + 'px'
+                    }}
+                    className={`p-2 shadow overflow-hidden new-book-dropdown fixed  transition-all -translate-x-1/2 -translate-y-1/2  bg-white z-50 flex flex-col justify-center items-center rounded-2xl w-36 ${langDropDown ? 'opacity-100 scale-100 ' : 'opacity-0 scale-0'} `}>
                     <Button onClick={() => {
                         let updatedBookData = BookData
                         updatedBookData.language = 'persian'
@@ -300,52 +313,66 @@ const NewBook = () => {
                             لطفا نام روی جلد کتاب یا یک نام دقیق که برای جستجو مناسب باشد را وارد کنید
                         </div>
 
-                        <section className={'bg-white w-full px-3 pb-10'}>
-                            <div className={'IranSansMedium text-textDarker pt-5'}>نویسنده</div>
-                            <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
-                                   wrapperClassName={'px-3 h-14'}
-                                   placeHolder={'کی نوشته کتابو ؟'}
+                        <section className={'bg-white w-full  pb-10'}>
+                            <div className={'IranSansMedium text-textDarker pt-5 mx-3'}>نویسنده</div>
+                            <Input id={'input'} numOnly={false}
+                                   inputClassName={' h-14  mt-5 rounded-xl border-gray-300 transition-all focus:border-primary '}
+                                   wrapperClassName={'px-3 mx-3 h-14'}
+                                   placeHolder={'کی نوشته کتاب رو ؟'}
+                                   onClick={(e: any) => {
+                                       try {
+                                           e.target.parentNode.parentNode.parentNode.parentNode.parentNode.scroll(0, 1000)
+                                           console.log(e.target.parentNode.parentNode.parentNode.parentNode.parentNode)
+
+                                       } catch (e) {
+
+                                       }
+                                   }}
                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                        updateBookData('writer', e.currentTarget.value)
                                    }}
                             />
 
-                            <div className={'new-divider mt-5'}/>
+                            <div className={'new-divider mt-10'}/>
 
-                            <div
-                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
+                            <Button id={'lang-select'} rippleColor={'rgba(0,0,0,0.19)'}
+                                    onClick={() => {
+                                        // Sdimmer(true)
+                                        SlangDropDown(true)
+
+                                        if (selectLangRef.current) {
+                                            let elPosition = selectLangRef.current.getBoundingClientRect()
+                                            _langPosition([elPosition.top, elPosition.left])
+                                        }
+                                    }}
+
+                                    className={'flex overflow-y-hidden px-3 overflow-x-visible flex-row w-full  pt-5 pb-5 justify-between items-center text-textDarker IranSansMedium'}>
                                 <span>زبان <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
-                                <span onClick={() => {
-                                    Sdimmer(true)
-                                    SlangDropDown(true)
-                                }}
-                                      className={'text-textDark'}>{!BookData.language ? "انتخاب  زبان" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
-                            </div>
-                            <div className={'new-divider mt-5'}/>
-                            <div className={'IranSansMedium text-textDarker pt-5'}>مترجم <span
+                                <span ref={selectLangRef}
+                                      className={'text-textDark'}>{!BookData.language ? "انتخاب  کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
+                            </Button>
+                            <div className={'new-divider '}/>
+                            <div className={'IranSansMedium text-textDarker pt-5 mx-3'}>مترجم <span
                                 className={'text-textDark text-tiny '}>اختیاری</span></div>
                             <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
-                                   wrapperClassName={'px-3 h-14'}
+                                   wrapperClassName={'px-6 h-14'}
                                    placeHolder={'کی ترجمه کرده ؟'}/>
                         </section>
                         <div className={'w-full h-10 IranSans text-textDarker text-sm px-3 mt-3 mb-3 '}>اگه کتاب ترجمه
                             شده
                             از زبان دیگه ای هست اسم مترجمش رو بهمون بگو
                         </div>
+                        <div className={'h-20'}></div>
 
                     </Step>
 
                     <Step step={1}>
-                        <div className={'w-full bg-white px-5 pt-3 new-section pb-5 mt-4'}>
-                            <div className={'w-full flex flex-row justify-between'}>
-                                <span className={' text-lg IranSansMedium text-primary '}>عکس</span>
-                            </div>
+                        <div className={'w-full bg-white px-5 pt-3 new-section pb-5 '}>
+
                             <div className={'flex flex-row justify-between items-center'}>
-                                <div className={'flex flex-row items-center justify-start mt-3'}>
-                                    <div className={'h-6 w-6'}>
-                                        <GallerySVG/>
-                                    </div>
-                                    <span className={'IranSans mr-2'}>عکس</span>
+                                <div className={'flex flex-row items-center justify-start mt-1'}>
+
+                                    <span className={'IranSans mr-2'}>عکس کتاب</span>
                                 </div>
 
                                 <span
@@ -353,7 +380,7 @@ const NewBook = () => {
                             </div>
 
                             <div
-                                className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-3 max-w-sm mx-auto'}>
+                                className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-1 max-w-sm mx-auto'}>
                                 <div
                                     className={'new-photo h-36 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative mt-4'}>
                                     {
@@ -451,7 +478,9 @@ const NewBook = () => {
                                 })}
 
                             </div>
-                            <div className={'new-divider mt-5'}/>
+                            <span style={{fontSize: '0.7rem'}}
+                                  className={'block w-full text-center IranSansMedium text-textDark mt-3'}>در صورت امکان عکس را به صورت عمودی و واضح قرار دهید</span>
+                            <div className={'new-divider mt-4'}/>
                             <div
                                 onClick={() => {
                                     _appearanceComponent(true)
@@ -468,7 +497,7 @@ const NewBook = () => {
                                 className={'text-tiny text-textDarker'}>اختیاری</span></div>
 
                             <Input multiLine={true} id={'input'} numOnly={false}
-                                   inputClassName={'IranSans rounded-xl h-32 mt-5  border-primary border-2 py-1 px-2  w-full outline-0 '}
+                                   inputClassName={'IranSans rounded-xl h-32 mt-5  border-primary border-2 pt-2 px-3 w-full outline-0 '}
                                    wrapperClassName={''}
                                    placeHolder={'کتابِ...'}
                                    onChange={(e: InputEvent) => {
@@ -477,34 +506,33 @@ const NewBook = () => {
                                    }}
 
                             />
-                            <div className={'new-divider mt-5'}/>
-                            <div
-                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
-                                <span>شهر <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
-                                <span onClick={() => {
-                                    // Sdimmer(true)
-                                    // SlangDropDown(true)
-                                }}
-                                      className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
-                            </div>
-                            <div className={'new-divider mt-5'}/>
-                            <div
-                                className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
-                                <span>دانشگاه <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
-                                <span onClick={() => {
-                                    // Sdimmer(true)
-                                    // SlangDropDown(true)
-                                }}
-                                      className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
-                            </div>
-                            <div className={'new-divider mt-5'}/>
+                            <div className={'new-divider mt-3'}/>
+                            {/*<div*/}
+                            {/*    className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>*/}
+                            {/*    <span>شهر <span className={'text-tiny text-textDarker'}>اختیاری</span></span>*/}
+                            {/*    <span onClick={() => {*/}
+                            {/*        // Sdimmer(true)*/}
+                            {/*        // SlangDropDown(true)*/}
+                            {/*    }}*/}
+                            {/*          className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
+                            {/*</div>*/}
+                            {/*<div className={'new-divider mt-5'}/>*/}
+                            {/*<div*/}
+                            {/*    className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>*/}
+                            {/*    <span>دانشگاه <span className={'text-tiny text-textDarker'}>اختیاری</span></span>*/}
+                            {/*    <span onClick={() => {*/}
+                            {/*        // Sdimmer(true)*/}
+                            {/*        // SlangDropDown(true)*/}
+                            {/*    }}*/}
+                            {/*          className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
+                            {/*</div>*/}
+                            {/*<div className={'new-divider mt-5'}/>*/}
 
-                            <div className={'IranSansMedium text-textDarker pt-5'}>ناشر - نوبت چاپ <span
+                            <div className={'IranSansMedium text-textDarker pt-3'}>ناشر - نوبت چاپ <span
                                 className={'text-tiny text-textDarker'}>اختیاری</span></div>
 
-                            <div className={'w-full grid grid-cols-5 gap-10'}>
-                                <div className={'col-span-3'}></div>
-                                <Input id={'author'} numOnly={false} wrapperClassName={'col-span-3 h-12'}
+                            <div className={'w-full grid grid-cols-7 grid-rows-1 gap-2 mt-3'}>
+                                <Input id={'author'} numOnly={false} wrapperClassName={'col-span-5 h-12'}
                                        placeHolder={'اسم انتشارات'}
                                        inputClassName={"rounded-xl"}
                                        onChange={(e: InputEvent) => {
@@ -533,11 +561,12 @@ const NewBook = () => {
 
                     </Step>
                     <Step step={2}>
-                        <section className={'bg-white w-full px-3 pb-10'}>
+                        <section className={'bg-white w-full px-3 pb-5'}>
                             <div className={'IranSansMedium text-textDarker pt-5'}>نوع کتاب</div>
 
+
                             <div
-                                className={'w-4/5 mx-auto p-0 flex flex-row mt-3 items-center justify-between overflow-hidden rounded-lg relative border border-primary h-10'}>
+                                className={'bg-background w-4/5 mx-auto p-0 pt-1 flex flex-row mt-3 items-center justify-between overflow-hidden rounded-lg relative  border-primary h-12'}>
                                 <div
                                     className={`absolute w-1/2  top-0 h-full bg-primary transition-all ease-in-out ${BookData.type === 'physical' ? 'left-0' : 'left-1/2'}`}></div>
                                 <div
@@ -563,6 +592,7 @@ const NewBook = () => {
                                     }}>کتابِ فیـزیکـی
                                 </div>
                             </div>
+
                         </section>
                         <div className={'w-full h-10 IranSans text-textDarker text-sm px-3 mt-3 mb-3 '}>
                             تو یونیـمـون میتونین کتاب رو به صورت دیجیتال یا به صورت فیزیکی قرار بدین
@@ -570,7 +600,7 @@ const NewBook = () => {
 
 
                         <section
-                            className={`bg-white w-full  ${BookData.type !== 'pdf' ? 'h-0 overflow-hidden ' : 'px-3 pt-5 pb-5'} `}>
+                            className={`bg-white w-full transition-all  ${BookData.type !== 'pdf' ? 'h-0 overflow-hidden ' : 'px-3  pt-5 pb-5'} `}>
                             <div
                                 className={'new-file  flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
                                 <input type={"file"} className={'absolute w-full h-full top-0 left-0 opacity-0 z-10'}
@@ -588,8 +618,7 @@ const NewBook = () => {
                                                        _fileUploadingPercentage('')
                                                        if (response.data.validMimes) {
                                                            Toast("فرمت فایل معتبر نیست")
-                                                       }
-                                                       if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
+                                                       } else if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
                                                            // setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
                                                            // let updateUploadingProgress = [...uploadingProgress]
                                                            // updateUploadingProgress[uploadingProgress.length] = 0;
@@ -702,7 +731,7 @@ const NewBook = () => {
                             محدودیت آپلود برای کتاب ها 500 مگابایت است
                         </div>
 
-                        <section className={'bg-white w-full px-3 pt-5 pb-5 '}>
+                        <section className={'bg-white w-full px-3 pt-3 pb-3 '}>
                             <div className={'flex flex-row justify-between items-center'}>
                                 <span className={'IranSansMedium'}>تعداد صفحه</span>
                                 <Input id={'page-count'} numOnly={true} maxLength={5} wrapperClassName={'w-20 h-10'}
@@ -716,10 +745,11 @@ const NewBook = () => {
                             </div>
                             <div className={'new-divider mt-5'}></div>
 
-                            <div className={'flex flex-row justify-between items-center mt-5'}>
+
+                            <div className={'flex flex-row justify-between items-center mt-3'}>
                                 <span className={'IranSansMedium'}>فروش به قیمت</span>
                                 <div
-                                    className={'IranSansMedium h-10 w-20 flex flex-row justify-around items-center bg-background rounded-lg'}>
+                                    className={'IranSansMedium h-10 w-24 px-2 flex flex-row justify-around items-center bg-background rounded-lg'}>
                                     <input id={'free-book'} className={'scale-150 rounded border-2 border-primary'}
                                            type={'checkbox'} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                         if (e.currentTarget.checked)
@@ -734,14 +764,14 @@ const NewBook = () => {
                             </div>
 
                             <div
-                                className={`${BookData.price === 'free' ? 'grayscale pointer-events-none' : ''} border-primary border-2 w-4/5 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
-                                <div className={'w-10 h-10 p-2'}>
+                                className={`${BookData.price === 'free' ? 'grayscale pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
+                                <div className={'w-10 h-10 mx-2 p-2'}>
                                     <Toman/>
                                 </div>
                                 <div className={'h-3/5 bg-gray-400 w-0 border'}/>
                                 <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'} defaultValue={'20,000'}
                                        numOnly={false}
-                                       inputClassName={'border-0 border-transparent text-left IranSansMedium rounded-xl'}
+                                       inputClassName={'border-0 border-transparent text-left text-lg IranSansBold rounded-xl'}
                                        wrapperClassName={'w-full h-full '}
                                        onChange={(e: InputEvent) => {
                                            let el = e.currentTarget as HTMLInputElement
@@ -819,6 +849,8 @@ const NewBook = () => {
                                 submitBook()
                             } else {
                                 ScurrentStep(currentStep + 1)
+                                if (mainScroller.current)
+                                    mainScroller.current.scroll(0, 0)
                             }
                         }}
                         disabled={!bookVerification()}

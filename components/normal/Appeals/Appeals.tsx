@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import Eye from "../../../assets/svgCodes/Eye";
-import {gql, useLazyQuery, useReactiveVar} from "@apollo/client";
+import {gql, useLazyQuery, useMutation, useReactiveVar} from "@apollo/client";
 import Link from 'next/link'
 import {lastAppealSubmitSuccess, lastGottenAppeals} from "../../../store/appeals";
 import {getAppealsQuery} from "../../../Requests/normal/appeals";
@@ -18,6 +18,9 @@ import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 import Toast from "../Toast/Toast";
 import {lastBookSubmitSuccess} from "../../../store/books";
 
+import gsap from 'gsap'
+import loadingDialog from "../../view/LoadingDialog/LoadingDialog";
+
 
 const Appeals = () => {
     const [scrollingToBottom, setScrollingToBottom] = useState(false);
@@ -30,47 +33,97 @@ const Appeals = () => {
     const [nothingFound, setNothingFound] = useState(false);
     const [searchLoading, setSearchLoading] = useState(false);
     const [hasMore, ShasMore] = useState(true);
-    const [ta, sta] = useState(["", '', '', ''] as string[]);
     const lastScrollPosition = useRef(0);
     const scrollerRef = useRef(null);
+    const [seenTick, _seenTick] = useState(0);
+    const visibleAppealsList = useRef([] as any);
+    const [refreshLoading, _refreshLoading] = useState(false)
 
 
-    const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen', 'id'])
+    const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen', 'id', 'hashtags'])
     const [getAppeals, {
         data,
         loading,
-        error
+        error,
+        refetch
     }] = useLazyQuery(gql`${AppealsQuery.query}`);
+
+    const SeenQuery = gql`
+        mutation Seen($type: String! $list:[Seen]) {
+            seen(type: $type, list: $list) {
+                status
+                message
+                errors
+                data
+            }
+        }
+    `
+    const [seenQuery, seenQueryResult] = useMutation(SeenQuery);
 
     const lastGottenAppealsState = useReactiveVar(lastGottenAppeals)
 
 
     useEffect(() => {
-
-        // const Toast = (text:string) => {
-        //     toast.info(text, {
-        //         position: "bottom-center",
-        //         autoClose: 2000,
-        //         pauseOnHover: true,
-        //         closeButton: <div/>,
-        //         style: {
-        //             bottom: '10px',
-        //             width: '95%',
-        //             borderRadius: ' 20px',
-        //             padding: '10px',
-        //             display: 'flex',
-        //             flexFlow: 'row-reverse',
-        //             alignItems: 'center',
-        //             justifyContent: 'center',
-        //             margin: 'auto'
-        //         }
-        //     });
-        // }
         if (lastAppealSubmitSuccess().length) {
             Toast('آگهی شما ثبت شد و  در انتظار بررسی است')
             lastAppealSubmitSuccess('')
         }
+    }, [])
 
+    // check if element is in viewport
+    const isInViewport = (el: any) => {
+        const rect = el.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    }
+
+
+    useEffect(() => {
+            if (seenTick === 10) {
+
+                seenQuery({variables: {type: 'appeal', list: visibleAppealsList.current}})
+                _seenTick(0)
+
+            } else {
+                if (scrollerRef.current) {
+                    try {
+                        //
+                        // let appeals = (((scrollerRef.current as any).el as HTMLDivElement).firstChild as HTMLDivElement).firstChild!.childNodes
+                        //
+                        // appeals.forEach((appeal) => {
+                        //     if (isInViewport(appeal) && (appeal as HTMLDivElement).getAttribute('id')) {
+                        //         let appealId = "";
+                        //         visibleAppealsList.current.push(
+                        //             {
+                        //                 id: (appeal as HTMLDivElement).getAttribute('id') ?? '',
+                        //                 times: 1
+                        //             }
+                        //         )
+                        //     }
+                        // })
+
+                    } catch
+                        (e) {
+
+                    }
+                }
+
+            }
+        }
+        ,
+        [seenTick]
+    )
+
+    useEffect(() => {
+        setInterval(() => {
+            _seenTick((t: number) => {
+                return t + 1
+            })
+        }, 1000)
     }, [])
 
     useEffect(() => {
@@ -117,8 +170,6 @@ const Appeals = () => {
 
     }
     const getNewerAppeals = () => {
-        console.log(appeals)
-        console.log('getting more')
         // setReachedEndState(false)
         if (!loading && appeals.length > 19) {
             if (lastCursor != appeals[appeals.length - 1]['cursor']) {
@@ -142,14 +193,12 @@ const Appeals = () => {
 
             if (scroll > lastScrollPosition.current) {
                 setScrollingToBottom(true)
-                console.log('going down')
-            }else{
+            } else {
                 setScrollingToBottom(false)
 
             }
             lastScrollPosition.current = scroll;
-        }
-        catch (e){
+        } catch (e) {
             console.log(e)
         }
     }
@@ -207,26 +256,28 @@ const Appeals = () => {
         )
     }
 
-    const appealUI = (Appeal: any, index: number, key: string) => {
+    const appealUI = (Appeal: any, index: number, key: string, id: string, hashtags?: any) => {
         return (
             <Link key={key} passHref={true} href={`/appeals/appeal/${Appeal.id}`}>
 
-                <div key={Appeal.title + index}
+                <div id={id} key={Appeal.title + index}
                      className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
 
                     <div className={'item-left w-1/2 h-full items-start flex flex-col justify-between'}>
+
+
                         <div className={'flex-col flex text-right'}>
-                                            <span
-                                                className={'IranSansBold text-textBlack text-l pt-1 whitespace-nowrap'}>{Appeal.title}</span>
+                            <span
+                                className={'IranSansBold text-textBlack text-l pt-1 whitespace-nowrap'}>{Appeal.title}
+                            </span>
                             <div
-
-                                // style={{height:'50px', display: 'block', overflow: 'hidden', wordWrap:'break-word', textOverflow:'ellipsis'}}
-
-                                className={'IranSans text-textDarker mt-2 text-sm appeal-details'}>{Appeal.details ? Appeal.details : "بدون توضیح"}</div>
+                                className={'IranSansMedium text-textDarker mt-2 text-sm appeal-details'}>{Appeal.details ? Appeal.details : "بدون توضیح"}
+                            </div>
 
                         </div>
                         <div
-                            className={'IranSansMedium text-textBlack whitespace-nowrap text-lg  flex flex-row items-end'}>
+                            className={'IranSansMedium text-textBlack whitespace-nowrap   flex flex-row items-end'}
+                            style={{fontSize: '1.07rem'}}>
                             <span className={'mx-0.5  flex flex-row items-end'}>از</span>
                             <span className={'mx-0.5  flex flex-row items-end'}>{Appeal.priceStart / 1000}</span>
                             <span className={'mx-0.5  flex flex-row items-end'}>تا</span>
@@ -293,28 +344,51 @@ const Appeals = () => {
     }
     let searchDeb = _.debounce(searchInput, 1000)
     return (
-        <div  className={'h-full relative overflow-scroll '} onScroll={onAdSectionScroll}>
+        <div className={'h-full relative overflow-scroll '} onScroll={onAdSectionScroll}>
             <ToastContainer transition={Slide}/>
 
             <Search searchLoading={searchLoading} collapse={scrollingToBottom}
-                    onInputChange={(e) => {
+                    onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        if (e.currentTarget.value.replace(/ /g, '') === '') {
+                            setSearchedAppeals([])
+                        }
+
                         setSearchLoading(true)
                         searchDeb(e)
                     }}/>
             <NewAppealButton hidden={scrollingToBottom}/>
-            <div className={'h-full overflow-scroll pb-32 pt-32'} id={'scrollable'}>
+            <div className={'h-full overflow-scroll pb-32 pt-32'} ref={scrollerRef} id={'scrollable'}>
                 {nothingFound ?
                     <div className={'w-full flex flex-col items-center justify-center mt-44'}>
                         <span className={'IranSansMedium opacity-50'}>نتیجه ای یافت نشد</span>
                     </div> :
                     <InfiniteScroll
-                        pullDownToRefresh={true}
-                        pullDownToRefreshContent={<h1 className={'h-20'}>Hola</h1>}
-                        pullDownToRefreshThreshold={90}
+                        pullDownToRefresh={!refreshLoading && !loading}
+                        releaseToRefreshContent={<div
+                            className={'h-12 pb-4  w-full text-center IranSansMedium text-sm flex flex-col items-center justify-center'}>
+
+                            رها کنید
+                        </div>}
+                        pullDownToRefreshContent={<div
+                            className={'h-12 pb-4  w-full text-center IranSansMedium text-sm flex flex-col items-center justify-center'}>
+                            بکشید
+                        </div>}
+                        pullDownToRefreshThreshold={60}
                         refreshFunction={() => {
-                            console.log('refresh')
+                            if (!refreshLoading) {
+                                refetch()
+                                console.log('refreshed')
+                                _refreshLoading(() => {
+                                    return true
+                                })
+                                setTimeout(() => {
+                                    _refreshLoading(() => {
+                                        return false
+                                    })
+                                }, 2000)
+                            }
+
                         }}
-                        ref={scrollerRef}
                         onScroll={onAdSectionScroll}
                         next={getNewerAppeals}
                         hasMore={hasMore}
@@ -323,12 +397,21 @@ const Appeals = () => {
                             appealsSkeleton(1)
                         }
                         scrollableTarget={'scrollable'}
-                        className={''}>
+                        className={'px-3'}>
+
+                        {
+
+                            <div
+                                className={`${(refreshLoading || loading) ? 'pt-3' : 'h-0 overflow-hidden '}  duration-100 eas-in-out w-full text-center IranSansMedium text-sm h-8 flex flex-row items-center justify-center `}>
+                                دریافت آگهی ها
+                                <LoadingDialog wrapperClassName={'w-4 h-4 mr-2'} strokeWidth={4}/>
+                            </div>
+                        }
                         {
                             searchedAppeals.length ?
                                 searchedAppeals.map((ad: any, index: number) => {
                                         let Appeal = ad.node
-                                        return (appealUI(Appeal, index, index + 'i')
+                                        return (appealUI(Appeal, index, index + 'i', Appeal.id)
                                         )
                                     }
                                 )
@@ -336,24 +419,24 @@ const Appeals = () => {
                                 appeals.length && !nothingFound ?
                                     appeals.map((ad: any, index: number) => {
                                             let Appeal = ad.node
-                                            return (appealUI(Appeal, index, index + 'i1')
-                                            )
+                                        return (appealUI(Appeal, index, index + 'i1', Appeal.id)
+                                        )
                                         }
                                     )
                                     : lastGottenAppealsState ?
                                         lastGottenAppealsState.map((ad: any, index: number) => {
                                                 let Appeal = ad.node
-                                                return (appealUI(Appeal, index, index + 'i2')
+                                                return (appealUI(Appeal, index, index + 'i2', Appeal.id)
                                                 )
                                             }
                                         ) : null
 
                         }
-                        {/*{*/}
-                        {/*    loading && !appeals.length ?*/}
-                        {/*        appealsSkeleton(5)*/}
-                        {/*        : null*/}
-                        {/*}*/}
+                        {
+                            loading && !appeals.length ?
+                                appealsSkeleton(5)
+                                : null
+                        }
                     </InfiniteScroll>
                 }
                 {/*{*/}
