@@ -90,6 +90,7 @@ const NewBook = () => {
     const [langPosition, _langPosition] = useState([1000, 1000]);
     const selectLangRef = useRef<HTMLSpanElement>(null);
     const mainScroller = useRef<HTMLDivElement>(null);
+    const lastPrice = useRef("");
 
 
     const [BookData, setBookData] = useState({
@@ -119,14 +120,14 @@ const NewBook = () => {
     })
 
 
-        useEffect(() => {
+    useEffect(() => {
 
 
-            if (isBrochure()) {
-                updateBookData('isBook', false);
-            }
+        if (isBrochure()) {
+            updateBookData('isBook', false);
+        }
 
-            _categoryComponent(true)
+        _categoryComponent(true)
         }, [])
 
 
@@ -608,7 +609,8 @@ const NewBook = () => {
                                            // if (e && e.currentTarget && e.currentTarget.files)
                                            //     uploadFile(e.currentTarget.files[0])
 
-                                           if (e.currentTarget.files) {
+                                           if (e.currentTarget.files && e.currentTarget.files[0]) {
+
                                                let fileName = e.currentTarget.files[0].name
                                                Sdimmer(true)
 
@@ -671,15 +673,36 @@ const NewBook = () => {
                                     <div dir={'ltr'} className={'IranSans w-7 h-7 '}><FileUploadSVG/></div>
                                 </div>
                             </div>
+
+                            {/*<div*/}
+                            {/*    className={'new-file mt-4 flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>*/}
+                            {/*    <div className={'file w-full flex flex-row justify-between items-center my-3'}>*/}
+                            {/*        <div className={'file-right flex flex-row justify-center items-center'}>*/}
+                            {/*            <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><FileSVG/>*/}
+                            {/*            </div>*/}
+                            {/*            <div className={'IranSansMedium w-24 mr-4 opacity-60 overflow-hidden'}>*/}
+                            {/*                 <span*/}
+                            {/*                     className={'block w-full ml-0  whitespace-nowrap overflow-hidden'}>*/}
+                            {/*                    {"فایل تستی"}*/}
+
+                            {/*                 </span>*/}
+                            {/*            </div>*/}
+                            {/*        </div>*/}
+                            {/*        <div dir={'ltr'} className={'IranSans w-7 h-7 '}><DownloadFileSVG/></div>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+
                             {
                                 BookData.fileNames.map((file: { name: string }) => {
 
                                     return (
                                         <div key={file.name}
                                              className={'new-file mt-4 flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
-                                            <div className={'file w-full flex flex-row justify-between items-center my-3'}>
+                                            <div
+                                                className={'file w-full flex flex-row justify-between items-center my-3'}>
                                                 <div className={'file-right flex flex-row justify-center items-center'}>
-                                                    <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><FileSVG/>
+                                                    <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}>
+                                                        <FileSVG/>
                                                     </div>
                                                     <div className={'IranSansMedium w-24 mr-4 opacity-60 overflow-hidden'}>
 
@@ -727,7 +750,7 @@ const NewBook = () => {
                         </section>
 
                         <div
-                            className={`w-full h-10 IranSans text-textDarker text-sm  ${BookData.type !== 'pdf' ? 'h-0 hidden overflow-hidden ' : 'px-3 mt-3 mb-3'} `}>
+                            className={`w-full  IranSans text-textDarker text-sm  ${BookData.type !== 'pdf' ? 'h-0 hidden overflow-hidden ' : 'px-3 mt-3 mb-3'} `}>
                             محدودیت آپلود برای کتاب ها 500 مگابایت است
                         </div>
 
@@ -743,7 +766,7 @@ const NewBook = () => {
                                        }}
                                 />
                             </div>
-                            <div className={'new-divider mt-5'}></div>
+                            <div className={'new-divider mt-3'}></div>
 
 
                             <div className={'flex flex-row justify-between items-center mt-3'}>
@@ -752,19 +775,23 @@ const NewBook = () => {
                                     className={'IranSansMedium h-10 w-24 px-2 flex flex-row justify-around items-center bg-background rounded-lg'}>
                                     <input id={'free-book'} className={'scale-150 rounded border-2 border-primary'}
                                            type={'checkbox'} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                        if (e.currentTarget.checked)
+                                        if (e.currentTarget.checked) {
+                                            if (priceInputRef.current)
+                                                (priceInputRef.current as HTMLInputElement).value = '0'
                                             updateBookData('price', 'free')
-                                        else if (priceInputRef.current)
-                                            updateBookData('price', (priceInputRef.current as HTMLInputElement).value)
 
-
+                                        } else if (priceInputRef.current) {
+                                            (priceInputRef.current as HTMLInputElement).value = lastPrice.current
+                                            console.log(lastPrice.current)
+                                            updateBookData('price', (lastPrice.current))
+                                        }
                                     }}/>
                                     <label htmlFor={'free-book'}> رایگان</label>
                                 </div>
                             </div>
 
                             <div
-                                className={`${BookData.price === 'free' ? 'grayscale pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
+                                className={`${BookData.price === 'free' ? 'opacity-70 pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
                                 <div className={'w-10 h-10 mx-2 p-2'}>
                                     <Toman/>
                                 </div>
@@ -776,6 +803,9 @@ const NewBook = () => {
                                        onChange={(e: InputEvent) => {
                                            let el = e.currentTarget as HTMLInputElement
                                            el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
+                                           if (lastPrice.current)
+                                               lastPrice.current = el.value.toString()
+                                           console.log(lastPrice)
                                        }}
                                 />
                             </div>
@@ -783,7 +813,7 @@ const NewBook = () => {
 
                         <div className={'w-full h-40 bg-white mt-4 px-4 pt-3 new-section'}>
 
-                            <span className={'text-textDark text-md IranSansMedium  '}>اطلاعات تماس</span>
+                            <span className={'text-textBlack text-md IranSansMedium  '}>اطلاعات تماس</span>
                             <div className={'w-full flex items-center justify-center relative mt-4'}>
                                 <div
                                     className={`absolute  left-6 top-1/2 -translate-y-1/2 flex flex-col justify-center items-center w-8 h-8`}>
@@ -845,12 +875,18 @@ const NewBook = () => {
                     <Button
 
                         onClick={() => {
+                            if (mainScroller.current)
+                                mainScroller.current.scroll(0, 0)
+
                             if (currentStep === 2) {
                                 submitBook()
                             } else {
                                 ScurrentStep(currentStep + 1)
-                                if (mainScroller.current)
-                                    mainScroller.current.scroll(0, 0)
+                                setTimeout(() => {
+                                    if (mainScroller.current)
+                                        mainScroller.current.scroll(0, 0)
+                                }, 20);
+
                             }
                         }}
                         disabled={!bookVerification()}

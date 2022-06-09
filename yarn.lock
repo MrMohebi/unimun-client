@@ -3887,6 +3887,11 @@
   "resolved" "https://registry.npmjs.org/word-wrap/-/word-wrap-1.2.3.tgz"
   "version" "1.2.3"
 
+"wordifyfa@^1.4.0":
+  "integrity" "sha512-yXEpNyceMH467TfVQTRFSMoQtM9N1rDg3RcflR0wyGpPQm8LSBk4Du/GUwYd2jutF8Ej4dTQ4QHwNvcnP4dAPQ=="
+  "resolved" "https://registry.npmjs.org/wordifyfa/-/wordifyfa-1.4.0.tgz"
+  "version" "1.4.0"
+
 "wrap-ansi@^7.0.0":
   "integrity" "sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q=="
   "resolved" "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-7.0.0.tgz"

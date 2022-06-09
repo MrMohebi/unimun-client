@@ -4,9 +4,6 @@ import Back from '../../../assets/svgs/back.svg'
 import {gql, useLazyQuery} from "@apollo/client";
 import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 import {useRouter} from "next/router";
-import {prop} from "styled-tools";
-import {analyze} from "@typescript-eslint/scope-manager";
-import {UserToken} from "../../../store/user";
 import SearchSVG from "../../../assets/svgs/search.svg";
 import CloseSVG from "../../../assets/svgs/close.svg";
 
@@ -76,6 +73,7 @@ const BookCategories = (props: { onCatSelected: Function }) => {
 
     useEffect(() => {
         getBookCategories().then(e => {
+            console.log(e)
             createCategoryTree(e.data.bookCategories.data, '')
             data.current = e.data.bookCategories.data
         })
@@ -94,6 +92,8 @@ const BookCategories = (props: { onCatSelected: Function }) => {
                 _tree(searchedData as [])
             }
         } else {
+            if (lastClicked.current)
+                lastClicked.current = [];
 
             if (data.current)
                 createCategoryTree(data.current, '')
@@ -105,8 +105,10 @@ const BookCategories = (props: { onCatSelected: Function }) => {
 
 
     const router = useRouter();
+
     return (
-        <div className={'w-full h-full fixed top-0 left-0 z-40 bg-background overflow-scroll pb-10 '}>
+        <div className={'w-full pt-20 h-full fixed top-0 left-0 z-40 bg-background overflow-scroll pb-10 '}
+             id={'test-categories'}>
             <Header title={'انتخاب دسته بندی'} back={true} backOnClick={() => {
 
                 if (getBookCategoriesResult.loading || lastClicked.current.length < 1) {
@@ -120,7 +122,7 @@ const BookCategories = (props: { onCatSelected: Function }) => {
                 }
             }}/>
 
-            <div className={'h-20 rounded-b-xl w-full bg-white px-4 pt-5'}>
+            <div className={'h-20 fixed top-10 rounded-b-xl w-full  bg-white px-4 pt-5 z-50'}>
 
                 <div
                     className={`bg-background px-3 h-10 w-full flex flex-row items-center justify-between  rounded-xl  transition-all overflow-hidden duration-200 origin-top `}>
@@ -154,7 +156,7 @@ const BookCategories = (props: { onCatSelected: Function }) => {
             </div>
 
             {
-                lastClicked.current.length > 0 && searchText === '' ?
+                lastClicked.current.length === 0 && searchText === '' ?
                     <div className={'w-full IranSansMedium text-sm px-3 pt-2 text-textDark scale-95 mb-2'}>
                         کتاب ها و جزوه هامونو تو این 3 تا دسته ی اصلی قرار دادیم تا راحت تر بتونی چیزی که میخوای رو پیدا
                         کنی

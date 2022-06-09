@@ -173,6 +173,7 @@ const Index = () => {
                 after: ''
             }
         }).then((result) => {
+            console.log(result)
 
             try {
 
@@ -324,6 +325,7 @@ const Index = () => {
                                     price: number
                                     id: string
                                 }, index) => {
+
                                     return (
                                         <div key={'book' + index}
                                              onClick={() => {
@@ -347,7 +349,7 @@ const Index = () => {
 
                                                     <div
                                                         className={'IranSansMedium text-sm  whitespace-nowrap'}><span
-                                                        className={'text-textDark'}>دسته بندی: </span> {book.category.title}
+                                                        className={'text-textDark'}>دسته بندی: </span> {book.category ? book.category.title : '-'}
                                                     </div>
                                                     <div
                                                         className={'IranSansMedium text-sm  whitespace-nowrap'}><span
