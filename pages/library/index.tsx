@@ -344,7 +344,7 @@ const Index = () => {
 
                                                     <div
                                                         className={'IranSansMedium text-sm  whitespace-nowrap'}><span
-                                                        className={'text-textDark'}>نویسنده:</span> {book.appearance.writer ?? '-'}
+                                                        className={'text-textDark'}>نویسنده:</span> {book.appearance ? book.appearance.writer ?? "-" : '-'}
                                                     </div>
 
                                                     <div
