@@ -353,7 +353,7 @@ const Index = () => {
                                                     </div>
                                                     <div
                                                         className={'IranSansMedium text-sm  whitespace-nowrap'}><span
-                                                        className={'text-textDark'}>وضعیت ظاهری:</span> {book.appearance.title}
+                                                        className={'text-textDark'}>وضعیت ظاهری:</span> {book.appearance ? book.appearance.title ?? "-" : "-"}
                                                     </div>
                                                     <div
                                                         className={'IranSansMedium text-sm  whitespace-nowrap'}><span
