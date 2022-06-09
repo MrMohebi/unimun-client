@@ -326,6 +326,7 @@ const Index = () => {
                                     id: string
                                 }, index) => {
 
+
                                     return (
                                         <div key={'book' + index}
                                              onClick={() => {
@@ -423,14 +424,25 @@ const Index = () => {
                                                     </div>
                                                 </div>
 
+
                                                 <div
                                                     className={'flex flex-col ml-3 translate-y-2.5 h-full justify-end  IranSansMedium'}>
-                                                    <div className={'flex-row flex'}>
+                                                    {
+                                                        book.price && book.price.toString() !== 'free' ?
+                                                            <div className={'flex-row flex'}>
                                                           <span className={'mx-1 pb-2 '}>
-                                        {book.price ? book.price / 1000 : ""}
-                                        </span>
-                                                        <ThousandTomans/>
-                                                    </div>
+                                                                {book.price / 1000}
+                                                          </span>
+                                                                <ThousandTomans/>
+                                                            </div>
+                                                            :
+                                                            <span
+                                                                className={'pb-2 IranSansMedium text-sm'}>
+
+                                                                رایگان</span>
+
+                                                    }
+
 
                                                 </div>
 
