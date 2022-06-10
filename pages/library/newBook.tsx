@@ -1,10 +1,9 @@
-import React, {ChangeEvent, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
 import StepperFragment from "../../components/view/StepperFtagment/StepperFragment";
 import Step from "../../components/view/StepperFtagment/Step/Step";
 import Button from "../../components/view/Button/Button";
-import {lastAppealSubmitSuccess} from "../../store/appeals";
 import {useRouter} from "next/router";
 import Dimmer from "../../components/view/Dimmer/Dimmer";
 import GallerySVG from "../../assets/svgs/gallery.svg";
@@ -16,17 +15,13 @@ import CircularProgressBar from "../../components/view/CircularProgressBar/Circu
 import FileUploadSVG from "../../assets/svgs/fileUpload.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
 import FileSVG from "../../assets/svgs/file.svg";
-import Book from "./book/[id]";
-import {gql, useLazyQuery, useMutation} from "@apollo/client";
+import {gql, useMutation} from "@apollo/client";
 import Toman from '../../assets/svgs/toman.svg'
 import BookCategories from "../../components/normal/BookCategories/BookCategories";
 import BookAppearance from "../../components/normal/BookAppearance/BookAppearance";
-import {DOWNLOAD_HOST} from "../../LocalVariables/LocalVariables";
 import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
-import Divider from "../../components/view/Divider/Divider";
 import {isBrochure, lastBookSubmitSuccess} from "../../store/books";
-import {strict} from "assert";
-import {analyze} from "@typescript-eslint/scope-manager";
+import Trash from '../../assets/svgs/trash.svg'
 import TelInputSVG from "../../assets/svgs/telInput.svg";
 import BoldMobile from "../../assets/svgs/boldMobile.svg";
 import RightSquareSVG from "../../assets/svgs/rightSquare.svg";
@@ -83,7 +78,7 @@ const NewBook = () => {
     const [categoryComponent, _categoryComponent] = useState(false)
     const [appearanceComponent, _appearanceComponent] = useState(false)
     const [uploadedFile, _uploadedFile] = useState('')
-    const [fileUploadingPercentage, _fileUploadingPercentage] = useState('')
+    const [fileUploadingPercentage, _fileUploadingPercentage] = useState('0')
     const [contactType, setContactType] = useState('')
     const [contactAddress, setContactAddress] = useState('')
     const [connectWay, setConnectWay] = useState('')
@@ -91,7 +86,9 @@ const NewBook = () => {
     const selectLangRef = useRef<HTMLSpanElement>(null);
     const mainScroller = useRef<HTMLDivElement>(null);
     const lastPrice = useRef("");
-
+    const [bookUploadState, setBookUploadState] = useState('');
+    const [fileSize, setFileSize] = useState(0);
+    const [fileName, setFileName] = useState("");
 
     const [BookData, setBookData] = useState({
         type: 'physical',
@@ -128,7 +125,7 @@ const NewBook = () => {
         }
 
         _categoryComponent(true)
-        }, [])
+    }, [])
 
 
         const submitBook = () => {
@@ -604,27 +601,30 @@ const NewBook = () => {
                             className={`bg-white w-full transition-all  ${BookData.type !== 'pdf' ? 'h-0 overflow-hidden ' : 'px-3  pt-5 pb-5'} `}>
                             <div
                                 className={'new-file  flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
-                                <input type={"file"} className={'absolute w-full h-full top-0 left-0 opacity-0 z-10'}
+                                <input type={"file"}
+                                       className={`absolute w-full h-full top-0 left-0 opacity-0 z-10 ${bookUploadState === "uploaded" ? 'pointer-events-none' : ''}`}
                                        onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
                                            // if (e && e.currentTarget && e.currentTarget.files)
                                            //     uploadFile(e.currentTarget.files[0])
 
+
                                            if (e.currentTarget.files && e.currentTarget.files[0]) {
 
                                                let fileName = e.currentTarget.files[0].name
-                                               Sdimmer(true)
+                                               let fileSize = e.currentTarget.files[0].size
+
+                                               fileSize = parseFloat((fileSize / 1000000).toFixed(2))
+
+                                               setFileSize(fileSize)
+                                               setFileName(fileName)
+                                               setBookUploadState('uploading')
+
 
                                                uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId, (response: any) => {
-                                                       console.log(response)
-                                                       Sdimmer(false)
-                                                       _fileUploadingPercentage('')
+                                                       _fileUploadingPercentage('0')
                                                        if (response.data.validMimes) {
                                                            Toast("فرمت فایل معتبر نیست")
                                                        } else if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
-                                                           // setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
-                                                           // let updateUploadingProgress = [...uploadingProgress]
-                                                           // updateUploadingProgress[uploadingProgress.length] = 0;
-                                                           // setUploadingProgress(updateUploadingProgress)
                                                            let files = [];
                                                            files = BookData.files
 
@@ -637,22 +637,19 @@ const NewBook = () => {
                                                            fileNames.push(fileName)
                                                            updateBookData('files', [...files])
                                                            updateBookData('fileNames', [...fileNames])
-                                                           console.log(BookData)
                                                            removeEmptyProgresses()
+                                                           setBookUploadState('uploaded')
+
+                                                       } else {
+                                                           Toast('خطا در آپلود فایل، دوبره تلاش کنید')
+                                                           setBookUploadState('')
+
                                                        }
                                                    }, (error: any) => {
-                                                       console.log(error)
                                                        Sdimmer(false)
-
-                                                       // showError('خطا در آپلود فایل، دوبره تلاش کنید')
-
-                                                       // let updateUploadingProgress = [...uploadingProgress]
-                                                       // updateUploadingProgress[uploadingProgress.length] = 0;
-                                                       // setUploadingProgress(updateUploadingProgress)
-                                                       // removeEmptyProgresses()
+                                                       setBookUploadState('')
                                                    },
                                                    (progressEvent: any) => {
-                                                       console.log(progressEvent)
                                                        let percentCompleted = Math.round(
                                                            (progressEvent.loaded * 100) / progressEvent.total
                                                        );
@@ -663,89 +660,136 @@ const NewBook = () => {
 
                                            // e.currentTarget.value = '';
 
+
                                        }}/>
+
                                 <div className={'file w-full flex flex-row justify-between items-center my-3'}>
                                     <div className={'file-right flex flex-row justify-center items-center'}>
-                                        <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><EmptyFileSVG/>
+                                        <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}>
+                                            {!bookUploadState ?
+                                                <EmptyFileSVG/>
+                                                :
+                                                <FileSVG/>
+                                            }
                                         </div>
-                                        <div className={'IranSansMedium mr-4 opacity-60'}> افزودن فایل کتاب</div>
+                                        <div
+                                            className={'IranSansMedium mr-4 opacity-60 whitespace-nowrap '} style={{
+                                            width: '100px ',
+                                            textOverflow: `${bookUploadState ? 'ellipsis' : ''}`,
+                                            overflow: `${bookUploadState ? 'hidden' : ''}`
+                                        }}>{!bookUploadState ? ' افزودن فایل کتاب' : fileName}</div>
                                     </div>
-                                    <div dir={'ltr'} className={'IranSans w-7 h-7 '}><FileUploadSVG/></div>
+                                    <div id={'file-upload-state-holder'}
+                                         className={'flex flex-row  justify-center items-center'}>
+                                        {
+                                            bookUploadState ?
+
+                                                bookUploadState === "uploading" ?
+                                                    <div
+                                                        className={'flex flex-row-reverse justify-center items-center'}>
+                                                        <div
+                                                            className={"relative flex flex-col justify-center items-center mr-3"}>
+                                                            <CircularProgressBar sqSize={30} strokeWidth={3}
+                                                                                 percentage={parseInt(fileUploadingPercentage)}
+                                                                                 color={'#1DA1F2'}/>
+
+                                                            <span
+                                                                className={'block text-textDarker absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 IranSansMedium scale-90'}>{fileUploadingPercentage}</span>
+                                                        </div>
+                                                        {
+                                                            parseInt(fileUploadingPercentage) ?
+                                                                <span dir={'ltr'}
+                                                                      className={'IranSansMedium text-sm'}>{`${(fileSize * parseInt(fileUploadingPercentage) / 100).toFixed(2)} MB / ${fileSize} MB`}</span> :
+                                                                <span dir={'ltr'}
+                                                                      className={'IranSansMedium text-sm'}>{`0MB / ${fileSize} MB`}</span>
+
+                                                        }
+                                                    </div>
+
+                                                    :
+                                                    bookUploadState === 'uploaded' ?
+                                                        <div
+                                                            className={'flex flex-row-reverse justify-center items-center'}>
+
+                                                            <div onClick={() => {
+                                                                updateBookData('files', [])
+                                                                updateBookData('fileNames', [])
+                                                                setBookUploadState('')
+
+                                                            }} className={'w-8 h-8 mr-2 p-1 bg-background rounded'}>
+                                                                <Trash/>
+                                                            </div>
+
+
+                                                            <span dir={'ltr'}
+                                                                  className={'IranSansMedium text-sm'}>{`${fileSize} MB`}</span>
+
+
+                                                        </div>
+                                                        :
+
+                                                        null
+                                                :
+                                                <div dir={'ltr'} className={'IranSans w-7 h-7  '}><FileUploadSVG/></div>
+
+                                        }
+
+                                    </div>
                                 </div>
                             </div>
 
-                            {/*<div*/}
-                            {/*    className={'new-file mt-4 flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>*/}
-                            {/*    <div className={'file w-full flex flex-row justify-between items-center my-3'}>*/}
-                            {/*        <div className={'file-right flex flex-row justify-center items-center'}>*/}
-                            {/*            <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><FileSVG/>*/}
+                            {/*{*/}
+                            {/*    BookData.fileNames.map((file: { name: string }) => {*/}
+
+                            {/*        return (*/}
+                            {/*            <div key={file.name}*/}
+                            {/*                 className={'new-file mt-4 flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>*/}
+                            {/*                <div*/}
+                            {/*                    className={'file w-full flex flex-row justify-between items-center my-3'}>*/}
+                            {/*                    <div className={'file-right flex flex-row justify-center items-center'}>*/}
+                            {/*                        <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}>*/}
+                            {/*                            <FileSVG/>*/}
+                            {/*                        </div>*/}
+                            {/*                        <div className={'IranSansMedium w-24 mr-4 opacity-60 overflow-hidden'}>*/}
+
+                            {/*                            <span*/}
+                            {/*                                className={'block w-full ml-0  whitespace-nowrap overflow-hidden'}>*/}
+                            {/*                        {file.name}*/}
+
+                            {/*                            </span>*/}
+
+                            {/*                        </div>*/}
+                            {/*                    </div>*/}
+                            {/*                    <div dir={'ltr'} className={'IranSans w-7 h-7 '}><DownloadFileSVG/></div>*/}
+                            {/*                </div>*/}
                             {/*            </div>*/}
-                            {/*            <div className={'IranSansMedium w-24 mr-4 opacity-60 overflow-hidden'}>*/}
-                            {/*                 <span*/}
-                            {/*                     className={'block w-full ml-0  whitespace-nowrap overflow-hidden'}>*/}
-                            {/*                    {"فایل تستی"}*/}
-
-                            {/*                 </span>*/}
-                            {/*            </div>*/}
-                            {/*        </div>*/}
-                            {/*        <div dir={'ltr'} className={'IranSans w-7 h-7 '}><DownloadFileSVG/></div>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-
-                            {
-                                BookData.fileNames.map((file: { name: string }) => {
-
-                                    return (
-                                        <div key={file.name}
-                                             className={'new-file mt-4 flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
-                                            <div
-                                                className={'file w-full flex flex-row justify-between items-center my-3'}>
-                                                <div className={'file-right flex flex-row justify-center items-center'}>
-                                                    <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}>
-                                                        <FileSVG/>
-                                                    </div>
-                                                    <div className={'IranSansMedium w-24 mr-4 opacity-60 overflow-hidden'}>
-
-                <span
-                    className={'block w-full ml-0  whitespace-nowrap overflow-hidden'}>
-            {file.name}
-
-                </span>
-
-                                                    </div>
-                                                </div>
-                                                <div dir={'ltr'} className={'IranSans w-7 h-7 '}><DownloadFileSVG/></div>
-                                            </div>
-                                        </div>
 
 
+                            {/*            // <a href={DOWNLOAD_HOST + '/' + file.url} rel={'noreferrer'}*/}
+                            {/*            //    target={'_blank'} key={file.url} className={'block w-full flex flex-row-reverse justify-center border border-gray-300 max-w-sm rounded-2xl  items-center mt-4 mx-auto'}>*/}
+                            {/*            //     <div*/}
+                            {/*            //         className={'file w-full flex flex-col justify-between items-center my-3'}>*/}
+                            {/*            //         <div*/}
+                            {/*            //             className={'file-right  w-96 flex flex-row justify-center items-center'}>*/}
+                            {/*            //             <div dir={'ltr'}*/}
+                            {/*            //                  className={'h-10 w-10 m-0 overflow-hidden'}>*/}
+                            {/*            //                 <FileSVG/></div>*/}
+                            {/*            //             <div*/}
+                            {/*            //                 className={'IranSansMedium mr-2 w-20 overflow-hidden'}>{file.name}</div>*/}
+                            {/*            //             <div dir={'ltr'}*/}
+                            {/*            //                  className={'download-holder w-4 h-4 mr-2'}>*/}
+                            {/*            //                 <DownloadFileSVG/>*/}
+                            {/*            //             </div>*/}
+                            {/*            //         </div>*/}
+                            {/*            //         /!*<div dir={'ltr'} className={'IranSans'}>{"12.5 MB"}</div>*!/*/}
+                            {/*            //     </div>*/}
+                            {/*            //*/}
+                            {/*            //*/}
+                            {/*            // </a>*/}
+                            {/*        )*/}
 
-
-                                        // <a href={DOWNLOAD_HOST + '/' + file.url} rel={'noreferrer'}
-                                        //    target={'_blank'} key={file.url} className={'block w-full flex flex-row-reverse justify-center border border-gray-300 max-w-sm rounded-2xl  items-center mt-4 mx-auto'}>
-                                        //     <div
-                                        //         className={'file w-full flex flex-col justify-between items-center my-3'}>
-                                        //         <div
-                                        //             className={'file-right  w-96 flex flex-row justify-center items-center'}>
-                                        //             <div dir={'ltr'}
-                                        //                  className={'h-10 w-10 m-0 overflow-hidden'}>
-                                        //                 <FileSVG/></div>
-                                        //             <div
-                                        //                 className={'IranSansMedium mr-2 w-20 overflow-hidden'}>{file.name}</div>
-                                        //             <div dir={'ltr'}
-                                        //                  className={'download-holder w-4 h-4 mr-2'}>
-                                        //                 <DownloadFileSVG/>
-                                        //             </div>
-                                        //         </div>
-                                        //         {/*<div dir={'ltr'} className={'IranSans'}>{"12.5 MB"}</div>*/}
-                                        //     </div>
-                                        //
-                                        //
-                                        // </a>
-                                    )
-
-                                })
-                            }
+                            {/*    })*/}
+                            {/*}*/}
 
                         </section>
 
