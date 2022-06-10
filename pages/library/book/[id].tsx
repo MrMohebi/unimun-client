@@ -269,10 +269,18 @@ const Book = (props: Props) => {
                     <div className={'w-full text-lg h-full relative'}>
                         <div className={'w-full flex flex-row justify-between items-center px-3 pt-1 '}>
                             <span className={'text-md scale-90'}>قیمت</span>
-                            <div className={'flex flex-row justify-center items-start'}>
-                                <span className={'block ml-1'}>{book.price ?? ''}</span>
-                                <div className={'h-5 w-5 '}><Toman/></div>
-                            </div>
+                            {
+                                book.price ?
+                                    <div className={'flex flex-row justify-center items-start'}>
+                                        <span className={'block ml-1'}>{book.price}</span>
+                                        <div className={'h-5 w-5 '}><Toman/></div>
+                                    </div>
+                                    :
+                                    <div className={'flex flex-row justify-center items-start'}>
+                                        <span className={'block ml-1'}>{'رایگان'}</span>
+                                    </div>
+                            }
+
 
                         </div>
                         <div className={'fixed bottom-2 w-full left-1/2 -translate-x-1/2 px-2'}>
@@ -300,7 +308,15 @@ const Book = (props: Props) => {
                                             </div>
                                         </div>
                                         :
-                                        null
+                                        <div className={'w-full h-full flex flex-row justify-center items-center'}>
+                                            <div className={'flex flex-row justify-center items-center px-4'}>
+
+                                                <span
+                                                    className={'text-white block mr-3 '}
+                                                    style={{fontSize: '1rem'}}>{book.isBook ? 'کتاب رو میخوام' : 'جزوه رو میخوام'}</span>
+                                            </div>
+
+                                        </div>
                                 }
 
                             </Button>
