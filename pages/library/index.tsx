@@ -400,7 +400,7 @@ const Index = () => {
 
 
                                                     <img
-                                                        src={book.attachments ? book.attachments[0].preview : '/assets/image/noBookImage.png'}
+                                                        src={book.attachments ? `https://dl.unimun.me/${(book.attachments[0] as { url: string, preview: string }).url}` : '/assets/image/noBookImage.png'}
                                                         alt={book.title} className={'h-full w-32 rounded-xl'}/>
 
 
