@@ -30,6 +30,7 @@ const Book = (props: Props) => {
         query getBook($id:ID!){
             book(id:$id){
                 data{
+                    title
                     creator {
                         name
                         username
@@ -137,9 +138,10 @@ const Book = (props: Props) => {
                 }
 
 
-                <span className={'text-textDark IranSansMedium mx-auto block text-sm text-center mt-4'}>نویسنده</span>
                 <span
-                    className={'text-black IranSansBold mx-auto block text-center mt-2'}>{book.writer ?? 'مشخص نشده'}</span>
+                    className={'text-textDark IranSansMedium mx-auto block text-sm text-center mt-4'}>{book.writer ?? "-"}</span>
+                <span
+                    className={'text-black IranSansBold mx-auto block text-center mt-2'}>{book.title ?? '-'}</span>
 
 
                 <div className={'w-full flex flex-row justify-around items-center h-16 nt-3'}>
