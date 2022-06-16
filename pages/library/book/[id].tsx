@@ -295,7 +295,7 @@ const Book = (props: Props) => {
                         </div>
                         <div className={'fixed bottom-2 w-full left-1/2 -translate-x-1/2 px-2'}>
 
-                            <input type={'text'} ref={phoneInputRef}/>
+                            
                             <Button id={'buy-book'} className={'w-full h-12 bg-primary rounded-xl  bottom-0 '}
                                     rippleColor={'rgba(255,255,255,0.4)'}
                                     onClick={() => {
