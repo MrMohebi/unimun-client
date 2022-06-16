@@ -69,7 +69,7 @@ const ImageSlider = (props: Props) => {
                 {
                     images.map((image, index) => {
                         return (
-                            <div className={'relative contents'}>
+                            <div key={index + 'ed'} className={'relative contents'}>
                                 <img key={'image' + index} src={"https://dl.unimun.me/" + images[index]}
                                      className={`h-44 w-32 ${true ? 'h-44 w-32' : 'h-40 w-28'} overflow-hidden  rounded-xl mx-2 mt-10 snap-center`}
                                      ref={(el) => {
