@@ -15,6 +15,7 @@ import {lastGottenBooks} from "../../store/books";
 import InfiniteScroll from "react-infinite-scroll-component";
 import _ from 'lodash';
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
+import Unimun from '../../assets/svgs/unimun.svg'
 import {UserToken} from "../../store/user";
 
 const Index = () => {
@@ -333,7 +334,7 @@ const Index = () => {
                                                  // console.log(book.id)
                                                  router.push('/library/book/' + book.id)
                                              }}
-                                             className={'bg-white h-44 mt-4 grid grid-cols-2 w-full max-w-xl  rounded-2xl relative'}>
+                                             className={'bg-white h-44 mt-4 grid grid-cols-2 w-full max-w-xl mx-auto rounded-2xl relative'}>
 
                                             <div
                                                 className={'col-span-1 flex flex-col justify-start h-full items-start p-3'}>
@@ -370,7 +371,7 @@ const Index = () => {
                                                 className={'col-span-1 p-3 flex flex-row-reverse justify-between items-center'}>
 
 
-                                                <div className={' w-28 relative '}
+                                                <div className={'w-28 relative'}
                                                      style={{
                                                          minWidth: '7rem',
                                                          height: '9.5rem'
@@ -400,7 +401,7 @@ const Index = () => {
 
 
                                                     <img
-                                                        src={book.attachments ? `https://dl.unimun.me/${(book.attachments[0] as { url: string, preview: string }).url}` : '/assets/image/noBookImage.png'}
+                                                        src={book.attachments ? `https://dl.unimun.me/${(book.attachments[0] as { url: string, preview: string }).url}` : '/assets/image/noImageBook.png'}
                                                         alt={book.title} className={'h-full w-32 rounded-xl'}/>
 
 

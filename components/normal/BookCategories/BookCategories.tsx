@@ -107,7 +107,7 @@ const BookCategories = (props: { onCatSelected: Function }) => {
     const router = useRouter();
 
     return (
-        <div className={'w-full pt-20 h-full fixed top-0 left-0 z-40 bg-background overflow-scroll pb-10 '}
+        <div className={'w-full pt-20 h-full  top-0 left-0 z-40 bg-background overflow-scroll pb-10 '}
              id={'test-categories'}>
             <Header title={'انتخاب دسته بندی'} back={true} backOnClick={() => {
 
@@ -122,7 +122,7 @@ const BookCategories = (props: { onCatSelected: Function }) => {
                 }
             }}/>
 
-            <div className={'h-20 fixed top-10 rounded-b-xl w-full  bg-white px-4 pt-5 z-50'}>
+            <div className={'h-20 absolute top-10 rounded-b-xl w-full  bg-white px-4 pt-5 z-50'}>
 
                 <div
                     className={`bg-background px-3 h-10 w-full flex flex-row items-center justify-between  rounded-xl  transition-all overflow-hidden duration-200 origin-top `}>

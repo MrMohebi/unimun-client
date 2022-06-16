@@ -5,23 +5,36 @@ module.exports = {
         "./components/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
-        borderWidth: {
-            DEFAULT: '1px',
-            '0': '0',
-            '2': '2px',
-            '3': '3px',
-            '4': '4px',
-            '6': '6px',
-            '8': '8px',
-        },
+
         extend: {
+            borderWidth: {
+                DEFAULT: '1px',
+                '0': '0',
+                '2': '2px',
+                '3': '3px',
+                '4': '4px',
+                '6': '6px',
+                '8': '8px',
+            },
+            borderRadius: {
+                'mob-size': '2rem'
+            },
+
+            maxWidth: {
+                'mob-w': '19rem'
+            },
+            maxHeight: {
+                'mob-h': '40rem',
+            },
             fontSize: {
                 tiny: '0.65em'
             },
             spacing: {
                 'nav': '60px',
                 '0p': '0%',
-                'inputBorder': '3px'
+                'inputBorder': '3px',
+                'mob-round': '2rem',
+
             },
             colors: {
                 primary: '#1DA1F2',

@@ -14,6 +14,7 @@ const Navbar = (props: { children: any }) => {
     const hideInThisRoutes = ['login', 'newBook']
     const [svg, _svg] = useState(<h1>Mokafelam</h1>)
 
+
     const navbarIcons = [
         {
             name: 'بپرس',

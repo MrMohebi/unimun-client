@@ -363,7 +363,6 @@ body,
   -webkit-appearance: none;
   margin: 0;
 }
-
 * input[type=number] {
   -moz-appearance: textfield;
 }
@@ -380,7 +379,6 @@ html, body {
 .hide-scrollbars *::-webkit-scrollbar {
   display: none;
 }
-
 .hide-scrollbars * {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -389,7 +387,6 @@ html, body {
 body *::-webkit-scrollbar {
   display: none;
 }
-
 body * {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -440,6 +437,36 @@ body * {
 }
 .center-placeholder:-ms-input-placeholder {
   text-align: center;
+}
+
+.desktop {
+  background: radial-gradient(circle at top left, #8D96D9, transparent 1000px), radial-gradient(circle at top right, #B3E8FF, transparent 400px), radial-gradient(at left, #7670C4, transparent 1000px), radial-gradient(at left bottom, #7670C4, transparent 1200px), radial-gradient(at top center, #82BBF8, transparent 1200px), radial-gradient(at center, #d7cbd6, transparent 700px), radial-gradient(at bottom right, rgba(232, 146, 146, 0.5), transparent 1800px);
+}
+
+.desktop-container {
+  mask-image: url("/notch.svg"), linear-gradient(#000, #000);
+  mask-repeat: no-repeat;
+  mask-position: top center;
+  mask-composite: exclude;
+}
+
+.image-slider:after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 10%;
+  height: 100%;
+  background: linear-gradient(to right, #f4f8fa, transparent);
+}
+.image-slider:before {
+  content: "";
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 10%;
+  height: 100%;
+  background: linear-gradient(to left, #f4f8fa, transparent);
 }
 
 /*# sourceMappingURL=globals.css.map */

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import ImageSlider from "../../../components/normal/ImageSlider/ImageSlider";
 import Header from "../../../components/common/Header/Header";
 import {gql, useLazyQuery} from "@apollo/client";
@@ -16,6 +16,8 @@ import DownloadBold from "../../../assets/svgs/download-bold.svg";
 import More from "../../../assets/svgs/more.svg";
 import BookmarkBook from "../../../assets/svgs/bookmark-book.svg";
 import BackButton from "../../../assets/svgCodes/BackButton";
+import Toast from "../../../components/normal/Toast/Toast";
+import {ToastContainer} from "react-toastify";
 
 
 interface Props {
@@ -31,6 +33,8 @@ const Book = (props: Props) => {
             book(id:$id){
                 data{
                     title
+                    id
+                    connectWay
                     creator {
                         name
                         username
@@ -60,6 +64,9 @@ const Book = (props: Props) => {
                     publishedDate
                     publishedAt
                     language
+                    bookFiles {
+                        url
+                    }
                 }
             }
         }
@@ -70,6 +77,7 @@ const Book = (props: Props) => {
 
     const [book, _book] = useState({} as any);
     const [bookDetails, _bookDetails] = useState(false)
+    const phoneInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         let bookId = window.location.href.split('/')[window.location.href.split('/').length - 1]
@@ -85,9 +93,9 @@ const Book = (props: Props) => {
 
 
     return (
-        <div className={' overflow-scroll h-full'}>
+        <div className={'overflow-scroll h-full'}>
 
-
+            <ToastContainer/>
             <Dimmer show={getBookResults.loading} onClose={() => {
 
 
@@ -103,8 +111,9 @@ const Book = (props: Props) => {
             }
 
 
-            <div className={'fixed -top-1 w-full h-14 backdrop-blur  flex flex-row justify-between items-center'}
-                 style={{background: 'rgba(245,248,250,0.83)'}}>
+            <div
+                className={'absolute z-40 -top-1 w-full h-14 backdrop-blur  flex flex-row justify-between items-center'}
+                style={{background: 'rgba(245,248,250,0.83)'}}>
                 <div className={'px-1 mr-4'} onClick={() => {
                     router.push('/library')
 
@@ -123,23 +132,22 @@ const Book = (props: Props) => {
 
 
             </div>
+            {
+                book.attachments ?
+                    <ImageSlider images={book.attachments}/>
+                    : null
 
+            }
             <div className={'px-3 pt-3'}>
 
                 {/*<Header backOnClick={() => {*/}
                 {/*    router.push('/library')*/}
 
                 {/*}} back={true} title={'کتاب'}/>*/}
-                {
-                    // book.attachments ?
-                    // <ImageSlider images={book.attachments}/>
-                    // : null
-
-                }
 
 
                 <span
-                    className={'text-textDark IranSansMedium mx-auto block text-sm text-center mt-4'}>{book.writer ?? "-"}</span>
+                    className={'text-textDark IranSansMedium mx-auto block text-sm text-center mt-4'}>{book.writer ?? "نویسنده مشخص نشده"}</span>
                 <span
                     className={'text-black IranSansBold mx-auto block text-center mt-2'}>{book.title ?? '-'}</span>
 
@@ -155,7 +163,7 @@ const Book = (props: Props) => {
 
                     <div className={'flex flex-col justify-center items-center basis-0 flex-1'}>
                         <span className={'text-textDark IranSansMedium text-sm'}>تعداد صفحه</span>
-                        <span className={'text-black IranSansMedium text-md'}>{book.pages ?? "00"}</span>
+                        <span className={'text-black IranSansMedium text-md'}>{book.pages ?? "-"}</span>
                     </div>
 
 
@@ -286,8 +294,36 @@ const Book = (props: Props) => {
 
                         </div>
                         <div className={'fixed bottom-2 w-full left-1/2 -translate-x-1/2 px-2'}>
+
+                            <input type={'text'} ref={phoneInputRef}/>
                             <Button id={'buy-book'} className={'w-full h-12 bg-primary rounded-xl  bottom-0 '}
-                                    rippleColor={'rgba(255,255,255,0.4)'}>
+                                    rippleColor={'rgba(255,255,255,0.4)'}
+                                    onClick={() => {
+                                        // console.log(book.bookFiles[0].url)
+                                        if (book.isDownloadable)
+                                            window.open(book.bookFiles[0].url, '_blank')
+
+                                        if (book.isPurchasable) {
+
+                                            if (book.connectWay) {
+                                                if (book.connectWay[0] === "0") {
+                                                    let text = book.connectWay;
+                                                    navigator.clipboard.writeText(text).then(function () {
+                                                        Toast('شماره تلفن در کلیپبورد شما کپی شد');
+                                                    }, function () {
+                                                        Toast(book.connectWay);
+                                                    });
+                                                } else {
+                                                    window.open(`https://t.me/${book.connectWay.replace('@', '')}`, '_blank')
+                                                }
+                                            }
+
+                                        }
+                                        // window.open(book.bookFiles[0].url, '_blank')
+
+                                    }}
+
+                            >
 
                                 {
                                     book.isDownloadable ?

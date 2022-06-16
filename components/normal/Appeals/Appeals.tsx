@@ -38,6 +38,7 @@ const Appeals = () => {
     const [seenTick, _seenTick] = useState(0);
     const visibleAppealsList = useRef([] as any);
     const [refreshLoading, _refreshLoading] = useState(false)
+    const dragPos = useRef({top: 0, left: 0, x: 0, y: 0});
 
 
     const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen', 'id', 'hashtags'])
@@ -188,6 +189,7 @@ const Appeals = () => {
     }
 
     const onAdSectionScroll = (event: any) => {
+        console.log('ok')
         try {
             let scroll = event.target.scrollTop
 
