@@ -8,7 +8,6 @@ const httpLink = createHttpLink({
     uri: uri,
 });
 
-
 const authLink = setContext((_, {headers}) => {
     // get the authentication token from local storage if it exists
     const token = UserToken()
