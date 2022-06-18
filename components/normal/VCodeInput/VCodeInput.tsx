@@ -46,7 +46,7 @@ const VCodeInput = (props: Props) => {
 
     return (
         <div className={'w-full relative px-3 h-28'} onClick={focusOnInput}>
-            <div className={'h-full w-full  flex flex-row-reverse justify-around items-center pointer-events-none'}
+            <div className={'h-full w-full z-10 flex flex-row-reverse justify-around items-center pointer-events-none'}
                  onClick={focusOnInput}>
 
                 <Input inputRef={InputRef} autoFocus={true} id={'Vcode'}
@@ -66,7 +66,7 @@ const VCodeInput = (props: Props) => {
                     inputs.map((vInput, index) => {
                         return (
                             <div key={index}
-                                 className={`w-12 -z-10 h-16 ${err ? 'text-errorRed' : success ? 'text-primary' : 'text-textDarker'} overflow-hidden IranSansMedium flex flex-row justify-center items-center text-5xl relative`}>
+                                 className={`w-12  h-16 ${err ? 'text-errorRed' : success ? 'text-primary' : 'text-textDarker'} overflow-hidden IranSansMedium flex flex-row justify-center items-center text-5xl relative`}>
                                 <span
                                     className={`transition duration-200 ${code[index] === undefined ? 'translate-y-16' : 'translate-x-0'} `}>{code[index] ? code[index] : numbersHolder[index]}</span>
 

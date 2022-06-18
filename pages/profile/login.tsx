@@ -325,7 +325,7 @@ const Login = () => {
             <div className={'w-full px-3 flex flex-row h-10 items-center fixed bottom-4'}>
                 <div
                     className={`${currentStep === 0 ? 'w-2/3 opacity-100 px-1' : ' opacity-0 w-0p h-0p'} h-14 overflow-hidden flex flex-row items-center justify-center  text-center transition-all float-right duration-500 `}
-                    style={{fontSize: "5vmin"}}>
+                    style={{fontSize: "0.9rem"}}>
                     <span className={'IranSansMedium text-tiny'}>با ورود به <span
                         className={'text-black'}>یـونـیـمـون</span> ، <span
                         className={'text-primary'}>شـرایـط</span>  و <br/><span
