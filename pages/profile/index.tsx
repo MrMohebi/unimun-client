@@ -252,7 +252,12 @@ const Index = () => {
                                 <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                                     <div className={'profile-drawer-svg'}><MyAppealsSVG/></div>
                                     <div
-                                        className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>اگهی
+                                        className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}
+                                        onClick={() => {
+                                            // redirectTo('/profile/myAppeals');
+                                        }}
+
+                                    >آگهی
                                         های من
                                     </div>
                                 </button>

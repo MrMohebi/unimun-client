@@ -95,33 +95,36 @@ const Notifications = () => {
                 >
                     {notifications.map((notification, index) => {
 
+                        try {
+                            let notificationLocal = notification as { node: any }
+                            let node = notificationLocal.node as { created_at: string, appeal: { title: string, details: string } }
 
-                        let notificationLocal = notification as { node: any }
-                        let node = notificationLocal.node as { created_at: string, appeal: { title: string, details: string } }
-
-                        let myDateArr = node.created_at.toString().split(' ')[0].split('-')
-                        let newDate = new Date(parseInt(myDateArr[0]), parseInt(myDateArr[1]) - 1, parseInt(myDateArr[2]));
-                        let notificationPassedTime = passedTime(newDate.getTime() / 1000);
-                        if (node.appeal)
-                            return (<div key={index + 'notifications'}
-                                         className={'norif -mt-1 w-full overflow-hidden relative  flex flex-row justify-start items-start pl-3 pr-5  pb-6'}>
-                                <div
-                                    className={'h-full w-4 absolute right-1.5 top-0  flex flex-col justify-center items-center '}>
-                                    <div className={'h-full w-1 rounded bg-primary '}/>
+                            let myDateArr = node.created_at.toString().split(' ')[0].split('-')
+                            let newDate = new Date(parseInt(myDateArr[0]), parseInt(myDateArr[1]) - 1, parseInt(myDateArr[2]));
+                            let notificationPassedTime = passedTime(newDate.getTime() / 1000);
+                            if (node.appeal)
+                                return (<div key={index + 'notifications'}
+                                             className={'norif -mt-1 w-full overflow-hidden relative  flex flex-row justify-start items-start pl-3 pr-5  pb-6'}>
                                     <div
-                                        className={'w-4 h-4 absolute rounded-2xl border border-4 border-background top-2 left-1/2 bg-primary -translate-x-1/2'}/>
-                                </div>
-                                <div className={'w-full flex flex-col justify-start items-center'}>
-                                    <div className={'w-full flex flex-row justify-between pt-0.5 items-center '}>
-                                        <span className={'IranSansMedium text-md pr-2 '}>{node.appeal.title}</span>
-                                        <span
-                                            className={'IranSans text-sm pr-2 text-sm text-primary'}>{notificationPassedTime}</span>
+                                        className={'h-full w-4 absolute right-1.5 top-0  flex flex-col justify-center items-center '}>
+                                        <div className={'h-full w-1 rounded bg-primary '}/>
+                                        <div
+                                            className={'w-4 h-4 absolute rounded-2xl border border-4 border-background top-2 left-1/2 bg-primary -translate-x-1/2'}/>
                                     </div>
-                                    <p className={'px-3 pt-5 IranSansMedium text-sm text-right w-full'}>{node.appeal.details}</p>
-                                </div>
-                            </div>)
-                        else {
-                            return (null)
+                                    <div className={'w-full flex flex-col justify-start items-center'}>
+                                        <div className={'w-full flex flex-row justify-between pt-0.5 items-center '}>
+                                            <span className={'IranSansMedium text-md pr-2 '}>{node.appeal.title}</span>
+                                            <span
+                                                className={'IranSans text-sm pr-2 text-sm text-primary'}>{notificationPassedTime}</span>
+                                        </div>
+                                        <p className={'px-3 pt-5 IranSansMedium text-sm text-right w-full'}>{node.appeal.details}</p>
+                                    </div>
+                                </div>)
+                            else {
+                                return (null)
+                            }
+                        } catch (e) {
+                            console.log(e)
                         }
                     })}
                 </InfiniteScroll>
