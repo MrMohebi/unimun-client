@@ -143,12 +143,16 @@ const Index = () => {
                                         className={'bg-white relative flex flex-col justify-center items-center rounded-2xl py-4 px-6'}>
                                         {/*<span className={'text-primary IranSansBold text-xl'}>0</span>*/}
                                         {/*<span className={'text-primary IranSansBold text-tiny'}>آگهی</span>*/}
-                                        <CircularProgressBar sqSize={60} strokeWidth={2}
-                                                             percentage={data.user.data.xpLevelPercentage ?? 0}
-                                                             color={'#1da1f2'}/>
+                                        <div className={'relative '}>
+                                            <CircularProgressBar sqSize={60} strokeWidth={2}
+                                                                 percentage={data.user.data.xpLevelPercentage ?? 0}
+                                                                 color={'#1da1f2'}/>
+                                            <div
+                                                className={'absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 IranSansMedium text-primary text-xl'}>{data.user.data.level ?? 0}</div>
+                                        </div>
+
                                         <span className={'text-textBlack IranSansBold text-sm mt-3'}>سطح</span>
-                                        <div
-                                            className={'fixed top-1/2 left-1/2 -translate-y-12 -translate-x-1/2 IranSansMedium text-primary text-xl'}>{data.user.data.level ?? 0}</div>
+
 
                                     </div>
                                     <div
