@@ -147,7 +147,7 @@ const MyBooks = () => {
 
                 <InfiniteScroll pullDownToRefreshContent={<h1 className={'h-10'}></h1>}
                                 releaseToRefreshContent={<div
-                                    className={'h-10 w-full text-center IranSans text-sm '}>والا اینجا جیزی واسه رفرش
+                                    className={'h-10 w-full text-center IranSans text-sm '}>والا اینجا چیزی واسه رفرش
                                     نیست شما که از خودمونی :)</div>}
                                 className={''}
                                 pullDownToRefreshThreshold={90} refreshFunction={() => {
