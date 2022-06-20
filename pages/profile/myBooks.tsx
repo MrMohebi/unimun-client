@@ -216,7 +216,7 @@ const MyBooks = () => {
                                         </div>
                                         <div
                                             style={{fontSize: '0.7rem'}}
-                                            className={'h-8  text-center flex flex-row justify-center items-center  bg-background rounded-xl  px-2 mx-1 IranSansMedium  '}>
+                                            className={'h-8  text-center flex flex-row justify-center items-center  bg-background rounded-xl  px-2 mx-1 IranSansMedium '}>
                                             ویرایش
                                             <div className={'w-4 h-4 ml-2'}>
                                                 <Edit/>

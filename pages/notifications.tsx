@@ -87,14 +87,14 @@ const Notifications = () => {
 
             <div className={'h-full overflow-scroll pb-16 pt-2 '} id={'notif-scroller'}>
 
-
                 <InfiniteScroll
                     className={'overflow-visible'}
                     scrollableTarget={'notif-scroller'}
                     dataLength={notifications.length}
                     next={fetchNew}
                     hasMore={!scrollEnd}
-                    loader={<LoadingDialog wrapperClassName={'w-10 m-auto h-10'} color={'#1da1f2'}/>}
+                    loader={<LoadingDialog wrapperClassName={'w-10 m-auto h-10'} color={'#1da1f2'}/>
+                    }
                 >
                     {notifications.map((notification, index) => {
 

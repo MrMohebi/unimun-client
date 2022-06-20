@@ -24,16 +24,16 @@ function MyApp({Component, pageProps}: AppProps) {
             <UserAuthenticationCheck>
                 <div
 
-                    className={' overflow-hidden hide-scrollbars  lg:block md:block md:h-full md:w-full lg:w-full lg:h-full block desktop  flex flex-col items-center justify-center'}>
+                    className={' overflow-hidden hide-scrollbars lg:block md:block md:h-full md:w-full lg:w-full lg:h-full block desktop  flex flex-col items-center justify-center'}>
                     <div
 
                         id={'scaler'}
-                        className={'h-full  w-full  flex flex-col items-center justify-center fixed  top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2'}
+                        className={'h-full  w-full flex flex-col items-center justify-center fixed  top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2'}
 
 
                     >
                         <div dir={'ltr'}
-                             className={'w-full max-w-md fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'}>
+                             className={'w-full lg:max-w-mob-w lg:max-h-mob-h max-w-md fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'}>
                             <Phone/>
                             <div dir={'ltr'} className={'w-14 h-14 p-5 rounded-2xl bottom-8 absolute -ml-16 '}
                                  style={{background: 'rgba(255,255,255,0.5)'}}>
@@ -62,7 +62,7 @@ function MyApp({Component, pageProps}: AppProps) {
                                             fontSize: '0.75rem'
                                         }}>{(new Date().getHours().toString().length === 1 ? "0" + new Date().getHours() : new Date().getHours()) + ":" + (new Date().getMinutes().toString().length === 1 ? "0" + new Date().getMinutes() : new Date().getMinutes())}</span>
                                     </div>
-                                    <div className={'relative bg-background overflow-hidden h-full  '} style={{}}>
+                                    <div className={'relative bg-background overflow-hidden h-full  '}>
                                         <Component {...pageProps} />
 
                                     </div>
