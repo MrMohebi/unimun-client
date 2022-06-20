@@ -1,25 +1,20 @@
 import React, {useEffect, useRef, useState} from 'react';
 import Eye from "../../../assets/svgCodes/Eye";
-import {gql, useLazyQuery, useMutation, useReactiveVar} from "@apollo/client";
-import Link from 'next/link'
-import {lastAppealSubmitSuccess, lastGottenAppeals} from "../../../store/appeals";
+import {gql, useLazyQuery, useReactiveVar} from "@apollo/client";
+import {cameFromAppeal, lastAppealSubmitSuccess, lastGottenAppeals} from "../../../store/appeals";
 import {getAppealsQuery} from "../../../Requests/normal/appeals";
 import NewAppealButton from "../NewAppealButton/NewAppealButton";
-import ThousandTomans from '../../../assets/svgs/thousandTomans.svg'
+import ThousandTomans from '../../../assets/svgs/thousandTomans.svg';
 import Search from "../Search/Search";
 import _ from 'lodash';
 import SkeletonElement from "../../view/Skeleton/Skeleton";
 import {passedTime} from "../../../helpers/passedTime";
-import {toast, ToastContainer} from "react-toastify";
-import {cssTransition} from 'react-toastify';
-import {Slide, Zoom, Flip, Bounce} from 'react-toastify';
+import {ToastContainer} from "react-toastify";
+import {Slide} from 'react-toastify';
 import InfiniteScroll from "react-infinite-scroll-component";
 import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 import Toast from "../Toast/Toast";
-import {lastBookSubmitSuccess} from "../../../store/books";
-
-import gsap from 'gsap'
-import loadingDialog from "../../view/LoadingDialog/LoadingDialog";
+import {useRouter} from "next/router";
 
 
 const Appeals = () => {
@@ -39,7 +34,7 @@ const Appeals = () => {
     const visibleAppealsList = useRef([] as any);
     const [refreshLoading, _refreshLoading] = useState(false)
     const dragPos = useRef({top: 0, left: 0, x: 0, y: 0});
-
+    const router = useRouter();
 
     const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen', 'id', 'hashtags'])
     const [getAppeals, {
@@ -49,20 +44,8 @@ const Appeals = () => {
         refetch
     }] = useLazyQuery(gql`${AppealsQuery.query}`);
 
-    const SeenQuery = gql`
-        mutation Seen($type: String! $list:[Seen]) {
-            seen(type: $type, list: $list) {
-                status
-                message
-                errors
-                data
-            }
-        }
-    `
-    const [seenQuery, seenQueryResult] = useMutation(SeenQuery);
 
     const lastGottenAppealsState = useReactiveVar(lastGottenAppeals)
-
 
     useEffect(() => {
         if (lastAppealSubmitSuccess().length) {
@@ -83,49 +66,6 @@ const Appeals = () => {
     }
 
 
-    useEffect(() => {
-            if (seenTick === 10) {
-
-                seenQuery({variables: {type: 'appeal', list: visibleAppealsList.current}})
-                _seenTick(0)
-
-            } else {
-                if (scrollerRef.current) {
-                    try {
-                        //
-                        // let appeals = (((scrollerRef.current as any).el as HTMLDivElement).firstChild as HTMLDivElement).firstChild!.childNodes
-                        //
-                        // appeals.forEach((appeal) => {
-                        //     if (isInViewport(appeal) && (appeal as HTMLDivElement).getAttribute('id')) {
-                        //         let appealId = "";
-                        //         visibleAppealsList.current.push(
-                        //             {
-                        //                 id: (appeal as HTMLDivElement).getAttribute('id') ?? '',
-                        //                 times: 1
-                        //             }
-                        //         )
-                        //     }
-                        // })
-
-                    } catch
-                        (e) {
-
-                    }
-                }
-
-            }
-        }
-        ,
-        [seenTick]
-    )
-
-    useEffect(() => {
-        setInterval(() => {
-            _seenTick((t: number) => {
-                return t + 1
-            })
-        }, 1000)
-    }, [])
 
     useEffect(() => {
         if (!data && !loading) {
@@ -148,11 +88,6 @@ const Appeals = () => {
 
 
                 })
-        }
-
-
-        if (lastCursor) {
-
         }
 
 
@@ -260,7 +195,11 @@ const Appeals = () => {
 
     const appealUI = (Appeal: any, index: number, key: string, id: string, hashtags?: any) => {
         return (
-            <Link key={key} passHref={true} href={`/appeals/appeal/${Appeal.id}`}>
+            <div key={key} onClick={() => {
+                cameFromAppeal(true);
+                router.push(`/appeals/appeal/${Appeal.id}`)
+
+            }}>
 
                 <div id={id} key={Appeal.title + index}
                      className={'item w-full bg-white rounded-2xl h-44 flex flex-row justify-between overflow-hidden px-4 py-3 mt-4'}>
@@ -322,7 +261,7 @@ const Appeals = () => {
                     </div>
 
                 </div>
-            </Link>
+            </div>
 
         )
     }

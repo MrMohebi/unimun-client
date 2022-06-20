@@ -32,6 +32,7 @@ const MyBooks = () => {
                         attachments {
                             url
                         }
+                        status
                         isBook
                         price
                         seen
@@ -52,7 +53,6 @@ const MyBooks = () => {
 
             if (!getMyBooksData.loading) {
                 getMyBooksData.loading = true;
-                console.log('loaded')
             }
 
 
@@ -63,6 +63,7 @@ const MyBooks = () => {
                         after: null
                     }
                 }).then(e => {
+                    console.log(e)
 
                         try {
 
@@ -180,6 +181,7 @@ const MyBooks = () => {
                                 isBook: boolean
                                 title: string
                                 seen: string
+                                status: string
 
                             } = item;
                             return (
@@ -194,8 +196,7 @@ const MyBooks = () => {
                                         className={'flex flex-row-reverse justify-start items-center col-span-3 IranSansMedium'}>
                                         <span>{book.title}</span>
                                         <div
-                                            className={'IranSansMedium text-primary p-1 rounded-xl px-2 bg-background mr-3'}>فعال
-                                        </div>
+                                            className={'IranSansMedium text-primary p-1 rounded-xl px-2 bg-background mr-3'}>{book.status === "PENDING_REVIEW" ? "در حال بررسی" : ""}</div>
                                     </div>
                                     <span dir={'ltr'}
                                           className={'IranSansMedium text-sm col-span-1 text-textDark self-center flex flex-row justify-start ml-2 items-center '}><div

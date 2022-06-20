@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useRouter} from "next/router";
-import {gql, useLazyQuery} from "@apollo/client";
+import {gql, useLazyQuery, useMutation} from "@apollo/client";
 import {getAppealQuery} from "../../../Requests/normal/appeals";
 import Header from "../../../components/common/Header/Header";
 import Skeleton from "react-loading-skeleton";
@@ -19,7 +19,7 @@ import SkeletonElement from "../../../components/view/Skeleton/Skeleton";
 import Head from "next/head";
 import {DOWNLOAD_HOST} from "../../../LocalVariables/LocalVariables";
 import Button from "../../../components/view/Button/Button";
-import {lastAppealSubmitSuccess} from "../../../store/appeals";
+import {cameFromAppeal, lastAppealSubmitSuccess} from "../../../store/appeals";
 import Dialog from "../../../components/view/Dialog/Dialog";
 
 const moment = require('moment')
@@ -77,6 +77,30 @@ const Item = () => {
 
     }, [data])
 
+    // seen query
+
+    const SeenQuery = gql`
+        mutation Seen($type: String! $list:[Seen]) {
+            seen(type: $type, list: $list) {
+                status
+                message
+                errors
+                data
+            }
+        }
+    `
+    const [seenQuery, seenQueryResult] = useMutation(SeenQuery);
+
+    useEffect(() => {
+        seenQuery({
+            variables: {
+                type: 'appeal',
+                list: [{id: router.query.id, times: Math.floor(Math.random() * 5)}]
+            }
+        }).then((value) => {
+        })
+    }, [])
+
 
     return (
         <div className={'w-full h-full'}>
@@ -87,7 +111,10 @@ const Item = () => {
             </Head>
 
             <Header title={'آگهی'} back={true} backOnClick={() => {
-                window.location.replace(window.location.href.replace(window.location.pathname, ''));
+                if (cameFromAppeal())
+                    router.back()
+                else
+                    window.location.replace(window.location.href.replace(window.location.pathname, ''));
             }}>
             </Header>
 

@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import ImageSlider from "../../../components/normal/ImageSlider/ImageSlider";
 import Header from "../../../components/common/Header/Header";
-import {gql, useLazyQuery} from "@apollo/client";
+import {gql, useLazyQuery, useMutation} from "@apollo/client";
 import Button from "../../../components/view/Button/Button";
 import Toman from '../../../assets/svgs/toman.svg'
 import Downlad from '../../../assets/svgs/downloadOutline.svg'
@@ -18,6 +18,9 @@ import BookmarkBook from "../../../assets/svgs/bookmark-book.svg";
 import BackButton from "../../../assets/svgCodes/BackButton";
 import Toast from "../../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
+import {UserData, UserId} from "../../../store/user";
+import {getAndSetUserData} from "../../../helpers/GetAndSetUserData";
+import {getUserQuery} from "../../../Requests/normal/user";
 
 
 interface Props {
@@ -73,6 +76,23 @@ const Book = (props: Props) => {
 
     `
 
+    let bookConnectQuery = gql`
+        mutation bookConnect($bookId:ID!,$userId:ID!){
+            bookConnectClick(
+                bookID:$bookId
+                userID:$userId
+            )
+            {
+                status
+                message
+                data
+            }
+        }
+    `
+
+    const [bookConnectMutation, {loading, data, error}] = useMutation(bookConnectQuery)
+    const [getUser, getUserResults] = useLazyQuery(gql`${getUserQuery(['id', 'name', 'created_at', 'phone', 'referenceCode','username','bio','level','xpLevelPercentage']).query}`)
+
     const [getBook, getBookResults] = useLazyQuery(getBookQuery)
 
     const [book, _book] = useState({} as any);
@@ -80,6 +100,7 @@ const Book = (props: Props) => {
     const phoneInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
+
         let bookId = window.location.href.split('/')[window.location.href.split('/').length - 1]
         getBook({variables: {id: bookId}}).then((e) => {
             try {
@@ -89,8 +110,9 @@ const Book = (props: Props) => {
                 console.log(e)
             }
         })
-    }, [])
 
+
+    }, [])
 
     return (
         <div className={'overflow-scroll h-full'}>
@@ -295,18 +317,37 @@ const Book = (props: Props) => {
                         </div>
                         <div className={'fixed bottom-2 w-full left-1/2 -translate-x-1/2 px-2'}>
 
-                            
+
                             <Button id={'buy-book'} className={'w-full h-12 bg-primary rounded-xl  bottom-0 '}
                                     rippleColor={'rgba(255,255,255,0.4)'}
                                     onClick={() => {
+
                                         // console.log(book.bookFiles[0].url)
                                         if (book.isDownloadable)
                                             window.open(book.bookFiles[0].url, '_blank')
 
                                         if (book.isPurchasable) {
+                                            let bookId = window.location.href.split('/')[window.location.href.split('/').length - 1]
+
 
                                             if (book.connectWay) {
                                                 if (book.connectWay[0] === "0") {
+
+                                                    if (!UserId()) {
+                                                        router.push('/profile/login')
+                                                    }
+                                                    bookConnectMutation({
+                                                        variables: {
+                                                            bookId: bookId,
+                                                            userId: UserId()
+                                                        }
+                                                    }).then((value) => {
+                                                        console.log(value)
+                                                        if (value.data.bookConnectClick.status === "SUCCESS") {
+                                                            Toast('درخواست شما برای ارائه دهنده ارسال شد ');
+                                                        }
+                                                    })
+
                                                     let text = book.connectWay;
                                                     navigator.clipboard.writeText(text).then(function () {
                                                         Toast('شماره تلفن در کلیپبورد شما کپی شد');

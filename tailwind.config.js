@@ -7,6 +7,9 @@ module.exports = {
     theme: {
 
         extend: {
+            screens: {
+                "md": "500px",
+            },
             borderWidth: {
                 DEFAULT: '1px',
                 '0': '0',
@@ -21,10 +24,10 @@ module.exports = {
             },
 
             maxWidth: {
-                'mob-w': '19rem'
+                'mob-w': '22rem'
             },
             maxHeight: {
-                'mob-h': '40rem',
+                'mob-h': '46.5rem',
             },
             fontSize: {
                 tiny: '0.65em'

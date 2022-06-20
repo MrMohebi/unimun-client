@@ -5,9 +5,9 @@ import Button from "../../components/view/Button/Button";
 import VCodeInput from "../../components/normal/VCodeInput/VCodeInput";
 import {gql, useLazyQuery, useMutation} from "@apollo/client";
 import {useRouter} from "next/router";
-import {UserToken} from "../../store/user";
+import {UserData, UserToken} from "../../store/user";
 import {isReferenceCodeValid, SendVCodeQuery, VerifyVCode} from "../../Requests/normal/login";
-import {setToken} from "../../helpers/TokenHelper";
+import {setId, setToken} from "../../helpers/TokenHelper";
 import Promoter from "../../assets/svgs/postbox.svg";
 import {updateUser} from "../../Requests/withAuthentication/user";
 import {currentNavActiveIndex} from "../../store/navbar";
@@ -116,11 +116,25 @@ const Login = () => {
             }
         }
         if (verifyVCodeResult.data) {
+
+            console.log(verifyVCodeResult.data.verifyVCode.data.id)
+
+            try {
+                console.log(verifyVCodeResult.data.verifyVCode.data.id)
+                let userData = UserData()
+                // userData.id = verifyVCodeResult.data.verifyVCode.data.id
+                UserData(verifyVCodeResult.data.verifyVCode.data)
+                console.log(UserData())
+
+            } catch (e) {
+
+            }
             if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && sendVCodeResult.data.sendVCode.data.isSignup) {
                 setStep(3)
                 setAllowForNextStep(false)
                 UserToken(verifyVCodeResult.data.verifyVCode.data.token)
                 setToken(verifyVCodeResult.data.verifyVCode.data.token)
+                setId(verifyVCodeResult.data.verifyVCode.data.id)
                 verifyVCodeResult.reset()
             }
             if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && !sendVCodeResult.data.sendVCode.data.isSignup) {
@@ -128,6 +142,7 @@ const Login = () => {
                 setTimeout(() => {
                     UserToken(verifyVCodeResult.data.verifyVCode.data.token)
                     setToken(verifyVCodeResult.data.verifyVCode.data.token)
+                    setId(verifyVCodeResult.data.verifyVCode.data.id)
                     router.push('/').then(() => {
                         currentNavActiveIndex(2)
                     })

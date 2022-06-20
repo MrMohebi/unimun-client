@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {getToken, setToken} from "../helpers/TokenHelper";
-import {UserToken} from "../store/user";
+import {getId, getToken, setId, setToken} from "../helpers/TokenHelper";
+import {UserId, UserToken} from "../store/user";
 
 const UserAuthenticationCheck = ({children}: any) => {
 
@@ -12,6 +12,12 @@ const UserAuthenticationCheck = ({children}: any) => {
         }
         if (getToken().length) {
             UserToken(getToken())
+        }
+        if (UserId()) {
+            setId(UserId())
+        }
+        if (getId().length) {
+            UserId(getId())
         }
     })
     return (
