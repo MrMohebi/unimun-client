@@ -231,6 +231,7 @@ const NewBook = () => {
 
         if (editing) {
 
+            
             updateBook({
                 variables: {
                     id: BookData.id,
