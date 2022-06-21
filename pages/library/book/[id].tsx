@@ -342,7 +342,6 @@ const Book = (props: Props) => {
                                                             userId: UserId()
                                                         }
                                                     }).then((value) => {
-                                                        console.log(value)
                                                         if (value.data.bookConnectClick.status === "SUCCESS") {
                                                             Toast('درخواست شما برای ارائه دهنده ارسال شد ');
                                                         }

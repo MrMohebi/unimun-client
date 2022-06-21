@@ -24,10 +24,13 @@ module.exports = {
             },
 
             maxWidth: {
-                'mob-w': '22rem'
+                'mob-w': '25rem',
+                'mob-cont-w': '20rem'
+
             },
             maxHeight: {
-                'mob-h': '46.5rem',
+                'mob-h': '45rem',
+                'mob-cont-h': '41.5rem'
             },
             fontSize: {
                 tiny: '0.65em'

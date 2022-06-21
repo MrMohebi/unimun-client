@@ -39,8 +39,10 @@ const Index = () => {
                     node {
                         title
                         writer
+                        status
                         id
                         details
+                        isBook
                         price
                         category {
                             title
@@ -56,7 +58,6 @@ const Index = () => {
                         bookFiles {
                             url
                         }
-
                     }
                 }
             }
@@ -289,7 +290,6 @@ const Index = () => {
                                 })
                             }}
                             next={() => {
-                                console.log('getting new')
                                 getNewBooks()
                             }}
                             hasMore={hasMore}
@@ -302,7 +302,6 @@ const Index = () => {
                             }
                             scrollableTarget={'scroller-library'}
                             className={' px-3 book-scroller'}>
-
                             {
 
                                 <div
@@ -320,6 +319,8 @@ const Index = () => {
                                         title: string
                                         writer: string
                                     }
+                                    isBook: boolean
+                                    status: string
                                     publisher: string
                                     isDownloadable: boolean
                                     attachments: [{ preview: string }]
@@ -327,129 +328,138 @@ const Index = () => {
                                     id: string
                                 }, index) => {
 
+                                    if (book.status === 'DELETED')
+                                        return null
+                                    else
+                                        return (
+                                            <div key={'book' + index}
+                                                 onClick={() => {
+                                                     // console.log(book.id)
+                                                     router.push('/library/book/' + book.id)
+                                                 }}
+                                                 className={'bg-white h-44 mt-4 grid grid-cols-2 w-full max-w-xl mx-auto rounded-2xl relative'}>
 
-                                    return (
-                                        <div key={'book' + index}
-                                             onClick={() => {
-                                                 // console.log(book.id)
-                                                 router.push('/library/book/' + book.id)
-                                             }}
-                                             className={'bg-white h-44 mt-4 grid grid-cols-2 w-full max-w-xl mx-auto rounded-2xl relative'}>
-
-                                            <div
-                                                className={'col-span-1 flex flex-col justify-start h-full items-start p-3'}>
+                                                <div
+                                                    className={'col-span-1 flex flex-col justify-start h-full items-start p-3'}>
                                                 <span className={'IranSansBold '}
-                                                      style={{fontSize: '0.95rem'}}>{book.title}</span>
-
-                                                <div
-                                                    className={'flex flex-col justify-between mt-2 h-full items-start'}>
+                                                      style={{fontSize: '0.95rem'}}>{book.isBook ? " کتاب " : " جزوه "}{book.title}</span>
 
                                                     <div
-                                                        className={'IranSansMedium text-sm  whitespace-nowrap'}><span
-                                                        className={'text-textDark'}>نویسنده:</span> {book.appearance ? book.appearance.writer ?? "-" : '-'}
-                                                    </div>
+                                                        className={'flex flex-col justify-between mt-2 h-full items-start'}>
 
-                                                    <div
-                                                        className={'IranSansMedium text-sm  whitespace-nowrap'}><span
-                                                        className={'text-textDark'}>دسته بندی: </span> {book.category ? book.category.title : '-'}
-                                                    </div>
-                                                    <div
-                                                        className={'IranSansMedium text-sm  whitespace-nowrap'}><span
-                                                        className={'text-textDark'}>وضعیت ظاهری:</span> {book.appearance ? book.appearance.title ?? "-" : "-"}
-                                                    </div>
-                                                    <div
-                                                        className={'IranSansMedium text-sm  whitespace-nowrap'}><span
-                                                        className={'text-textDark'}>اراعه دهنده:</span> {book.publisher ?? '-'}
-                                                    </div>
-
-
-                                                </div>
-
-
-                                            </div>
-                                            <div
-                                                className={'col-span-1 p-3 flex flex-row-reverse justify-between items-center'}>
-
-
-                                                <div className={'w-28 relative'}
-                                                     style={{
-                                                         minWidth: '7rem',
-                                                         height: '9.5rem'
-                                                     }}>
-
-                                                    {book.isDownloadable ?
                                                         <div
-                                                            className={'  w-11/12   flex flex-row h-7 justify-between items-center absolute  left-1/2 -translate-x-1/2 py-1 rounded-lg px-2 '}
-                                                            style={{
-                                                                bottom: '0.4rem',
-                                                                background: 'rgba(83,82,85,0.61)'
-                                                            }}>
-
-                                                            <div dir={'ltr'} className={'IranSans w-3 h-3 '}>
-                                                                <DownloadOutline/>
-                                                            </div>
-                                                            <span
-                                                                className={'text-white whitespace-nowrap text-tiny IranSans'}>قـابـل دانـلـود</span>
-                                                            <div dir={'ltr'}
-                                                                 className={'IranSans w-1 h-3 opacity-0 '}>
-                                                                <DownloadOutline/>
-                                                            </div>
+                                                            className={'IranSansMedium text-sm  whitespace-nowrap'}><span
+                                                            className={'text-textDark'}>نویسنده:</span> {book.appearance ? book.appearance.writer ?? "-" : '-'}
                                                         </div>
-                                                        :
-                                                        null
-                                                    }
+
+                                                        <div
+                                                            className={'IranSansMedium text-sm  whitespace-nowrap'}><span
+                                                            className={'text-textDark'}>دسته بندی: </span> {book.category ? book.category.title : '-'}
+                                                        </div>
+                                                        <div style={{}}
+                                                             className={'IranSansMedium flex flex-row items-center text-sm  whitespace-nowrap'}>
+                                                            <span
+                                                                className={'text-textDark'}>
+                                                                وضعیت ظاهری:</span>
+                                                            <span
+                                                                className={'overflow-hidden text-ellipsis w-4/12 inline-block mr-1'}>
+                                                                                                                            {book.appearance ? book.appearance.title ?? "-" : "-"}
+
+                                                            </span>
+                                                        </div>
+                                                        <div
+                                                            className={'IranSansMedium text-sm  whitespace-nowrap'}><span
+                                                            className={'text-textDark'}>ارائه دهنده:</span> {book.publisher ?? '-'}
+                                                        </div>
 
 
-                                                    <img
-                                                        src={book.attachments ? `https://dl.unimun.me/${(book.attachments[0] as { url: string, preview: string }).url}` : '/assets/image/noImageBook.png'}
-                                                        alt={book.title} className={'h-full w-32 rounded-xl'}/>
-
-
-                                                    <div dir={'ltr'}
-                                                         className={'absolute left-2 top-2 p-2  rounded-xl p-1 '}
-                                                         style={{
-                                                             background: 'rgba(83,82,85,0.61)'
-                                                         }}>
-                                                        {
-                                                            book.attachments ?
-                                                                <div className={'invert'}>
-                                                                    <SVGModifier SVGName={'galleryImage'}
-                                                                                 elementClass={'number'}
-                                                                                 value={book.attachments.length.toString()}>
-                                                                        <GalleryImageSVG/>
-                                                                    </SVGModifier>
-                                                                </div>
-
-                                                                : null
-                                                        }
                                                     </div>
+
+
                                                 </div>
-
-
                                                 <div
-                                                    className={'flex flex-col ml-3 translate-y-2.5 h-full justify-end  IranSansMedium'}>
-                                                    {
-                                                        book.price && book.price.toString() !== 'free' ?
-                                                            <div className={'flex-row flex'}>
+                                                    className={'col-span-1 p-3 flex flex-row-reverse justify-between items-center'}>
+
+
+                                                    <div className={'w-28 relative'}
+                                                         style={{
+                                                             minWidth: '7rem',
+                                                             height: '9.5rem'
+                                                         }}>
+
+                                                        {book.isDownloadable ?
+                                                            <div
+                                                                className={'  w-11/12   flex flex-row h-7 justify-between items-center absolute  left-1/2 -translate-x-1/2 py-1 rounded-lg px-2 '}
+                                                                style={{
+                                                                    bottom: '0.4rem',
+                                                                    background: 'rgba(83,82,85,0.61)'
+                                                                }}>
+
+                                                                <div dir={'ltr'} className={'IranSans w-3 h-3 '}>
+                                                                    <DownloadOutline/>
+                                                                </div>
+                                                                <span
+                                                                    className={'text-white whitespace-nowrap text-tiny IranSans'}>قـابـل دانـلـود</span>
+                                                                <div dir={'ltr'}
+                                                                     className={'IranSans w-1 h-3 opacity-0 '}>
+                                                                    <DownloadOutline/>
+                                                                </div>
+                                                            </div>
+                                                            :
+                                                            null
+                                                        }
+
+
+                                                        <img
+                                                            src={book.attachments && book.attachments.length ? `https://dl.unimun.me/${(book.attachments[0] as { url: string, preview: string }).url}` : '/assets/image/noImageBook.png'}
+                                                            alt={book.title} className={'h-full w-32 rounded-xl'}/>
+
+
+                                                        <div dir={'ltr'}
+                                                             className={'absolute left-2 top-2 p-2  rounded-xl p-1 '}
+                                                             style={{
+                                                                 background: 'rgba(83,82,85,0.61)'
+                                                             }}>
+                                                            {
+                                                                book.attachments ?
+                                                                    <div className={'invert'}>
+                                                                        <SVGModifier SVGName={'galleryImage'}
+                                                                                     elementClass={'number'}
+                                                                                     value={book.attachments.length.toString()}>
+                                                                            <GalleryImageSVG/>
+                                                                        </SVGModifier>
+                                                                    </div>
+
+                                                                    : null
+                                                            }
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div
+                                                        className={'flex flex-col ml-3 translate-y-2.5 h-full justify-end  IranSansMedium'}>
+                                                        {
+                                                            book.price && book.price.toString() !== 'free' ?
+                                                                <div className={'flex-row flex'}>
                                                           <span className={'mx-1 pb-2 '}>
                                                                 {book.price / 1000}
                                                           </span>
-                                                                <ThousandTomans/>
-                                                            </div>
-                                                            :
-                                                            <span
-                                                                className={'pb-2 IranSansMedium text-sm'}>
+                                                                    <ThousandTomans/>
+                                                                </div>
+                                                                :
+                                                                <span
+                                                                    className={'pb-2 IranSansMedium text-sm'}>
 
                                                                 رایگان</span>
 
-                                                    }
+                                                        }
 
+
+                                                    </div>
 
                                                 </div>
-
                                             </div>
-                                        </div>
-                                    )
+                                        )
                                 })
                             }
 

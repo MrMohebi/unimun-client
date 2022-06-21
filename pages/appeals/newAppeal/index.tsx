@@ -188,24 +188,24 @@ const Index = () => {
                                 <div
                                     className={`h-full text-primary text-sm IranSans absolute w-full flex flex-col justify-center items-center ${30 - title.length > 21 ? 'scale-0' : 'scale-100'} transition-all duration-300 ease-in-out`}
                                     style={{
-                                        color: 30 - title.length > 21 ? '#4eb3f1' : 30 - title.length > 5 ? '#FF8800' : '#ff3333'
+                                        color: title.length < 21 ? '#4eb3f1' : title.length < 5 ? '#FF8800' : '#ff3333'
                                     }}>
-                                    {30 - title.length}
+                                    {40 - title.length}
                                 </div>
 
                                 <CircularProgressBar emptyColor={'#f6f8fa'} sqSize={25}
-                                                     strokeWidth={30 - title.length > 21 ? 4 : 3}
+                                                     strokeWidth={40 - title.length > 21 ? 4 : 3}
                                                      percentage={titleLimit}
-                                                     color={30 - title.length > 21 ? '#4eb3f1' : 30 - title.length > 5 ? '#FF8800' : '#ff3333'}/>
+                                                     color={40 - title.length > 21 ? '#4eb3f1' : 40 - title.length > 5 ? '#FF8800' : '#ff3333'}/>
                             </div>
                             <span className={'text-textDark text-md IranSansMedium  '}>عنوان آگهی</span>
                             <div className={'w-full flex items-center justify-center relative mt-4'}>
-                                <Input placeHolder={'عنوان'} maxLength={30} id={'title'} numOnly={false}
+                                <Input placeHolder={'عنوان'} maxLength={40} id={'title'} numOnly={false}
                                        wrapperClassName={'w-11/12 h-14'}
                                        onChange={(e: any) => {
-                                           e.currentTarget.value = e.currentTarget.value.slice(0, 30)
+                                           e.currentTarget.value = e.currentTarget.value.slice(0, 40)
                                            setTitle(e.currentTarget.value)
-                                           setTitleLimit(Math.floor((e.currentTarget.value.length * 100) / 30))
+                                           setTitleLimit(Math.floor((e.currentTarget.value.length * 100) / 40))
                                        }}
                                        labelText={'در عنوان اگهی به موارد مهم اشاره کنید'}/>
                             </div>

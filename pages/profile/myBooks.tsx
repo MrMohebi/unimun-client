@@ -5,13 +5,15 @@ import Edit from '../../assets/svgs/edit.svg'
 import Delete from '../../assets/svgs/delete.svg'
 import Seen from '../../assets/svgs/eye.svg'
 import Toman from '../../assets/svgs/toman.svg'
-import {gql, useLazyQuery} from "@apollo/client";
+import {gql, useLazyQuery, useMutation} from "@apollo/client";
 import {useRouter} from "next/router";
 import {UserToken} from "../../store/user";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
 import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
+import DropDown from "../../components/view/DropDown/DropDown";
+import {EditBookData} from "../../store/books";
 
 const MyBooks = () => {
 
@@ -32,21 +34,57 @@ const MyBooks = () => {
                         attachments {
                             url
                         }
+                        language
                         status
                         isBook
+                        category {
+                            title
+                        }
+                        categoryID
                         price
                         seen
                         title
                         id
                         pages
                         verifiedAt
+                        writer
+                        publisher
+                        appearanceID
+                        appearance {
+                            title
+                        }
+                        details
+                        publishedDate
+                        attachments {
+                            mime
+                            preview
+                            thumbnail
+                            type
+                            uploadedAsFile
+                            url
+                        }
+                        pages
+                        price
+                        connectWay
                     }
                 }
             }
         }
     `
 
+    const removeBookQuery = gql`
+        mutation removeBook($id:ID! $status:String){
+            updateBook(id:$id, status:$status){
+                data {
+                    status
+                }
+            }
+        }
+    `
+
+
     const [getMyBooks, getMyBooksData] = useLazyQuery(myBooksQuery)
+    const [removeBook, removeBookResult] = useMutation(removeBookQuery)
 
     const router = useRouter();
     useEffect(() => {
@@ -144,7 +182,7 @@ const MyBooks = () => {
                 </Tab>
             </div>
 
-            <div className={'w-full h-full overflow-scroll px-3'} id={'my-books-scroller'}>
+            <div className={'w-full h-full overflow-scroll pb-20 px-3'} id={'my-books-scroller'}>
 
                 <InfiniteScroll pullDownToRefreshContent={<h1 className={'h-10'}></h1>}
                                 releaseToRefreshContent={<div
@@ -177,6 +215,7 @@ const MyBooks = () => {
                     {
                         (currentActivePart === 1 ? myBooks : myBrochures).map((item, index) => {
                             let book: {
+                                id: string
                                 price: string
                                 isBook: boolean
                                 title: string
@@ -184,6 +223,8 @@ const MyBooks = () => {
                                 status: string
 
                             } = item;
+
+
                             return (
                                 <div dir={'ltr'} key={'my-book' + index}
                                      className={'w-full h-36 rounded-2xl shadow-sm bg-white mt-3 grid grid-cols-4 grid-rows-3 px-3'}>
@@ -196,7 +237,7 @@ const MyBooks = () => {
                                         className={'flex flex-row-reverse justify-start items-center col-span-3 IranSansMedium'}>
                                         <span>{book.title}</span>
                                         <div
-                                            className={'IranSansMedium text-primary p-1 rounded-xl px-2 bg-background mr-3'}>{book.status === "PENDING_REVIEW" ? "در حال بررسی" : ""}</div>
+                                            className={`IranSansMedium ${book.status === "DELETED" ? "text-errorRed" : "text-primary"}  text-sm p-1 rounded-xl px-2 bg-background mr-3`}>{book.status === "PENDING_REVIEW" ? "در حال بررسی" : book.status === "PUBLISHED" ? "فعال" : book.status === "DELETED" ? "حذف شده" : book.status === "REJECTED" ? "تایید نشده" : ""}</div>
                                     </div>
                                     <span dir={'ltr'}
                                           className={'IranSansMedium text-sm col-span-1 text-textDark self-center flex flex-row justify-start ml-2 items-center '}><div
@@ -209,27 +250,98 @@ const MyBooks = () => {
 
                                     <div
                                         className={'IranSansMedium text-sm col-span-3 flex flex-row-reverse justify-start items-center  text-tiny'}>
-                                        <div
-                                            className={'h-8 w-8 text-center  bg-background rounded-lg p-1  IranSansMedium text-md tracking-tighter font-black whitespace-nowrap px-2'}>
-                                            . . .
+                                        {/*<div*/}
+                                        {/*    className={'h-8 w-8 text-center  bg-background rounded-lg p-1  IranSansMedium text-md tracking-tighter font-black whitespace-nowrap px-2'}>*/}
+                                        {/*    . . .*/}
 
-                                        </div>
-                                        <div
-                                            style={{fontSize: '0.7rem'}}
-                                            className={'h-8  text-center flex flex-row justify-center items-center  bg-background rounded-xl  px-2 mx-1 IranSansMedium '}>
-                                            ویرایش
-                                            <div className={'w-4 h-4 ml-2'}>
-                                                <Edit/>
+                                        {/*</div>*/}
+
+
+                                        <DropDown className={'  text-center'}
+                                                  dropDownContent={
+                                                      <div
+                                                          className={'h-8 w-8 text-center   bg-background rounded-lg p-1  IranSansMedium text-md tracking-tighter font-black whitespace-nowrap px-2'}>
+                                                          . . .
+
+                                                      </div>
+                                                  }
+                                                  containerClassName={'backdrop-blur-2xl shadow-lg p-3 rounded-lg overflow-hidden flex flex-col justify-center items-center'}
+                                        >
+
+                                            <div
+
+                                                onClick={() => {
+                                                    EditBookData(item)
+                                                    router.push("/library/newBook")
+                                                }}
+                                                style={{fontSize: '0.7rem'}}
+                                                className={'h-10  text-center flex flex-row justify-end items-center  bg-background rounded-xl  px-2 mx-1 IranSansMedium '}>
+                                                ویرایش
+                                                <div className={'w-4 h-4 ml-2'}>
+                                                    <Edit/>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div
-                                            style={{fontSize: '0.7rem'}}
-                                            className={'h-8 text-errorRed text-center flex flex-row justify-center items-center   bg-background rounded-xl  px-2 mx-1 IranSansMedium  '}>
-                                            حذف
-                                            <div className={'w-4 h-4 ml-2'}>
-                                                <Delete/>
-                                            </div>
-                                        </div>
+
+                                            {
+                                                book.status === "DELETED" ?
+                                                    null
+                                                    :
+                                                    <div
+                                                        onClick={() => {
+                                                            removeBook({
+                                                                variables: {
+                                                                    id: book.id,
+                                                                    status: 'DELETED'
+                                                                }
+                                                            }).then((value) => {
+                                                                console.log(value)
+
+                                                            })
+                                                        }}
+                                                        style={{fontSize: '0.7rem'}}
+                                                        className={'h-10 w-20 mt-2 text-errorRed text-center flex flex-row justify-end items-center   bg-background rounded-xl  px-2 mx-1 IranSansMedium  '}>
+                                                        حذف
+                                                        <div className={'w-4 h-4 ml-2'}>
+                                                            <Delete/>
+                                                        </div>
+                                                    </div>
+
+                                            }
+
+
+                                        </DropDown>
+
+                                        {/*<select dir={'rtl'} className={'w-24 bg-transparent rounded h-8 backdrop-blur'} name="cars" id="cars">*/}
+                                        {/*    <option value="volvo">Volvo</option>*/}
+                                        {/*    <option value="saab">Saab</option>*/}
+                                        {/*    <option value="opel">Opel</option>*/}
+                                        {/*    <option value="audi">Audi</option>*/}
+                                        {/*</select>*/}
+
+                                        {/*<div className={'dropdown w-24 relative h-10 bg-black active:scale-125'}>*/}
+                                        {/*    <div className={'dropdown-content top-0 right-0 absolute'}>*/}
+                                        {/*        <div className={'h-10 w-20 bg-red-200'}>click</div>*/}
+                                        {/*        <div className={'h-10 w-20 bg-red-200'}>click</div>*/}
+                                        {/*        <div className={'h-10 w-20 bg-red-200'}>click</div>*/}
+                                        {/*    </div>*/}
+                                        {/*</div>*/}
+
+                                        {/*<div*/}
+                                        {/*    style={{fontSize: '0.7rem'}}*/}
+                                        {/*    className={'h-8  text-center flex flex-row justify-center items-center  bg-background rounded-xl  px-2 mx-1 IranSansMedium '}>*/}
+                                        {/*    ویرایش*/}
+                                        {/*    <div className={'w-4 h-4 ml-2'}>*/}
+                                        {/*        <Edit/>*/}
+                                        {/*    </div>*/}
+                                        {/*</div>*/}
+                                        {/*<div*/}
+                                        {/*    style={{fontSize: '0.7rem'}}*/}
+                                        {/*    className={'h-8 text-errorRed text-center flex flex-row justify-center items-center   bg-background rounded-xl  px-2 mx-1 IranSansMedium  '}>*/}
+                                        {/*    حذف*/}
+                                        {/*    <div className={'w-4 h-4 ml-2'}>*/}
+                                        {/*        <Delete/>*/}
+                                        {/*    </div>*/}
+                                        {/*</div>*/}
 
                                         <div dir={'ltr'}
                                              className={'IranSansMedium text-sm text-textBlack text-left col-span-1 w-full  self-center ml-2 flex flex-grow justify-start items-center'}>
@@ -244,6 +356,8 @@ const MyBooks = () => {
 
                         })
                     }
+
+                    <div className={'h-20'}></div>
 
                 </InfiniteScroll>
 

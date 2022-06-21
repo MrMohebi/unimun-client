@@ -24,16 +24,17 @@ function MyApp({Component, pageProps}: AppProps) {
             <UserAuthenticationCheck>
                 <div
 
-                    className={' overflow-hidden hide-scrollbars lg:block md:block md:h-full md:w-full lg:w-full lg:h-full block desktop  flex flex-col items-center justify-center'}>
+                    className={'overflow-hidden hide-scrollbars lg:block md:block md:h-full md:w-full lg:w-full lg:h-full block desktop  flex flex-col items-center justify-center'}>
                     <div
 
                         id={'scaler'}
-                        className={'h-full  w-full flex flex-col items-center justify-center fixed  top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2'}
+                        className={'h-full w-full lg:max-h-mob-h lg:max-w-mob-w flex flex-col items-center justify-center fixed  top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2'}
 
 
                     >
                         <div dir={'ltr'}
-                             className={'w-full lg:max-w-mob-w lg:max-h-mob-h max-w-md fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'}>
+                             className={'w-full max-w-mob-w  fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'}
+                        >
                             <Phone/>
                             <div dir={'ltr'} className={'w-14 h-14 p-5 rounded-2xl bottom-8 absolute -ml-16 '}
                                  style={{background: 'rgba(255,255,255,0.5)'}}>
@@ -46,28 +47,30 @@ function MyApp({Component, pageProps}: AppProps) {
 
                         </div>
 
+                        <div className={'max-h-mob-h'}></div>
 
                         <div dir={'rtl'}
 
-                             className={'s w-full h-full -mt-2 lg:fixed lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 md:fixed md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 overflow-hidden  md:max-w-mob-w md:max-h-mob-h lg:max-w-mob-w  md:rounded-mob-size lg:rounded-mob-size lg:max-w-mob-w lg:max-h-mob-h'}>
-                            <div className={'contents '}>
-                                <Navbar>
-                                    <div
-                                        className={'h-6 w-full bg-white flex px-5 pt-1 flex-row justify-between items-center hidden lg:flex md:flex desktop-container'}
-                                        style={{background: 'rgba(245,248,250,0.83)'}}>
-                                        <div className={'w-10 h-2'}>
-                                            <Icons/>
-                                        </div>
-                                        <span className={'IranSansMedium pl-1'} style={{
-                                            fontSize: '0.75rem'
-                                        }}>{(new Date().getHours().toString().length === 1 ? "0" + new Date().getHours() : new Date().getHours()) + ":" + (new Date().getMinutes().toString().length === 1 ? "0" + new Date().getMinutes() : new Date().getMinutes())}</span>
+
+                             className={' h-full w-full  lg:max-w-mob-cont-w  lg:max-h-mob-cont-h  md:max-w-mob-cont-w  md:max-h-mob-cont-h -mt-2 lg:fixed lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 md:fixed md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 overflow-hidden md:rounded-3xl lg:rounded-3xl '}>
+                            {/*<div className={'contents '}>*/}
+                            <Navbar>
+                                <div
+                                    className={'h-6 w-full bg-white flex px-5 pt-1 flex-row justify-between items-center hidden lg:flex md:flex desktop-container'}
+                                    style={{background: 'rgba(245,248,250,0.83)'}}>
+                                    <div className={'w-10 h-2'}>
+                                        <Icons/>
+                                    </div>
+                                    <span className={'IranSansMedium pl-1'} style={{
+                                        fontSize: '0.75rem'
+                                    }}>{(new Date().getHours().toString().length === 1 ? "0" + new Date().getHours() : new Date().getHours()) + ":" + (new Date().getMinutes().toString().length === 1 ? "0" + new Date().getMinutes() : new Date().getMinutes())}</span>
                                     </div>
                                     <div className={'relative bg-background overflow-hidden h-full  '}>
                                         <Component {...pageProps} />
 
                                     </div>
                                 </Navbar>
-                            </div>
+                            {/*</div>*/}
                         </div>
                     </div>
                 </div>
