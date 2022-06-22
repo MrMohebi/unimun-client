@@ -15,18 +15,19 @@ import CircularProgressBar from "../../components/view/CircularProgressBar/Circu
 import FileUploadSVG from "../../assets/svgs/fileUpload.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
 import FileSVG from "../../assets/svgs/file.svg";
-import {gql, useMutation} from "@apollo/client";
+import {gql, useLazyQuery, useMutation} from "@apollo/client";
 import Toman from '../../assets/svgs/toman.svg'
 import BookCategories from "../../components/normal/BookCategories/BookCategories";
 import BookAppearance from "../../components/normal/BookAppearance/BookAppearance";
 import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
-import {isBrochure, lastBookSubmitSuccess} from "../../store/books";
+import {EditBookData, isBrochure, lastBookSubmitSuccess} from "../../store/books";
 import TelInputSVG from "../../assets/svgs/telInput.svg";
 import BoldMobile from "../../assets/svgs/boldMobile.svg";
 import RightSquareSVG from "../../assets/svgs/rightSquare.svg";
 import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
 import Semesters from "../../components/normal/Semesters/Semesters";
+import _ from "lodash";
 
 const NewBrochure = () => {
 
@@ -34,7 +35,7 @@ const NewBrochure = () => {
         //queries
 
         const createBookMutation = gql`
-            mutation createBook($isBook:Boolean! $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
+            mutation createBook($isBook:Boolean! $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String! $teacher:String){
                 createBook(
                     isBook:$isBook,
                     isDownloadable: $isDownloadable,
@@ -44,6 +45,7 @@ const NewBrochure = () => {
                     details: $details,
                     price: $price,
                     language: $language,
+                    teacher: $teacher
                     writer: $writer,
                     publisher: $publisher,
                     publishedDate: $publishedDate,
@@ -61,7 +63,38 @@ const NewBrochure = () => {
                 }
             }
         `
+
+    const updateBookMutation = gql`
+        mutation updateBook($id:ID!  $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
+            updateBook(
+                id: $id
+                isDownloadable: $isDownloadable,
+                isPurchasable: $isPurchasable,
+                categoryID: $categoryID,
+                title: $title,
+                details: $details,
+                price: $price,
+                language: $language,
+                writer: $writer,
+                publisher: $publisher,
+                publishedDate: $publishedDate,
+                appearanceID: $appearanceID
+                bookFiles: $bookFiles,
+                attachments: $attachments,
+                connectWay:$connectWay
+            ){
+                status
+                data {
+                    title
+                    id
+                }
+                message
+            }
+        }
+    `
+
     const [createBook, createBookResult] = useMutation(createBookMutation)
+    const [updateBook, updateBookResult] = useMutation(updateBookMutation)
 
 
     const router = useRouter()
@@ -84,6 +117,7 @@ const NewBrochure = () => {
     const [connectWay, setConnectWay] = useState('')
     const [showSemester, setShowSemester] = useState(false);
     const [chosenSemester, setChosenSemester] = useState("");
+    const [editing, setEditing] = useState(false);
 
     const [BookData, setBookData] = useState({
         type: 'physical',
@@ -93,6 +127,7 @@ const NewBrochure = () => {
         fileNames: [],
         term: ''
     } as {
+        id: string
         isBook: boolean
         title: string
         writer: string
@@ -103,6 +138,7 @@ const NewBrochure = () => {
         type: string
         price: string
         pages: string
+        teacher: string
         categoryID: string
         categoryPersian: string
         publisher: string
@@ -114,17 +150,112 @@ const NewBrochure = () => {
     })
 
 
-        useEffect(() => {
-            if (isBrochure()) {
-                updateBookData('isBook', false);
-                console.log(BookData)
+    useEffect(() => {
+        if (isBrochure()) {
+            updateBookData('isBook', false);
+        }
+        if (EditBookData())
+            if (!EditBookData().category)
+                _categoryComponent(true)
+    }, [])
+
+
+    useEffect(() => {
+
+
+        if (EditBookData()) {
+            setEditing(() => {
+                return true
+            })
+
+            console.log(EditBookData())
+            try {
+
+                updateBookData('title', EditBookData()?.title)
+                updateBookData('id', EditBookData()?.id)
+                if (EditBookData().appearance)
+                    updateBookData('appearance', EditBookData().appearance.title)
+                if (EditBookData().category)
+                    updateBookData('categoryPersian', EditBookData().category.title)
+                updateBookData('categoryID', EditBookData().categoryID)
+                updateBookData('writer', EditBookData().writer)
+                updateBookData('details', EditBookData().details)
+                updateBookData('term', EditBookData().term ?? "")
+                // updateBookData('price', EditBookData().price??'')
+                // updateBookData('connectWay', EditBookData().connectWay)
+                setConnectWay(EditBookData().connectWay)
+                setContactType(EditBookData().connectWay[0] === "0" ? 'phone' : 'telegram')
+                updateBookData('language', EditBookData().language)
+                // updateBookData('attachments', EditBookData().attachments)
+                let imagesArr = [] as any[]
+                let attachments = [] as any[]
+                let imagesArrString = [] as any[]
+                if (EditBookData().attachments) {
+                    (EditBookData().attachments as []).map((attachment) => {
+                        imagesArr.push(attachment)
+                    })
+                }
+                imagesArr.forEach((e) => {
+                    attachments.push((_.omit(e, ['__typename'])).test = "e")
+                    imagesArrString.push(JSON.stringify(_.omit(e, ['__typename'])))
+                })
+
+                updateBookData('attachments', attachments)
+
+                setUploadedImages(imagesArrString)
+                updateBookData('attachments', EditBookData().attachments)
+                updateBookData('files', EditBookData().files)
+
+
+                EditBookData(null)
+                bookVerification()
+
+
+            } catch (e) {
+                console.log(e)
+                Toast('خطا در هنگام ویرایش کتاب')
             }
+            EditBookData(null)
+        }
 
-            _categoryComponent(true)
-        }, [])
+    }, [])
 
 
-        const submitBook = () => {
+    const submitBook = () => {
+
+        if (editing) {
+
+            updateBook({
+                variables: {
+                    id: BookData.id,
+                    title: BookData.title,
+                    categoryID: BookData.categoryID,
+                    isPurchasable: BookData.price ? BookData.price !== 'free' : false,
+                    isDownloadable: BookData.type === 'pdf',
+                    isBook: true,
+                    bookFiles: BookData.files,
+                    attachments: BookData.attachments,
+                    connectWay: connectWay,
+                    appearanceID: BookData.appearanceID,
+                    pages: BookData.pages
+
+                }
+            }).then((e) => {
+                try {
+                    if (e.data.updateBook.status === 'SUCCESS') {
+                        lastBookSubmitSuccess(e.data.updateBook.data.id)
+                        router.push('/library')
+                    } else {
+                        Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
+                    }
+                } catch (e) {
+                    console.log(e)
+                }
+            })
+
+        } else {
+
+
             createBook({
                 variables: {
                     title: BookData.title,
@@ -134,7 +265,9 @@ const NewBrochure = () => {
                     isBook: false,
                     bookFiles: BookData.files,
                     attachments: BookData.attachments,
-                    connectWay: connectWay
+                    connectWay: connectWay,
+                    teacher: BookData.teacher,
+                    term: BookData.term
                 }
             }).then((e) => {
                 try {
@@ -147,8 +280,9 @@ const NewBrochure = () => {
                     console.log(e)
                 }
             })
-
         }
+
+    }
         const removeEmptyProgresses = () => {
             let updateUploadingProgress = [...uploadingProgress];
             updateUploadingProgress.filter(item => {
@@ -205,6 +339,8 @@ const NewBrochure = () => {
                     showSemester ?
                         <Semesters onCatSelected={(e: string) => {
                             setShowSemester(false)
+                            console.log('hrese e')
+                            console.log(e)
                             if (e.length) {
                                 setChosenSemester(e)
                                 updateBookData('term', e)
@@ -300,6 +436,7 @@ const NewBrochure = () => {
                             <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl  '}
                                    wrapperClassName={'px-3 h-14'}
                                    placeHolder={'جـزوه ی چه درسیه ؟'}
+                                   defaultValue={BookData.title}
                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                        updateBookData('title', e.currentTarget.value)
                                    }}
@@ -317,8 +454,9 @@ const NewBrochure = () => {
                             <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
                                    wrapperClassName={'px-3 h-14'}
                                    placeHolder={'مال کدوم استاده ؟'}
+                                   defaultValue={BookData.teacher}
                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                       updateBookData('writer', e.currentTarget.value)
+                                       updateBookData('teacher', e.currentTarget.value)
                                    }}
                             />
 
@@ -337,7 +475,6 @@ const NewBrochure = () => {
                                 className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}
                                 onClick={() => {
                                     setShowSemester(true)
-
                                 }}
                             >
                                 <span>ترم ارائه درس <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
@@ -477,6 +614,7 @@ const NewBrochure = () => {
                                 className={'text-tiny text-textDarker'}>اختیاری</span></div>
 
                             <Input multiLine={true} id={'input'} numOnly={false}
+                                   defaultValue={BookData.details}
                                    inputClassName={'IranSans rounded-xl h-32 mt-5  border-primary border-2  pt-2 px-3 w-full outline-0 '}
                                    wrapperClassName={''}
                                    placeHolder={'کتابِ...'}
@@ -701,6 +839,7 @@ const NewBrochure = () => {
                                 <div
                                     className={'IranSansMedium h-10 w-20 flex flex-row justify-around items-center bg-background rounded-lg'}>
                                     <input id={'free-book'} className={'scale-150 rounded border-2 border-primary'}
+                                           defaultValue={BookData.price}
                                            type={'checkbox'} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                         if (e.currentTarget.checked)
                                             updateBookData('price', 'free')
@@ -720,8 +859,10 @@ const NewBrochure = () => {
                                     <Toman/>
                                 </div>
                                 <div className={'h-3/5 bg-gray-400 w-0 border'}/>
-                                <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'} defaultValue={'20,000'}
+                                <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'}
+                                       defaultValue={BookData.price ? BookData.price.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '') : '20,000'}
                                        numOnly={false}
+
                                        inputClassName={'border-0 border-transparent text-left text-lg IranSansBold rounded-xl'}
                                        wrapperClassName={'w-full h-full '}
                                        onChange={(e: InputEvent) => {
@@ -763,6 +904,7 @@ const NewBrochure = () => {
                                        inputClassName={'text-left pl-12 rounded-xl border-2'} maxLength={30}
                                        id={'title'} numOnly={false}
                                        wrapperClassName={'w-11/12 h-14 '}
+                                       defaultValue={connectWay}
                                        onChange={(e: any) => {
                                            if (e.currentTarget.value.length > 0) {
                                                if (contactType === 'phone') {

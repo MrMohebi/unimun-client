@@ -34,6 +34,7 @@ const MyBooks = () => {
                         attachments {
                             url
                         }
+                        teacher
                         language
                         status
                         isBook
@@ -48,6 +49,7 @@ const MyBooks = () => {
                         pages
                         verifiedAt
                         writer
+                        term
                         publisher
                         appearanceID
                         appearance {
@@ -162,7 +164,7 @@ const MyBooks = () => {
             }} title={'کتاب های من'} back={true}>
 
             </Header>
-            <div className={'h-10 w-full bg-white  z-50'}>
+            <div className={'h-10 w-full bg-white z-50'}>
 
                 <Tab indicatorAtBottom={true} indicatorSizeDivider={2} activeIndex={currentActivePart}>
                     <div className={'w-20 text-center opacity-0'}></div>
@@ -272,7 +274,8 @@ const MyBooks = () => {
 
                                                 onClick={() => {
                                                     EditBookData(item)
-                                                    router.push("/library/newBook")
+                                                    router.push(book.isBook ? "/library/newBook" : "/library/newBrochure")
+                                                    console.log(book)
                                                 }}
                                                 style={{fontSize: '0.7rem'}}
                                                 className={'h-10  text-center flex flex-row justify-end items-center  bg-background rounded-xl  px-2 mx-1 IranSansMedium '}>
