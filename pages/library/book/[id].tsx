@@ -105,7 +105,6 @@ const Book = (props: Props) => {
         getBook({variables: {id: bookId}}).then((e) => {
             try {
                 _book(e.data.book.data)
-                console.log(e.data.book.data)
             } catch (e) {
                 console.log(e)
             }

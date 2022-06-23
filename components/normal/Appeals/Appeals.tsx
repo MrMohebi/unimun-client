@@ -36,7 +36,7 @@ const Appeals = () => {
     const dragPos = useRef({top: 0, left: 0, x: 0, y: 0});
     const router = useRouter();
 
-    const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen', 'id', 'hashtags'])
+    const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen', 'id', 'hashtags', 'status'])
     const [getAppeals, {
         data,
         loading,
@@ -64,7 +64,6 @@ const Appeals = () => {
             rect.right <= (window.innerWidth || document.documentElement.clientWidth)
         );
     }
-
 
 
     useEffect(() => {
@@ -124,7 +123,6 @@ const Appeals = () => {
     }
 
     const onAdSectionScroll = (event: any) => {
-        console.log('ok')
         try {
             let scroll = event.target.scrollTop
 
@@ -318,7 +316,6 @@ const Appeals = () => {
                         refreshFunction={() => {
                             if (!refreshLoading) {
                                 refetch()
-                                console.log('refreshed')
                                 _refreshLoading(() => {
                                     return true
                                 })
@@ -352,23 +349,25 @@ const Appeals = () => {
                             searchedAppeals.length ?
                                 searchedAppeals.map((ad: any, index: number) => {
                                         let Appeal = ad.node
-                                        return (appealUI(Appeal, index, index + 'i', Appeal.id)
-                                        )
+                                        if (Appeal.status && Appeal.status !== "DELETED")
+                                            return (appealUI(Appeal, index, index + 'i', Appeal.id))
                                     }
                                 )
                                 :
                                 appeals.length && !nothingFound ?
                                     appeals.map((ad: any, index: number) => {
+
+
                                             let Appeal = ad.node
-                                        return (appealUI(Appeal, index, index + 'i1', Appeal.id)
-                                        )
+                                            if (Appeal.status && Appeal.status !== "DELETED")
+                                                return (appealUI(Appeal, index, index + 'i1', Appeal.id))
                                         }
                                     )
                                     : lastGottenAppealsState ?
                                         lastGottenAppealsState.map((ad: any, index: number) => {
                                                 let Appeal = ad.node
-                                                return (appealUI(Appeal, index, index + 'i2', Appeal.id)
-                                                )
+                                                if (Appeal.status && Appeal.status !== "DELETED")
+                                                    return (appealUI(Appeal, index, index + 'i2', Appeal.id))
                                             }
                                         ) : null
 

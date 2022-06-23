@@ -16,47 +16,12 @@ const ImageSlider = (props: Props) => {
         const [images, setImages] = useState(['', '', '', '', '']);
 
         useEffect(() => {
-                console.log(props.images)
                 let imgCopy = [] as Array<string>;
                 props.images.forEach((item, index) => {
                     imgCopy.push(item.preview);
                 })
 
                 setImages(imgCopy);
-                console.log(imgCopy)
-
-
-                // setImages((images) => {
-                //     return images.concat(images.concat(images).concat(images).concat(images))
-                // })
-                // images = images.concat(['','','',''])
-
-                // for (let i = 0; i < 200; i++) {
-                //
-                //     imgCopy.forEach((img)=>{
-                //     images.push(img)
-                //     })
-                //
-                //     // images = images.concat([0,0,0,0,0])
-                // }
-                // setInterval(() => {
-                //
-                //     try {
-                //         if (imageScroller.current) {
-                //
-                //             let arr = Array.prototype.slice.call(imageScroller.current.children)
-                //             arr.forEach((item: HTMLDivElement, index) => {
-                //                 console.log(item.getBoundingClientRect().x)
-                //             })
-                //         }
-                //
-                //     } catch
-                //         (e) {
-                //
-                //     }
-                //
-                // }, 1000)
-
 
             }, []
         )

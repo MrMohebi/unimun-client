@@ -25,7 +25,6 @@ const Invite = () => {
             loading
         }] = useLazyQuery(gql`${getUserQuery(['referenceCode','referenceCodeLeft']).query}`)
         useEffect(() => {
-            console.log(getToken())
             getUser().then(e => {
                 sRefCode(e.data.user.data.referenceCode ?? '')
                 sRefCodeLeft(e.data.user.data.referenceCodeLeft)

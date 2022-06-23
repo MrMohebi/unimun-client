@@ -73,7 +73,6 @@ const BookCategories = (props: { onCatSelected: Function }) => {
 
     useEffect(() => {
         getBookCategories().then(e => {
-            console.log(e)
             createCategoryTree(e.data.bookCategories.data, '')
             data.current = e.data.bookCategories.data
         })

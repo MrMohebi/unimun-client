@@ -258,7 +258,7 @@ const Index = () => {
                                     <div
                                         className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}
                                         onClick={() => {
-                                            // redirectTo('/profile/myAppeals');
+                                            redirectTo('/profile/myAppeals');
                                         }}
 
                                     >آگهی

@@ -460,13 +460,17 @@ body * {
   background: linear-gradient(to right, #f4f8fa, transparent);
 }
 .image-slider:before {
-  content: "";
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 10%;
-  height: 100%;
-  background: linear-gradient(to left, #f4f8fa, transparent);
+    content: "";
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 10%;
+    height: 100%;
+    background: linear-gradient(to left, #f4f8fa, transparent);
+}
+
+.m-appeals-scroller div {
+    width: 100%;
 }
 
 /*# sourceMappingURL=globals.css.map */

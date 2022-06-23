@@ -2,7 +2,6 @@ import React from 'react';
 import {toast} from "react-toastify";
 
 const Toast = (text: string) => {
-    console.log('ok')
     toast.info(text, {
         position: "bottom-center",
         autoClose: 2000,

@@ -37,12 +37,7 @@ const Semesters = (props: { onCatSelected: Function }) => {
             ) as [string]
         })
 
-        console.log(semesters)
-        setTimeout(() => {
-            console.log(semesters)
-        }, 1000);
-
-
+      
     }, [])
 
 
