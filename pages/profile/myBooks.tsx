@@ -241,7 +241,7 @@ const MyBooks = () => {
                                     <div
                                         className={'flex flex-row-reverse justify-start items-center col-span-3 IranSansMedium'}>
                                         <span
-                                            className={'block w-20 text-right overflow-hidden text-ellipsis'}>{book.title}</span>
+                                            className={'block whitespace-nowrap w-20 text-right overflow-hidden text-ellipsis'}>{book.title}</span>
                                         <div
                                             className={`IranSansMedium ${book.status === "DELETED" ? "text-errorRed" : "text-primary"}  text-sm p-1 rounded-xl px-2 bg-background mr-3`}>{book.status === "PENDING_REVIEW" ? "در حال بررسی" : book.status === "PUBLISHED" ? "فعال" : book.status === "DELETED" ? "حذف شده" : book.status === "REJECTED" ? "تایید نشده" : ""}</div>
                                     </div>

@@ -33,6 +33,7 @@ const Appeals = () => {
     const [seenTick, _seenTick] = useState(0);
     const visibleAppealsList = useRef([] as any);
     const [refreshLoading, _refreshLoading] = useState(false)
+    const [endCursor, setEndCursor] = useState('');
     const dragPos = useRef({top: 0, left: 0, x: 0, y: 0});
     const router = useRouter();
 
@@ -44,6 +45,36 @@ const Appeals = () => {
         refetch
     }] = useLazyQuery(gql`${AppealsQuery.query}`);
 
+    const _getAppealsQuery = gql`
+        query getAppeals($after:String){
+            appeals(after: $after first:10){
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+                edges {
+                    node {
+                        title
+                        createdAt
+                        details
+                        priceStart
+                        priceEnd
+                        seen
+                        id
+                        hashtags
+                        status
+                    }
+                }
+            }
+        }
+    `
+    const [gtAppeals, appealsResult] = useLazyQuery(_getAppealsQuery)
+    // useEffect(() => {
+    //     gtAppeals().then((value) => {
+    //         console.log(value)
+    //
+    //     })
+    // }, [])
 
     const lastGottenAppealsState = useReactiveVar(lastGottenAppeals)
 
@@ -68,29 +99,54 @@ const Appeals = () => {
 
     useEffect(() => {
         if (!data && !loading) {
-            getAppeals()
-                .then((e) => {
-                    if (e.data.appeals === null) {
 
-                    } else {
-                        if (e.error === undefined) {
-                            if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
-                                setAppeals(e.data.appeals.edges)
-                                lastGottenAppeals(e.data.appeals.edges)
-                                reachedEnd.current = true;
-                                setReachedEndState(true)
-                            }
-                        } else {
+            gtAppeals().then((e) => {
+                if (e.data.appeals === null) {
+
+                } else {
+                    if (e.error === undefined) {
+
+
+                        if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
+
+                            let apls = appeals.concat(e.data.appeals.edges)
+                            setEndCursor(e.data.appeals.pageInfo.endCursor)
+                            setAppeals(apls)
+                            lastGottenAppeals(apls)
+                            reachedEnd.current = true;
+                            setReachedEndState(true)
                         }
-
+                    } else {
                     }
 
+                }
 
-                })
+
+            })
+
+            //     getAppeals()
+            //         .then((e) => {
+            //             if (e.data.appeals === null) {
+            //
+            //             } else {
+            //                 if (e.error === undefined) {
+            //                     if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
+            //                         setAppeals(e.data.appeals.edges)
+            //                         lastGottenAppeals(e.data.appeals.edges)
+            //                         reachedEnd.current = true;
+            //                         setReachedEndState(true)
+            //                     }
+            //                 } else {
+            //                 }
+            //
+            //             }
+            //
+            //
+            //         })
         }
 
 
-    }, [appeals, data, loading, error, lastCursor])
+    }, [])
 
     const checkLastCursor = (res: any) => {
         if (res.data.appeals.edges[res.data.appeals.edges.length - 1]['cursor'] !== lastCursor.current) {
@@ -106,20 +162,51 @@ const Appeals = () => {
     }
     const getNewerAppeals = () => {
         // setReachedEndState(false)
-        if (!loading && appeals.length > 19) {
-            if (lastCursor != appeals[appeals.length - 1]['cursor']) {
-                lastCursor.current = (appeals[appeals.length - 1]['cursor'])
-                getAppeals({variables: {after: lastCursor.current}}).then((e) => {
-                    checkLastCursor(e)
-                    if (e.data) {
-                        if (e.data.appeals.edges.length < 19) {
+
+        appealsResult.refetch({
+            after: endCursor
+        }).then((e) => {
+            if (e.data.appeals === null) {
+            } else {
+                if (e.error === undefined) {
+
+                    if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
+                        if (!e.data.appeals.pageInfo.hasNextPage)
                             ShasMore(false)
-                        }
+
+
+                        let apls = appeals.concat(e.data.appeals.edges)
+                        setEndCursor(e.data.appeals.pageInfo.endCursor)
+                        setAppeals(apls)
+                        lastGottenAppeals(apls)
+                        reachedEnd.current = true;
+                        setReachedEndState(true)
+
+
                     }
-                    console.log(e)
-                })
+                } else {
+                }
+
             }
-        }
+
+
+        })
+        // if (!loading && appeals.length > 19) {
+        //     if (lastCursor != appeals[appeals.length - 1]['cursor']) {
+        //         lastCursor.current = (appeals[appeals.length - 1]['cursor'])
+        //
+        //
+        //         getAppeals({variables: {after: lastCursor.current}}).then((e) => {
+        //             checkLastCursor(e)
+        //             if (e.data) {
+        //                 if (e.data.appeals.edges.length < 19) {
+        //                     ShasMore(false)
+        //                 }
+        //             }
+        //             console.log(e)
+        //         })
+        //     }
+        // }
     }
 
     const onAdSectionScroll = (event: any) => {
