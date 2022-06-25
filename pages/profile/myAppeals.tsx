@@ -15,6 +15,9 @@ const MyAppeals = () => {
     const getMyAppealsQuery = gql`
         query myAppeals ($first:Int $after:String){
             appealsUserCreated(after: $after,first:$first){
+                pageInfo {
+                    endCursor
+                }
                 edges {
                     cursor
                     node {
@@ -46,12 +49,22 @@ const MyAppeals = () => {
     const [getMyAppeals, getMyAppealsResult] = useLazyQuery(getMyAppealsQuery)
     const [updateAppeal, updateAppealResult] = useMutation(updateAppealQuery)
     const [appeals, setAppeals] = useState([] as any[]);
+    const [hasMore, setHasMore] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [gettingLoading, setGettingLoading] = useState(false);
     const router = useRouter()
 
     useEffect(() => {
 
-        getMyAppeals().then((value) => {
-            console.log(value)
+        setLoading(true)
+        setGettingLoading(true)
+        getMyAppeals({
+            variables: {
+                first: 100
+            }
+        }).then((value) => {
+            setLoading(false)
+            setGettingLoading(false)
             try {
                 setAppeals(value.data.appealsUserCreated.edges)
             } catch (e) {
@@ -61,9 +74,9 @@ const MyAppeals = () => {
 
     }, [])
     return (
-        <div>
+        <div className={'h-full '}>
 
-            <FullScreenLoading show={getMyAppealsResult.loading || updateAppealResult.loading}/>
+            <FullScreenLoading show={loading}/>
 
 
             <Header back={true} backOnClick={() => {
@@ -74,7 +87,7 @@ const MyAppeals = () => {
 
 
             <div
-                className={'m-appeals-scroller w-full flex px-4 pt-5 pb-20 rounded-2xl flex-col justify-center items-center h-full overflow-scroll'}
+                className={'h-full m-appeals-scroller w-full  flex px-4  rounded-2xl h-full overflow-scroll'}
                 id={'m-scroller'}>
 
                 <InfiniteScroll
@@ -92,31 +105,46 @@ const MyAppeals = () => {
                     refreshFunction={() => {
 
                         console.log('refreshing')
+                        setGettingLoading(true)
                         getMyAppealsResult.refetch().then((value) => {
+                            setGettingLoading(false)
+
                             console.log('gotten')
                             setAppeals(value.data.appealsUserCreated.edges)
                         })
                     }}
                     onScroll={() => {
 
-                        console.log('scrolling')
                     }}
                     next={() => {
-                        getMyAppealsResult.refetch({after: appeals.reverse()[0].cursor}).then((value) => {
-                            setAppeals(value.data.appealsUserCreated.edges)
-                        })
+                        // console.log(appeals.reverse()[0].cursor)
+                        let appealsCopy = appeals
+                        let cursor = appeals[appeals.length - 1].cursor
+                        // getMyAppealsResult.refetch({first:2,after: "MTk="}).then((value) => {
+                        //
+                        //     console.log(value)
+                        //     setAppeals((prevState: any) => {
+                        //         console.log(prevState)
+                        //
+                        //         if (value.data.appealsUserCreated.edges[0].cursor === prevState[0].cursor) {
+                        //             setHasMore(false)
+                        //             return prevState
+                        //         } else
+                        //             return (prevState as any[]).concat(value.data.appealsUserCreated.edges)
+                        //     })
+                        // })
                     }}
-                    hasMore={true}
+                    hasMore={hasMore}
                     dataLength={appeals.length}
                     loader={
                         <h1>Loading</h1>
                     }
                     scrollableTarget={'m-scroller'}
-                    className={'w-full'}>
+                    className={'w-full '}>
                     {
 
                         <div
-                            className={`${(getMyAppealsResult.loading) ? 'pt-3' : 'h-0 overflow-hidden '}  duration-100 eas-in-out w-full text-center IranSansMedium text-sm h-8 flex flex-row items-center justify-center `}>
+                            className={`${(gettingLoading) ? 'pt-3  h-8' : 'h-0 overflow-hidden '}  duration-100 eas-in-out w-full text-center IranSansMedium text-sm flex flex-row items-center justify-center `}>
                             دریافت آگهی ها
                             <LoadingDialog wrapperClassName={'w-4 h-4 mr-2'} strokeWidth={4}/>
                         </div>
@@ -128,7 +156,7 @@ const MyAppeals = () => {
 
                             return (
                                 <div key={'appeal-m-' + index}
-                                     className={'each-m-appeal flex flex-col justify-start items-center w-full bg-white pb-4 '}>
+                                     className={'each-m-appeal mt-4 flex flex-col justify-start items-center w-full bg-white pb-4 '}>
                                     <div
                                         className={'w-full IranSansBold text-lg p-3 flex flex-row justify-between items-center'}>
                                         <span>{_appeal.title ?? ""}</span>
@@ -157,9 +185,23 @@ const MyAppeals = () => {
                                             id={'appeal-action-btn-' + index}
                                             rippleColor={'rgba(0,0,0,0.08)'}
                                             onClick={() => {
+                                                setLoading(true)
                                                 updateAppeal({
                                                     variables: {id: _appeal.id, status: "DELETED"}
                                                 }).then((value) => {
+                                                    setLoading(false)
+                                                    getMyAppeals({
+                                                        variables: {
+                                                            first: 100
+                                                        }
+                                                    }).then((value) => {
+                                                        console.log(value)
+                                                        try {
+                                                            setAppeals(value.data.appealsUserCreated.edges)
+                                                        } catch (e) {
+
+                                                        }
+                                                    })
                                                     if (value.data.updateAppeal.status === 'SUCCESS')
                                                         console.log(value)
                                                 })
@@ -189,6 +231,7 @@ const MyAppeals = () => {
                             )
                         })
                     }
+                    <div className={'h-20'}></div>
 
                 </InfiniteScroll>
 

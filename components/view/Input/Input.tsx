@@ -77,7 +77,7 @@ const Input = ({
             </div>
             :
             <div className={wrapperClassName ?? ''}>
-                <textarea autoFocus={autoFocus} onChange={(e) => {
+                <textarea autoFocus={autoFocus} defaultValue={defaultValue} onChange={(e) => {
                     if (numOnly && isNaN(parseInt(e.currentTarget.value[e.currentTarget.value.length - 1]))) {
                         e.currentTarget.value = e.currentTarget.value.slice(0, e.currentTarget.value.length - 1)
                     }

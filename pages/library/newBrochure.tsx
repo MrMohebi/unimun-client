@@ -28,44 +28,50 @@ import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
 import Semesters from "../../components/normal/Semesters/Semesters";
 import _ from "lodash";
+import {fixPrice} from "../../helpers/fixPrice";
+import Book from "./book/[id]";
 
 const NewBrochure = () => {
 
 
-        //queries
+    //queries
 
-        const createBookMutation = gql`
-            mutation createBook($isBook:Boolean! $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String! $teacher:String){
-                createBook(
-                    isBook:$isBook,
-                    isDownloadable: $isDownloadable,
-                    isPurchasable: $isPurchasable,
-                    categoryID: $categoryID,
-                    title: $title,
-                    details: $details,
-                    price: $price,
-                    language: $language,
-                    teacher: $teacher
-                    writer: $writer,
-                    publisher: $publisher,
-                    publishedDate: $publishedDate,
-                    appearanceID: $appearanceID
-                    bookFiles: $bookFiles,
-                    attachments: $attachments,
-                    connectWay:$connectWay
-                ){
-                    status
-                    data {
-                        title
-                        id
-                    }
-                    message
+    const createBookMutation = gql`
+        mutation createBook($isBook:Boolean! $term:String $university:String $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String! $teacher:String){
+            createBook(
+                isBook:$isBook,
+                isDownloadable: $isDownloadable,
+                isPurchasable: $isPurchasable,
+                categoryID: $categoryID,
+                title: $title,
+                details: $details,
+                price: $price,
+                language: $language,
+                teacher: $teacher
+                writer: $writer,
+                publisher: $publisher,
+                publishedDate: $publishedDate,
+                appearanceID: $appearanceID
+                bookFiles: $bookFiles,
+                attachments: $attachments,
+                connectWay:$connectWay
+                pages:$pages
+                university: $university
+                term:$term
+
+            ){
+                status
+                data {
+                    title
+                    id
                 }
+                message
             }
-        `
+        }
+    `
 
     const updateBookMutation = gql`
-        mutation updateBook($id:ID!  $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
+        mutation updateBook($id:ID! $term:String $teacher:String $pages:Int  $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
             updateBook(
                 id: $id
                 isDownloadable: $isDownloadable,
@@ -75,6 +81,7 @@ const NewBrochure = () => {
                 details: $details,
                 price: $price,
                 language: $language,
+                teacher: $teacher
                 writer: $writer,
                 publisher: $publisher,
                 publishedDate: $publishedDate,
@@ -82,6 +89,8 @@ const NewBrochure = () => {
                 bookFiles: $bookFiles,
                 attachments: $attachments,
                 connectWay:$connectWay
+                pages:$pages
+                term:$term
             ){
                 status
                 data {
@@ -121,7 +130,7 @@ const NewBrochure = () => {
 
     const [BookData, setBookData] = useState({
         type: 'physical',
-        price: '20000',
+        price: 20000,
         attachments: [],
         files: [],
         fileNames: [],
@@ -136,7 +145,7 @@ const NewBrochure = () => {
         appearanceID: string
         details: string
         type: string
-        price: string
+        price: number
         pages: string
         teacher: string
         categoryID: string
@@ -147,6 +156,7 @@ const NewBrochure = () => {
         attachments: []
         fileNames: []
         term: string
+        university: string
     })
 
 
@@ -163,7 +173,7 @@ const NewBrochure = () => {
     useEffect(() => {
 
 
-        if (EditBookData()) {
+        if (Object.keys(EditBookData()).length) {
             setEditing(() => {
                 return true
             })
@@ -180,12 +190,14 @@ const NewBrochure = () => {
                 updateBookData('categoryID', EditBookData().categoryID)
                 updateBookData('writer', EditBookData().writer)
                 updateBookData('details', EditBookData().details)
+                updateBookData('teacher', EditBookData().teacher ?? "")
                 updateBookData('term', EditBookData().term ?? "")
                 // updateBookData('price', EditBookData().price??'')
                 // updateBookData('connectWay', EditBookData().connectWay)
                 setConnectWay(EditBookData().connectWay)
                 setContactType(EditBookData().connectWay[0] === "0" ? 'phone' : 'telegram')
                 updateBookData('language', EditBookData().language)
+                updateBookData('university', EditBookData().university)
                 // updateBookData('attachments', EditBookData().attachments)
                 let imagesArr = [] as any[]
                 let attachments = [] as any[]
@@ -215,13 +227,16 @@ const NewBrochure = () => {
                 console.log(e)
                 Toast('خطا در هنگام ویرایش کتاب')
             }
-            EditBookData(null)
+            EditBookData({})
+        } else {
+
         }
 
     }, [])
 
 
     const submitBook = () => {
+        console.log(BookData)
 
         if (editing) {
 
@@ -230,15 +245,18 @@ const NewBrochure = () => {
                     id: BookData.id,
                     title: BookData.title,
                     categoryID: BookData.categoryID,
-                    isPurchasable: BookData.price ? BookData.price !== 'free' : false,
+                    isPurchasable: BookData.price ? BookData.price !== 0 : false,
                     isDownloadable: BookData.type === 'pdf',
                     isBook: true,
+                    details: BookData.details,
                     bookFiles: BookData.files,
                     attachments: BookData.attachments,
                     connectWay: connectWay,
                     appearanceID: BookData.appearanceID,
-                    pages: BookData.pages
-
+                    pages: parseInt(BookData.pages),
+                    university: BookData.university,
+                    price: BookData.price,
+                    term: BookData.term
                 }
             }).then((e) => {
                 try {
@@ -260,14 +278,18 @@ const NewBrochure = () => {
                 variables: {
                     title: BookData.title,
                     categoryID: BookData.categoryID,
-                    isPurchasable: BookData.price ? BookData.price !== 'free' : false,
+                    isPurchasable: BookData.price ? BookData.price !== 0 : false,
                     isDownloadable: BookData.type === 'pdf',
                     isBook: false,
                     bookFiles: BookData.files,
+                    details: BookData.details,
                     attachments: BookData.attachments,
                     connectWay: connectWay,
                     teacher: BookData.teacher,
-                    term: BookData.term
+                    term: BookData.term,
+                    university: BookData.university,
+                    price: BookData.price,
+                    pages: parseInt(BookData.pages),
                 }
             }).then((e) => {
                 try {
@@ -339,8 +361,7 @@ const NewBrochure = () => {
                     showSemester ?
                         <Semesters onCatSelected={(e: string) => {
                             setShowSemester(false)
-                            console.log('hrese e')
-                            console.log(e)
+
                             if (e.length) {
                                 setChosenSemester(e)
                                 updateBookData('term', e)
@@ -467,7 +488,13 @@ const NewBrochure = () => {
                                 className={'text-textDark text-tiny '}>اختیاری</span></div>
                             <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
                                    wrapperClassName={'px-3 h-14'}
-                                   placeHolder={'کدوم دانشگاه ؟'}/>
+                                   placeHolder={'کدوم دانشگاه ؟'}
+                                   defaultValue={BookData.university ?? ''}
+                                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                       updateBookData('university', e.currentTarget.value)
+                                   }}
+
+                            />
 
 
                             <div className={'new-divider mt-10'}></div>
@@ -617,7 +644,6 @@ const NewBrochure = () => {
                                    defaultValue={BookData.details}
                                    inputClassName={'IranSans rounded-xl h-32 mt-5  border-primary border-2  pt-2 px-3 w-full outline-0 '}
                                    wrapperClassName={''}
-                                   placeHolder={'کتابِ...'}
                                    onChange={(e: InputEvent) => {
                                        let el = e.currentTarget as HTMLTextAreaElement
                                        updateBookData('details', el.value)
@@ -839,12 +865,12 @@ const NewBrochure = () => {
                                 <div
                                     className={'IranSansMedium h-10 w-20 flex flex-row justify-around items-center bg-background rounded-lg'}>
                                     <input id={'free-book'} className={'scale-150 rounded border-2 border-primary'}
-                                           defaultValue={BookData.price}
+                                           defaultValue={fixPrice(BookData.price)}
                                            type={'checkbox'} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                         if (e.currentTarget.checked)
-                                            updateBookData('price', 'free')
+                                            updateBookData('price', 0)
                                         else if (priceInputRef.current)
-                                            updateBookData('price', (priceInputRef.current as HTMLInputElement).value)
+                                            updateBookData('price', 20000)
 
 
                                     }}/>
@@ -854,20 +880,22 @@ const NewBrochure = () => {
 
 
                             <div
-                                className={`${BookData.price === 'free' ? 'grayscale pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
+                                className={`${BookData.price === 0 ? 'grayscale pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
                                 <div className={'w-10 h-10 mx-2 p-2'}>
                                     <Toman/>
                                 </div>
                                 <div className={'h-3/5 bg-gray-400 w-0 border'}/>
                                 <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'}
-                                       defaultValue={BookData.price ? BookData.price.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '') : '20,000'}
+                                       defaultValue={fixPrice(BookData.price) ?? '20,000'}
                                        numOnly={false}
 
                                        inputClassName={'border-0 border-transparent text-left text-lg IranSansBold rounded-xl'}
                                        wrapperClassName={'w-full h-full '}
                                        onChange={(e: InputEvent) => {
                                            let el = e.currentTarget as HTMLInputElement
+                                           updateBookData('price', parseInt(el.value.replace(',', '')))
                                            el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
+
                                        }}
                                 />
                             </div>
@@ -947,9 +975,10 @@ const NewBrochure = () => {
                         }}
                         disabled={!bookVerification()}
                         id={'new-appeal-submit'}
-                        loading={createBookResult.loading}
+                        loading={createBookResult.loading || updateBookResult.loading}
                         className={`w-11/12 h-14 ${bookVerification() ? 'bg-primary' : 'bg-gray-400'}  transition-all duration-300  rounded-xl flex flex-row justify-between items-center px-4`}
                         rippleColor={'rgba(255,255,255,0.49)'}
+
                     >
                         <div className={'text-white IranSans w-8 '}/>
                         <div className={'text-white IranSans  '}>{`${currentStep == 2 ? 'ثبت' : 'بعدی'}`}</div>

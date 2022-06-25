@@ -21,6 +21,7 @@ import {ToastContainer} from "react-toastify";
 import {UserData, UserId} from "../../../store/user";
 import {getAndSetUserData} from "../../../helpers/GetAndSetUserData";
 import {getUserQuery} from "../../../Requests/normal/user";
+import {fixPrice} from "../../../helpers/fixPrice";
 
 
 interface Props {
@@ -303,7 +304,7 @@ const Book = (props: Props) => {
                             {
                                 book.price ?
                                     <div className={'flex flex-row justify-center items-start'}>
-                                        <span className={'block ml-1'}>{book.price}</span>
+                                        <span className={'block ml-1'}>{fixPrice(parseInt(book.price))}</span>
                                         <div className={'h-5 w-5 '}><Toman/></div>
                                     </div>
                                     :

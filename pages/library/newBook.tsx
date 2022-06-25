@@ -27,9 +27,8 @@ import BoldMobile from "../../assets/svgs/boldMobile.svg";
 import RightSquareSVG from "../../assets/svgs/rightSquare.svg";
 import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
-import {images} from "next/dist/build/webpack/config/blocks/images";
 import _ from 'lodash'
-import Book from "./book/[id]";
+import {fixPrice} from "../../helpers/fixPrice";
 
 const NewBook = () => {
 
@@ -37,7 +36,7 @@ const NewBook = () => {
     //queries
 
     const createBookMutation = gql`
-        mutation createBook($isBook:Boolean! $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
+        mutation createBook($isBook:Boolean! $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
             createBook(
                 isBook:$isBook,
                 isDownloadable: $isDownloadable,
@@ -54,6 +53,7 @@ const NewBook = () => {
                 bookFiles: $bookFiles,
                 attachments: $attachments,
                 connectWay:$connectWay
+                pages:$pages
             ){
                 status
                 data {
@@ -124,10 +124,11 @@ const NewBook = () => {
     const [fileSize, setFileSize] = useState(0);
     const [fileName, setFileName] = useState("");
     const [editing, setEditing] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     const [BookData, setBookData] = useState({
         type: 'physical',
-        price: '20000',
+        price: 20000,
         attachments: [],
         files: [],
         fileNames: []
@@ -141,8 +142,8 @@ const NewBook = () => {
         appearanceID: string
         details: string
         type: string
-        price: string
-        pages: string
+        price: number
+        pages: number
         categoryID: string
         categoryPersian: string
         publisher: string
@@ -154,7 +155,7 @@ const NewBook = () => {
 
 
     useEffect(() => {
-        if (EditBookData()) {
+        if (Object.keys(EditBookData()).length) {
             setEditing(() => {
                 return true
             })
@@ -169,7 +170,12 @@ const NewBook = () => {
                 if (EditBookData().category)
                     updateBookData('categoryPersian', EditBookData().category.title)
                 updateBookData('categoryID', EditBookData().categoryID)
+                updateBookData('details', EditBookData().details)
                 updateBookData('writer', EditBookData().writer)
+                updateBookData('publishedDate', EditBookData().publishedDate)
+                updateBookData('price', parseInt(EditBookData().price))
+
+                updateBookData('publisher', EditBookData().publisher ?? '')
                 // updateBookData('price', EditBookData().price??'')
                 // updateBookData('connectWay', EditBookData().connectWay)
                 setConnectWay(EditBookData().connectWay)
@@ -204,7 +210,9 @@ const NewBook = () => {
                 console.log(e)
                 Toast('خطا در هنگام ویرایش کتاب')
             }
-            EditBookData(null)
+            EditBookData({})
+        } else {
+            _categoryComponent(true)
         }
 
     }, [])
@@ -216,13 +224,17 @@ const NewBook = () => {
             updateBookData('isBook', false);
         }
 
-        if (EditBookData())
-            if (!EditBookData().category)
-                _categoryComponent(true)
+
     }, [])
 
 
     const submitBook = () => {
+
+        if (uploading) {
+            Toast('در حال آپلود فایل یا عکس...')
+            // return 0
+        }
+
         let attachments = [] as any[]
         BookData.attachments.map((item) => {
             attachments.push(_.omit(item, ["__typename"]))
@@ -236,14 +248,20 @@ const NewBook = () => {
                     id: BookData.id,
                     title: BookData.title,
                     categoryID: BookData.categoryID,
-                    isPurchasable: BookData.price ? BookData.price !== 'free' : false,
+                    details: BookData.details,
+                    isPurchasable: BookData.price ? BookData.price !== 0 : false,
                     isDownloadable: BookData.type === 'pdf',
                     isBook: true,
                     bookFiles: BookData.files,
                     attachments: BookData.attachments,
                     connectWay: connectWay,
                     appearanceID: BookData.appearanceID,
-                    pages: BookData.pages
+                    pages: BookData.pages,
+                    publishedDate: BookData.publishedDate,
+                    publisher: BookData.publisher,
+                    price: BookData.price,
+                    writer: BookData.writer,
+                    language: BookData.language
                 }
             }).then((e) => {
                 try {
@@ -258,19 +276,26 @@ const NewBook = () => {
                 }
             })
         } else {
+            console.log(BookData)
 
             createBook({
                 variables: {
                     title: BookData.title,
                     categoryID: BookData.categoryID,
-                    isPurchasable: BookData.price ? BookData.price !== 'free' : false,
+                    details: BookData.details,
+                    isPurchasable: BookData.price ? BookData.price !== 0 : false,
                     isDownloadable: BookData.type === 'pdf',
                     isBook: true,
                     bookFiles: BookData.files,
                     attachments: BookData.attachments,
                     connectWay: connectWay,
                     appearanceID: BookData.appearanceID,
-                    pages: BookData.pages
+                    pages: BookData.pages,
+                    publishedDate: BookData.publishedDate,
+                    publisher: BookData.publisher,
+                    price: BookData.price,
+                    writer: BookData.writer,
+                    language: BookData.language
                 }
             }).then((e) => {
                 try {
@@ -522,9 +547,12 @@ const NewBook = () => {
                                         <input type={'file'}
                                                className={'opacity-0 absolute top-0 left-0 w-full h-full '}
                                                accept={'.png,.jpeg,.jpg'} onInput={(e) => {
-                                            if (e.currentTarget && e.currentTarget.files && e.currentTarget.files.length)
+                                            if (e.currentTarget && e.currentTarget.files && e.currentTarget.files.length) {
+                                                setUploading(true)
+
                                                 uploadBookImages(e.currentTarget.files[0], removeEmptyProgresses, currentBookId, (response: any) => {
-                                                        console.log(response.data)
+                                                        setUploading(false)
+
                                                         if (typeof response.data !== "number") {
                                                             updateBookData('attachments', [...uploadedImages, response.data])
                                                             setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
@@ -535,9 +563,11 @@ const NewBook = () => {
                                                         } else {
                                                             Toast("خطا در هنگام آپلود")
                                                             removeEmptyProgresses()
+                                                            setUploading(false)
                                                         }
                                                     }, (error: any) => {
                                                         // showError('خطا در آپلود فایل، دوبره تلاش کنید')
+                                                        setUploading(false)
 
                                                         let updateUploadingProgress = [...uploadingProgress]
                                                         updateUploadingProgress[uploadingProgress.length] = 0;
@@ -545,6 +575,8 @@ const NewBook = () => {
                                                         removeEmptyProgresses()
                                                     },
                                                     (progressEvent: any) => {
+                                                        setUploading(false)
+
                                                         let percentCompleted = Math.round(
                                                             (progressEvent.loaded * 100) / progressEvent.total
                                                         );
@@ -553,6 +585,9 @@ const NewBook = () => {
                                                         setUploadingProgress(updatedUploadedProgress)
                                                     }
                                                 )
+
+                                            }
+
                                         }}/> : null
                                 }
 
@@ -630,7 +665,7 @@ const NewBook = () => {
                         <div className={'IranSansMedium text-textDarker pt-5'}>درباره کتاب <span
                             className={'text-tiny text-textDarker'}>اختیاری</span></div>
 
-                        <Input multiLine={true} id={'input'} numOnly={false}
+                        <Input defaultValue={BookData.details} multiLine={true} id={'input'} numOnly={false}
                                inputClassName={'IranSans rounded-xl h-32 mt-5  border-primary border-2 pt-2 px-3 w-full outline-0 '}
                                wrapperClassName={''}
                                placeHolder={'کتابِ...'}
@@ -669,6 +704,7 @@ const NewBook = () => {
                             <Input id={'author'} numOnly={false} wrapperClassName={'col-span-5 h-12'}
                                    placeHolder={'اسم انتشارات'}
                                    inputClassName={"rounded-xl"}
+                                   defaultValue={BookData.publisher}
                                    onChange={(e: InputEvent) => {
                                        let el = e.currentTarget as HTMLTextAreaElement
                                        updateBookData('publisher', el.value)
@@ -677,10 +713,11 @@ const NewBook = () => {
 
                             <Input id={'author'} numOnly={true} maxLength={4}
                                    inputClassName={'center-placeholder rounded-xl px-3 text-center'}
+                                   defaultValue={BookData.publishedDate}
                                    wrapperClassName={'col-span-2 h-12'} placeHolder={'سال'}
                                    onChange={(e: InputEvent) => {
                                        let el = e.currentTarget as HTMLTextAreaElement
-                                       updateBookData('publishedDate', el.value)
+                                       updateBookData('publishedDate', parseInt(el.value))
                                    }}
                             />
                         </div>
@@ -942,7 +979,7 @@ const NewBook = () => {
                                    placeHolder={'تعداد'}
                                    onChange={(e: InputEvent) => {
                                        let el = e.currentTarget as HTMLTextAreaElement
-                                       updateBookData('pages', el.value)
+                                       updateBookData('pages', parseInt(el.value))
                                    }}
                             />
                         </div>
@@ -954,40 +991,41 @@ const NewBook = () => {
                             <div
                                 className={'IranSansMedium h-10 w-24 px-2 flex flex-row justify-around items-center bg-background rounded-lg'}>
                                 <input id={'free-book'} className={'scale-150 rounded border-2 border-primary'}
-                                       type={'checkbox'} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                    if (e.currentTarget.checked) {
-                                        if (priceInputRef.current)
-                                            (priceInputRef.current as HTMLInputElement).value = '0'
-                                        updateBookData('price', 'free')
+                                       type={'checkbox'} defaultValue={BookData.price}
+                                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                           if (e.currentTarget.checked) {
+                                               if (priceInputRef.current)
+                                                   (priceInputRef.current as HTMLInputElement).value = '0'
+                                               updateBookData('price', 0)
 
-                                    } else if (priceInputRef.current) {
-                                        (priceInputRef.current as HTMLInputElement).value = lastPrice.current
-                                        console.log(lastPrice.current)
-                                        updateBookData('price', (lastPrice.current))
-                                    }
-                                }}/>
+                                           } else if (priceInputRef.current) {
+                                               (priceInputRef.current as HTMLInputElement).value = lastPrice.current
+                                               console.log(lastPrice.current)
+                                               updateBookData('price', parseInt(lastPrice.current))
+                                           }
+                                       }}/>
                                 <label htmlFor={'free-book'}> رایگان</label>
                             </div>
                         </div>
 
                         <div
-                            className={`${BookData.price === 'free' ? 'opacity-70 pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
+                            className={`${BookData.price === 0 ? 'opacity-70 pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
                             <div className={'w-10 h-10 mx-2 p-2'}>
                                 <Toman/>
                             </div>
                             <div className={'h-3/5 bg-gray-400 w-0 border'}/>
                             <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'}
-                                   defaultValue={BookData.price ?? '20,000'}
+                                   defaultValue={fixPrice(BookData.price) ?? '20,000'}
                                    numOnly={false}
 
                                    inputClassName={'border-0 border-transparent text-left text-lg IranSansBold rounded-xl'}
                                    wrapperClassName={'w-full h-full '}
                                    onChange={(e: InputEvent) => {
                                        let el = e.currentTarget as HTMLInputElement
+                                       updateBookData('price', parseInt(el.value.replace(',', '')))
                                        el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
                                        if (lastPrice.current)
                                            lastPrice.current = el.value.toString()
-                                       console.log(lastPrice)
                                    }}
                             />
                         </div>
@@ -1074,7 +1112,7 @@ const NewBook = () => {
                     }}
                     disabled={!bookVerification()}
                     id={'new-appeal-submit'}
-                    loading={createBookResult.loading}
+                    loading={createBookResult.loading || updateBookResult.loading}
                     className={`w-11/12 h-14 ${bookVerification() ? 'bg-primary' : 'bg-gray-400'}  transition-all duration-300  rounded-xl flex flex-row justify-between items-center px-4`}
                     rippleColor={'rgba(255,255,255,0.49)'}
                 >

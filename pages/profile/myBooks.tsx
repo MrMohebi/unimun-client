@@ -51,6 +51,7 @@ const MyBooks = () => {
                         writer
                         term
                         publisher
+                        university
                         appearanceID
                         appearance {
                             title
@@ -223,7 +224,7 @@ const MyBooks = () => {
                                 title: string
                                 seen: string
                                 status: string
-
+                                attachments: any[]
                             } = item;
 
 
@@ -231,13 +232,16 @@ const MyBooks = () => {
                                 <div dir={'ltr'} key={'my-book' + index}
                                      className={'w-full h-36 rounded-2xl shadow-sm bg-white mt-3 grid grid-cols-4 grid-rows-3 px-3'}>
                                     <div
-                                        className={'row-span-3 h-full col-span-1 h-full self-end flex flex-col items-center justify-center'}>
-                                        <img src="/assets/image/noBookImage.png" alt=""/>
+                                        className={'row-span-3 h-full col-span-1 h-full self-end flex flex-col items-center justify-center overflow-hidden'}>
+                                        <img
+                                            src={book.attachments && book.attachments.length ? `https://dl.unimun.me/${(book.attachments[0] as { url: string, preview: string }).url}` : '/assets/image/noImageBook.png'}
+                                            alt=""/>
                                     </div>
 
                                     <div
                                         className={'flex flex-row-reverse justify-start items-center col-span-3 IranSansMedium'}>
-                                        <span>{book.title}</span>
+                                        <span
+                                            className={'block w-20 text-right overflow-hidden text-ellipsis'}>{book.title}</span>
                                         <div
                                             className={`IranSansMedium ${book.status === "DELETED" ? "text-errorRed" : "text-primary"}  text-sm p-1 rounded-xl px-2 bg-background mr-3`}>{book.status === "PENDING_REVIEW" ? "در حال بررسی" : book.status === "PUBLISHED" ? "فعال" : book.status === "DELETED" ? "حذف شده" : book.status === "REJECTED" ? "تایید نشده" : ""}</div>
                                     </div>
@@ -274,8 +278,9 @@ const MyBooks = () => {
 
                                                 onClick={() => {
                                                     EditBookData(item)
+                                                    console.log(item)
+
                                                     router.push(book.isBook ? "/library/newBook" : "/library/newBrochure")
-                                                    console.log(book)
                                                 }}
                                                 style={{fontSize: '0.7rem'}}
                                                 className={'h-10  text-center flex flex-row justify-end items-center  bg-background rounded-xl  px-2 mx-1 IranSansMedium '}>
@@ -314,43 +319,11 @@ const MyBooks = () => {
 
                                         </DropDown>
 
-                                        {/*<select dir={'rtl'} className={'w-24 bg-transparent rounded h-8 backdrop-blur'} name="cars" id="cars">*/}
-                                        {/*    <option value="volvo">Volvo</option>*/}
-                                        {/*    <option value="saab">Saab</option>*/}
-                                        {/*    <option value="opel">Opel</option>*/}
-                                        {/*    <option value="audi">Audi</option>*/}
-                                        {/*</select>*/}
-
-                                        {/*<div className={'dropdown w-24 relative h-10 bg-black active:scale-125'}>*/}
-                                        {/*    <div className={'dropdown-content top-0 right-0 absolute'}>*/}
-                                        {/*        <div className={'h-10 w-20 bg-red-200'}>click</div>*/}
-                                        {/*        <div className={'h-10 w-20 bg-red-200'}>click</div>*/}
-                                        {/*        <div className={'h-10 w-20 bg-red-200'}>click</div>*/}
-                                        {/*    </div>*/}
-                                        {/*</div>*/}
-
-                                        {/*<div*/}
-                                        {/*    style={{fontSize: '0.7rem'}}*/}
-                                        {/*    className={'h-8  text-center flex flex-row justify-center items-center  bg-background rounded-xl  px-2 mx-1 IranSansMedium '}>*/}
-                                        {/*    ویرایش*/}
-                                        {/*    <div className={'w-4 h-4 ml-2'}>*/}
-                                        {/*        <Edit/>*/}
-                                        {/*    </div>*/}
-                                        {/*</div>*/}
-                                        {/*<div*/}
-                                        {/*    style={{fontSize: '0.7rem'}}*/}
-                                        {/*    className={'h-8 text-errorRed text-center flex flex-row justify-center items-center   bg-background rounded-xl  px-2 mx-1 IranSansMedium  '}>*/}
-                                        {/*    حذف*/}
-                                        {/*    <div className={'w-4 h-4 ml-2'}>*/}
-                                        {/*        <Delete/>*/}
-                                        {/*    </div>*/}
-                                        {/*</div>*/}
-
                                         <div dir={'ltr'}
                                              className={'IranSansMedium text-sm text-textBlack text-left col-span-1 w-full  self-center ml-2 flex flex-grow justify-start items-center'}>
                                             <div className={' w-4 h-4 '}><Toman/></div>
                                             <span
-                                                className={'block ml-1'}>{book.price ? book.price.split('').reverse().join('').replace(/(\d{3}(?!$))/g, '$1,').split('').reverse().join('') : '0'}</span>
+                                                className={'block ml-1'}>{book.price ? book.price.toString().split('').reverse().join('').replace(/(\d{3}(?!$))/g, '$1,').split('').reverse().join('') : '0'}</span>
                                         </div>
 
                                     </div>

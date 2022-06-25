@@ -3,7 +3,7 @@ import Search from "../../components/normal/Search/Search";
 import Add from '../../assets/svgs/add.svg'
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
-import {lastBookSubmitSuccess} from "../../store/books";
+import {EditBookData, lastBookSubmitSuccess} from "../../store/books";
 import Toast from "../../components/normal/Toast/Toast";
 import {gql, useLazyQuery} from "@apollo/client";
 import ThousandTomans from "../../assets/svgs/thousandTomans.svg";
@@ -305,7 +305,7 @@ const Index = () => {
                             {
 
                                 <div
-                                    className={`${(refreshLoading || getBooksResult.loading) ? 'pt-3' : 'h-0 overflow-hidden '}  duration-100 eas-in-out w-full text-center IranSansMedium text-sm h-8 flex flex-row items-center justify-center `}>
+                                    className={`${(refreshLoading || getBooksResult.loading) ? 'pt-3 h-8' : 'h-0 overflow-hidden '}  duration-100 eas-in-out w-full text-center IranSansMedium text-sm  flex flex-row items-center justify-center `}>
                                     دریافت کتاب ها
                                     <LoadingDialog wrapperClassName={'w-4 h-4 mr-2'} strokeWidth={4}/>
                                 </div>
@@ -496,6 +496,7 @@ const Index = () => {
             <div
                 className={`fixed right-7 bottom-40 flex flex-col items-start justify-center transition-all z-50 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
                 <Button onClick={() => {
+                    EditBookData({})
                     if (UserToken())
                         router.push('library/newBook')
                     else
