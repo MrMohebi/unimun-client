@@ -20,17 +20,17 @@ module.exports = {
                 '8': '8px',
             },
             borderRadius: {
-                'mob-size': '2rem'
+                'mob-border': '2.5rem'
             },
 
             maxWidth: {
                 'mob-w': '25rem',
-                'mob-cont-w': '20rem'
+                'mob-cont-w': '27rem'
 
             },
             maxHeight: {
-                'mob-h': '45rem',
-                'mob-cont-h': '41.5rem'
+                'mob-h': '50rem',
+                'mob-cont-h': '59.5rem'
             },
             fontSize: {
                 tiny: '0.65em'
@@ -40,6 +40,10 @@ module.exports = {
                 '0p': '0%',
                 'inputBorder': '3px',
                 'mob-round': '2rem',
+                'mob-w': '20rem',
+                'mob-h': '42rem',
+                'mob-s-w': '25rem',
+                'mob-s-h': '55rem',
 
             },
             colors: {

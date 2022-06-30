@@ -40,8 +40,12 @@ const Index = () => {
                         title
                         writer
                         status
+                        creator {
+                            name
+                        }
                         id
                         details
+                        publisher
                         isBook
                         price
                         category {
@@ -78,6 +82,8 @@ const Index = () => {
                 after: books.length ? books[books.length - 1]['cursor'] : ''
             }
         }).then(e => {
+
+            console.log(e)
 
             try {
                 if (e.data.books.edges) {
@@ -285,7 +291,28 @@ const Index = () => {
                             refreshFunction={() => {
                                 if (!getBooksResult.loading)
                                     _refreshLoading(true)
-                                getBooksResult.refetch().then(() => {
+                                getBooksResult.refetch().then((result) => {
+
+                                    try {
+                                        let Books = [] as object[]
+                                        result.data.books.edges.forEach((book: { node: any }) => {
+                                            Books.push(book.node)
+                                        })
+                                        //get last element of books
+                                        let lastBook = books[books.length - 1]
+                                        if ((lastBook as {
+                                            cursor: string
+                                        }).cursor === (Books[Books.length - 1] as {
+                                            cursor: string
+                                        })['cursor']) {
+                                            _hasMore(false)
+                                        } else
+                                            _books(books.concat(Books as never[]))
+                                    } catch (e) {
+                                        Toast('خطا هنگام دریافت کتاب ها')
+                                    }
+
+
                                     _refreshLoading(false)
                                 })
                             }}
@@ -325,7 +352,9 @@ const Index = () => {
                                     isDownloadable: boolean
                                     attachments: [{ preview: string }]
                                     price: number
+                                    writer: string
                                     id: string
+                                    creator: { name: string }
                                 }, index) => {
 
                                     if (book.status === 'DELETED')
@@ -337,10 +366,10 @@ const Index = () => {
                                                      // console.log(book.id)
                                                      router.push('/library/book/' + book.id)
                                                  }}
-                                                 className={'bg-white h-44 mt-4 grid grid-cols-2 w-full max-w-xl mx-auto rounded-2xl relative'}>
+                                                 className={'bg-white h-44 mt-4 grid grid-cols-3 w-full max-w-xl mx-auto rounded-2xl relative overflow-hidden'}>
 
                                                 <div
-                                                    className={'col-span-1 flex flex-col justify-start h-full items-start p-3'}>
+                                                    className={'col-span-2 flex flex-col justify-start h-full items-start p-3'}>
                                                 <span className={'IranSansBold '}
                                                       style={{fontSize: '0.95rem'}}>{book.isBook ? " کتاب " : " جزوه "}{book.title}</span>
 
@@ -349,7 +378,7 @@ const Index = () => {
 
                                                         <div
                                                             className={'IranSansMedium text-sm  whitespace-nowrap'}><span
-                                                            className={'text-textDark'}>نویسنده:</span> {book.appearance ? book.appearance.writer ?? "-" : '-'}
+                                                            className={'text-textDark'}>نویسنده:</span> {book.writer ? book.writer ?? "-" : '-'}
                                                         </div>
 
                                                         <div
@@ -362,14 +391,14 @@ const Index = () => {
                                                                 className={'text-textDark'}>
                                                                 وضعیت ظاهری:</span>
                                                             <span
-                                                                className={'overflow-hidden text-ellipsis w-4/12 inline-block mr-1'}>
+                                                                className={'overflow-hidden text-ellipsis  inline-block mr-1'}>
                                                                                                                             {book.appearance ? book.appearance.title ?? "-" : "-"}
 
                                                             </span>
                                                         </div>
                                                         <div
                                                             className={'IranSansMedium text-sm  whitespace-nowrap'}><span
-                                                            className={'text-textDark'}>ارائه دهنده:</span> {book.publisher ?? '-'}
+                                                            className={'text-textDark'}>ارائه دهنده:</span> {book.creator ? book.creator.name : '-' ?? '-'}
                                                         </div>
 
 
@@ -381,10 +410,12 @@ const Index = () => {
                                                     className={'col-span-1 p-3 flex flex-row-reverse justify-between items-center'}>
 
 
-                                                    <div className={'w-28 relative'}
+                                                    <div className={'w-28 relative z-10'}
                                                          style={{
                                                              minWidth: '7rem',
-                                                             height: '9.5rem'
+                                                             height: '9.5rem',
+                                                             boxShadow: "rgb(255 255 255) -8px 15px 9px 20px"
+
                                                          }}>
 
                                                         {book.isDownloadable ?
@@ -437,10 +468,15 @@ const Index = () => {
 
 
                                                     <div
-                                                        className={'flex flex-col ml-3 translate-y-2.5 h-full justify-end  IranSansMedium'}>
+
+                                                        className={'flex flex-col  ml-3 translate-y-2.5 h-full justify-end  IranSansMedium'}>
                                                         {
                                                             book.price && book.price.toString() !== 'free' ?
-                                                                <div className={'flex-row flex'}>
+                                                                <div style={{
+                                                                    boxShadow: "rgb(255 255 255) -8px 15px 9px 20px"
+                                                                }} className={'flex-row flex bg-white'}
+
+                                                                >
                                                           <span className={'mx-1 pb-2 '}>
                                                                 {book.price / 1000}
                                                           </span>

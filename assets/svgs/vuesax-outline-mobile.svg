@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="101.007" height="110.38"
+     viewBox="0 0 101.007 110.38">
+    <defs>
+        <filter id="a" x="0" y="0" width="101.007" height="110.38" filterUnits="userSpaceOnUse">
+            <feOffset dy="12"/>
+            <feGaussianBlur stdDeviation="10" result="b"/>
+            <feFlood flood-color="#455b63" flood-opacity="0.102"/>
+            <feComposite operator="in" in2="b"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+        <filter id="c" x="14.059" y="8.201" width="72.888" height="63.515" filterUnits="userSpaceOnUse">
+            <feOffset dy="12"/>
+            <feGaussianBlur stdDeviation="10" result="d"/>
+            <feFlood flood-color="#455b63" flood-opacity="0.102"/>
+            <feComposite operator="in" in2="d"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+        <filter id="e" x="15.114" y="32.829" width="70.779" height="70.779" filterUnits="userSpaceOnUse">
+            <feOffset dy="12"/>
+            <feGaussianBlur stdDeviation="10" result="f"/>
+            <feFlood flood-color="#455b63" flood-opacity="0.102"/>
+            <feComposite operator="in" in2="f"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+    </defs>
+    <g transform="translate(30 18)">
+        <g transform="translate(0)">
+            <g transform="matrix(1, 0, 0, 1, -30, -18)" filter="url(#a)">
+                <path d="M27.533,50.38H13.474C3.14,50.38,0,47.24,0,36.906V13.474C0,3.14,3.14,0,13.474,0H27.533C37.867,0,41.007,3.14,41.007,13.474V36.906C41.007,47.24,37.867,50.38,27.533,50.38ZM13.474,3.515c-8.389,0-9.959,1.593-9.959,9.959V36.906c0,8.365,1.57,9.959,9.959,9.959H27.533c8.389,0,9.959-1.593,9.959-9.959V13.474c0-8.365-1.57-9.959-9.959-9.959Z"
+                      transform="translate(30 18)" fill="#292d32"/>
+            </g>
+            <g transform="matrix(1, 0, 0, 1, -30, -18)" filter="url(#c)">
+                <path d="M11.13,3.515H1.757A1.77,1.77,0,0,1,0,1.757,1.77,1.77,0,0,1,1.757,0H11.13a1.77,1.77,0,0,1,1.757,1.757A1.77,1.77,0,0,1,11.13,3.515Z"
+                      transform="translate(44.06 26.2)" fill="#292d32"/>
+            </g>
+            <g transform="matrix(1, 0, 0, 1, -30, -18)" filter="url(#e)">
+                <path d="M5.389,10.779a5.389,5.389,0,1,1,5.389-5.389A5.39,5.39,0,0,1,5.389,10.779Zm0-7.287A1.875,1.875,0,1,0,7.264,5.366,1.88,1.88,0,0,0,5.389,3.491Z"
+                      transform="translate(45.11 50.83)" fill="#292d32"/>
+            </g>
+        </g>
+    </g>
+</svg>
