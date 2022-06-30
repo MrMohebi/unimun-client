@@ -33,7 +33,7 @@ const Search = (props: Props) => {
 
     return (
         <div
-            className={`absolute top-0 left-0 px-4 w-full  bg-white pt-3 ${props.collapse && !manualSearch[0] ? 'pb-1 ' : 'pb-4'} rounded-br-xl rounded-bl-xl z-10 shadow`}>
+            className={`absolute top-0 left-0 px-4 w-full  bg-white pt-3 ${props.collapse && !manualSearch[0] ? 'pb-1 ' : 'pb-4'} rounded-br-xl rounded-bl-xl z-20 shadow`}>
             <div className={'search-upper flex flex-row justify-between items-center'}>
 
 

@@ -420,7 +420,7 @@ const NewBook = () => {
                 className={`p-2 shadow overflow-hidden new-book-dropdown fixed  transition-all -translate-x-1/2 -translate-y-1/2  bg-white z-50 flex flex-col justify-center items-center rounded-2xl w-36 ${langDropDown ? 'opacity-100 scale-100 ' : 'opacity-0 scale-0'} `}>
                 <Button onClick={() => {
                     let updatedBookData = BookData
-                    updatedBookData.language = 'persian'
+                    updatedBookData.language = 'فارسی'
                     setBookData(updatedBookData)
                     Sdimmer(false)
                     SlangDropDown(false)
@@ -431,7 +431,7 @@ const NewBook = () => {
                 <div className={'new-divider'}/>
                 <Button onClick={() => {
                     let updatedBookData = BookData
-                    updatedBookData.language = 'english'
+                    updatedBookData.language = 'انگلیسی'
                     setBookData(updatedBookData)
                     Sdimmer(false)
                     SlangDropDown(false)
@@ -508,7 +508,7 @@ const NewBook = () => {
                                 className={'flex overflow-y-hidden px-3 overflow-x-visible flex-row w-full  pt-5 pb-5 justify-between items-center text-textDarker IranSansMedium'}>
                             <span>زبان <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
                             <span ref={selectLangRef}
-                                  className={'text-textDark'}>{!BookData.language ? "انتخاب  کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>
+                                  className={'text-textDark'}>{!BookData.language ? "انتخاب  کنید" : BookData.language === "فارسی" ? "فارسی" : "انگلیسی"}</span>
                         </Button>
                         <div className={'new-divider '}/>
                         <div className={'IranSansMedium text-textDarker pt-5 mx-3'}>مترجم <span

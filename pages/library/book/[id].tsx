@@ -155,23 +155,30 @@ const Book = (props: Props) => {
 
             </div>
             {
-                book.attachments ?
+                book.attachments && book.attachments.length ?
                     <ImageSlider images={book.attachments}/>
-                    : null
+                    :
+                    <div className={'w-full flex flex-row mt-10 justify-center items-center'}>
+                        <div className={'relative border-2 rounded-xl mt-10 py-2'}>
+                            <img src={"/assets/image/noImageBook.png"}
+                                 className={`h-44 w-32 ${true ? 'h-44 w-32' : 'h-40 w-28'} overflow-hidden  rounded-xl mx-2  snap-center`}
+
+                                 style={{flex: '0 0 auto'}}/>
+
+                            {/*<span>{index}</span>*/}
+                        </div>
+                    </div>
+
 
             }
-            <div className={'px-3 pt-3'}>
+            <div className={'px-3 pt-3 '}>
 
-                {/*<Header backOnClick={() => {*/}
-                {/*    router.push('/library')*/}
-
-                {/*}} back={true} title={'کتاب'}/>*/}
 
 
                 <span
                     className={'text-textDark IranSansMedium mx-auto block text-sm text-center mt-4'}>{book.writer ?? "نویسنده مشخص نشده"}</span>
                 <span
-                    className={'text-black IranSansBold mx-auto block text-center mt-2'}>{book.title ?? '-'}</span>
+                    className={'text-black IranSansBold mx-auto block text-center mt-3'}>{book.title ?? '-'}</span>
 
 
                 <div className={'w-full flex flex-row justify-around items-center h-16 nt-3'}>
@@ -193,7 +200,8 @@ const Book = (props: Props) => {
                         <span className={'text-textDark IranSansMedium text-sm'}>ارائه دهنده</span>
                         {
                             book.creator ?
-                                <span className={'text-textBlack IranSansMedium text-sm mt-1 '}>محمد</span>
+                                <span
+                                    className={'text-textBlack IranSansMedium text-sm mt-1 '}>{book.creator.name}</span>
                                 :
                                 <div className={'mt-1 w-16'}>
                                     <Unimun/>
@@ -229,7 +237,7 @@ const Book = (props: Props) => {
                         <span className={'text-textDark IranSansMedium text-sm inline-block'}> سال انتشار:</span>
 
                         <span
-                            className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{book.publisherDate ?? '-'}</span>
+                            className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{book.publishedDate ?? '-'}</span>
                     </div>
                     <div className={'mt-2'}>
                         <span className={'text-textDark IranSansMedium text-sm inline-block'}>زبان:</span>
@@ -348,11 +356,17 @@ const Book = (props: Props) => {
                                                     })
 
                                                     let text = book.connectWay;
-                                                    navigator.clipboard.writeText(text).then(function () {
-                                                        Toast('شماره تلفن در کلیپبورد شما کپی شد');
-                                                    }, function () {
-                                                        Toast(book.connectWay);
-                                                    });
+                                                    try {
+                                                        navigator.clipboard.writeText(text).then(function () {
+                                                            Toast('شماره تلفن در کلیپبورد شما کپی شد');
+                                                        }, function () {
+                                                            Toast(book.connectWay);
+                                                        });
+                                                    } catch (e) {
+                                                        console.log('copy error')
+
+                                                    }
+
                                                 } else {
                                                     window.open(`https://t.me/${book.connectWay.replace('@', '')}`, '_blank')
                                                 }

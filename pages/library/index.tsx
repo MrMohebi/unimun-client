@@ -8,7 +8,7 @@ import Toast from "../../components/normal/Toast/Toast";
 import {gql, useLazyQuery} from "@apollo/client";
 import ThousandTomans from "../../assets/svgs/thousandTomans.svg";
 import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
-import GalleryImageSVG from "../../assets/svgs/galleryImage.svg";
+import GalleryImageSVG from "../../assets/svgs/galleryImageW.svg";
 import DownloadOutline from "../../assets/svgs/downloadOutline.svg";
 import SkeletonElement from "../../components/view/Skeleton/Skeleton";
 import {lastGottenBooks} from "../../store/books";
@@ -293,21 +293,14 @@ const Index = () => {
                                     _refreshLoading(true)
                                 getBooksResult.refetch().then((result) => {
 
+                                    console.log(result)
                                     try {
                                         let Books = [] as object[]
                                         result.data.books.edges.forEach((book: { node: any }) => {
                                             Books.push(book.node)
                                         })
-                                        //get last element of books
-                                        let lastBook = books[books.length - 1]
-                                        if ((lastBook as {
-                                            cursor: string
-                                        }).cursor === (Books[Books.length - 1] as {
-                                            cursor: string
-                                        })['cursor']) {
-                                            _hasMore(false)
-                                        } else
-                                            _books(books.concat(Books as never[]))
+                                        _hasMore(true)
+                                        _books(Books as never[])
                                     } catch (e) {
                                         Toast('خطا هنگام دریافت کتاب ها')
                                     }
@@ -445,25 +438,29 @@ const Index = () => {
                                                             src={book.attachments && book.attachments.length ? `https://dl.unimun.me/${(book.attachments[0] as { url: string, preview: string }).url}` : '/assets/image/noImageBook.png'}
                                                             alt={book.title} className={'h-full w-32 rounded-xl'}/>
 
+                                                        {
+                                                            book.attachments && book.attachments.length ?
+                                                                <div dir={'ltr'}
+                                                                     className={'absolute flex flex-col justify-center items-center left-2 top-2  w-8 h-8 pb-7 p-0.5 rounded-xl '}
+                                                                     style={{
+                                                                         background: 'rgba(83,82,85,0.61)'
 
-                                                        <div dir={'ltr'}
-                                                             className={'absolute left-2 top-2 p-2  rounded-xl p-1 '}
-                                                             style={{
-                                                                 background: 'rgba(83,82,85,0.61)'
-                                                             }}>
-                                                            {
-                                                                book.attachments ?
-                                                                    <div className={'invert'}>
-                                                                        <SVGModifier SVGName={'galleryImage'}
+                                                                     }}>
+
+
+                                                                    <div className={' w-full  h-full p-0.5 '}>
+                                                                        <SVGModifier SVGName={'galleryImageW'}
                                                                                      elementClass={'number'}
                                                                                      value={book.attachments.length.toString()}>
                                                                             <GalleryImageSVG/>
                                                                         </SVGModifier>
                                                                     </div>
 
-                                                                    : null
-                                                            }
-                                                        </div>
+
+                                                                </div>
+                                                                :
+                                                                null
+                                                        }
                                                     </div>
 
 
