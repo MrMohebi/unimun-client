@@ -22,6 +22,8 @@ import {UserData, UserId} from "../../../store/user";
 import {getAndSetUserData} from "../../../helpers/GetAndSetUserData";
 import {getUserQuery} from "../../../Requests/normal/user";
 import {fixPrice} from "../../../helpers/fixPrice";
+import NoPic from "../../../components/normal/NoPic/NoPic";
+import Free from "../../../assets/svgs/free.svg";
 
 
 interface Props {
@@ -158,12 +160,14 @@ const Book = (props: Props) => {
                 book.attachments && book.attachments.length ?
                     <ImageSlider images={book.attachments}/>
                     :
-                    <div className={'w-full flex flex-row mt-10 justify-center items-center'}>
-                        <div className={'relative border-2 rounded-xl mt-10 py-2'}>
-                            <img src={"/assets/image/noImageBook.png"}
-                                 className={`h-44 w-32 ${true ? 'h-44 w-32' : 'h-40 w-28'} overflow-hidden  rounded-xl mx-2  snap-center`}
+                    <div className={'w-full   flex flex-row mt-10 justify-center items-center'}>
+                        <div className={'relative h-40 w-28 border-2 rounded-xl mt-10 py-2'}>
 
-                                 style={{flex: '0 0 auto'}}/>
+                            <NoPic/>
+                            {/*<img src={"/assets/image/noImageBook.png"}*/}
+                            {/*     className={`h-44 w-32 ${true ? 'h-44 w-32' : 'h-40 w-28'} overflow-hidden  rounded-xl mx-2  snap-center`}*/}
+
+                            {/*     style={{flex: '0 0 auto'}}/>*/}
 
                             {/*<span>{index}</span>*/}
                         </div>
@@ -317,7 +321,10 @@ const Book = (props: Props) => {
                                     </div>
                                     :
                                     <div className={'flex flex-row justify-center items-start'}>
-                                        <span className={'block ml-1'}>{'رایگان'}</span>
+                                        <div className={'w-9'}>
+                                            <Free/>
+
+                                        </div>
                                     </div>
                             }
 

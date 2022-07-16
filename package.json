@@ -31,7 +31,8 @@
     "react-loading-skeleton": "^3.0.3",
     "react-toastify": "^8.2.0",
     "tippy.js": "^6.3.7",
-    "wordifyfa": "^1.4.0"
+    "wordifyfa": "^1.4.0",
+    "@react-buddy/ide-toolbox": "^2.2.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.181",

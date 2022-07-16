@@ -17,6 +17,8 @@ import _ from 'lodash';
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 import Unimun from '../../assets/svgs/unimun.svg'
 import {UserToken} from "../../store/user";
+import NoPic from "../../components/normal/NoPic/NoPic";
+import Free from '../../assets/svgs/free.svg'
 
 const Index = () => {
 
@@ -29,6 +31,7 @@ const Index = () => {
     const [searchLoading, _searchLoading] = useState(false);
     const [nothingFound, _nothingFound] = useState(false);
     const [refreshLoading, _refreshLoading] = useState(false)
+
 
 
     const getBooksQuery = gql`
@@ -403,7 +406,7 @@ const Index = () => {
                                                     className={'col-span-1 p-3 flex flex-row-reverse justify-between items-center'}>
 
 
-                                                    <div className={'w-28 relative z-10'}
+                                                    <div className={'w-28 relative z-10 '}
                                                          style={{
                                                              minWidth: '7rem',
                                                              height: '9.5rem',
@@ -434,9 +437,20 @@ const Index = () => {
                                                         }
 
 
-                                                        <img
-                                                            src={book.attachments && book.attachments.length ? `https://dl.unimun.me/${(book.attachments[0] as { url: string, preview: string }).url}` : '/assets/image/noImageBook.png'}
-                                                            alt={book.title} className={'h-full w-32 rounded-xl'}/>
+                                                        {
+                                                            book.attachments && book.attachments.length ?
+                                                                <img
+                                                                    src={`https://dl.unimun.me/${(book.attachments[0] as { url: string, preview: string }).url}`}
+                                                                    alt={book.title}
+                                                                    className={'h-full w-32 rounded-xl'}/>
+                                                                :
+                                                                <div className={' rounded-xl h-full overflow-hidden'}>
+                                                                    <NoPic/>
+                                                                </div>
+                                                        }
+                                                        {/*<img*/}
+                                                        {/*    src={book.attachments && book.attachments.length ? `https://dl.unimun.me/${(book.attachments[0] as { url: string, preview: string }).url}` : '/assets/image/noImageBook.png'}*/}
+                                                        {/*    alt={book.title} className={'h-full w-32 rounded-xl'}/>*/}
 
                                                         {
                                                             book.attachments && book.attachments.length ?
@@ -466,11 +480,11 @@ const Index = () => {
 
                                                     <div
 
-                                                        className={'flex flex-col  ml-3 translate-y-2.5 h-full justify-end  IranSansMedium'}>
+                                                        className={'flex flex-col z-10  ml-3 translate-y-2.5 h-full justify-end  IranSansMedium'}>
                                                         {
                                                             book.price && book.price.toString() !== 'free' ?
                                                                 <div style={{
-                                                                    boxShadow: "rgb(255 255 255) -8px 15px 9px 20px"
+                                                                    boxShadow: "rgb(255 255 255) 4px 10px 11px 13px"
                                                                 }} className={'flex-row flex bg-white'}
 
                                                                 >
@@ -480,10 +494,17 @@ const Index = () => {
                                                                     <ThousandTomans/>
                                                                 </div>
                                                                 :
-                                                                <span
-                                                                    className={'pb-2 IranSansMedium text-sm'}>
+                                                                <div
+                                                                    style={{
+                                                                        boxShadow: "rgb(255 255 255) 4px 10px 11px 13px"
+                                                                    }}
+                                                                    className={'pb-4 bg-white IranSansMedium text-sm'}>
 
-                                                                رایگان</span>
+                                                                    <div className={'w-9'}>
+                                                                        <Free/>
+
+                                                                    </div>
+                                                                </div>
 
                                                         }
 

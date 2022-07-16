@@ -989,8 +989,9 @@ const NewBook = () => {
                         <div className={'flex flex-row justify-between items-center mt-3'}>
                             <span className={'IranSansMedium'}>فروش به قیمت</span>
                             <div
-                                className={'IranSansMedium h-10 w-24 px-2 flex flex-row justify-around items-center bg-background rounded-lg'}>
-                                <input id={'free-book'} className={'scale-150 rounded border-2 border-primary'}
+                                className={' IranSansMedium h-10 w-24 px-2 flex flex-row justify-around items-center bg-background rounded-lg'}>
+                                <input id={'free-book'}
+                                       className={'free-checkbox scale-150 rounded border-2 border-primary'}
                                        type={'checkbox'} defaultValue={BookData.price}
                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                            if (e.currentTarget.checked) {
@@ -1004,6 +1005,7 @@ const NewBook = () => {
                                                updateBookData('price', parseInt(lastPrice.current))
                                            }
                                        }}/>
+                                <label htmlFor={'free-book'}> رایگان</label>
                                 <label htmlFor={'free-book'}> رایگان</label>
                             </div>
                         </div>

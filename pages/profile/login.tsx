@@ -29,6 +29,7 @@ const Login = () => {
     const refCodeInputRef = useRef<HTMLInputElement>(null)
     const clearCodeFunc = useRef<Function>(null)
     const router = useRouter()
+    const [shouldSignUp, setShouldSignUp] = useState(false);
 
 
     const [sendVcode, sendVCodeResult] = useMutation(gql`${SendVCodeQuery(phoneNumber).query}`, {variables: SendVCodeQuery(phoneNumber).variables})
@@ -65,10 +66,10 @@ const Login = () => {
             title: 'شماره تلفن خود را وارد کنید',
             description: 'یک کد برای این شماره ارسال خواهد شد!'
         },
-        {
-            title: 'کـد دعـوت دارید ؟',
-            description: `واسه وارد شدن به یونیمون ، لازمه که از طرف یکی دعوت شده باشید و کد دعوتش رو در کادر زیر وارد کنید!`
-        },
+        // {
+        //     title: 'کـد دعـوت دارید ؟',
+        //     description: `واسه وارد شدن به یونیمون ، لازمه که از طرف یکی دعوت شده باشید و کد دعوتش رو در کادر زیر وارد کنید!`
+        // },
         {
             title: 'کد تایید را وارد کنید',
             description: `برای ${phoneNumber} یک کد ارسال شده که خیلی محرمانه هست! بدون این که کسی ببینه واردش کنید :)`
@@ -98,26 +99,65 @@ const Login = () => {
 
     }, [])
 
+
+    const submitButtonClick = () => {
+
+        if (currentStep === 0) {
+            sendVcode().then(e => {
+                if (e.data.sendVCode.data.isSignup) {
+                    setShouldSignUp(true)
+                }
+
+                if (e.data.sendVCode.status === 'SUCCESS') {
+                    setStep(1)
+                    setReferenceCode('MRM755')
+                }
+            })
+        }
+
+        if (currentStep === 1 && codeValidation(vCode)) {
+            verifyVCode()
+        }
+
+
+        if (vCodeError) {
+            setVCodeError(false)
+            verifyVCodeResult.reset()
+            if (clearCodeFunc.current)
+                clearCodeFunc.current()
+        }
+
+        if (currentStep === 2) {
+            if (nameInputRef.current)
+                setName({variables: {name: nameInputRef.current.value}}).then(e => {
+                    if (e.data) {
+                        if (e.data.updateUser.status === 'SUCCESS') {
+                            router.push('/').then(() => {
+                                currentNavActiveIndex(2)
+                            })
+                        }
+                    }
+                })
+        }
+    }
+
     //handel query data
     useEffect(() => {
         if (sendVCodeResult.data) {
             if (sendVCodeResult.data.sendVCode.data.vCode) {
                 setVCodeHint(parseInt(sendVCodeResult.data.sendVCode.data.vCode[0]))
+                if (sendVCodeResult.data.sendVCode.data.isSignup) {
+                    setShouldSignUp(true)
+                }
             }
-            if (sendVCodeResult.data.sendVCode.data.isSignup && !referenceCode) {
-                // setStep(1)
-                setAllowForNextStep(false)
-            }
-            if (!sendVCodeResult.data.sendVCode.data.isSignup) {
-                // setStep(2)
+
+            if (!sendVCodeResult.data) {
                 if (deadLine.current === 0)
                     deadLine.current = Math.floor(Date.now() / 1000)
 
             }
         }
         if (verifyVCodeResult.data) {
-
-            console.log(verifyVCodeResult.data.verifyVCode.data.id)
 
             try {
                 console.log(verifyVCodeResult.data.verifyVCode.data.id)
@@ -129,24 +169,23 @@ const Login = () => {
             } catch (e) {
 
             }
-            if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && sendVCodeResult.data.sendVCode.data.isSignup) {
-                setStep(3)
-                setAllowForNextStep(false)
-                UserToken(verifyVCodeResult.data.verifyVCode.data.token)
-                setToken(verifyVCodeResult.data.verifyVCode.data.token)
-                setId(verifyVCodeResult.data.verifyVCode.data.id)
-                verifyVCodeResult.reset()
-            }
-            if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS" && !sendVCodeResult.data.sendVCode.data.isSignup) {
+
+            if (verifyVCodeResult.data.verifyVCode.status === "SUCCESS") {
                 setVcodeSuccess(true)
-                setTimeout(() => {
+                if (shouldSignUp) {
                     UserToken(verifyVCodeResult.data.verifyVCode.data.token)
                     setToken(verifyVCodeResult.data.verifyVCode.data.token)
                     setId(verifyVCodeResult.data.verifyVCode.data.id)
-                    router.push('/').then(() => {
-                        currentNavActiveIndex(2)
-                    })
-                }, 300)
+                    setStep(2)
+                } else
+                    setTimeout(() => {
+                        UserToken(verifyVCodeResult.data.verifyVCode.data.token)
+                        setToken(verifyVCodeResult.data.verifyVCode.data.token)
+                        setId(verifyVCodeResult.data.verifyVCode.data.id)
+                        router.push('/').then(() => {
+                            currentNavActiveIndex(2)
+                        })
+                    }, 300)
 
             } else {
                 setVCodeError(true)
@@ -158,24 +197,18 @@ const Login = () => {
         <div dir={'rtl'} className={'w-full h-full'}>
             <Header backOnClick={() => {
                 setVCodeError(false)
+
                 if (currentStep === 0)
                     router.push('/').then(() => {
                         currentNavActiveIndex(2)
                     })
+
                 if (currentStep === 1) {
-                    sendVCodeResult.reset()
-                    setStep(0)
-                }
-                if (currentStep === 2 && sendVCodeResult.data.sendVCode.data.isSignup) {
                     sendVCodeResult.reset()
                     verifyVCodeResult.reset()
                     setStep(1)
                 }
-                if (currentStep === 2 && !sendVCodeResult.data.sendVCode.data.isSignup) {
-                    sendVCodeResult.reset()
-                    verifyVCodeResult.reset()
-                    setStep(0)
-                }
+
 
             }} alignment={'rtl'} title={'ورود به یونیمون'} back={true}/>
             <div className={'w-full px-5 pt-4 h-full'}>
@@ -206,78 +239,80 @@ const Login = () => {
                         </div>
 
 
-                        : currentStep === 1 ?
+                        //todo this step is skipped by number five
+                        : currentStep === 5 ?
                             <div className={'h-full'}>
-                                <Input inputRef={refCodeInputRef} onFocus={() => {
-                                    setShowPromoter(false)
-                                }} onBlur={() => {
-                                    setShowPromoter(true)
-                                }} maxLength={6} key={'ref'} defaultValue={''} id={'ref-code'}
-                                       wrapperClassName={`mt-5 transition-all h-14 duration-400`}
-                                       numOnly={false}
-                                       dir={'ltr'}
-                                       inputClassName={`text-center english text-md ${refCodeStatus === 'SUCCESS' ? 'text-primary' : refCodeStatus === 'ERROR' ? 'text-errorRed' : ''}`}
-                                       onChange={(e: any) => {
+                                {/*<Input inputRef={refCodeInputRef} onFocus={() => {*/}
+                                {/*    setShowPromoter(false)*/}
+                                {/*}} onBlur={() => {*/}
+                                {/*    setShowPromoter(true)*/}
+                                {/*}} maxLength={6} key={'ref'} defaultValue={''} id={'ref-code'}*/}
+                                {/*       wrapperClassName={`mt-5 transition-all h-14 duration-400`}*/}
+                                {/*       numOnly={false}*/}
+                                {/*       dir={'ltr'}*/}
+                                {/*       inputClassName={`text-center english text-md ${refCodeStatus === 'SUCCESS' ? 'text-primary' : refCodeStatus === 'ERROR' ? 'text-errorRed' : ''}`}*/}
+                                {/*       onChange={(e: any) => {*/}
 
-                                           setRefCodeStatus('')
-                                           e.currentTarget.value = e.currentTarget.value.toUpperCase()
-                                           setReferenceCode(e.currentTarget.value)
-                                           if (e.currentTarget.value.length === 6) {
-                                               verifyReferral({variables: {referenceCode: e.target.value.toString()}}).then(e => {
-                                                   if (e.data.isReferenceCodeValid.status === 'SUCCESS') {
-                                                       setRefCodeStatus('SUCCESS')
-                                                       setAllowForNextStep(true)
-                                                   } else {
-                                                       setRefCodeStatus('ERROR')
-                                                   }
-                                               })
+                                {/*           setRefCodeStatus('')*/}
+                                {/*           e.currentTarget.value = e.currentTarget.value.toUpperCase()*/}
+                                {/*           setReferenceCode(e.currentTarget.value)*/}
+                                {/*           if (e.currentTarget.value.length === 6) {*/}
+                                {/*               verifyReferral({variables: {referenceCode: e.target.value.toString()}}).then(e => {*/}
+                                {/*                   if (e.data.isReferenceCodeValid.status === 'SUCCESS') {*/}
+                                {/*                       setRefCodeStatus('SUCCESS')*/}
+                                {/*                       setAllowForNextStep(true)*/}
+                                {/*                   } else {*/}
+                                {/*                       setRefCodeStatus('ERROR')*/}
+                                {/*                   }*/}
+                                {/*               })*/}
 
-                                               // setAllowForNextStep(true)
-                                           }
+                                {/*               // setAllowForNextStep(true)*/}
+                                {/*           }*/}
 
-                                       }}
+                                {/*       }}*/}
 
-                                />
-                                <div className={'mt-3 mr-1'}>
-                                        <span className={'IranSansMedium text-primary  text-sm mt-3'} onClick={() => {
-                                            if (refCodeInputRef.current) {
-                                                if (refCodeInputRef.current.value.toString().length > 3) {
-                                                    verifyReferral({variables: {referenceCode: refCodeInputRef.current.value.toString()}}).then((e: any) => {
-                                                        verifyReferral({variables: {referenceCode: e.target.value.toString()}}).then(e => {
-                                                            if (e.data.isReferenceCodeValid.status === 'SUCCESS') {
-                                                                setRefCodeStatus('SUCCESS')
-                                                                setAllowForNextStep(true)
-                                                            } else {
-                                                                setRefCodeStatus('ERROR')
-                                                            }
-                                                        })
-                                                    })
-                                                }
-                                            }
-                                        }}>بررسی کد</span>
-                                </div>
+                                {/*/>*/}
+                                {/*<div className={'mt-3 mr-1'}>*/}
+                                {/*        <span className={'IranSansMedium text-primary  text-sm mt-3'} onClick={() => {*/}
+                                {/*            if (refCodeInputRef.current) {*/}
+                                {/*                if (refCodeInputRef.current.value.toString().length > 3) {*/}
+                                {/*                    verifyReferral({variables: {referenceCode: refCodeInputRef.current.value.toString()}}).then((e: any) => {*/}
+                                {/*                        verifyReferral({variables: {referenceCode: e.target.value.toString()}}).then(e => {*/}
+                                {/*                            if (e.data.isReferenceCodeValid.status === 'SUCCESS') {*/}
+                                {/*                                setRefCodeStatus('SUCCESS')*/}
+                                {/*                                setAllowForNextStep(true)*/}
+                                {/*                            } else {*/}
+                                {/*                                setRefCodeStatus('ERROR')*/}
+                                {/*                            }*/}
+                                {/*                        })*/}
+                                {/*                    })*/}
+                                {/*                }*/}
+                                {/*            }*/}
+                                {/*        }}>بررسی کد</span>*/}
+                                {/*</div>*/}
 
 
-                                <div className={'mt-6 IranSans text-sm px-3 text-textDark'}>
-                                    خب اگه کد دعوت نداشتیم چیکار کنیم ؟
-                                    <br/>
-                                    <br/>
+                                {/*<div className={'mt-6 IranSans text-sm px-3 text-textDark'}>*/}
+                                {/*    خب اگه کد دعوت نداشتیم چیکار کنیم ؟*/}
+                                {/*    <br/>*/}
+                                {/*    <br/>*/}
 
-                                    اصلا نگران نباشید پایین صفحه رو نگا کنید :)
-                                    <br/>
+                                {/*    اصلا نگران نباشید پایین صفحه رو نگا کنید :)*/}
+                                {/*    <br/>*/}
 
-                                </div>
-                                <div onClick={() => {
-                                    window.open('https://www.instagram.com/unimun.me/', '_blank')
-                                }} className={'w-full mt-10 mx-auto flex flex-col justify-center items-center '}
-                                     style={{maxWidth: '420px'}}>
-                                    <Promoter/>
-                                </div>
+                                {/*</div>*/}
+                                {/*<div onClick={() => {*/}
+                                {/*    window.open('https://www.instagram.com/unimun.me/', '_blank')*/}
+                                {/*}} className={'w-full mt-10 mx-auto flex flex-col justify-center items-center '}*/}
+                                {/*     style={{maxWidth: '420px'}}>*/}
+                                {/*    <Promoter/>*/}
+                                {/*</div>*/}
+
 
                             </div>
 
 
-                            : currentStep === 2 ?
+                            : currentStep === 1 ?
                                 <div>
                                     <VCodeInput clearCodeFunction={clearCodeFunc} hint={vCodeHint} stepBack={stepBack}
                                                 success={vCodeSuccess}
@@ -318,7 +353,7 @@ const Login = () => {
                                 </div>
 
                                 :
-                                currentStep === 3 ?
+                                currentStep === 2 ?
                                     <Input inputRef={nameInputRef} id={'1'}
                                            wrapperClassName={`mt-5 transition-all h-14 duration-400`}
                                            numOnly={false}
@@ -349,48 +384,7 @@ const Login = () => {
                 <Button id={'verify-phone-button'}
                         loading={sendVCodeResult.loading || verifyVCodeResult.loading || verifyReferralResult.loading || setNameResult.loading}
                         onClick={() => {
-                            if (!vCodeError) {
-                                if (currentStep === 0) {
-                                    sendVcode().then(e => {
-                                        if (e.data.sendVCode.status === 'SUCCESS') {
-                                            if (e.data.sendVCode.data.isSignup) {
-                                                setStep(1)
-                                            } else {
-                                                setStep(2)
-                                            }
-                                        }
-                                    })
-                                }
-                                if (currentStep === 1) {
-                                    nextStep()
-                                }
-
-                                if (currentStep === 2 && codeValidation(vCode)) {
-                                    verifyVCode()
-                                }
-                            } else {
-                                setVCodeError(false)
-                            }
-
-                            if (vCodeError) {
-                                setVCodeError(false)
-                                verifyVCodeResult.reset()
-                                if (clearCodeFunc.current)
-                                    clearCodeFunc.current()
-                            }
-                            if (currentStep === 3) {
-
-                                if (nameInputRef.current)
-                                    setName({variables: {name: nameInputRef.current.value}}).then(e => {
-                                        if (e.data) {
-                                            if (e.data.updateUser.status === 'SUCCESS') {
-                                                router.push('/').then(() => {
-                                                    currentNavActiveIndex(2)
-                                                })
-                                            }
-                                        }
-                                    })
-                            }
+                            submitButtonClick()
 
                         }} disabled={!allowForNextStep} rippleColor={'rgba(255,255,255,0.62)'}
                         className={`${currentStep === 0 ? 'w-2/4' : 'w-full'} ${currentStep === 3 && allowForNextStep ? ' bg-primary ' : ''}${allowForNextStep ? 'bg-primary' : 'bg-textDark'}  ${allowForNextStep && !vCodeError ? 'bg-primary' : !vCodeError ? 'bg-textDark' : ''} ${vCodeError && currentStep === 2 ? 'bg-errorRed' : ''} transition-all text-md duration-500 h-14 rounded-xl `}>

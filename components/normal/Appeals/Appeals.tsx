@@ -69,6 +69,7 @@ const Appeals = () => {
         }
     `
     const [gtAppeals, appealsResult] = useLazyQuery(_getAppealsQuery)
+
     // useEffect(() => {
     //     gtAppeals().then((value) => {
     //         console.log(value)
@@ -401,17 +402,40 @@ const Appeals = () => {
                         </div>}
                         pullDownToRefreshThreshold={60}
                         refreshFunction={() => {
-                            if (!refreshLoading) {
-                                refetch()
+
+                            _refreshLoading(() => {
+                                return true
+                            })
+                            gtAppeals().then((e) => {
                                 _refreshLoading(() => {
-                                    return true
+                                    return false
                                 })
-                                setTimeout(() => {
-                                    _refreshLoading(() => {
-                                        return false
-                                    })
-                                }, 2000)
-                            }
+                                if (e.data.appeals === null) {
+
+                                } else {
+                                    if (e.error === undefined) {
+
+                                        _refreshLoading(() => {
+                                            return false
+                                        })
+
+                                        if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
+
+                                            let apls = appeals.concat(e.data.appeals.edges)
+                                            setEndCursor(e.data.appeals.pageInfo.endCursor)
+                                            setAppeals(apls)
+                                            lastGottenAppeals(apls)
+                                            reachedEnd.current = true;
+                                            setReachedEndState(true)
+                                        }
+                                    } else {
+                                    }
+
+                                }
+
+
+                            })
+
 
                         }}
                         onScroll={onAdSectionScroll}
