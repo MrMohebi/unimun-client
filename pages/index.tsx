@@ -4,6 +4,10 @@ import Appeals from "../components/normal/Appeals/Appeals";
 import React, {useEffect} from "react";
 import {getToken} from "../helpers/TokenHelper";
 import {UserToken} from "../store/user";
+import getConfig from 'next/config'
+
+const {publicRuntimeConfig: config} = getConfig()
+console.log('config:', JSON.stringify(config))
 
 
 const Home: NextPage = () => {

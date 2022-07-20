@@ -8,7 +8,15 @@ const nextConfig = {
         });
 
         return config;
+    },
+
+    publicRuntimeConfig: {
+        IS_DEV_MOD: process.env.IS_DEV_MOD,
+        description: process.env.DESCRIPTION,
     }
+
 }
+
+
 
 module.exports = nextConfig

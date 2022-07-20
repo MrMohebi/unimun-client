@@ -78,8 +78,8 @@ const Index = () => {
 
         if (lastGottenBooks().length) {
             _books(lastGottenBooks() as never[])
-
         }
+
         getBooks({
             variables: {
                 after: books.length ? books[books.length - 1]['cursor'] : ''
