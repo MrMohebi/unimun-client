@@ -1,4 +1,4 @@
-import React, {ReactEventHandler, useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import UserOutlineSvg from "../../assets/svgs/useOutliner.svg";
 import MaterialInput from "../../components/view/MaterialInput/MaterialInput";
 import Dialog from "../../components/view/Dialog/Dialog";
@@ -6,14 +6,11 @@ import Button from "../../components/view/Button/Button";
 import Header from "../../components/common/Header/Header";
 import {useRouter} from "next/router";
 import CheckSVG from '../../assets/svgs/check.svg'
-import {route} from "next/dist/server/router";
 import {UserData} from "../../store/user";
 import {updateUser} from "../../Requests/withAuthentication/user";
 import {gql, useMutation} from "@apollo/client";
 import {TailSpin} from "react-loader-spinner";
-import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
-import _, {slice} from 'lodash'
 
 const EditProfile = () => {
     const router = useRouter()
