@@ -11,8 +11,8 @@ const nextConfig = {
     },
 
     publicRuntimeConfig: {
-        IS_DEV_MOD: process.env.IS_DEV_MOD,
-        description: process.env.DESCRIPTION,
+        name: process.env.IS_DEV_MOD,
+        description: "check if server is dev"
     }
 
 }
