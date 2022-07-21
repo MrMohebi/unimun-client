@@ -14,11 +14,9 @@ const TestEnv = () => {
 
 
             <button className={'bg-white shadow rounded p-4 mt-5'} onClick={() => {
-                console.log(process.env.IS_DEV_MOD)
+                console.log(process.env.NEXT_PUBLIC_IS_DEV_MOD)
                 console.log(process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS)
             }}>
-                {process.env.IS_DEV_MOD?.length}
-                <br/>
                 get IS_DEV_MODE
             </button>
         </div>
