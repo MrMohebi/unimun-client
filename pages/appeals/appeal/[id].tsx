@@ -5,6 +5,9 @@ import {getAppealQuery} from "../../../Requests/normal/appeals";
 import Header from "../../../components/common/Header/Header";
 import Skeleton from "react-loading-skeleton";
 
+import {cssTransition} from "react-toastify";
+import Copy from '../../../assets/svgs/copy-icon.svg'
+
 import Divider from "../../../components/view/Divider/Divider";
 import Tab from "../../../components/view/Tab/Tab";
 import FileSVG from "../../../assets/svgs/file.svg";
@@ -21,6 +24,9 @@ import {DOWNLOAD_HOST} from "../../../LocalVariables/LocalVariables";
 import Button from "../../../components/view/Button/Button";
 import {cameFromAppeal, lastAppealSubmitSuccess} from "../../../store/appeals";
 import Dialog from "../../../components/view/Dialog/Dialog";
+import ContactToast from "../../../components/view/ContactToast/ContactToast";
+import {ToastContainer} from "react-toastify";
+import Toast from "../../../components/normal/Toast/Toast";
 
 const moment = require('moment')
 
@@ -49,6 +55,8 @@ const Item = () => {
     const [currentMediaPart, setCurrentMediaPart] = useState('files')
     const [appeal, setAppeal] = useState({} as Appeal)
     const [connectWayDialogOpen, setConnectWayDialogOpen] = useState(false)
+
+    const [contactAppealShow, setContactAppealShow] = useState(false);
 
     const [getAppeal, {data, loading, error}] = useLazyQuery(gql`${getAppealQuery().query}`)
 
@@ -104,6 +112,36 @@ const Item = () => {
 
     return (
         <div className={'w-full h-full'}>
+            <ToastContainer
+
+            />
+
+            <ContactToast
+                onClose={(command: string) => {
+                    if (command === 'copyPhone') {
+                        setTimeout(() => {
+                            Toast("شماره تلفن کپی شد", '', 1000, <div className={'w-5 h-5 '}><Copy/></div>, 70)
+
+                        }, 300)
+                    }
+
+                    if (command === 'copyTel') {
+                        setTimeout(() => {
+                            Toast("آیدی تلگرام کپی شد", '', 1000, <div className={'w-5 h-5 '}><Copy/></div>, 70)
+
+                        }, 300)
+                    }
+                    setContactAppealShow(false)
+
+                }}
+                buttonOnClick={() => {
+
+                    console.log(appeal)
+                }}
+                show={contactAppealShow}
+                type={/[^0-9]/.test(appeal.connectWay) ? 'telegram' : 'phone'}
+                value={appeal.connectWay}
+            />
 
             <Head>
                 <title>Unimun Appeal</title>
@@ -315,11 +353,14 @@ const Item = () => {
                     <Button id={'connect-appeal'}
                             className={`w-11/12 h-14 transition-all duration-300 bg-primary rounded-xl flex flex-row justify-center items-center px-4`}
                             onClick={() => {
-                                if (/[^0-9]/.test(appeal.connectWay)) {
-                                    window.location.replace(`https://t.me/${appeal.connectWay.replace('@', '')}`)
-                                } else {
-                                    window.open(`tel:${appeal.connectWay ?? ''}`, '_blank')
-                                }
+
+
+                                setContactAppealShow(true)
+                                // if (/[^0-9]/.test(appeal.connectWay)) {
+                                //     window.location.replace(`https://t.me/${appeal.connectWay.replace('@', '')}`)
+                                // } else {
+                                //     window.open(`tel:${appeal.connectWay ?? ''}`, '_blank')
+                                // }
                             }}
                             rippleColor={'rgba(255,255,255,0.49)'}>
                         <div className={'text-white IranSans '}>پیشنهاد دادن</div>

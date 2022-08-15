@@ -1,0 +1,15 @@
+.Toastify__toast-body {
+  @apply rounded;
+
+  @apply IranSansMedium text-black m-auto #{!important};
+
+
+}
+
+.Toastify__toast {
+  @apply rounded-2xl  p-0 px-5 m-auto #{!important};
+}
+
+.Toastify__progress-bar {
+  @apply bg-textDarker h-0.5 #{!important};
+}

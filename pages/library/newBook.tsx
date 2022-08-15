@@ -108,6 +108,7 @@ const NewBook = () => {
     const [uploadingProgress, setUploadingProgress] = useState([] as number[])
     const [loadingDialog, setLoadingDialog] = useState(false)
     const priceInputRef = useRef(null)
+    const [isBookFree, setIsBookFree] = useState(false)
     const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
     const [categoryComponent, _categoryComponent] = useState(false)
     const [appearanceComponent, _appearanceComponent] = useState(false)
@@ -259,7 +260,7 @@ const NewBook = () => {
                     pages: BookData.pages,
                     publishedDate: BookData.publishedDate,
                     publisher: BookData.publisher,
-                    price: BookData.price,
+                    price: isBookFree ? "0" : BookData.price,
                     writer: BookData.writer,
                     language: BookData.language
                 }
@@ -293,7 +294,7 @@ const NewBook = () => {
                     pages: BookData.pages,
                     publishedDate: BookData.publishedDate,
                     publisher: BookData.publisher,
-                    price: BookData.price,
+                    price: isBookFree ? "0" : BookData.price,
                     writer: BookData.writer,
                     language: BookData.language
                 }
@@ -450,12 +451,18 @@ const NewBook = () => {
                                 _categoryComponent(true)
                             }}
                             className={'flex flex-row pt-5 justify-between items-center text-textDarker IranSansMedium'}>
-                            <span>دسته بندی</span>
+                            <span>دسته بندی
+                                                    <span className={' should-be-filled'}>*</span>
+
+                            </span>
                             <span className={'text-textDark'}>{BookData.categoryPersian ?? "انتخاب دسته بندی"}</span>
                         </div>
 
                         <div className={'new-divider mt-5'}/>
-                        <div className={'IranSansMedium text-textDarker pt-5'}>نام کتاب</div>
+                        <div className={'IranSansMedium text-textDarker pt-5 should-be-filled'}>نام کتاب
+
+                            <span className={' should-be-filled'}>*</span>
+                        </div>
 
                         <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl  '}
                                wrapperClassName={'px-3 h-14'}
@@ -474,7 +481,7 @@ const NewBook = () => {
                     <section className={'bg-white w-full  pb-10'}>
                         <div className={'IranSansMedium text-textDarker pt-5 mx-3'}>نویسنده</div>
                         <Input id={'input'} numOnly={false}
-                               inputClassName={' h-14  mt-5 rounded-xl border-gray-300 transition-all focus:border-primary '}
+                               inputClassName={' h-14  mt-5 rounded-xl transition-all  '}
                                wrapperClassName={'px-3 mx-3 h-14'}
                                defaultValue={BookData.writer}
                                placeHolder={'کی نوشته کتاب رو ؟'}
@@ -655,7 +662,14 @@ const NewBook = () => {
                                 _appearanceComponent(true)
                             }}
                             className={'flex flex-row  pt-5 justify-between items-center text-textDarker IranSansMedium'}>
-                            <span>وضعیت ظاهری کتاب </span>
+                            <span>
+
+
+                                وضعیت ظاهری کتاب
+
+                                                    <span className={' should-be-filled'}>*</span>
+
+                            </span>
                             <span
 
                                 className={'text-textDark'}>{!BookData.appearance ? "انتخاب  کنید" : BookData.appearance}</span>
@@ -991,30 +1005,35 @@ const NewBook = () => {
                             <div
                                 className={' IranSansMedium h-10 w-24 px-2 flex flex-row justify-around items-center bg-background rounded-lg'}>
                                 <input id={'free-book'}
-                                       className={'free-checkbox scale-150 rounded border-2 border-primary'}
-                                       type={'checkbox'} defaultValue={BookData.price}
+                                       className={'free-checkbox h-5 w-5 rounded border-2 border-primary'}
+                                       type={'checkbox'}
+                                    // defaultValue={BookData.price}
                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+
                                            if (e.currentTarget.checked) {
                                                if (priceInputRef.current)
-                                                   (priceInputRef.current as HTMLInputElement).value = '0'
-                                               updateBookData('price', 0)
+                                                   (priceInputRef.current as HTMLInputElement).value = "0"
+                                               //todo this state just added
+                                               setIsBookFree(true)
+
 
                                            } else if (priceInputRef.current) {
-                                               (priceInputRef.current as HTMLInputElement).value = lastPrice.current
-                                               console.log(lastPrice.current)
-                                               updateBookData('price', parseInt(lastPrice.current))
+                                               setIsBookFree(false);
+                                               (priceInputRef.current as HTMLInputElement).value = (BookData.price.toString() ?? "").split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
+
                                            }
                                        }}/>
-                                <label htmlFor={'free-book'}> رایگان</label>
                                 <label htmlFor={'free-book'}> رایگان</label>
                             </div>
                         </div>
 
                         <div
-                            className={`${BookData.price === 0 ? 'opacity-70 pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
+                            className={`${isBookFree ? 'opacity-70 grayscale pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
                             <div className={'w-10 h-10 mx-2 p-2'}>
                                 <Toman/>
                             </div>
+                            {/*todo theres a bug when user wants to edit its always 20000*/}
+
                             <div className={'h-3/5 bg-gray-400 w-0 border'}/>
                             <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'}
                                    defaultValue={fixPrice(BookData.price) ?? '20,000'}
@@ -1035,7 +1054,10 @@ const NewBook = () => {
 
                     <div className={'w-full h-40 bg-white mt-4 px-4 pt-3 new-section'}>
 
-                        <span className={'text-textBlack text-md IranSansMedium  '}>اطلاعات تماس</span>
+                        <span className={'text-textBlack text-md IranSansMedium  '}>اطلاعات تماس
+                                                <span className={' should-be-filled'}>*</span>
+
+                        </span>
                         <div className={'w-full flex items-center justify-center relative mt-4'}>
                             <div
                                 className={`absolute  left-6 top-1/2 -translate-y-1/2 flex flex-col justify-center items-center w-8 h-8`}>

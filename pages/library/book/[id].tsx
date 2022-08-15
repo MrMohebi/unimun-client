@@ -24,6 +24,8 @@ import {getUserQuery} from "../../../Requests/normal/user";
 import {fixPrice} from "../../../helpers/fixPrice";
 import NoPic from "../../../components/normal/NoPic/NoPic";
 import Free from "../../../assets/svgs/free.svg";
+import Copy from "../../../assets/svgs/copy-icon.svg";
+import ContactToast from "../../../components/view/ContactToast/ContactToast";
 
 
 interface Props {
@@ -98,6 +100,9 @@ const Book = (props: Props) => {
 
     const [getBook, getBookResults] = useLazyQuery(getBookQuery)
 
+    const [contactAppealShow, setContactAppealShow] = useState(false);
+
+
     const [book, _book] = useState({} as any);
     const [bookDetails, _bookDetails] = useState(false)
     const phoneInputRef = useRef<HTMLInputElement>(null)
@@ -118,6 +123,34 @@ const Book = (props: Props) => {
 
     return (
         <div className={'overflow-scroll h-full'}>
+
+
+            <ContactToast
+                onClose={(command: string) => {
+                    if (command === 'copyPhone') {
+                        setTimeout(() => {
+                            Toast("شماره تلفن کپی شد", '', 1000, <div className={'w-5 h-5 '}><Copy/></div>, 70)
+
+                        }, 300)
+                    }
+
+                    if (command === 'copyTel') {
+                        setTimeout(() => {
+                            Toast("آیدی تلگرام کپی شد", '', 1000, <div className={'w-5 h-5 '}><Copy/></div>, 70)
+
+                        }, 300)
+                    }
+                    setContactAppealShow(false)
+
+                }}
+                buttonOnClick={() => {
+
+                    console.log(book)
+                }}
+                show={contactAppealShow}
+                type={/[^0-9]/.test(book.connectWay) ? 'telegram' : 'phone'}
+                value={book.connectWay}
+            />book
 
             <ToastContainer/>
             <Dimmer show={getBookResults.loading} onClose={() => {
@@ -337,50 +370,53 @@ const Book = (props: Props) => {
                                     rippleColor={'rgba(255,255,255,0.4)'}
                                     onClick={() => {
 
+
+                                        setContactAppealShow(true)
+
                                         // console.log(book.bookFiles[0].url)
-                                        if (book.isDownloadable)
-                                            window.open(book.bookFiles[0].url, '_blank')
-
-                                        if (book.isPurchasable) {
-                                            let bookId = window.location.href.split('/')[window.location.href.split('/').length - 1]
-
-
-                                            if (book.connectWay) {
-                                                if (book.connectWay[0] === "0") {
-
-                                                    if (!UserId()) {
-                                                        router.push('/profile/login')
-                                                    }
-                                                    bookConnectMutation({
-                                                        variables: {
-                                                            bookId: bookId,
-                                                            userId: UserId()
-                                                        }
-                                                    }).then((value) => {
-                                                        if (value.data.bookConnectClick.status === "SUCCESS") {
-                                                            Toast('درخواست شما برای ارائه دهنده ارسال شد ');
-                                                        }
-                                                    })
-
-                                                    let text = book.connectWay;
-                                                    try {
-                                                        navigator.clipboard.writeText(text).then(function () {
-                                                            Toast('شماره تلفن در کلیپبورد شما کپی شد');
-                                                        }, function () {
-                                                            Toast(book.connectWay);
-                                                        });
-                                                    } catch (e) {
-                                                        console.log('copy error')
-
-                                                    }
-
-                                                } else {
-                                                    window.open(`https://t.me/${book.connectWay.replace('@', '')}`, '_blank')
-                                                }
-                                            }
-
-                                        }
-                                        // window.open(book.bookFiles[0].url, '_blank')
+                                        // if (book.isDownloadable)
+                                        //     window.open(book.bookFiles[0].url, '_blank')
+                                        //
+                                        // if (book.isPurchasable) {
+                                        //     let bookId = window.location.href.split('/')[window.location.href.split('/').length - 1]
+                                        //
+                                        //
+                                        //     if (book.connectWay) {
+                                        //         if (book.connectWay[0] === "0") {
+                                        //
+                                        //             if (!UserId()) {
+                                        //                 router.push('/profile/login')
+                                        //             }
+                                        //             bookConnectMutation({
+                                        //                 variables: {
+                                        //                     bookId: bookId,
+                                        //                     userId: UserId()
+                                        //                 }
+                                        //             }).then((value) => {
+                                        //                 if (value.data.bookConnectClick.status === "SUCCESS") {
+                                        //                     Toast('درخواست شما برای ارائه دهنده ارسال شد ');
+                                        //                 }
+                                        //             })
+                                        //
+                                        //             let text = book.connectWay;
+                                        //             try {
+                                        //                 navigator.clipboard.writeText(text).then(function () {
+                                        //                     Toast('شماره تلفن در کلیپبورد شما کپی شد');
+                                        //                 }, function () {
+                                        //                     Toast(book.connectWay);
+                                        //                 });
+                                        //             } catch (e) {
+                                        //                 console.log('copy error')
+                                        //
+                                        //             }
+                                        //
+                                        //         } else {
+                                        //             window.open(`https://t.me/${book.connectWay.replace('@', '')}`, '_blank')
+                                        //         }
+                                        //     }
+                                        //
+                                        // }
+                                        // // window.open(book.bookFiles[0].url, '_blank')
 
                                     }}
 

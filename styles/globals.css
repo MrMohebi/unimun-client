@@ -292,6 +292,19 @@ body {
   animation-iteration-count: infinite;
 }
 
+.Toastify__toast-body {
+  @apply rounded;
+  @apply IranSansMedium text-black m-auto !important;
+}
+
+.Toastify__toast {
+  @apply rounded-2xl  p-0 px-5 m-auto !important;
+}
+
+.Toastify__progress-bar {
+  @apply bg-textDarker h-0.5 !important;
+}
+
 .appeal-details {
   width: 205px;
   height: 40px;
@@ -476,6 +489,44 @@ body * {
 .free-checkbox {
   background: url("/assets/svgs/checkbox.svg");
   background-repeat: no-repeat;
+}
+
+textarea {
+  outline: none !important;
+  user-select: all !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-clip: padding-box !important;
+}
+
+textarea:focus {
+  user-select: all !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-clip: padding-box !important;
+}
+
+input {
+  outline: none !important;
+  user-select: all !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-clip: padding-box !important;
+}
+
+input:focus {
+  user-select: all !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-clip: padding-box !important;
+}
+
+.should-be-filled {
+  @apply text-errorRed mx-1.5;
 }
 
 /*# sourceMappingURL=globals.css.map */

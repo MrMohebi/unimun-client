@@ -27,6 +27,7 @@ import InstaSVG from '../../assets/svgs/instagram-gray.svg'
 import TwitterSVG from '../../assets/svgs/twitter-gray.svg'
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 import SkeletonElement from "../../components/view/Skeleton/Skeleton";
+import {route} from "next/dist/server/router";
 
 const Index = () => {
     const router = useRouter()
@@ -304,7 +305,9 @@ const Index = () => {
 
 
                     <span className={'IranSansBold text-primary text-sm mr-4'}>دربارمون</span>
-                    <Button id={'rules'} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
+                    <Button id={'rules'} onClick={() => {
+                        router.push('/rules')
+                    }} rippleColor={"rgba(0,0,0,0.15)"} className={'drawer-buttons'}>
                         <button className={'flex flex-row justify-start mt-4 items-center w-full'}>
                             <div className={'profile-drawer-svg'}><JudgeSVG/></div>
                             <div className={'text-md IranSansMedium w-full text-right mx-4 border-b pb-4'}>قوانین و

@@ -4,8 +4,8 @@ import {UserToken} from "./store/user";
 
 const env = process.env.NODE_ENV
 
-let uri = 'https://api.unimun.me/graphql'
-// let uri = 'https://tttapi.unimun.me/graphql'
+// let uri = 'https://api.unimun.me/graphql'
+let uri = 'https://tttapi.unimun.me/graphql'
 const httpLink = createHttpLink({
     uri: uri,
 });

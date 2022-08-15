@@ -11,6 +11,7 @@
 @import "components/circularProgressBar";
 @import "components/loadingDialog";
 @import "components/skeleton";
+@import "components/Toast";
 @import "components/appeals";
 @import "skeleton";
 @import "pages/profile";
@@ -227,5 +228,47 @@ body {
 .free-checkbox {
   background: url("/assets/svgs/checkbox.svg");
   background-repeat: no-repeat;
+}
+
+
+textarea {
+  outline: none !important;
+
+  &:focus {
+    user-select: all !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background-clip: padding-box !important;
+  }
+
+  user-select: all !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-clip: padding-box !important;
+}
+
+input {
+
+  outline: none !important;
+
+  &:focus {
+    user-select: all !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background-clip: padding-box !important;
+  }
+
+  user-select: all !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-clip: padding-box !important;
+}
+
+.should-be-filled {
+  @apply text-errorRed mx-1.5;
 }
 

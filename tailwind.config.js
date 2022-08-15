@@ -53,7 +53,9 @@ module.exports = {
                 textDarker: '#5B5F64',
                 textBright: '#E1E8ED',
                 background: '#F6F8FA',
-                errorRed: '#FF1E60'
+                errorRed: '#FF1E60',
+                inputNotActive: '#FF1E60',
+
             }
         },
     },
