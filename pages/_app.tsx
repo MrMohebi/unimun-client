@@ -17,7 +17,6 @@ import UsePhone from "../components/normal/UsePhone/UsePhone";
 
 
 function MyApp({Component, pageProps}: AppProps) {
-    const router = useRouter()
     // rerender the website
 
 
@@ -73,7 +72,9 @@ function MyApp({Component, pageProps}: AppProps) {
                                     }}>{(new Date().getHours().toString().length === 1 ? "0" + new Date().getHours() : new Date().getHours()) + ":" + (new Date().getMinutes().toString().length === 1 ? "0" + new Date().getMinutes() : new Date().getMinutes())}</span>
                                 </div>
                                 <div className={'relative bg-background overflow-hidden h-full '}>
+                                    {/*@ts-ignore*/}
                                     <Component {...pageProps} />
+
 
                                 </div>
                             </Navbar>
