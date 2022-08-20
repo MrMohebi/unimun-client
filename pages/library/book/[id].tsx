@@ -26,6 +26,7 @@ import NoPic from "../../../components/normal/NoPic/NoPic";
 import Free from "../../../assets/svgs/free.svg";
 import Copy from "../../../assets/svgs/copy-icon.svg";
 import ContactToast from "../../../components/view/ContactToast/ContactToast";
+import {UNIMUN_PROVIDERS} from "../../../store/GLOBAL_VARIABLES";
 
 
 interface Props {
@@ -237,13 +238,17 @@ const Book = (props: Props) => {
                         <span className={'text-textDark IranSansMedium text-sm'}>ارائه دهنده</span>
                         {
                             book.creator ?
-                                <span
-                                    className={'text-textBlack IranSansMedium text-sm mt-1 '}>{book.creator.name}</span>
-                                :
-                                <div className={'mt-1 w-16'}>
-                                    <Unimun/>
+                                UNIMUN_PROVIDERS().includes(book.creator.id) ?
+                                    <div className={'mt-1 w-16'}>
+                                        <Unimun/>
 
-                                </div>
+                                    </div>
+                                    :
+                                    <span
+                                        className={'text-textBlack IranSansMedium text-sm mt-1 '}>{book.creator ? book.creator.name : ''}</span>
+                                :
+                                null
+
 
                         }
                     </div>
