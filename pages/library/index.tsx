@@ -19,6 +19,7 @@ import Unimun from '../../assets/svgs/unimun.svg'
 import {UserToken} from "../../store/user";
 import NoPic from "../../components/normal/NoPic/NoPic";
 import Free from '../../assets/svgs/free.svg'
+import {UNIMUN_PROVIDERS} from "../../store/GLOBAL_VARIABLES";
 
 const Index = () => {
 
@@ -33,7 +34,6 @@ const Index = () => {
     const [refreshLoading, _refreshLoading] = useState(false)
 
 
-
     const getBooksQuery = gql`
         query getBooks($first:Int $searchText:String $after:String){
             books(first: $first,searchText: $searchText,after: $after){
@@ -45,6 +45,7 @@ const Index = () => {
                         status
                         creator {
                             name
+                            id
                         }
                         id
                         details
@@ -350,7 +351,7 @@ const Index = () => {
                                     price: number
                                     writer: string
                                     id: string
-                                    creator: { name: string }
+                                    creator: { name: string, id: string }
                                 }, index) => {
 
                                     if (book.status === 'DELETED')
@@ -392,9 +393,17 @@ const Index = () => {
 
                                                             </span>
                                                         </div>
+
+
                                                         <div
-                                                            className={'IranSansMedium text-sm  whitespace-nowrap'}><span
-                                                            className={'text-textDark'}>ارائه دهنده:</span> {book.creator ? book.creator.name : '-' ?? '-'}
+                                                            className={'IranSansMedium text-sm  whitespace-nowrap flex flex-row justify-center items-center'}>
+                                                            <span
+                                                                className={'text-textDark ml-1'}>ارائه دهنده:</span> {book.creator ? UNIMUN_PROVIDERS().includes(book.creator.id) ?
+                                                            <div className={' w-14  inline-block'}>
+                                                                <Unimun/>
+                                                            </div>
+                                                            :
+                                                            book.creator.name : '-' ?? '-'}
                                                         </div>
 
 
