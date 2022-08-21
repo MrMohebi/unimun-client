@@ -31,12 +31,12 @@ export const uploadImage = (image: any, removeEmptyProgresses: Function, current
 }
 
 
-export const uploadBookImages = (image: any, removeEmptyProgresses: Function, currentBookId: { current: string }, success: Function, error: Function, onUploadProgress: Function) => {
-    removeEmptyProgresses()
+export const uploadBookImages = (image: any, currentBookId: string, success: Function, error: Function, onUploadProgress: Function) => {
+    // removeEmptyProgresses()
     let data = new FormData();
     data.append('token', UserToken());
     data.append('file', image);
-    data.append('bookID', currentBookId.current);
+    data.append('bookID', currentBookId);
     data.append('uploadedAsFile', '0');
 
     let config: AxiosRequestConfig = {
@@ -59,13 +59,13 @@ export const uploadBookImages = (image: any, removeEmptyProgresses: Function, cu
         });
 
 }
-export const uploadBookFile = (image: any, removeEmptyProgresses: Function, currentBookId: { current: string }, success: Function, error: Function, onUploadProgress: Function) => {
+export const uploadBookFile = (image: any, removeEmptyProgresses: Function, currentBookId: string, success: Function, error: Function, onUploadProgress: Function) => {
     removeEmptyProgresses()
 
     let data = new FormData();
     data.append('token', UserToken());
     data.append('file', image);
-    data.append('bookID', currentBookId.current);
+    data.append('bookID', currentBookId);
     data.append('uploadedAsFile', '1');
 
     let config: AxiosRequestConfig = {

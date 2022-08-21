@@ -29,6 +29,7 @@ import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
 import _ from 'lodash'
 import {fixPrice} from "../../helpers/fixPrice";
+import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUpload";
 
 const NewBook = () => {
 
@@ -177,8 +178,7 @@ const NewBook = () => {
                 updateBookData('price', parseInt(EditBookData().price))
 
                 updateBookData('publisher', EditBookData().publisher ?? '')
-                // updateBookData('price', EditBookData().price??'')
-                // updateBookData('connectWay', EditBookData().connectWay)
+
                 setConnectWay(EditBookData().connectWay)
                 setContactType(EditBookData().connectWay[0] === "0" ? 'phone' : 'telegram')
                 updateBookData('language', EditBookData().language)
@@ -236,11 +236,7 @@ const NewBook = () => {
             // return 0
         }
 
-        let attachments = [] as any[]
-        BookData.attachments.map((item) => {
-            attachments.push(_.omit(item, ["__typename"]))
-        })
-        updateBookData('attachments', attachments)
+
 
         if (editing) {
 
@@ -542,116 +538,33 @@ const NewBook = () => {
                             </div>
 
                             <span
-                                className={'text-primary IranSansMedium text-sm'}>{`${uploadedImages.length}/5`}</span>
+                                className={'text-primary IranSansMedium text-sm'}>{`${BookData.attachments.length}/5`}</span>
                         </div>
 
                         <div
                             className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-1 max-w-sm mx-auto'}>
-                            <div
-                                className={'new-photo h-36 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative mt-4'}>
-                                {
-                                    uploadedImages.length < 5 ?
-                                        <input type={'file'}
-                                               className={'opacity-0 absolute top-0 left-0 w-full h-full '}
-                                               accept={'.png,.jpeg,.jpg'} onInput={(e) => {
-                                            if (e.currentTarget && e.currentTarget.files && e.currentTarget.files.length) {
-                                                setUploading(true)
-
-                                                uploadBookImages(e.currentTarget.files[0], removeEmptyProgresses, currentBookId, (response: any) => {
-                                                        setUploading(false)
-
-                                                        if (typeof response.data !== "number") {
-                                                            updateBookData('attachments', [...uploadedImages, response.data])
-                                                            setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
-                                                            let updateUploadingProgress = [...uploadingProgress]
-                                                            updateUploadingProgress[uploadingProgress.length] = 0;
-                                                            setUploadingProgress(updateUploadingProgress)
-                                                            removeEmptyProgresses()
-                                                        } else {
-                                                            Toast("خطا در هنگام آپلود")
-                                                            removeEmptyProgresses()
-                                                            setUploading(false)
-                                                        }
-                                                    }, (error: any) => {
-                                                        // showError('خطا در آپلود فایل، دوبره تلاش کنید')
-                                                        setUploading(false)
-
-                                                        let updateUploadingProgress = [...uploadingProgress]
-                                                        updateUploadingProgress[uploadingProgress.length] = 0;
-                                                        setUploadingProgress(updateUploadingProgress)
-                                                        removeEmptyProgresses()
-                                                    },
-                                                    (progressEvent: any) => {
-                                                        setUploading(false)
-
-                                                        let percentCompleted = Math.round(
-                                                            (progressEvent.loaded * 100) / progressEvent.total
-                                                        );
-                                                        let updatedUploadedProgress = [...uploadingProgress]
-                                                        updatedUploadedProgress[uploadingProgress.length] = percentCompleted
-                                                        setUploadingProgress(updatedUploadedProgress)
-                                                    }
-                                                )
-
-                                            }
-
-                                        }}/> : null
-                                }
-
-                                <div className={'flex flex-col items-center justify-center'}>
-                                    <div className={'h-7 w-7'}><NewPhotoSVG/></div>
-                                    <span className={'text-sm IranSansMedium'}>افزودن عکس</span>
-                                </div>
-                            </div>
                             {
-                                uploadedImages.map((uploadedImage, index) => {
-                                    return (<div onClick={(e) => {
-                                            // setImageBottomSheetOpened(true)
-                                            // currentSelectedImage.current = uploadedImage
-                                        }} key={`${index}photo`}
-                                                 className={'new-photo h-36 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative overflow-hidden mt-4'}>
-                                            <img src={`https://dl.unimun.me/${JSON.parse(uploadedImage).preview}`}
-                                                 alt={'Unimun ' + index}
-                                                 className={' w-full h-full'}/>
-                                            <div dir={'ltr'}
-                                                 className={'w-9 h-9  rounded-xl absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col justify-center items-center'}
-                                                 style={{background: 'rgba(255,255,255,0.85)'}}>
-                                                <SVGModifier SVGName={'galleryImage'} elementClass={'number'}
-                                                             value={(index + 1).toString()}>
-                                                    <GalleryImageSVG/>
-                                                </SVGModifier>
-                                            </div>
-                                        </div>
-                                    )
+                                Array(6).fill('').map((photos, index) => {
+                                    console.log(BookData)
+
+                                    return <div key={index + 'imageUpload'} className={'contents'}>
+                                        <BookImageUpload isFirst={index === 0} id={index.toString()}
+                                                         onUploadComplete={(e: any) => {
+                                                             let _bookAttachments: any[] = BookData.attachments;
+                                                             _bookAttachments.push(e.data)
+                                                             updateBookData('attachments', _bookAttachments)
+
+                                                             setTimeout(() => {
+                                                                 console.log(BookData)
+                                                             }, 1000)
+                                                             console.log(e)
+                                                         }} onError={() => {
+                                            console.log('error')
+                                        }} bookID={currentBookId.current} setUploading={setUploading}/>
+                                    </div>
+
                                 })
                             }
-                            {Array(5 - uploadedImages.length).fill('').map((photos, index) => {
-                                return (
-                                    <div key={`${index}photo`}
-                                         className={'new-photo relative h-36 w-24 flex flex-col justify-center items-center rounded-2xl border-dashed border-2 mx-3 relative mt-4'}>
-                                        {
-                                            uploadingProgress[index] ?
-                                                <div
-                                                    className={'relative '}>
-                                                    <CircularProgressBar sqSize={40} strokeWidth={1.5}
-                                                                         percentage={uploadingProgress[index]}
-                                                                         color={'#0080ff'}/>
-                                                    <div
-                                                        className={'absolute left-1/2 top-1/2 -translate-y-1/2 IranSans text-primary -translate-x-1/2'}>
-                                                        {`${uploadingProgress[index]}%`}
-                                                    </div>
-                                                </div>
-
-                                                :
-                                                <div
-                                                    className={'flex flex-col items-center justify-center opacity-60'}>
-                                                    <div className={'h-7 w-7'}><GallerySVG/></div>
-                                                    <span className={'text-sm IranSansMedium'}>عکس</span>
-                                                </div>
-                                        }
-                                    </div>
-                                )
-                            })}
 
                         </div>
                         <span style={{fontSize: '0.7rem'}}
@@ -807,7 +720,7 @@ const NewBook = () => {
                                            setBookUploadState('uploading')
 
 
-                                           uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId, (response: any) => {
+                                           uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {
                                                    _fileUploadingPercentage('0')
                                                    if (response.data.validMimes) {
                                                        Toast("فرمت فایل معتبر نیست")

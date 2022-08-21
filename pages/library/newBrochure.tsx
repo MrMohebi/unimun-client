@@ -30,6 +30,7 @@ import Semesters from "../../components/normal/Semesters/Semesters";
 import _ from "lodash";
 import {fixPrice} from "../../helpers/fixPrice";
 import Book from "./book/[id]";
+import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUpload";
 
 const NewBrochure = () => {
 
@@ -127,6 +128,7 @@ const NewBrochure = () => {
     const [showSemester, setShowSemester] = useState(false);
     const [chosenSemester, setChosenSemester] = useState("");
     const [editing, setEditing] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     const [BookData, setBookData] = useState({
         type: 'physical',
@@ -534,101 +536,29 @@ const NewBrochure = () => {
 
                             <div
                                 className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-1س max-w-sm mx-auto'}>
-                                <div
-                                    className={'new-photo h-36 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative mt-4'}>
-                                    {
-                                        uploadedImages.length < 5 ?
-                                            <input type={'file'}
-                                                   className={'opacity-0 absolute top-0 left-0 w-full h-full '}
-                                                   accept={'.png,.jpeg,.jpg'} onInput={(e) => {
-                                                if (e.currentTarget && e.currentTarget.files && e.currentTarget.files.length)
-                                                    uploadBookImages(e.currentTarget.files[0], removeEmptyProgresses, currentBookId, (response: any) => {
-                                                            console.log(response.data)
-                                                            if (typeof response.data !== "number") {
-                                                                updateBookData('attachments', [...uploadedImages, response.data])
-                                                                setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
-                                                                let updateUploadingProgress = [...uploadingProgress]
-                                                                updateUploadingProgress[uploadingProgress.length] = 0;
-                                                                setUploadingProgress(updateUploadingProgress)
-                                                                removeEmptyProgresses()
-                                                            } else {
-                                                                Toast("خطا در هنگام آپلود")
-                                                                removeEmptyProgresses()
-                                                            }
-                                                        }, (error: any) => {
-                                                            // showError('خطا در آپلود فایل، دوبره تلاش کنید')
-
-                                                            let updateUploadingProgress = [...uploadingProgress]
-                                                            updateUploadingProgress[uploadingProgress.length] = 0;
-                                                            setUploadingProgress(updateUploadingProgress)
-                                                            removeEmptyProgresses()
-                                                        },
-                                                        (progressEvent: any) => {
-                                                            let percentCompleted = Math.round(
-                                                                (progressEvent.loaded * 100) / progressEvent.total
-                                                            );
-                                                            let updatedUploadedProgress = [...uploadingProgress]
-                                                            updatedUploadedProgress[uploadingProgress.length] = percentCompleted
-                                                            setUploadingProgress(updatedUploadedProgress)
-                                                        }
-                                                    )
-                                            }}/> : null
-                                    }
-
-                                    <div className={'flex flex-col items-center justify-center'}>
-                                        <div className={'h-7 w-7'}><NewPhotoSVG/></div>
-                                        <span className={'text-sm IranSansMedium'}>افزودن عکس</span>
-                                    </div>
-                                </div>
                                 {
-                                    uploadedImages.map((uploadedImage, index) => {
-                                        return (<div onClick={(e) => {
-                                                // setImageBottomSheetOpened(true)
-                                                // currentSelectedImage.current = uploadedImage
-                                            }} key={`${index}photo`}
-                                                     className={'new-photo h-36 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative overflow-hidden mt-4'}>
-                                                <img src={`https://dl.unimun.me/${JSON.parse(uploadedImage).thumbnail}`}
-                                                     alt={'Unimun ' + index}
-                                                     className={' w-full h-full'}/>
-                                                <div dir={'ltr'}
-                                                     className={'w-9 h-9  rounded-xl absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col justify-center items-center'}
-                                                     style={{background: 'rgba(255,255,255,0.85)'}}>
-                                                    <SVGModifier SVGName={'galleryImage'} elementClass={'number'}
-                                                                 value={(index + 1).toString()}>
-                                                        <GalleryImageSVG/>
-                                                    </SVGModifier>
-                                                </div>
-                                            </div>
-                                        )
+                                    Array(6).fill('').map((photos, index) => {
+                                        console.log(BookData)
+
+                                        return <div key={index + 'imageUpload'} className={'contents'}>
+                                            <BookImageUpload isFirst={index === 0} id={index.toString()}
+                                                             onUploadComplete={(e: any) => {
+                                                                 let _bookAttachments: any[] = BookData.attachments;
+                                                                 _bookAttachments.push(e.data)
+                                                                 updateBookData('attachments', _bookAttachments)
+
+                                                                 setTimeout(() => {
+                                                                     console.log(BookData)
+                                                                 }, 1000)
+                                                                 console.log(e)
+                                                             }} onError={() => {
+                                                console.log('error')
+                                            }} bookID={currentBookId.current} setUploading={setUploading}/>
+                                        </div>
+
                                     })
                                 }
-                                {Array(5 - uploadedImages.length).fill('').map((photos, index) => {
-                                    return (
-                                        <div key={`${index}photo`}
-                                             className={'new-photo relative h-36 w-24 flex flex-col justify-center items-center rounded-2xl border-dashed border-2 mx-3 relative mt-4'}>
-                                            {
-                                                uploadingProgress[index] ?
-                                                    <div
-                                                        className={'relative '}>
-                                                        <CircularProgressBar sqSize={40} strokeWidth={1.5}
-                                                                             percentage={uploadingProgress[index]}
-                                                                             color={'#0080ff'}/>
-                                                        <div
-                                                            className={'absolute left-1/2 top-1/2 -translate-y-1/2 IranSans text-primary -translate-x-1/2'}>
-                                                            {`${uploadingProgress[index]}%`}
-                                                        </div>
-                                                    </div>
 
-                                                    :
-                                                    <div
-                                                        className={'flex flex-col items-center justify-center opacity-60'}>
-                                                        <div className={'h-7 w-7'}><GallerySVG/></div>
-                                                        <span className={'text-sm IranSansMedium'}>عکس</span>
-                                                    </div>
-                                            }
-                                        </div>
-                                    )
-                                })}
 
                             </div>
 
@@ -726,7 +656,7 @@ const NewBrochure = () => {
                                                let fileName = e.currentTarget.files[0].name
                                                Sdimmer(true)
 
-                                               uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId, (response: any) => {
+                                               uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {
                                                        console.log(response)
                                                        Sdimmer(false)
                                                        _fileUploadingPercentage('')
