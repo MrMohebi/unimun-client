@@ -111,8 +111,6 @@ const Preview = () => {
                                        }}/>
                                 <label htmlFor={'free-book'}> رایگان</label>
                             </div>
-
-
                         </div>
 
 
