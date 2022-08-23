@@ -1,26 +1,49 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import Library from '../../assets/svgs/library.svg';
+// @ts-ignore
+import ImageCapture from "react-image-data-capture";
+import {useRouter} from "next/router";
+import {UserToken} from "../../store/user";
+import dynamic from "next/dynamic";
+import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
 
+// @ts-ignore
+const QrScan = dynamic(() => import('react-qr-reader'), {ssr: false})
 const Scan = () => {
     const [data, setData] = useState("")
+    const router = useRouter()
+    const [loadingDialog, setLoadingDialog] = useState(false);
 
     useEffect(() => {
-        setTimeout(
-            () => {
-                setData("fad")
 
-            }, 1000
-        )
+
+        setTimeout(() => {
+            if (UserToken()) {
+
+            } else {
+                router.push('/profile/login')
+            }
+
+
+        }, 1)
+
+
     }, [])
+
+    const config = useMemo(() => ({video: true}), []);
+
+
     return (
         <div className={'h-full overflow-scroll pb-20'}>
 
+            <FullScreenLoading show={loadingDialog}/>
+
+            <img src={''} id={'dasf'}></img>
             <div className={'w-full pt-16  flex flex-col justify-center items-center  '}>
                 <div className={'w-24'}>
                     <Library/>
 
                 </div>
-
 
                 <span className={'IranSans mt-10 '}> بارکـد کتاب را اسکن کنید</span>
                 <p className={'text-center IranSans text-[0.75rem] block mt-3 text-textDark'}>کتاب که الان تو دستاته به
@@ -28,7 +51,43 @@ const Scan = () => {
                     <br/>
                     فقط کافیه اکسنش کنی
                 </p>
-                <div className={'w-72 h-72 border-primary border-2  rounded-2xl overflow-hidden mt-5 '}>
+                <div className={'w-72 h-72 border-primary border-2 scan-container rounded-2xl overflow-hidden mt-5 '}>
+
+
+                    <QrScan
+                        // @ts-ignore
+                        delay={(loadingDialog ? 2000 : 200) as any}
+                        onError={(e: any) => {
+                            console.log(e)
+                        }}
+                        onScan={(e: any) => {
+                            let local = true
+                            if (e) {
+                                if (e.toString().includes('qr.unimun')) {
+                                    console.log(e)
+                                    setLoadingDialog(true)
+                                    router.push(e)
+                                }
+
+
+                                // router.push("/qr/preview")
+                            }
+
+                        }}
+                        style={{width: '100%'}}
+                    />
+
+                    {/*<QrScan*/}
+                    {/*    delay={300}*/}
+                    {/*    onError={(E:any)=>{*/}
+
+                    {/*    }}*/}
+                    {/*    onScan={()=>{*/}
+                    {/*        console.log('scanned')*/}
+
+                    {/*    }}*/}
+                    {/*    style={{ height: 240, width: 320 }}*/}
+                    {/*/>*/}
 
 
                 </div>

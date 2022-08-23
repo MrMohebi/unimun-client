@@ -5,6 +5,7 @@ import {uploadBookImages} from "../../../Requests/uploadRequests";
 import Toast from "../Toast/Toast";
 import {DOWNLOAD_HOST} from "../../../store/GLOBAL_VARIABLES";
 import NewPhotoSVG from "../../../assets/svgs/newPhoto.svg";
+// @ts-ignore
 
 const BookImageUpload = (props: {
     setUploading: Function,
