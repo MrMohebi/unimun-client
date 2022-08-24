@@ -60,7 +60,7 @@ jobs:
           
      
      
-  deploy:
+  prod-deploy:
     if: contains(github.event.head_commit.message, 'prod-deploy')
     runs-on: ubuntu-latest
     env:
@@ -87,8 +87,8 @@ jobs:
           REMOTE_USER: ${{ secrets.SSH_USER }}
           TARGET: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
   
-  dockerize-and-run:
-    needs: deploy
+  prod-dockerize-and-run:
+    needs: prod-deploy
     if: contains(github.event.head_commit.message, 'prod-deploy')
     runs-on: ubuntu-latest
     name: 'dockerize and run'
