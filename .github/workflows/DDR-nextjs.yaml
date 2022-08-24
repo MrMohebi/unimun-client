@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FRONT_DEPLOY_PATH: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
-    name: deploy
+    name: 'prod deploy'
     steps:
       - name: remove previous files
         uses: fifsky/ssh-action@master
@@ -91,7 +91,7 @@ jobs:
     needs: prod-deploy
     if: contains(github.event.head_commit.message, 'prod-deploy')
     runs-on: ubuntu-latest
-    name: 'dockerize and run'
+    name: 'prod dockerize and run'
     env:
       FRONT_DEPLOY_PATH: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
     steps:
