@@ -7,7 +7,7 @@ on:
 
 jobs:
   dev-deploy:
-    if: contains(github.event.head_commit.message, 'dev-deploy')
+    if: contains(github.event.head_commit.message, 'deploy')
     runs-on: ubuntu-latest
     env:
       FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEV_DEPLOY_PATH }}
@@ -35,7 +35,7 @@ jobs:
   
   dev-dockerize-and-run:
     needs: dev-deploy
-    if: contains(github.event.head_commit.message, 'dev-deploy')
+    if: contains(github.event.head_commit.message, 'deploy')
     runs-on: ubuntu-latest
     name: 'dev dockerize and run'
     env:
@@ -61,7 +61,7 @@ jobs:
      
      
   deploy:
-    if: contains(github.event.head_commit.message, 'deploy')
+    if: contains(github.event.head_commit.message, 'prod-deploy')
     runs-on: ubuntu-latest
     env:
       FRONT_DEPLOY_PATH: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
@@ -89,7 +89,7 @@ jobs:
   
   dockerize-and-run:
     needs: deploy
-    if: contains(github.event.head_commit.message, 'deploy')
+    if: contains(github.event.head_commit.message, 'prod-deploy')
     runs-on: ubuntu-latest
     name: 'dockerize and run'
     env:
