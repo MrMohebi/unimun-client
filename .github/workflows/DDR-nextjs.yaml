@@ -7,7 +7,7 @@ on:
 
 jobs:
   dev-deploy:
-    if: github.event.head_commit.message == 'dev deploy'
+    if: contains(github.event.head_commit.message, 'dev deploy')
     runs-on: ubuntu-latest
     env:
       FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEV_DEPLOY_PATH }}
@@ -35,7 +35,7 @@ jobs:
   
   dev-dockerize-and-run:
     needs: dev-deploy
-    if: github.event.head_commit.message == 'dev deploy'
+    if: contains(github.event.head_commit.message, 'dev deploy')
     runs-on: ubuntu-latest
     name: 'dev dockerize and run'
     env:
@@ -51,11 +51,17 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY}}
+      - name: send err log
+        if: failure()
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://log.m3m.dev/api/unimun-clint-deploy.php?type=DEV&token=61875b275a6ef7b562b43ce6cc640aaae3cbd1bb6224aab9c3bdb8a45e05ab44'
+          method: 'GET'
           
      
      
   deploy:
-    if: github.event.head_commit.message == 'deploy'
+    if: contains(github.event.head_commit.message, 'deploy')
     runs-on: ubuntu-latest
     env:
       FRONT_DEPLOY_PATH: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
@@ -83,7 +89,7 @@ jobs:
   
   dockerize-and-run:
     needs: deploy
-    if: github.event.head_commit.message == 'deploy'
+    if: contains(github.event.head_commit.message, 'deploy')
     runs-on: ubuntu-latest
     name: 'dockerize and run'
     env:
@@ -99,3 +105,9 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY}}
+      - name: send err log
+        if: failure()
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://log.m3m.dev/api/unimun-clint-deploy.php?type=PROD&token=61875b275a6ef7b562b43ce6cc640aaae3cbd1bb6224aab9c3bdb8a45e05ab44'
+          method: 'GET'
