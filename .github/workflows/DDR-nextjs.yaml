@@ -7,7 +7,7 @@ on:
 
 jobs:
   dev-deploy:
-    if: contains(github.event.head_commit.message, 'dev deploy')
+    if: contains(github.event.head_commit.message, 'dev-deploy')
     runs-on: ubuntu-latest
     env:
       FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEV_DEPLOY_PATH }}
@@ -35,7 +35,7 @@ jobs:
   
   dev-dockerize-and-run:
     needs: dev-deploy
-    if: contains(github.event.head_commit.message, 'dev deploy')
+    if: contains(github.event.head_commit.message, 'dev-deploy')
     runs-on: ubuntu-latest
     name: 'dev dockerize and run'
     env:
