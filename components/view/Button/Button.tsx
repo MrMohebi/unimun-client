@@ -28,6 +28,7 @@ const Button = (props: Props) => {
             button.removeChild(ripple)
         }, 600)
     }
+
     return (
         <button disabled={props.disabled || props.loading} id={props.id} onClick={(e) => {
             e.preventDefault()
@@ -46,6 +47,7 @@ const Button = (props: Props) => {
                 :
                 props.children
             }
+
         </button>
     );
 };

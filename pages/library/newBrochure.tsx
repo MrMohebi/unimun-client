@@ -541,7 +541,8 @@ const NewBrochure = () => {
                                         console.log(BookData)
 
                                         return <div key={index + 'imageUpload'} className={'contents'}>
-                                            <BookImageUpload isFirst={index === 0} id={index.toString()}
+                                            <BookImageUpload defaultImage={uploadedImages[index]} isFirst={index === 0}
+                                                             id={index.toString()}
                                                              onUploadComplete={(e: any) => {
                                                                  let _bookAttachments: any[] = BookData.attachments;
                                                                  _bookAttachments.push(e.data)

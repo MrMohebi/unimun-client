@@ -68,7 +68,7 @@ const Search = (props: Props) => {
                             :
                             <Badge color={'#ff1a1a'}>
                                 <div className={'chat rounded-lg bg-background p-1.5 w-9 h-9'} onClick={() => {
-                                    router.push('/notifications')
+                                    router.push('/chat')
                                 }}>
                                     <NotifSVG/>
                                 </div>

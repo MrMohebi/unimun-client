@@ -14,6 +14,7 @@ const BookImageUpload = (props: {
     onError: Function,
     id: string,
     isFirst: boolean,
+    defaultImage: string
 }) => {
 
     const [uploadingProgress, setUploadingProgress] = useState(0);
@@ -24,6 +25,13 @@ const BookImageUpload = (props: {
     useEffect(() => {
         props.setUploading(uploading)
     }, [uploading]);
+
+    useEffect(() => {
+
+        if (props.defaultImage) {
+            setUploadedImageURL(props.defaultImage)
+        }
+    }, [props.defaultImage]);
 
 
     return (
@@ -42,7 +50,7 @@ const BookImageUpload = (props: {
                                 props.onUploadComplete(response)
                                 if (typeof response.data !== "number") {
                                     setUploadingProgress(100)
-                                    setUploadedImageURL(DOWNLOAD_HOST() + (response.data.preview ?? response.data.thumbnail))
+                                    // setUploadedImageURL(DOWNLOAD_HOST() + (response.data.preview ?? response.data.thumbnail))
                                 } else {
                                     Toast("خطا در هنگام آپلود")
                                     setUploading(false)

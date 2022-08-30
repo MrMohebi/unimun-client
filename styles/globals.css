@@ -537,4 +537,17 @@ input:focus {
   height: 100%;
 }
 
+.chat-bubble-animation {
+  animation: chat-bubble 1s;
+}
+
+@keyframes chat-bubble {
+  from {
+    max-height: 0;
+  }
+  to {
+    max-height: 200px;
+  }
+}
+
 /*# sourceMappingURL=globals.css.map */

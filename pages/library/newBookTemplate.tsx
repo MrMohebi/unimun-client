@@ -39,8 +39,8 @@ const NewBook = () => {
     //queries
 
     const createBookMutation = gql`
-        mutation createBook($isBook:Boolean! $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
-            createBook(
+        mutation createBookTemplate($isBook:Boolean! $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] ){
+            createBookTemplate(
                 isBook:$isBook,
                 isDownloadable: $isDownloadable,
                 isPurchasable: $isPurchasable,
@@ -55,7 +55,6 @@ const NewBook = () => {
                 appearanceID: $appearanceID
                 bookFiles: $bookFiles,
                 attachments: $attachments,
-                connectWay:$connectWay
                 pages:$pages
             ){
                 status
@@ -286,7 +285,6 @@ const NewBook = () => {
                     isBook: true,
                     bookFiles: BookData.files,
                     attachments: BookData.attachments,
-                    connectWay: connectWay,
                     appearanceID: BookData.appearanceID,
                     pages: BookData.pages,
                     publishedDate: BookData.publishedDate,
@@ -298,17 +296,11 @@ const NewBook = () => {
             }).then((e) => {
                 try {
                     console.log(e)
-                    if (e.data.createBook.status === 'SUCCESS') {
-                        lastBookSubmitSuccess(e.data.createBook.data.id)
-                        router.push('/library')
-                    } else {
-                        Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
-                    }
+
                 } catch (e) {
                     console.log(e)
 
                 }
-                console.log(e.data.createBook.status)
             })
         }
 
@@ -342,12 +334,7 @@ const NewBook = () => {
         if (currentStep === 1 && BookData.appearance)
             return true
         if (currentStep === 2 && BookData.price) {
-            if (contactType === 'phone' && connectWay.length === 11) {
-                return true
-            }
-            if (contactType === 'telegram' && connectWay.length > 3) {
-                return true
-            }
+            return true
         }
 
         return false
