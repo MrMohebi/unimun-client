@@ -4,8 +4,36 @@ import Tab from "../../components/view/Tab/Tab";
 import {passedTime} from "../../helpers/passedTime";
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
-import {gql, useLazyQuery} from "@apollo/client";
+import {ApolloClient, createHttpLink, gql, InMemoryCache, useLazyQuery} from "@apollo/client";
+import {setContext} from "@apollo/client/link/context";
+import {UserToken} from "../../store/user";
 
+
+let uri = 'https://tttchat.unimun.me/graphql'
+const httpLink = createHttpLink({
+    uri: uri,
+});
+
+
+const authLink = setContext((_, {headers}) => {
+    // get the authentication token from local storage if it exists
+    const token = UserToken()
+    // return the headers to the context so httpLink can read them
+    return {
+        headers: {
+            "user-agent": "JS GraphQL",
+            "content-type": 'application/json',
+            ...headers,
+            token: token ? `${token}` : "",
+        }
+    }
+});
+
+
+const cl = new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache()
+});
 const Index = () => {
 
     const [currentActiveIndex, setCurrentActiveIndex] = useState(0);
@@ -61,12 +89,14 @@ const Index = () => {
         }
     `
 
-    const [getChats, getChatsResult] = useLazyQuery(chatsQuery, {context: {clientName: 'fdas'}})
+    const [getChats, getChatsResult] = useLazyQuery(chatsQuery, {client: cl})
+
     useEffect(() => {
         getChats().then((value) => {
             console.log(value)
         })
     }, []);
+
     return (
         <div className={'h-full w-full '}>
 
