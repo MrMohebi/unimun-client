@@ -1,9 +1,8 @@
 import '../styles/globals.css'
 import type {AppProps} from 'next/app'
-import {useRouter} from "next/router";
 import Navbar from "../components/common/Navbar/Navbar";
 import {ApolloProvider} from "@apollo/client";
-import client from "../apollo-client";
+import {client} from "../apollo-client";
 import UserAuthenticationCheck from "../middlewareComponents/UserAuthenticationCheck";
 import 'react-toastify/dist/ReactToastify.css'
 import 'tippy.js/dist/tippy.css';
@@ -12,31 +11,23 @@ import Phone from '../assets/svgs/phone.svg'
 import Back from '../assets/svgs/mob_back.svg'
 import Expand from '../assets/svgs/mob_expand.svg'
 import Icons from '../assets/svgs/mob-status-icons.svg'
-import {useEffect, useState} from "react";
 import UsePhone from "../components/normal/UsePhone/UsePhone";
-
+import {NewMessageNotification} from "../components/NewMessageNotification";
+import React from "react";
 
 function MyApp({Component, pageProps}: AppProps) {
-    // rerender the website
-
-
     return (
         <ApolloProvider client={client}>
             <UserAuthenticationCheck>
                 <div
-
                     className={'overflow-hidden hide-scrollbars lg:block md:block md:h-full md:w-full lg:w-full lg:h-full block desktop  flex flex-col items-center justify-center'}>
-
                     <div className={'hidden md:block lg:block'}>
                         <UsePhone/>
                     </div>
 
                     <div
-
                         id={'scaler'}
                         className={'w-full h-full flex flex-col  items-center justify-center fixed left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2  md:h-mob-s-h lg:h-mob-s-h md:w-mob-s-w lg:w-mob-s-w '}
-
-
                     >
                         <div
                             dir={'ltr'}
@@ -56,6 +47,7 @@ function MyApp({Component, pageProps}: AppProps) {
                             </div>
                         </div>
 
+                        <NewMessageNotification/>
 
                         <div dir={'rtl'}
 

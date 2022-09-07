@@ -1,18 +1,54 @@
-import {ApolloClient, createHttpLink, InMemoryCache} from "@apollo/client";
+import {ApolloClient, createHttpLink, InMemoryCache, split} from "@apollo/client";
+import {GraphQLWsLink} from '@apollo/client/link/subscriptions';
+import {getMainDefinition} from '@apollo/client/utilities';
+import {createClient} from 'graphql-ws';
 import {setContext} from "@apollo/client/link/context";
 import {UserToken} from "./store/user";
 
 const env = process.env.NODE_ENV
 
-// let uri = 'https://api.unimun.me/graphql'
 let uri = 'https://tttapi.unimun.me/graphql'
+let uriChat = 'https://tttchat.unimun.me/graphql'
+let urlChatWss = 'wss://tttchat.unimun.me/graphql'
+
+
+
+
 const httpLink = createHttpLink({
     uri: uri,
 });
+const httpLinkChat = createHttpLink({
+    uri: uriChat,
+});
+const wssLinkChat = typeof window !== "undefined" ?
+    new GraphQLWsLink(createClient({
+        url: ()=>{
+            const token = UserToken()
+            return urlChatWss + "?token=" + token
+        }
+    }))
+    : 
+    null;
+
+const createSplitLinkChat = () => {
+    return split(
+        ({ query,getContext}) => {
+            const def = getMainDefinition(query);
+            return (def.kind === "OperationDefinition" && def.operation === "subscription");
+        },
+        wssLinkChat,
+        httpLinkChat
+    )
+}
+
+
+const splitLinkChat = (typeof window !== "undefined" && typeof wssLinkChat !== "undefined") ?
+    createSplitLinkChat() 
+    :
+    httpLinkChat;
 
 
 const authLink = setContext((_, {headers}) => {
-    // get the authentication token from local storage if it exists
     const token = UserToken()
     // return the headers to the context so httpLink can read them
     return {
@@ -24,10 +60,12 @@ const authLink = setContext((_, {headers}) => {
 });
 
 
-const client = new ApolloClient({
+export const client = new ApolloClient({
     link: authLink.concat(httpLink),
     cache: new InMemoryCache()
 });
 
-
-export default client;
+export const clientChat = new ApolloClient({
+    link: authLink.concat(splitLinkChat),
+    cache: new InMemoryCache()
+});
