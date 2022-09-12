@@ -18,22 +18,27 @@ const Tab = ({children, activeIndex, indicatorAtBottom, indicatorSizeDivider}: P
 
 
     const moveIndicator = () => {
-        let children = document.getElementById('children' + componentId.current)?.children;
-        let child = children![activeIndex].getBoundingClientRect()
-        let leftOffset = 0;
-        if (container.current)
-            leftOffset = container.current.getBoundingClientRect().left
+        try {
+            let children = document.getElementById('children' + componentId.current)?.children;
+            let child = children![activeIndex].getBoundingClientRect()
+            let leftOffset = 0;
+            if (container.current)
+                leftOffset = container.current.getBoundingClientRect().left
 
 
-        if (indicatorRef && indicatorRef.current) {
-            let indicator = (indicatorRef.current as HTMLElement)
-            let divideBy = 1;
-            if (typeof indicatorSizeDivider === "number") {
-                divideBy = indicatorSizeDivider
+            if (indicatorRef && indicatorRef.current) {
+                let indicator = (indicatorRef.current as HTMLElement)
+                let divideBy = 1;
+                if (typeof indicatorSizeDivider === "number") {
+                    divideBy = indicatorSizeDivider
+                }
+                let width = child.width / divideBy;
+                (indicator as HTMLElement).style.width = width + 'px';
+                (indicator as HTMLElement).style.left = ((child.left - leftOffset + (child.width / 2)) - (width / 2)) + 'px'
             }
-            let width = child.width / divideBy;
-            (indicator as HTMLElement).style.width = width + 'px';
-            (indicator as HTMLElement).style.left = ((child.left - leftOffset + (child.width / 2)) - (width / 2)) + 'px'
+
+        } catch (e) {
+
         }
 
     }

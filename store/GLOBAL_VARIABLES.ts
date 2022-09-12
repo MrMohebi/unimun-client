@@ -5,3 +5,7 @@ export const UNIMUN_PROVIDERS = makeVar([
 ])
 
 export const DOWNLOAD_HOST = makeVar('https://dl.unimun.me/')
+// export const UnimunID = makeVar('6257bb3c68ef4e6962285153')
+
+//test
+export const UnimunID = makeVar('62ad846a7ee608aa2bfe9ab1')

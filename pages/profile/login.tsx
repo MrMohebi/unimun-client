@@ -175,6 +175,8 @@ const Login = () => {
                 if (shouldSignUp) {
                     UserToken(verifyVCodeResult.data.verifyVCode.data.token)
                     setToken(verifyVCodeResult.data.verifyVCode.data.token)
+                    console.log(verifyVCodeResult.data.verifyVCode.data.token)
+                    console.log('this is id of user')
                     setId(verifyVCodeResult.data.verifyVCode.data.id)
                     setStep(2)
                 } else

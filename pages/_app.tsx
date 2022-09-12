@@ -12,7 +12,7 @@ import Back from '../assets/svgs/mob_back.svg'
 import Expand from '../assets/svgs/mob_expand.svg'
 import Icons from '../assets/svgs/mob-status-icons.svg'
 import UsePhone from "../components/normal/UsePhone/UsePhone";
-import {NewMessageNotification} from "../components/NewMessageNotification";
+import {NewMessageNotification} from "../components/normal/NewMessageNotification";
 import React from "react";
 
 function MyApp({Component, pageProps}: AppProps) {

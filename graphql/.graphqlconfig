@@ -9,6 +9,13 @@
           "user-agent": "JS GraphQL"
         },
         "introspect": false
+      },
+      "Chat GraphQL Endpoint": {
+        "url": "https://chat.unimun.me/graphql",
+        "headers": {
+          "user-agent": "JS GraphQL"
+        },
+        "introspect": false
       }
     }
   }

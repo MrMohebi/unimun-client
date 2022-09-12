@@ -18,7 +18,7 @@ import BookmarkBook from "../../../assets/svgs/bookmark-book.svg";
 import BackButton from "../../../assets/svgCodes/BackButton";
 import Toast from "../../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
-import {UserData, UserId} from "../../../store/user";
+import {UserData, UserId, UserToken} from "../../../store/user";
 import {getAndSetUserData} from "../../../helpers/GetAndSetUserData";
 import {getUserQuery} from "../../../Requests/normal/user";
 import {fixPrice} from "../../../helpers/fixPrice";
@@ -26,7 +26,9 @@ import NoPic from "../../../components/normal/NoPic/NoPic";
 import Free from "../../../assets/svgs/free.svg";
 import Copy from "../../../assets/svgs/copy-icon.svg";
 import ContactToast from "../../../components/view/ContactToast/ContactToast";
-import {UNIMUN_PROVIDERS} from "../../../store/GLOBAL_VARIABLES";
+import {UNIMUN_PROVIDERS, UnimunID} from "../../../store/GLOBAL_VARIABLES";
+import {clientChat} from "../../../apollo-client";
+import {TailSpin} from "react-loader-spinner";
 
 
 interface Props {
@@ -107,10 +109,12 @@ const Book = (props: Props) => {
     const [book, _book] = useState({} as any);
     const [bookDetails, _bookDetails] = useState(false)
     const phoneInputRef = useRef<HTMLInputElement>(null)
-
+    const [bookId, setBookId] = useState("");
+    const [btnLoading, setBtnLoading] = useState(false);
     useEffect(() => {
 
         let bookId = window.location.href.split('/')[window.location.href.split('/').length - 1]
+        setBookId(bookId)
         getBook({variables: {id: bookId}}).then((e) => {
             try {
                 _book(e.data.book.data)
@@ -121,6 +125,38 @@ const Book = (props: Props) => {
 
 
     }, [])
+
+
+    const newMessageMutation = gql`
+        mutation($chatID:ID! $text:String) {
+            sendMessage(chatID: $chatID text:$text){
+                text
+                sentAt
+                id
+            }
+        }
+    `
+    const [newMessage, newMessageResult] = useMutation(newMessageMutation, {client: clientChat})
+    const buyBookFromUnimun = () => {
+        if (UserId() && UserToken()) {
+            setBtnLoading(true)
+
+
+            newMessage({
+                variables: {
+                    chatID: UnimunID(),
+                    text: `
+                    این کتاب رو میخوام 
+                    /library/book/${bookId}
+                    `
+                }
+            }).then((value) => {
+                console.log(value)
+                // router.push('/chat')
+            })
+        }
+
+    }
 
     return (
         <div className={'overflow-scroll h-full'}>
@@ -375,89 +411,57 @@ const Book = (props: Props) => {
                                     rippleColor={'rgba(255,255,255,0.4)'}
                                     onClick={() => {
 
+                                        buyBookFromUnimun()
+                                        // setContactAppealShow(true)
 
-                                        setContactAppealShow(true)
-
-                                        // console.log(book.bookFiles[0].url)
-                                        // if (book.isDownloadable)
-                                        //     window.open(book.bookFiles[0].url, '_blank')
-                                        //
-                                        // if (book.isPurchasable) {
-                                        //     let bookId = window.location.href.split('/')[window.location.href.split('/').length - 1]
-                                        //
-                                        //
-                                        //     if (book.connectWay) {
-                                        //         if (book.connectWay[0] === "0") {
-                                        //
-                                        //             if (!UserId()) {
-                                        //                 router.push('/profile/login')
-                                        //             }
-                                        //             bookConnectMutation({
-                                        //                 variables: {
-                                        //                     bookId: bookId,
-                                        //                     userId: UserId()
-                                        //                 }
-                                        //             }).then((value) => {
-                                        //                 if (value.data.bookConnectClick.status === "SUCCESS") {
-                                        //                     Toast('درخواست شما برای ارائه دهنده ارسال شد ');
-                                        //                 }
-                                        //             })
-                                        //
-                                        //             let text = book.connectWay;
-                                        //             try {
-                                        //                 navigator.clipboard.writeText(text).then(function () {
-                                        //                     Toast('شماره تلفن در کلیپبورد شما کپی شد');
-                                        //                 }, function () {
-                                        //                     Toast(book.connectWay);
-                                        //                 });
-                                        //             } catch (e) {
-                                        //                 console.log('copy error')
-                                        //
-                                        //             }
-                                        //
-                                        //         } else {
-                                        //             window.open(`https://t.me/${book.connectWay.replace('@', '')}`, '_blank')
-                                        //         }
-                                        //     }
-                                        //
-                                        // }
-                                        // // window.open(book.bookFiles[0].url, '_blank')
 
                                     }}
 
                             >
 
                                 {
-                                    book.isDownloadable ?
-                                        <div className={'w-full h-full flex flex-row justify-between items-center'}>
-                                            <div className={'flex flex-row justify-center items-center px-4'}>
+                                    btnLoading ?
+                                        <div
+                                            className={'w-full h-full flex flex-row justify-center items-center'}>
+                                            <TailSpin width={30} color={'white'}/>
 
-                                                <div className={'h-6 w-6'}>
-                                                    <DownloadBold/>
-                                                </div>
-                                                <span
-                                                    className={'text-white block mr-3 '}
-                                                    style={{fontSize: '1rem'}}>{book.isBook ? 'دانـلود کتـاب' : 'دانـلود جـزوه'}</span>
-                                            </div>
-                                            <div className={'flex px-3 flex-row justify-center items-center'}>
-
-                                                <div dir={'ltr'}
-                                                     className={'h-9 w-9 pb-1 flex flex-col justify-center items-center'}>
-                                                    <Pdf/>
-                                                </div>
-                                            </div>
                                         </div>
+
                                         :
-                                        <div className={'w-full h-full flex flex-row justify-center items-center'}>
-                                            <div className={'flex flex-row justify-center items-center px-4'}>
+                                        book.isDownloadable ?
+                                            <div
+                                                className={'w-full h-full flex flex-row justify-between items-center'}>
+                                                <div className={'flex flex-row justify-center items-center px-4'}>
+
+                                                    <div className={'h-6 w-6'}>
+                                                        <DownloadBold/>
+                                                    </div>
+                                                    <span
+                                                        className={'text-white block mr-3 '}
+                                                        style={{fontSize: '1rem'}}>{book.isBook ? 'دانـلود کتـاب' : 'دانـلود جـزوه'}</span>
+                                                </div>
+                                                <div className={'flex px-3 flex-row justify-center items-center'}>
+
+                                                    <div dir={'ltr'}
+                                                         className={'h-9 w-9 pb-1 flex flex-col justify-center items-center'}>
+                                                        <Pdf/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            :
+                                            <div
+                                                className={'w-full h-full flex flex-row justify-center items-center'}>
+                                                <div className={'flex flex-row justify-center items-center px-4'}>
 
                                                 <span
                                                     className={'text-white block mr-3 '}
                                                     style={{fontSize: '1rem'}}>{book.isBook ? 'کتاب رو میخوام' : 'جزوه رو میخوام'}</span>
+                                                </div>
+
                                             </div>
 
-                                        </div>
                                 }
+
 
                             </Button>
                         </div>

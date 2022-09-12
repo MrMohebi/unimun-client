@@ -1,5 +1,5 @@
 import {gql, useSubscription} from "@apollo/client";
-import {clientChat} from "../apollo-client";
+import {clientChat} from "../../apollo-client";
 
 const COMMENTS_SUBSCRIPTION = gql`
     subscription OnNewMessage{
@@ -13,6 +13,7 @@ const COMMENTS_SUBSCRIPTION = gql`
 
 
 export const NewMessageNotification = () => {
+
     const { data, loading, error } = useSubscription(
         COMMENTS_SUBSCRIPTION,
         { client:clientChat}
@@ -23,11 +24,11 @@ export const NewMessageNotification = () => {
     }
 
     return (
-        <div>
-            {loading?
+        <div className={'fixed top-0'}>
+            {loading ?
                 <h1>loading...</h1>
                 :
-                error?
+                error ?
                     <h1>{error.message}</h1>
                     :
                     <h1>new message got! show notification in top and then hide as instagram dose</h1>

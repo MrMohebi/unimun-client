@@ -6,7 +6,7 @@ import VerifySVG from '../../assets/svgs/verify.svg';
 import LogoutSVG from '../../assets/svgs/logout.svg';
 import {useRouter} from "next/router";
 import {UserPhone, UserToken} from "../../store/user";
-import {removeToken} from "../../helpers/TokenHelper";
+import {removeToken, setId, setToken} from "../../helpers/TokenHelper";
 import Button from "../../components/view/Button/Button";
 
 const AccountSettings = () => {
@@ -17,6 +17,8 @@ const AccountSettings = () => {
     const logoutOnClickHandler = () => {
         removeToken()
         UserToken('')
+        setToken('')
+        setId('')
         window.location.pathname = '/'
     }
 
