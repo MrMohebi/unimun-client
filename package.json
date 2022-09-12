@@ -13,7 +13,6 @@
     "@apollo/client": "^3.5.9",
     "@react-buddy/ide-toolbox": "^2.2.0",
     "@svgr/webpack": "^6.2.1",
-    "@yisheng90/react-loading": "^1.4.4",
     "animate.css": "^4.1.1",
     "axios": "^0.26.1",
     "gql-query-builder": "^3.5.9",
