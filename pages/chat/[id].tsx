@@ -197,12 +197,15 @@ const ChatScreen = () => {
                         if (item.type === 'TEXT')
                             return (
                                 <div key={'chat-bubble-' + index}
-                                     className={`w-full h-auto flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
+                                     className={` w-full h-auto flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
                                     <div style={{
                                         animationDelay: index * 50 + 'ms'
                                     }}
-                                         className={`flex IranSansMedium px-3 py-3 flex-col justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl w-full max-w-[80%] `}>
-                                        <p className={`${!sentByMe ? "text-textBlack" : "white"}`}>{item.text}</p>
+                                         className={` flex IranSansMedium px-3 py-3 flex-col justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl w-full max-w-[80%] `}>
+                                        <p style={{
+                                            wordBreak: 'break-word'
+                                        }}
+                                           className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>{item.text}</p>
                                         <div className={'flex mt-3 flex-row justify-start items-center w-full'}>
                                             <img src="/assets/svgs/check.svg"
                                                  className={`w-2 z-10 h-2 ${sentByMe ? '' : "invert-[0.5]"}`}
