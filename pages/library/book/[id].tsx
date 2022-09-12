@@ -152,7 +152,7 @@ const Book = (props: Props) => {
                 }
             }).then((value) => {
                 console.log(value)
-                // router.push('/chat')
+                router.push('/chat')
             })
         }
 
