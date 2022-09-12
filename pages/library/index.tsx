@@ -20,6 +20,7 @@ import {UserToken} from "../../store/user";
 import NoPic from "../../components/normal/NoPic/NoPic";
 import Free from '../../assets/svgs/free.svg'
 import {UNIMUN_PROVIDERS} from "../../store/GLOBAL_VARIABLES";
+import {currentNavActiveIndex} from "../../store/navbar";
 
 const Index = () => {
 
@@ -110,6 +111,10 @@ const Index = () => {
             Toast('کتاب شما ثبت شد و  در انتظار بررسی است')
             lastBookSubmitSuccess('')
         }
+
+
+        currentNavActiveIndex(1)
+
 
     }, [])
 
@@ -558,6 +563,16 @@ const Index = () => {
 
             <div
                 className={`fixed right-7 bottom-40 flex flex-col items-start justify-center transition-all z-50 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
+                <Button id={'new-note-option'} rippleColor={'rgba(0,0,0,0.24)'} onClick={() => {
+                    // isBrochure(true)
+                    if (UserToken())
+                        router.push('qr/scan')
+                    else
+                        router.push('profile/login')
+
+                }}
+                        className={`h-14 w-32 mb-4 bg-white rounded-2xl flex flex-col justify-center items-center px-5 IranSansMedium transition-all  ease-in-out duration-200 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>اسکن
+                    بارکد</Button>
                 <Button onClick={() => {
                     EditBookData({})
                     if (UserToken())
@@ -566,7 +581,7 @@ const Index = () => {
                         router.push('profile/login')
 
                 }} id={'new-book-option'} rippleColor={'rgba(0,0,0,0.24)'}
-                        className={`h-14 bg-white rounded-2xl flex flex-col justify-center items-center px-5 IranSansMedium delay-75 transition-all ease-in-out duration-200 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
+                        className={`h-14 w-32 bg-white rounded-2xl flex flex-col justify-center items-center px-5 IranSansMedium delay-75 transition-all ease-in-out duration-200 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
                     افزودن کتاب
                 </Button>
                 <Button id={'new-note-option'} rippleColor={'rgba(0,0,0,0.24)'} onClick={() => {
@@ -577,9 +592,10 @@ const Index = () => {
                         router.push('profile/login')
 
                 }}
-                        className={`h-14 mt-4 bg-white rounded-2xl flex flex-col justify-center items-center px-5 IranSansMedium transition-all  ease-in-out duration-200 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
+                        className={`h-14 w-32 mt-4 bg-white rounded-2xl flex flex-col justify-center items-center px-5 IranSansMedium transition-all  ease-in-out duration-200 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
                     افزودن جزوه
                 </Button>
+
 
             </div>
 

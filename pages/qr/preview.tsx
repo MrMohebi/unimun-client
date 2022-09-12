@@ -102,8 +102,9 @@ const Preview = () => {
 
                             <div
                                 className={' IranSansMedium h-10 w-24 px-2 flex flex-row justify-around items-center bg-background rounded-lg'}>
+                                <input type="checkbox" className={'w-10 h-10 border border-primary'}/>
                                 <input id={'free-book'}
-                                       className={'free-checkbox h-5 w-5 rounded border-2 border-primary'}
+                                       className={' h-5 w-5 rounded border-2 border-primary'}
                                        type={'checkbox'}
                                     // defaultValue={BookData.price}
                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

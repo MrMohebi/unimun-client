@@ -28,6 +28,7 @@ import TwitterSVG from '../../assets/svgs/twitter-gray.svg'
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 import SkeletonElement from "../../components/view/Skeleton/Skeleton";
 import {route} from "next/dist/server/router";
+import {currentNavActiveIndex} from "../../store/navbar";
 
 const Index = () => {
     const router = useRouter()
@@ -61,6 +62,9 @@ const Index = () => {
             getUser().then((e) => {
                 console.log(e)
             })
+
+        currentNavActiveIndex(4)
+
     }, [])
     useEffect(() => {
 

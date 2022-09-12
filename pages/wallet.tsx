@@ -2,6 +2,7 @@ import React, {useEffect, useRef} from 'react';
 import lottie from "lottie-web";
 import books from "../assets/animations/books.json";
 import WalletSVG from '../assets/svgs/wallet.svg'
+import {currentNavActiveIndex} from "../store/navbar";
 
 const Library = () => {
 
@@ -16,6 +17,8 @@ const Library = () => {
                 loop: true,
                 autoplay: true
             })
+        currentNavActiveIndex(3)
+
     }, [])
 
     return (

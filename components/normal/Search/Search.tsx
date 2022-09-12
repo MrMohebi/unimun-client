@@ -70,7 +70,8 @@ const Search = (props: Props) => {
                                 <div className={'chat rounded-lg bg-background p-1.5 w-9 h-9'} onClick={() => {
                                     router.push('/chat')
                                 }}>
-                                    <NotifSVG/>
+                                    <img src="/assets/svgs/chat.svg" alt=""/>
+                                    {/*<NotifSVG/>*/}
                                 </div>
                             </Badge>
                     }

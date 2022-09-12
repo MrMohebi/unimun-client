@@ -12,6 +12,8 @@ import CircularProgressBar from "../../components/view/CircularProgressBar/Circu
 import {InfinitySpin, TailSpin} from "react-loader-spinner";
 import {UnimunID} from "../../store/GLOBAL_VARIABLES";
 import {CurrentChatUserData} from "../../store/chat";
+import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
+import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
 
 
 const Index = () => {
@@ -76,38 +78,39 @@ const Index = () => {
                 router.push('/')
             }} back={true} blurBackground={true}/>
 
-            <div className={'px-10 bg-white shadow IranSansMedium text-md'}>
-                <div className={'w-full IranSans h-12 pt-4  bg-white z-50 -mt-2 '}>
-                    <Tab indicatorSizeDivider={3} activeIndex={currentActiveIndex} indicatorAtBottom={true}>
-                        <div onClick={item => setCurrentActiveIndex(0)}
-                             className={`ease-in-out ${currentActiveIndex === 0 ? "text-primary" : ""} transition-all `}>فعال
-                        </div>
-                        <div onClick={item => setCurrentActiveIndex(1)}
-                             className={`ease-in-out ${currentActiveIndex === 1 ? "text-primary" : ""} transition-all `}>غیر
-                            فعال
-                        </div>
-                        <div onClick={item => setCurrentActiveIndex(2)}
-                             className={`ease-in-out ${currentActiveIndex === 2 ? "text-primary" : ""} transition-all `}>درخواست
-                            ها
-                        </div>
+            {/*<div className={'px-10 bg-white shadow IranSansMedium text-md'}>*/}
+            {/*    <div className={'w-full IranSans h-12 pt-4  bg-white z-50 -mt-2 '}>*/}
+            {/*        <Tab indicatorSizeDivider={3} activeIndex={currentActiveIndex} indicatorAtBottom={true}>*/}
+            {/*            <div onClick={item => setCurrentActiveIndex(0)}*/}
+            {/*                 className={`ease-in-out ${currentActiveIndex === 0 ? "text-primary" : ""} transition-all `}>فعال*/}
+            {/*            </div>*/}
+            {/*            <div onClick={item => setCurrentActiveIndex(1)}*/}
+            {/*                 className={`ease-in-out ${currentActiveIndex === 1 ? "text-primary" : ""} transition-all `}>غیر*/}
+            {/*                فعال*/}
+            {/*            </div>*/}
+            {/*            <div onClick={item => setCurrentActiveIndex(2)}*/}
+            {/*                 className={`ease-in-out ${currentActiveIndex === 2 ? "text-primary" : ""} transition-all `}>درخواست*/}
+            {/*                ها*/}
+            {/*            </div>*/}
 
-                    </Tab>
-                </div>
-            </div>
+            {/*        </Tab>*/}
+            {/*    </div>*/}
+            {/*</div>*/}
 
 
             <div className={'h-full overflow-scroll '}>
+                <FullScreenLoading show={!chats.length && !chatsArrived}/>
 
-                {
-                    !chats.length && !chatsArrived ?
-                        <div className={'w-full flex flex-col justify-center items-center'}>
-                            <TailSpin width={50} color={'rgba(12,170,255,0.85)'}/>
+                {/*{*/}
+                {/*    !chats.length && !chatsArrived ?*/}
+                {/*        <div className={'w-full flex flex-col justify-center pt-10 items-center'}>*/}
+                {/*            <LoadingDialog wrapperClassName={'w-10 h-10 mr-2'} color={'#00bbff'} strokeWidth={4}/>*/}
 
-                        </div>
-                        :
-                        null
+                {/*        </div>*/}
+                {/*        :*/}
+                {/*        null*/}
 
-                }
+                {/*}*/}
 
                 {chats.map((chat: {
                     id: string
@@ -137,7 +140,7 @@ const Index = () => {
                                         <div
                                             className={'col-span-1 h-20 w-20 row-span-1 flex flex-row justify-start items-center'}>
                                             <div
-                                                className={'col-span-1 h-16 w-16 border-2 border-textDark row-span-1 rounded-2xl object-cover flex flex-col justify-center items-center'}>
+                                                className={'col-span-1 h-14 w-14 border-2 border-textDark row-span-1 rounded-2xl object-cover flex flex-col justify-center items-center'}>
                                             <span
                                                 className={'IranSansMedium text-2xl pt-2 text-textDark'}> {chat.members[1].name[0]} </span>
                                             </div>
@@ -145,7 +148,7 @@ const Index = () => {
                                             {/*     className={'col-span-1 h-16 w-16 row-span-1 rounded-2xl object-cover'}/>*/}
                                         </div>
                                         <div
-                                            className={'col-span-5 border-b-2 flex flex-col justify-start items-start pt-3 mr-3'}>
+                                            className={'col-span-5 border-b-2 flex flex-col justify-start items-start pt-3'}>
                                             <div id={'name'} className={'flex flex-row justify-start items-center'}>
                                                 <span
                                                     className={"IranSansMedium text-black"}>{chat.members[1].name}</span>
@@ -180,11 +183,15 @@ const Index = () => {
                                     className={'w-full  grid grid-cols-[4.5rem,auto,auto,auto,auto,auto] grid-rows-1 h-20'}>
                                     <div
                                         className={'col-span-1 h-20 w-20 row-span-1 flex flex-row justify-start items-center'}>
-                                        <img src={'/assets/svgs/chat-notifs.svg'} alt={"chat unimun"}
-                                             className={'col-span-1 h-16 w-16 row-span-1 rounded-2xl'}/>
+                                        <div
+                                            className={'flex flex-row w-14 h-14 p-3 bg-primary rounded-2xl justify-center items-center'}>
+                                            <img src="/assets/svgs/notif.svg" alt=""/>
+                                        </div>
+                                        {/*<img src={'/assets/svgs/chat-notifs.svg'} alt={"chat unimun"}*/}
+                                        {/*     className={'col-span-1 h-14 w-14 row-span-1 rounded-2xl'}/>*/}
                                     </div>
                                     <div
-                                        className={'col-span-5 border-b-2 flex flex-col justify-start items-start pt-3 mr-3'}>
+                                        className={'col-span-5 border-b-2 flex flex-col justify-start items-start pt-3 '}>
                                         <div id={'name'} className={'flex flex-row justify-start items-center'}>
                                             <span className={"IranSansMedium text-black"}>یونیمون</span>
                                         </div>

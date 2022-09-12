@@ -24,6 +24,7 @@ const ChatScreen = () => {
     const [messages, setMessages] = useState([] as any);
     const [myId, setMyId] = useState('');
     const [render, setRender] = useState(false);
+    const [currentChatStat, setCurrentChatStat] = useState('default');
 
 
     useEffect(() => {
@@ -151,17 +152,30 @@ const ChatScreen = () => {
 
     return (
         <div ref={chatBoxRef} className={'w-full h-full overflow-scroll scroll-auto pb-12'}>
+
+            {
+                currentChatStat === 'more' ?
+                    <div id={'test-pay'}
+                         className={'flex z-10 flex-row justify-center  bottom-16  bg-white rounded-xl right-4 shadow-md px-3 py-3  fixed'}>
+                        <img src="/assets/svgs/moneys.svg" alt=""/>
+                        <span className={'IranSansMedium text-textBlack mr-4'}> درخواست وجه</span>
+                    </div>
+                    :
+                    null
+            }
+
             <div id={'chat header'}
-                 className={'w-full h-20 px-4 bg-white/70 backdrop-blur shadow flex flex-row justify-between items-center fixed top-0 left-0 z-20'}>
+                 className={'w-full h-16 px-4 bg-white/70 backdrop-blur shadow flex flex-row justify-between items-center fixed top-0 left-0 z-20'}>
                 <div className={'flex flex-row justify-start items-center'}>
-                    <div className={'w-8 h-8 rotate-180'} onClick={() => {
+                    <div className={'w-6 h-6 rotate-180'} onClick={() => {
                         router.push('/chat')
                     }}><Back/></div>
                     {
                         CurrentChatUserData().id === UnimunID() ?
-                            <img
-                                src="/assets/svgs/chat-notifs.svg"
-                                alt="" className={'w-10 mr-2  h-10 rounded-lg '}/>
+                            <div
+                                className={'flex flex-row w-10 h-10 p-2 mr-2 bg-primary rounded-xl justify-center items-center'}>
+                                <img src="/assets/svgs/notif.svg" alt=""/>
+                            </div>
                             :
                             <div
                                 className={'w-10 mr-2  h-10 rounded-lg flex flex-col justify-center items-center '}>
@@ -177,19 +191,20 @@ const ChatScreen = () => {
                         <span className={'IranSansMedium'}>
                             {/*@ts-ignore*/}
                             {CurrentChatUserData().id === UnimunID() ? "یونیمون" : CurrentChatUserData() ? CurrentChatUserData().members ? CurrentChatUserData().members[1]!.name : "" : ""}</span>
-                        <span className={'IranSansMedium text-textDark text-[0.7rem]'}>20 دقیقه پیش</span>
+                        <span className={'IranSansMedium text-textDark text-[0.7rem]'}>چند لحظه پیش</span>
                     </div>
                 </div>
-                <Button id={'chat-more'} rippleColor={'rgba(0,0,0,0.18)'} className={'h-7 w-7 rounded-lg'}
-                        onClick={moreOnClick}>
-                    <img src={'/assets/svgs/more.svg'} alt={'unimun more chat'} className={'h-7 w-7'}/>
+                {/*<Button id={'chat-more'} rippleColor={'rgba(0,0,0,0.18)'} className={'h-7 w-7 rounded-lg'}*/}
+                {/*        onClick={moreOnClick}>*/}
+                {/*    <img src={'/assets/svgs/more.svg'} alt={'unimun more chat'} className={'h-7 w-7'}/>*/}
 
-                </Button>
+                {/*</Button>*/}
             </div>
 
 
             <div className={'chat-box w-full overflow-scroll flex flex-col justify-end items-center pt-20 pb-2'}
                  ref={chatScrollerRef}>
+
 
                 {
                     messages.map((item: any, index: number) => {
@@ -201,17 +216,17 @@ const ChatScreen = () => {
                                     <div style={{
                                         animationDelay: index * 50 + 'ms'
                                     }}
-                                         className={` flex IranSansMedium px-3 py-3 flex-col justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl w-full max-w-[80%] `}>
+                                         className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]  `}>
                                         <p style={{
                                             wordBreak: 'break-word'
                                         }}
                                            className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>{item.text}</p>
-                                        <div className={'flex mt-3 flex-row justify-start items-center w-full'}>
+                                        <div className={'flex mt-1 flex-row justify-start items-center '}>
                                             <img src="/assets/svgs/check.svg"
                                                  className={`w-2 z-10 h-2 ${sentByMe ? '' : "invert-[0.5]"}`}
                                                  alt=""/>
                                             <span
-                                                className={`IranSansMedium text-[0.7rem] mr-2 ${!sentByMe ? "text-textBlack" : "white"}`}>{moment(item.sentAt).format('MM:SS')}</span>
+                                                className={`IranSansMedium text-[0.75rem] mr-2 ${!sentByMe ? "text-textDark" : "white"}`}>{moment(item.sentAt).format('hh:mm')}</span>
                                         </div>
 
                                     </div>
@@ -223,47 +238,116 @@ const ChatScreen = () => {
                 }
 
 
+                <div className={'w-full flex flex-row justify-start items-center mt-2'}>
+                    <div className={'w-[80%] flex flex-col justify-start items-center px-2'}>
+                        <div
+                            className={'h-auto w-full bg-primary rounded-2xl flex flex-col justify-center items-center px-3 pb-1 pt-3'}>
+                            <div className={'flex flex-row justify-between items-center w-full'}>
+                                <img src="/assets/svgs/pay-request.svg" alt=""/>
+                                <span className={'text-white IranSansMedium w-full mr-3'}>درخواست</span>
+                                <span className={'text-white IranSansMedium whitespace-nowrap'}>120 هزار تومان</span>
+                            </div>
+                            <p className={'IranSansMedium text-white mt-3 '}>عنوان درخواست وجه که میتونه اینجا نوشته بشه
+                                تا 150 کاراکتر میتونه باشه</p>
+                            <div className={'w-full flex flex-row justify-between '}>
+                                <div className={'flex mt-1 flex-row justify-start items-center '}>
+                                    <img src="/assets/svgs/check.svg"
+                                         className={`w-2 z-10 h-2 ${true ? '' : "invert-[0.5]"}`}
+                                         alt=""/>
+                                    <span
+                                        className={`IranSansMedium text-[0.75rem] mr-2 ${false ? "text-textDark" : "text-white"}`}>{moment().format('hh:mm')}</span>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div className={'flex flex-row justify-between items-center w-full  mt-3'}>
+                            <Button id={'pay-btn'}
+                                    className={'bg-primary w-[47%] flex flex-row justify-center items-center  h-12 text-white rounded-2xl'}>
+                                <span className={'IranSansMedium '}>لغو</span>
+                            </Button>
+                            <Button id={'pay-btn'}
+                                    className={'bg-primary w-[47%] flex flex-row justify-center items-center h-12 text-white rounded-2xl'}>
+                                <span className={'IranSansMedium '}>ویرایش </span>
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
+
             <div
-                className={'bottom-0 fixed left-0 w-full bg-white/90 backdrop-blur z-20 shadow grid grid-cols-12 h-14 px-3'}>
-                <div className={'send-and-voice col-span-2 flex flex-row justify-start items-center'}>
-                    <img src={'/assets/svgs/send.svg'} className={'text-primary IranSansMedium text-sm h-5 w-5'}
-                         onClick={() => {
-                             let messageText = (document.getElementById('text-chat') as HTMLInputElement)!.value
+                className={'bottom-0 fixed left-0 w-full bg-white  z-20 shadow grid grid-cols-12 h-14 px-3'}>
+                <div className={'send-and-voice col-span-1 flex flex-row justify-start items-center'}>
 
 
-                             newMessage({
-                                 variables: {
-                                     chatID: id,
-                                     text: messageText
-                                 }
-                             }).then((value) => {
-                                 console.log(value)
-                             });
-                             //     // addMessage((document.getElementById('text-chat') as HTMLInputElement)!.value);
-                             (document.getElementById('text-chat') as HTMLInputElement)!.value = ""
-                         }} ref={sendMessageBtn}/>
-                    <img src="/assets/svgs/microphone.svg" alt="Unimun chat microphone svg"
-                         className={'w-6 h-6 mr-2'}/>
+                    {
+                        currentChatStat === 'write' ?
+                            <img src={'/assets/svgs/send.svg'}
+                                 className={'text-primary IranSansMedium text-sm h-6 w-6 animate__animated'}
+                                 onClick={() => {
+                                     let messageText = (document.getElementById('text-chat') as HTMLInputElement)!.value
+
+
+                                     newMessage({
+                                         variables: {
+                                             chatID: id,
+                                             text: messageText
+                                         }
+                                     }).then((value) => {
+                                         console.log(value)
+                                     });
+                                     //     // addMessage((document.getElementById('text-chat') as HTMLInputElement)!.value);
+                                     (document.getElementById('text-chat') as HTMLInputElement)!.value = ""
+                                 }} ref={sendMessageBtn}/>
+                            : currentChatStat === 'default' ?
+                                <img src="/assets/svgs/chat-add.svg" alt="" onClick={() => {
+                                    setCurrentChatStat('more')
+                                }}/>
+                                :
+                                currentChatStat === 'more' ?
+                                    <img src="/assets/svgs/add-collapse-chat.svg" alt="" onClick={() => {
+                                        setCurrentChatStat('default')
+                                    }}/>
+                                    :
+                                    <div></div>
+                    }
+
+                    {/*<img src="/assets/svgs/microphone.svg" alt="Unimun chat microphone svg"*/}
+                    {/*     className={'w-6 h-6 mr-2'}/>*/}
                 </div>
-                <div className={'send-and-voice col-span-9 flex flex-row justify-start items-center mr-2 pr-2'}>
-                    <input onKeyPress={(event) => {
-                        if (event.key == 'Enter') {
-                            event.preventDefault()
-                            sendMessageBtn.current!.click()
+                <div className={'send-and-voice col-span-11 flex flex-row justify-start items-center mr-2 pr-2'}>
+                    <textarea onChange={(event) => {
+                        if (event.currentTarget.value) {
+                            setCurrentChatStat('write')
+                        } else {
+                            setCurrentChatStat('default')
                         }
-                    }} id={'text-chat'} type="text" dir={'rtl'} placeholder={'بنویس'}
-                           className={'w-full IranSansMedium bg-transparent'}/>
+                    }} id={'text-chat'} placeholder={'بنویس'} className={'w-full IranSansMedium bg-transparent h-auto'}
+                              rows={1} name="Text1" onClick={() => {
+
+                    }}></textarea>
+                    {/*<input onKeyPress={(event) => {*/}
+                    {/*    if (event.key == 'Enter') {*/}
+                    {/*        event.preventDefault()*/}
+                    {/*        sendMessageBtn.current!.click()*/}
+                    {/*    }*/}
+                    {/*}} id={'text-chat'} type="text" dir={'rtl'} placeholder={'بنویس'}*/}
+                    {/*       className={'w-full IranSansMedium bg-transparent'}/>*/}
                 </div>
-                <div className={'send-and-voice col-span-1 flex flex-row justify-center items-center  '}>
-                    <img src="/assets/svgs/emoji-happy.svg" alt="Unimun chat microphone svg"
-                         className={'w-5 h-5 mr-2'}/>
-                </div>
+                {/*<div className={'send-and-voice col-span-1 flex flex-row justify-center items-center  '}>*/}
+                {/*    <div></div>*/}
+                {/*    /!*<img src="/assets/svgs/emoji-happy.svg" alt="Unimun chat microphone svg"*!/*/}
+                {/*    /!*     className={'w-5 h-5 mr-2'}/>*!/*/}
+                {/*</div>*/}
 
 
             </div>
+
 
             <div id={'bottom-of-chat fixed bottom-0 '}></div>
+
 
         </div>
 

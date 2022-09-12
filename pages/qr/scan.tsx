@@ -6,6 +6,7 @@ import {useRouter} from "next/router";
 import {UserToken} from "../../store/user";
 import dynamic from "next/dynamic";
 import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
+import Header from "../../components/common/Header/Header";
 
 // @ts-ignore
 const QrScan = dynamic(() => import('react-qr-reader'), {ssr: false})
@@ -34,10 +35,15 @@ const Scan = () => {
 
 
     return (
-        <div className={'h-full overflow-scroll pb-20'}>
+        <div className={'h-full overflow-scroll '}>
 
             <FullScreenLoading show={loadingDialog}/>
 
+            <div className={'w-full bg-transparent h-10 p-2'}>
+                <img src="/assets/svgs/back.svg" onClick={() => {
+                    router.push('/')
+                }} className={'w-8 h-8 rotate-180'} alt=""/>
+            </div>
             <img src={''} id={'dasf'}></img>
             <div className={'w-full pt-16  flex flex-col justify-center items-center  '}>
                 <div className={'w-24'}>
@@ -51,7 +57,8 @@ const Scan = () => {
                     <br/>
                     فقط کافیه اکسنش کنی
                 </p>
-                <div className={'w-72 h-72 border-primary border-2 scan-container rounded-2xl overflow-hidden mt-5 '}>
+                <div
+                    className={'w-72 h-72 border-primary border-2 scan-container rounded-2xl overflow-hidden mt-5 white-scan '}>
 
 
                     <QrScan

@@ -36,6 +36,7 @@ module.exports = {
                 tiny: '0.65em'
             },
             spacing: {
+                'test': '50px',
                 'nav': '60px',
                 '0p': '0%',
                 'inputBorder': '3px',

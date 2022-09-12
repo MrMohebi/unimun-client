@@ -4,6 +4,7 @@ import Appeals from "../components/normal/Appeals/Appeals";
 import React, {useEffect, useState} from "react";
 import {getToken} from "../helpers/TokenHelper";
 import {UserToken} from "../store/user";
+import {currentNavActiveIndex} from "../store/navbar";
 
 const Home: NextPage = () => {
 
@@ -11,6 +12,9 @@ const Home: NextPage = () => {
         if (getToken().length > 1) {
             UserToken(getToken())
         }
+
+
+        currentNavActiveIndex(2)
 
 
     }, [])

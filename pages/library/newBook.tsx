@@ -415,35 +415,6 @@ const NewBook = () => {
             }
 
 
-            <div
-                style={{
-                    top: langPosition[0] + 80 + 'px',
-                    left: langPosition[1] + 80 + 'px'
-                }}
-                className={`p-2 shadow overflow-hidden new-book-dropdown fixed  transition-all -translate-x-1/2 -translate-y-1/2  bg-white z-50 flex flex-col justify-center items-center rounded-2xl w-36 ${langDropDown ? 'opacity-100 scale-100 ' : 'opacity-0 scale-0'} `}>
-                <Button onClick={() => {
-                    let updatedBookData = BookData
-                    updatedBookData.language = 'فارسی'
-                    setBookData(updatedBookData)
-                    Sdimmer(false)
-                    SlangDropDown(false)
-                }} id={'book-lang-f'} rippleColor={'rgba(0,0,0,0.3)'}
-                        className={'w-full h-10 flex flex-col justify-center items-start IranSansMedium pr-3'}>
-                    فارسی
-                </Button>
-                <div className={'new-divider'}/>
-                <Button onClick={() => {
-                    let updatedBookData = BookData
-                    updatedBookData.language = 'انگلیسی'
-                    setBookData(updatedBookData)
-                    Sdimmer(false)
-                    SlangDropDown(false)
-                }} id={'book-lang-e'} rippleColor={'rgba(0,0,0,0.3)'}
-                        className={'w-full h-10 flex flex-col justify-center items-start IranSansMedium pr-3'}>
-                    انگلیسی
-                </Button>
-            </div>
-
             <StepperFragment step={currentStep}>
                 <Step step={0}>
                     <section className={'bg-white w-full px-3 pb-10'}>
@@ -488,13 +459,13 @@ const NewBook = () => {
                                defaultValue={BookData.writer}
                                placeHolder={'کی نوشته کتاب رو ؟'}
                                onClick={(e: any) => {
-                                   try {
-                                       e.target.parentNode.parentNode.parentNode.parentNode.parentNode.scroll(0, 1000)
-                                       console.log(e.target.parentNode.parentNode.parentNode.parentNode.parentNode)
-
-                                   } catch (e) {
-
-                                   }
+                                   // try {
+                                   //     e.target.parentNode.parentNode.parentNode.parentNode.parentNode.scroll(0, 1000)
+                                   //     console.log(e.target.parentNode.parentNode.parentNode.parentNode.parentNode)
+                                   //
+                                   // } catch (e) {
+                                   //
+                                   // }
                                }}
                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                    updateBookData('writer', e.currentTarget.value)
@@ -503,22 +474,51 @@ const NewBook = () => {
 
                         <div className={'new-divider mt-10'}/>
 
-                        <Button id={'lang-select'} rippleColor={'rgba(0,0,0,0.19)'}
-                                onClick={() => {
-                                    // Sdimmer(true)
-                                    SlangDropDown(true)
+                        <div id={'lang-select'}
+                             onClick={(e) => {
+                                 if (e.currentTarget.id === (e.target as HTMLDivElement).id || (e.target as HTMLDivElement).id === "lang-chose")
+                                     SlangDropDown(true)
 
-                                    if (selectLangRef.current) {
-                                        let elPosition = selectLangRef.current.getBoundingClientRect()
-                                        _langPosition([elPosition.top, elPosition.left])
-                                    }
-                                }}
+                                 if (selectLangRef.current) {
+                                     let elPosition = selectLangRef.current.getBoundingClientRect()
+                                     _langPosition([elPosition.top, elPosition.left])
+                                 }
+                             }}
 
-                                className={'flex overflow-y-hidden px-3 overflow-x-visible flex-row w-full  pt-5 pb-5 justify-between items-center text-textDarker IranSansMedium'}>
+                             className={'flex  px-3 overflow-visible flex-row w-full  pt-5 pb-5 justify-between items-center text-textDarker IranSansMedium relative'}>
+
+                            <div
+                                className={`p-2 shadow overflow-hidden new-book-dropdown absolute left-20 top-[6rem]  transition-all -translate-x-1/2 -translate-y-1/2  bg-white z-50 flex flex-col justify-center items-center rounded-2xl w-36 ${langDropDown ? 'opacity-100 scale-100 ' : 'opacity-0 scale-0'} `}>
+                                <Button onClick={() => {
+                                    // let updatedBookData = BookData
+                                    // updatedBookData.language = 'فارسی'
+                                    SlangDropDown(false)
+
+                                    setBookData(produce((draft) => {
+                                        draft.language = "فارسی"
+                                    }))
+                                    Sdimmer(false)
+                                }} id={'book-lang-f'} rippleColor={'rgba(0,0,0,0.3)'}
+                                        className={'w-full h-10 flex flex-col justify-center items-start IranSansMedium pr-3'}>
+                                    فارسی
+                                </Button>
+                                <div className={'new-divider'}/>
+                                <Button onClick={() => {
+                                    setBookData(produce((draft) => {
+                                        draft.language = "اینگلیسی"
+                                    }))
+                                    Sdimmer(false)
+                                    SlangDropDown(false)
+                                }} id={'book-lang-e'} rippleColor={'rgba(0,0,0,0.3)'}
+                                        className={'w-full h-10 flex flex-col justify-center items-start IranSansMedium pr-3'}>
+                                    انگلیسی
+                                </Button>
+                            </div>
+
                             <span>زبان <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
-                            <span ref={selectLangRef}
+                            <span id={'lang-chose'} ref={selectLangRef}
                                   className={'text-textDark'}>{!BookData.language ? "انتخاب  کنید" : BookData.language === "فارسی" ? "فارسی" : "انگلیسی"}</span>
-                        </Button>
+                        </div>
                         <div className={'new-divider '}/>
                         <div className={'IranSansMedium text-textDarker pt-5 mx-3'}>مترجم <span
                             className={'text-textDark text-tiny '}>اختیاری</span></div>
