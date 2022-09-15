@@ -13,7 +13,7 @@ const BookCategories = (props: { onCatSelected: Function }) => {
     const data = useRef(null)
     const lastClicked = useRef([])
     const [searchText, _searchText] = useState('')
-    const inputRef = useRef<HTMLInputElement>(null)
+    const inputRef = useRef<HTMLTextAreaElement>(null)
     const BookCategoriesQuery = gql`
         query bookCategories {
             bookCategories {
@@ -79,7 +79,7 @@ const BookCategories = (props: { onCatSelected: Function }) => {
     }, [])
 
 
-    const onSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onSearchInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         if (e.currentTarget.value !== '') {
             if (data.current) {
                 let searchedData = (data.current as []).map((item: { hasChild: boolean, title: string }) => {
@@ -132,9 +132,13 @@ const BookCategories = (props: { onCatSelected: Function }) => {
                         </div>
 
                     </div>
-                    <input ref={inputRef} id={'search-input'}
-                           className={'w-full h-full bg-transparent outline-0 px-2 text-sm IranSansMedium'}
-                           placeholder={'جستجو'} type="text" onChange={onSearchInputChange}/>
+                    <textarea onInput={(e) => {
+                        e.currentTarget.value = e.currentTarget.value.replace(/\n/g, '')
+                    }} cols={5} wrap={'off'} rows={1} title={'Search'} name={'search'} aria-autocomplete="list"
+                              autoCapitalize="off" autoComplete="off" autoCorrect="off" spellCheck="false"
+                              data-lpignore="true" ref={inputRef} id={'search-input'}
+                              className={'w-full h-full bg-transparent outline-0 px-2 text-sm IranSansMedium resize-none whitespace-nowrap overflow-x-scroll pt-[0.6rem]'}
+                              placeholder={'جستجو'} onChange={onSearchInputChange}/>
                     <div
                         className={`w-5 h-5 flex flex-col justify-center transition-all duration-100 items-center p-0.5 ${searchText ? "scale-100" : 'scale-0'}`}
                         onClick={() => {

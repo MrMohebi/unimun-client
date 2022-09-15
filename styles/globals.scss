@@ -104,7 +104,7 @@ body {
 
 * {
   user-select: none;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 .english {
@@ -226,8 +226,8 @@ body {
 }
 
 .free-checkbox {
-  background: url("/assets/svgs/checkbox.svg");
-  background-repeat: no-repeat;
+  //background: url("/assets/svgs/checkbox.svg");
+  //background-repeat: no-repeat;
 }
 
 

@@ -410,8 +410,8 @@ body * {
 }
 
 * {
-  user-select: none;
-  scroll-behavior: smooth;
+    user-select: none;
+    scroll-behavior: auto;
 }
 
 .english {
@@ -484,11 +484,6 @@ body * {
 
 .m-appeals-scroller div {
   width: 100%;
-}
-
-.free-checkbox {
-  background: url("/assets/svgs/checkbox.svg");
-  background-repeat: no-repeat;
 }
 
 textarea {

@@ -63,7 +63,7 @@ const PaymentInfo = () => {
 
     return (
         <div className={'w-100 h-100 left-1/2  top-1/2 flex flex-col items-center justify-center '}>
-            <div className={'w-full h-full max-w-md  '} ref={svgRef}>
+            <div dir={'ltr'} className={'w-full h-full max-w-md  '} ref={svgRef}>
                 <PaymentBaseSVG/>
             </div>
             <div className={'w-full text-center IranSans text-textDark'}>

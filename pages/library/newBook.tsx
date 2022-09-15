@@ -229,6 +229,7 @@ const NewBook = () => {
 
 
     }, [])
+    const pdfSoonRef = useRef<HTMLDivElement>(null);
 
 
     const submitBook = () => {
@@ -680,10 +681,25 @@ const NewBook = () => {
                             <div
                                 className={`absolute w-1/2  top-0 h-full bg-primary transition-all ease-in-out ${BookData.type === 'physical' ? 'left-0' : 'left-1/2'}`}></div>
                             <div
-                                className={`IranSansMedium relative transition-all h-full leading-9 ${BookData.type === 'pdf' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
+                                className={`relative IranSansMedium relative transition-all h-full leading-9 ${BookData.type === 'pdf' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                 onClick={() => {
-                                    updateBookData('type', 'pdf')
+                                    // updateBookData('type', 'pdf')
+                                    (pdfSoonRef.current as HTMLInputElement).style.opacity = "1";
+
+
+                                    setTimeout(() => {
+                                        (pdfSoonRef.current as HTMLInputElement).style.opacity = "0";
+
+                                    }, 1000)
+
                                 }}>
+                                <div style={{
+                                    opacity: 0
+                                }}
+                                     className={'absolute transition-all ease-in-out w-full h-full bg-background z-10 flex flex-row justify-center items-center'}
+                                     ref={pdfSoonRef}>
+                                    <span className={'IranSansMedium pb-2'}>به زودی</span>
+                                </div>
                                 <div
                                     className={'block relative mx-auto overflow-hidden flex flex-col justify-center items-center'}>
                                     <div>
@@ -704,8 +720,9 @@ const NewBook = () => {
                         </div>
 
                     </section>
-                    <div className={'w-full h-10 IranSans text-textDarker text-sm px-3 mt-3 mb-3 '}>
-                        تو یونیـمـون میتونین کتاب رو به صورت دیجیتال یا به صورت فیزیکی قرار بدین
+                    <div className={'w-full IranSans text-textDarker text-sm px-3 mt-3 mb-3 text-justify leading-6'}>
+                        فعلا فقط میتونین کتابای فیزیکیتون رو توی یونیـمـون قرار بدین . به زودی بخش کتاب دیجیتال هم اضافه
+                        میشه
                     </div>
 
 
@@ -929,8 +946,9 @@ const NewBook = () => {
                             <span className={'IranSansMedium'}>فروش به قیمت</span>
                             <div
                                 className={' IranSansMedium h-10 w-24 px-2 flex flex-row justify-around items-center bg-background rounded-lg'}>
-                                <input id={'free-book'}
-                                       className={'free-checkbox h-5 w-5 rounded border-2 border-primary'}
+                                <input name={'free'} id={'free-book'}
+
+                                       className={'free-checkbox flex flex-col justify-center items-center relative border-2 border-text-darker  after:w-full  checked:border-0 after:h-full after:content-[] checked:after:content-[url("/assets/svgs/check-box.svg")] h-5 w-5 rounded  '}
                                        type={'checkbox'}
                                     // defaultValue={BookData.price}
                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

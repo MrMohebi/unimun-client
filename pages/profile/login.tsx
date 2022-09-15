@@ -23,7 +23,8 @@ const Login = () => {
     const [referenceCode, setReferenceCode] = useState("")
     const [refCodeStatus, setRefCodeStatus] = useState("")
     const [showPromoter, setShowPromoter] = useState(true);
-    const deadLine = useRef(0);
+    const [resendCounter, setResendCounter] = useState(45);
+    const deadLine = useRef(45);
     const nameInputRef = useRef<HTMLInputElement>(null);
     const [elapsedTime, setElapsedTime] = useState(0);
     const refCodeInputRef = useRef<HTMLInputElement>(null)
@@ -54,8 +55,9 @@ const Login = () => {
         setStep(0)
     }
     const resendCode = () => {
-        if (elapsedTime > 45) {
+        if (resendCounter < 1) {
             deadLine.current = Math.floor(Date.now() / 1000)
+            setResendCounter(45)
             sendVcode()
         }
     }
@@ -91,16 +93,30 @@ const Login = () => {
         }
     }
     useEffect(() => {
-        setInterval(() => {
-            if (deadLine.current !== 0)
-                setElapsedTime(Math.floor(Date.now() / 1000) - deadLine.current)
-        }, 1000)
+        if (sendVCodeResult.data && sendVCodeResult.data.sendVCode.status === 'SUCCESS') {
+            setResendCounter(45)
+            setAllowForNextStep(false)
+
+            setInterval(() => {
+                if (deadLine.current !== 0)
+                    setElapsedTime(Math.floor(Date.now() / 1000) - deadLine.current)
+            }, 1000)
+        }
 
 
-    }, [])
+    }, [sendVCodeResult.data])
 
 
     const submitButtonClick = () => {
+
+        if (vCodeError) {
+            verifyVCodeResult.reset()
+            setVCodeError(false)
+            if (clearCodeFunc.current)
+                clearCodeFunc.current()
+            setAllowForNextStep(false)
+            return 0
+        }
 
         if (currentStep === 0) {
             sendVcode().then(e => {
@@ -141,6 +157,16 @@ const Login = () => {
         }
     }
 
+
+    useEffect(() => {
+
+
+        setInterval(() => {
+            setResendCounter((num) => {
+                return num - 1
+            })
+        }, 1000)
+    }, [])
     //handel query data
     useEffect(() => {
         if (sendVCodeResult.data) {
@@ -190,8 +216,15 @@ const Login = () => {
                     }, 300)
 
             } else {
+                verifyVCodeResult.reset()
                 setVCodeError(true)
+
+                console.log('here we change it')
             }
+        }
+
+        if (verifyVCodeResult.data && verifyVCodeResult.data.status === "ERROR") {
+            console.log('errored')
         }
     }, [sendVCodeResult, verifyVCodeResult])
 
@@ -208,7 +241,7 @@ const Login = () => {
                 if (currentStep === 1) {
                     sendVCodeResult.reset()
                     verifyVCodeResult.reset()
-                    setStep(1)
+                    setStep(0)
                 }
 
 
@@ -320,6 +353,15 @@ const Login = () => {
                                                 success={vCodeSuccess}
                                                 err={vCodeError}
                                                 onChange={(code: string) => {
+                                                    if (code.length === 4) {
+                                                        verifyVCode({
+                                                            variables: {
+                                                                vCode: code
+                                                            }
+                                                        })
+
+                                                    }
+
                                                     setVCodeError(false)
                                                     if (codeValidation(code)) {
                                                         setVCode(code)
@@ -335,7 +377,7 @@ const Login = () => {
                     setStep(0)
                 }}>ویرایش شماره</span>
                                         <span onClick={resendCode}
-                                              className={`${elapsedTime > 45 ? 'text-primary' : 'text-gray-500'}`}>{(45 - elapsedTime) > 0 ? ` ارسال دوباره کد (${(45 - elapsedTime) > 0 ? (45 - elapsedTime) + ' ثانیه' : ""} )` : 'ارسال دوباره کد'}</span>
+                                              className={`${resendCounter < 1 ? 'text-primary' : 'text-gray-500'}`}>{(resendCounter) > 0 ? ` ارسال دوباره کد (${(resendCounter) > 0 ? (resendCounter) + ' ثانیه' : ""} )` : 'ارسال دوباره کد'}</span>
                                     </div>
                                     <div className={'IranSansMedium text-textDark text-sm'}>
                                         چرا یکی از عدد ها پیداست ؟
@@ -377,8 +419,8 @@ const Login = () => {
             <div className={'w-full px-3 flex flex-row h-10 items-center fixed bottom-4'}>
                 <div
                     className={`${currentStep === 0 ? 'w-2/3 opacity-100 px-1' : ' opacity-0 w-0p h-0p'} h-14 overflow-hidden flex flex-row items-center justify-center  text-center transition-all float-right duration-500 `}
-                    style={{fontSize: "0.9rem"}}>
-                    <span className={'IranSansMedium text-tiny'}>با ورود به <span
+                >
+                    <span className={'IranSansMedium text-[0.7rem]'}>با ورود به <span
                         className={'text-black'}>یـونـیـمـون</span> ، <span
                         className={'text-primary'}>شـرایـط</span>  و <br/><span
                         className={'text-primary'}>قوانین حریم ‌خصوصی</span> را می‌ پذیرم</span>
@@ -389,11 +431,11 @@ const Login = () => {
                             submitButtonClick()
 
                         }} disabled={!allowForNextStep} rippleColor={'rgba(255,255,255,0.62)'}
-                        className={`${currentStep === 0 ? 'w-2/4' : 'w-full'} ${currentStep === 3 && allowForNextStep ? ' bg-primary ' : ''}${allowForNextStep ? 'bg-primary' : 'bg-textDark'}  ${allowForNextStep && !vCodeError ? 'bg-primary' : !vCodeError ? 'bg-textDark' : ''} ${vCodeError && currentStep === 2 ? 'bg-errorRed' : ''} transition-all text-md duration-500 h-14 rounded-xl `}>
+                        className={`${currentStep === 0 ? 'w-2/4' : 'w-full'} ${currentStep === 3 && allowForNextStep ? ' bg-primary ' : ''}${allowForNextStep ? 'bg-primary' : 'bg-textDark'}  ${allowForNextStep && !vCodeError ? 'bg-primary' : !vCodeError ? 'bg-textDark' : ''} ${vCodeError && currentStep === 1 ? 'bg-errorRed' : ''} transition-all text-md duration-500 h-14 rounded-xl `}>
                     <span className={'text-md text-white IranSansMedium'}>
 
                         {
-                            vCodeError && currentStep === 2 ? "تلاش مجدد"
+                            vCodeError && currentStep === 1 ? "تلاش مجدد"
                                 :
                                 "تایید"
                         }

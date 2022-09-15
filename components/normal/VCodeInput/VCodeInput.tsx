@@ -26,8 +26,12 @@ const VCodeInput = (props: Props) => {
 
     useEffect(() => {
         setSuccess(props.success)
-        setErr(props.err)
     }, [code, props.success, props.err])
+    useEffect(() => {
+        setErr(props.err)
+
+    }, [props.err]);
+
 
     useEffect(() => {
         props.clearCodeFunction.current = clearCode

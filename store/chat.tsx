@@ -7,4 +7,8 @@ export const CurrentChatUserData = makeVar({} as {
     members: [
         any
     ]
+    user: {
+        id: string,
+        profiles: any[]
+    }
 })

@@ -105,17 +105,17 @@ const Index = () => {
             }
 
             <Drawer minHeight={drawerMinHeight[0]} initHeight={drawerInitHeight[0]}
-                    closedHeight={170} wrap={
-                <div className={'w-full h-full IranSansMedium text-textBlack text-sm overflow-scroll '}>
-                    <div className={'w-full px-4 pt-3 flex flex-row justify-between'}>
-                        <div className={'IranSansBlack text-md pt-4'}>
-                            <span>پرو <span className={'text-primary -mr-1'}>فایل</span></span>
-                        </div>
-                        <div className={'h-6 w-6 opacity-0'} onClick={() => {
-                            //help on click
-                        }}>
-                            <HelpSvg/>
-                        </div>
+                    wrap={
+                        <div className={'w-full h-full IranSansMedium text-textBlack text-sm overflow-scroll '}>
+                            <div className={'w-full px-4 pt-3 flex flex-row justify-between'}>
+                                <div className={'IranSansBlack text-md pt-4'}>
+                                    <span>پرو <span className={'text-primary -mr-1'}>فایل</span></span>
+                                </div>
+                                <div className={'h-6 w-6 opacity-0'} onClick={() => {
+                                    //help on click
+                                }}>
+                                    <HelpSvg/>
+                                </div>
                     </div>
                     <div className={'w-full flex flex-col justify-center items-center'}>
                         <div

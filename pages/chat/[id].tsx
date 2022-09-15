@@ -13,7 +13,10 @@ import chat from "./index";
 import {UserId} from "../../store/user";
 import {verifyAndLint} from "next/dist/lib/verifyAndLint";
 import {setToken} from "../../helpers/TokenHelper";
-import {UnimunID} from "../../store/GLOBAL_VARIABLES";
+import {DOWNLOAD_HOST, UnimunID} from "../../store/GLOBAL_VARIABLES";
+import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
+import BottomSheet from "../../components/view/BottomSheet/BottomSheet";
+import Input from "../../components/view/Input/Input";
 
 const ChatScreen = () => {
 
@@ -25,8 +28,8 @@ const ChatScreen = () => {
     const [myId, setMyId] = useState('');
     const [render, setRender] = useState(false);
     const [currentChatStat, setCurrentChatStat] = useState('default');
-
-
+    const [payRequestOpen, setPayRequestOpen] = useState(false);
+    const [payRequestPrice, setPayRequestPrice] = useState(0);
     useEffect(() => {
         if (Object.keys(CurrentChatUserData()).length) {
             if (chatBoxRef.current!.classList.contains('scroll-auto')) {
@@ -39,16 +42,44 @@ const ChatScreen = () => {
     }, [])
 
 
+    const createRequestMutation = gql`
+        mutation($chatID:ID! $acceptorID:ID! $price:Int! $description:String) {
+            sendMessage(
+                chatID: $chatID
+                payRequest: {acceptorID: $acceptorID, price: $price, description: $description}
+                text: ""
+            ) {
+                chatID
+                editedAt
+                id
+
+            }
+        }
+    `
+    const [sendMoneyRequest, sendMoneyRequestResult] = useMutation(createRequestMutation, {client: clientChat})
     const chatsSubscriptionRequest = gql`
 
         subscription onNewMessage {
             newMessage{
-                id
                 userID
-                chatID
-                sentAt
-                type
                 text
+                type
+                sentAt
+                payRequest {
+                    acceptorID
+                    createdAt
+                    creatorID
+                    description
+                    id
+                    isAccepted
+                    paidAt
+                    price
+                    status
+                    updatedAt
+                }
+                id
+                chatID
+                editedAt
             }
         }`
 
@@ -71,16 +102,29 @@ const ChatScreen = () => {
     const chatMessagesQuery = gql`
         query($chatID:ID!){
             chatMessages(chatID: $chatID, limit: 100){
-                text
-                id
-                sentAt
                 userID
+                text
                 type
+                sentAt
+                payRequest {
+                    acceptorID
+                    createdAt
+                    creatorID
+                    description
+                    id
+                    isAccepted
+                    paidAt
+                    price
+                    status
+                    updatedAt
+                }
+                id
+                chatID
+                editedAt
             }
         }
     `
     const [chatMessages, chatMessagesResult] = useLazyQuery(chatMessagesQuery, {client: clientChat})
-
 
     const firstCatch = useRef(true)
 
@@ -92,7 +136,9 @@ const ChatScreen = () => {
                     chatID: id
                 }
             }).then((value) => {
+
                 try {
+                    setChatLoading(false)
                     setMessages(
                         produce((draft) => {
                             draft = [...value.data.chatMessages];
@@ -107,6 +153,11 @@ const ChatScreen = () => {
             })
         }
     }
+
+    useEffect(() => {
+        if (payRequestOpen === false)
+            setCurrentChatStat('default')
+    }, [payRequestOpen]);
     useEffect(() => {
         try {
             getMessages()
@@ -115,7 +166,6 @@ const ChatScreen = () => {
                 getMessages()
             }, 500)
         }
-        console.log(CurrentChatUserData())
     }, []);
 
     useEffect(() => {
@@ -137,11 +187,15 @@ const ChatScreen = () => {
     `
     const [newMessage, newMessageResult] = useMutation(newMessageMutation, {client: clientChat})
     const sendMessageBtn = useRef<HTMLImageElement>(null);
+    // 0, chatScrollerRef.current.getBoundingClientRect().height
 
-
+    const [chatLoading, setChatLoading] = useState(true);
     const scrollToBottom = () => {
         if (chatBoxRef && chatBoxRef.current && chatScrollerRef && chatScrollerRef.current) {
-            chatBoxRef.current.scrollTo(0, chatScrollerRef.current.getBoundingClientRect().height)
+            chatBoxRef.current.scrollTo({
+                top: chatScrollerRef.current.getBoundingClientRect().height,
+                behavior: 'auto'
+            })
         }
     }
 
@@ -153,44 +207,79 @@ const ChatScreen = () => {
     return (
         <div ref={chatBoxRef} className={'w-full h-full overflow-scroll scroll-auto pb-12'}>
 
+            <BottomSheet open={payRequestOpen} onClose={() => {
+                setPayRequestOpen(false)
+                setCurrentChatStat('default')
+            }}>
+                <div className={' w-full bg-transparent flex flex-col justify-start items-center pt-4 '}>
+                    <span
+                        className={'IranSansMedium text-textDarker text-right w-full text-md  pr-4 text-textDarker block'}>مبلغ درخواستی خود را وارد کنید</span>
+                    <div className={'relative w-full flex-col justify-center items-center mt-5'}>
+
+                        <div
+                            className={'absolute left-5  px-2 h-6  top-1/2 -translate-y-1/2 flex flex-col justify-center border-r-2 items-center'}>
+                            <img src="/assets/svgs/toman.svg" className={'invert scale-90'} alt=""/>
+                        </div>
+                        <Input onChange={(e: any) => {
+                            console.log(e.currentTarget.value)
+                            let el = e.currentTarget
+                            el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
+                            setPayRequestPrice(parseInt(el.value.replace(',', '')))
+
+                        }} id={'pay-req-input'} dir={'ltr'} numOnly={false}
+                               inputClassName={'pl-12 text-black IranSansMedium'}
+                               wrapperClassName={"w-11/12 h-12 m-auto "}/>
+
+                    </div>
+                    <div className={'w-full bg-background mt-3'}>
+                        <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>برای راحتی بیشتر میتونی از گزینه های بالا استفاده کنی</span>
+                    </div>
+
+                    <div className={'h-20'}></div>
+                </div>
+
+            </BottomSheet>
+            <FullScreenLoading dim={false} show={chatLoading}/>
             {
                 currentChatStat === 'more' ?
                     <div id={'test-pay'}
-                         className={'flex z-10 flex-row justify-center  bottom-16  bg-white rounded-xl right-4 shadow-md px-3 py-3  fixed'}>
-                        <img src="/assets/svgs/moneys.svg" alt=""/>
-                        <span className={'IranSansMedium text-textBlack mr-4'}> درخواست وجه</span>
+                         className={' z-10   bottom-16 overflow-hidden bg-white rounded-xl right-4 shadow-md   fixed'}>
+                        <Button onClick={() => {
+                            setPayRequestOpen(true)
+                            setCurrentChatStat('payRequest')
+                        }} className={'w-full h-full flex flex-row justify-center px-3 py-3'}>
+                            <img src="/assets/svgs/moneys.svg" alt=""/>
+                            <span className={'IranSansMedium text-textBlack mr-4 z-30'}> درخواست وجه</span>
+                        </Button>
+
                     </div>
                     :
                     null
             }
 
             <div id={'chat header'}
-                 className={'w-full h-16 px-4 bg-white/70 backdrop-blur shadow flex flex-row justify-between items-center fixed top-0 left-0 z-20'}>
+                 className={'w-full h-16 px-4 bg-white/70 backdrop-blur shadow flex flex-row justify-between items-center fixed top-0 left-0 z-[60]'}>
                 <div className={'flex flex-row justify-start items-center'}>
                     <div className={'w-6 h-6 rotate-180'} onClick={() => {
                         router.push('/chat')
                     }}><Back/></div>
                     {
-                        CurrentChatUserData().id === UnimunID() ?
-                            <div
-                                className={'flex flex-row w-10 h-10 p-2 mr-2 bg-primary rounded-xl justify-center items-center'}>
-                                <img src="/assets/svgs/notif.svg" alt=""/>
-                            </div>
-                            :
-                            <div
-                                className={'w-10 mr-2  h-10 rounded-lg flex flex-col justify-center items-center '}>
-                                    <span
-                                        className={'IranSansMedium text-lg'}>
-                                        {/*@ts-ignore*/}
-                                        {CurrentChatUserData().id === UnimunID() ? "یونیمون" : CurrentChatUserData() ? CurrentChatUserData().members ? CurrentChatUserData().members[1]!.name[0] : "" : ""}</span>
-                            </div>
+
+                        <div
+                            className={'w-10 mr-2  h-10 rounded-lg flex flex-col justify-center items-center '}>
+                            {/*@ts-ignore*/}
+                            <img className={'rounded-lg'}
+                                 src={CurrentChatUserData().user?.profiles ? DOWNLOAD_HOST() + CurrentChatUserData().user?.profiles[0].thumbnail : "/assets/image/no-prof.png"}
+                                 alt=""/>
+
+                        </div>
                     }
 
                     <div className={'flex flex-col justify-center items-start mr-4'}>
 
                         <span className={'IranSansMedium'}>
                             {/*@ts-ignore*/}
-                            {CurrentChatUserData().id === UnimunID() ? "یونیمون" : CurrentChatUserData() ? CurrentChatUserData().members ? CurrentChatUserData().members[1]!.name : "" : ""}</span>
+                            {CurrentChatUserData().user?.name}</span>
                         <span className={'IranSansMedium text-textDark text-[0.7rem]'}>چند لحظه پیش</span>
                     </div>
                 </div>
@@ -214,16 +303,16 @@ const ChatScreen = () => {
                                 <div key={'chat-bubble-' + index}
                                      className={` w-full h-auto flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
                                     <div style={{
-                                        animationDelay: index * 50 + 'ms'
+                                        // animationDelay: index * 50 + 'ms'
                                     }}
-                                         className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]  `}>
+                                         className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]  `}>
                                         <p style={{
                                             wordBreak: 'break-word'
                                         }}
                                            className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>{item.text}</p>
                                         <div className={'flex mt-1 flex-row justify-start items-center '}>
                                             <img src="/assets/svgs/check.svg"
-                                                 className={`w-2 z-10 h-2 ${sentByMe ? '' : "invert-[0.5]"}`}
+                                                 className={`w-2  h-2 ${sentByMe ? '' : "invert-[0.5]"}`}
                                                  alt=""/>
                                             <span
                                                 className={`IranSansMedium text-[0.75rem] mr-2 ${!sentByMe ? "text-textDark" : "white"}`}>{moment(item.sentAt).format('hh:mm')}</span>
@@ -234,51 +323,72 @@ const ChatScreen = () => {
                                 </div>
 
                             )
+                        else if (item.type === "PAY_REQUEST") return <div
+                            className={`w-full flex flex-row ${sentByMe ? "justify-start " : "justify-end"} items-center my-3`}>
+                            <div className={'w-[80%] flex flex-col justify-start items-center px-2'}>
+                                <div
+                                    className={`h-auto w-full  ${sentByMe ? "bg-primary" : 'bg-white'} rounded-2xl flex flex-col justify-center items-center px-3 pb-1 pt-3`}>
+                                    <div className={'flex flex-row justify-between items-center w-full'}>
+                                        <img className={'w-10'}
+                                             src={sentByMe ? "/assets/svgs/pay-request.svg" : "/assets/svgs/pay-request-sender.svg"}
+                                             alt=""/>
+                                        <span
+                                            className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium w-full mr-3`}>درخواست</span>
+                                        <div
+                                            className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium whitespace-nowrap flex flex-row justify-center items-start`}>
+                                            <span className={'ml-1 text-lg'}>120</span>
+                                            <img src="/assets/svgs/thousand-tomans.svg" alt=""
+                                                 className={`ml-3 w-20 ${sentByMe ? '' : 'invert'}`}/>
+                                        </div>
+                                    </div>
+                                    <p className={`IranSansMedium ${sentByMe ? 'text-white' : 'text-black'}  mt-2 text-justify text-sm`}>عنوان
+                                        درخواست
+                                        وجه که میتونه اینجا
+                                        نوشته بشه
+                                        تا 150 کاراکتر میتونه باشه</p>
+                                    <div className={'w-full flex flex-row justify-between '}>
+                                        <div className={'flex mt-1 flex-row justify-start items-center '}>
+                                            <img src="/assets/svgs/check.svg"
+                                                 className={`w-2 z-10 h-2 ${sentByMe ? '' : 'invert-[0.5]'}`}
+                                                 alt=""/>
+                                            <span
+                                                className={`IranSansMedium text-[0.75rem] mr-2 ${sentByMe ? "text-white" : "text-textDarker"}`}>{moment().format('hh:mm')}</span>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                {
+                                    sentByMe ?
+                                        <div className={'flex flex-row justify-between items-center w-full  mt-1.5'}>
+                                            <Button id={'pay-btn'}
+                                                    className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                <span className={'IranSansMedium '}>لغو</span>
+                                            </Button>
+                                            <Button id={'pay-btn'}
+                                                    className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center h-11 text-sm text-white rounded-xl'}>
+                                                <span className={'IranSansMedium '}>ویرایش </span>
+                                            </Button>
+                                        </div>
+                                        :
+                                        <Button id={'pay-btn'}
+                                                className={'bg-primary shadow w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                            <span className={'IranSansMedium '}>پرداخت</span>
+                                        </Button>
+                                }
+
+                            </div>
+                        </div>
                     })
                 }
 
 
-                <div className={'w-full flex flex-row justify-start items-center mt-2'}>
-                    <div className={'w-[80%] flex flex-col justify-start items-center px-2'}>
-                        <div
-                            className={'h-auto w-full bg-primary rounded-2xl flex flex-col justify-center items-center px-3 pb-1 pt-3'}>
-                            <div className={'flex flex-row justify-between items-center w-full'}>
-                                <img src="/assets/svgs/pay-request.svg" alt=""/>
-                                <span className={'text-white IranSansMedium w-full mr-3'}>درخواست</span>
-                                <span className={'text-white IranSansMedium whitespace-nowrap'}>120 هزار تومان</span>
-                            </div>
-                            <p className={'IranSansMedium text-white mt-3 '}>عنوان درخواست وجه که میتونه اینجا نوشته بشه
-                                تا 150 کاراکتر میتونه باشه</p>
-                            <div className={'w-full flex flex-row justify-between '}>
-                                <div className={'flex mt-1 flex-row justify-start items-center '}>
-                                    <img src="/assets/svgs/check.svg"
-                                         className={`w-2 z-10 h-2 ${true ? '' : "invert-[0.5]"}`}
-                                         alt=""/>
-                                    <span
-                                        className={`IranSansMedium text-[0.75rem] mr-2 ${false ? "text-textDark" : "text-white"}`}>{moment().format('hh:mm')}</span>
-                                </div>
-
-
-                            </div>
-                        </div>
-                        <div className={'flex flex-row justify-between items-center w-full  mt-3'}>
-                            <Button id={'pay-btn'}
-                                    className={'bg-primary w-[47%] flex flex-row justify-center items-center  h-12 text-white rounded-2xl'}>
-                                <span className={'IranSansMedium '}>لغو</span>
-                            </Button>
-                            <Button id={'pay-btn'}
-                                    className={'bg-primary w-[47%] flex flex-row justify-center items-center h-12 text-white rounded-2xl'}>
-                                <span className={'IranSansMedium '}>ویرایش </span>
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-
-
             </div>
 
-            <div
-                className={'bottom-0 fixed left-0 w-full bg-white  z-20 shadow grid grid-cols-12 h-14 px-3'}>
+            <div style={{
+                boxShadow: "0px -1px 9px 0px #0000000f"
+            }}
+                 className={'bottom-0 fixed left-0 w-full bg-white  z-[60]  border grid grid-cols-12 h-14 px-3'}>
                 <div className={'send-and-voice col-span-1 flex flex-row justify-start items-center'}>
 
 
@@ -300,6 +410,13 @@ const ChatScreen = () => {
                                      });
                                      //     // addMessage((document.getElementById('text-chat') as HTMLInputElement)!.value);
                                      (document.getElementById('text-chat') as HTMLInputElement)!.value = ""
+                                     setCurrentChatStat('default');
+                                     try {
+                                         document.getElementById('text-chat')!.focus()
+
+                                     } catch (e) {
+
+                                     }
                                  }} ref={sendMessageBtn}/>
                             : currentChatStat === 'default' ?
                                 <img src="/assets/svgs/chat-add.svg" alt="" onClick={() => {
@@ -311,7 +428,28 @@ const ChatScreen = () => {
                                         setCurrentChatStat('default')
                                     }}/>
                                     :
-                                    <div></div>
+                                    currentChatStat === 'payRequest' ?
+
+                                        <img src={'/assets/svgs/send.svg'}
+                                             className={'text-primary IranSansMedium text-sm h-6 w-6  animate__animated '}
+                                             onClick={() => {
+                                                 let messageText = (document.getElementById('text-chat') as HTMLInputElement)!.value
+
+                                                 sendMoneyRequest({
+                                                     variables: {
+                                                         acceptorID: CurrentChatUserData().user.id,
+                                                         chatID: id,
+                                                         price: payRequestPrice,
+                                                         description: messageText
+
+                                                     }
+                                                 }).then((value) => {
+                                                     setPayRequestOpen(false)
+                                                 });
+                                                 (document.getElementById('text-chat') as HTMLTextAreaElement)!.value = ""
+                                             }}/>
+                                        :
+                                        <div></div>
                     }
 
                     {/*<img src="/assets/svgs/microphone.svg" alt="Unimun chat microphone svg"*/}
@@ -319,12 +457,14 @@ const ChatScreen = () => {
                 </div>
                 <div className={'send-and-voice col-span-11 flex flex-row justify-start items-center mr-2 pr-2'}>
                     <textarea onChange={(event) => {
-                        if (event.currentTarget.value) {
-                            setCurrentChatStat('write')
-                        } else {
-                            setCurrentChatStat('default')
-                        }
-                    }} id={'text-chat'} placeholder={'بنویس'} className={'w-full IranSansMedium bg-transparent h-auto'}
+                        if (currentChatStat !== "payRequest")
+                            if (event.currentTarget.value) {
+                                setCurrentChatStat('write')
+                            } else {
+                                setCurrentChatStat('default')
+                            }
+                    }} id={'text-chat'} placeholder={currentChatStat === 'payRequest' ? 'متن درخواست' : 'بنویس'}
+                              className={'w-full IranSansMedium bg-transparent h-auto'}
                               rows={1} name="Text1" onClick={() => {
 
                     }}></textarea>
@@ -351,8 +491,7 @@ const ChatScreen = () => {
 
         </div>
 
-    )
-        ;
+    );
 };
 
 export default ChatScreen;

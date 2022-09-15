@@ -423,8 +423,8 @@ const Appeals = () => {
 
                                             let apls = appeals.concat(e.data.appeals.edges)
                                             setEndCursor(e.data.appeals.pageInfo.endCursor)
-                                            setAppeals(apls)
-                                            lastGottenAppeals(apls)
+                                            setAppeals(e.data.appeals.edges)
+                                            lastGottenAppeals(e.data.appeals.edges)
                                             reachedEnd.current = true;
                                             setReachedEndState(true)
                                         }
