@@ -17,6 +17,7 @@ import {DOWNLOAD_HOST, UnimunID} from "../../store/GLOBAL_VARIABLES";
 import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
 import BottomSheet from "../../components/view/BottomSheet/BottomSheet";
 import Input from "../../components/view/Input/Input";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const ChatScreen = () => {
 
@@ -35,7 +36,7 @@ const ChatScreen = () => {
             if (chatBoxRef.current!.classList.contains('scroll-auto')) {
                 chatBoxRef.current!.classList.remove('scroll-auto')
             }
-            scrollToBottom()
+            // scrollToBottom()
         } else {
             router.push('/chat')
         }
@@ -94,7 +95,7 @@ const ChatScreen = () => {
                     return draft
                 })
             );
-            scrollToBottom()
+            // scrollToBottom()
         }
     }, [chatsSubscription.data]);
 
@@ -170,7 +171,7 @@ const ChatScreen = () => {
 
     useEffect(() => {
         if (firstCatch.current) {
-            scrollToBottom()
+            // scrollToBottom()
         }
 
     }, [messages]);
@@ -239,6 +240,8 @@ const ChatScreen = () => {
                 </div>
 
             </BottomSheet>
+
+
             <FullScreenLoading dim={false} show={chatLoading}/>
             {
                 currentChatStat === 'more' ?
@@ -283,104 +286,99 @@ const ChatScreen = () => {
                         <span className={'IranSansMedium text-textDark text-[0.7rem]'}>چند لحظه پیش</span>
                     </div>
                 </div>
-                {/*<Button id={'chat-more'} rippleColor={'rgba(0,0,0,0.18)'} className={'h-7 w-7 rounded-lg'}*/}
-                {/*        onClick={moreOnClick}>*/}
-                {/*    <img src={'/assets/svgs/more.svg'} alt={'unimun more chat'} className={'h-7 w-7'}/>*/}
-
-                {/*</Button>*/}
             </div>
 
 
-            <div className={'chat-box w-full overflow-scroll flex flex-col justify-end items-center pt-20 pb-2'}
+            <div className={'chat-box w-full  h-full overflow-scroll flex flex-col-reverse  pt-20 pb-2'}
                  ref={chatScrollerRef}>
 
 
-                {
-                    messages.map((item: any, index: number) => {
-                        let sentByMe = item.userID === UserId()
-                        if (item.type === 'TEXT')
-                            return (
-                                <div key={'chat-bubble-' + index}
-                                     className={` w-full h-auto flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
-                                    <div style={{
-                                        // animationDelay: index * 50 + 'ms'
-                                    }}
-                                         className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]  `}>
-                                        <p style={{
-                                            wordBreak: 'break-word'
+                <div className={' bottom-0 h-auto '}>
+                    {
+                        messages.map((item: any, index: number) => {
+                            let sentByMe = item.userID === UserId()
+                            if (item.type === 'TEXT')
+                                return (
+                                    <div key={'chat-bubble-' + index}
+                                         className={` w-full h-auto flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
+                                        <div style={{
+                                            // animationDelay: index * 50 + 'ms'
                                         }}
-                                           className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>{item.text}</p>
-                                        <div className={'flex mt-1 flex-row justify-start items-center '}>
-                                            <img src="/assets/svgs/check.svg"
-                                                 className={`w-2  h-2 ${sentByMe ? '' : "invert-[0.5]"}`}
+                                             className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]  `}>
+                                            <p style={{
+                                                wordBreak: 'break-word'
+                                            }}
+                                               className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>{item.text}</p>
+                                            <div className={'flex mt-1 flex-row justify-start items-center '}>
+                                                <img src="/assets/svgs/check.svg"
+                                                     className={`w-2  h-2 ${sentByMe ? '' : "invert-[0.5]"}`}
+                                                     alt=""/>
+                                                <span
+                                                    className={`IranSansMedium text-[0.75rem] mr-2 ${!sentByMe ? "text-textDark" : "white"}`}>{moment(item.sentAt).format('hh:mm')}</span>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                )
+                            else if (item.type === "PAY_REQUEST") return <div
+                                className={`w-full flex flex-row ${sentByMe ? "justify-start " : "justify-end"} items-center my-3`}>
+                                <div className={'w-[80%] flex flex-col justify-start items-center px-2'}>
+                                    <div
+                                        className={`h-auto w-full  ${sentByMe ? "bg-primary" : 'bg-white'} rounded-2xl flex flex-col justify-center items-center px-3 pb-1 pt-3`}>
+                                        <div className={'flex flex-row justify-between items-center w-full'}>
+                                            <img className={'w-10'}
+                                                 src={sentByMe ? "/assets/svgs/pay-request.svg" : "/assets/svgs/pay-request-sender.svg"}
                                                  alt=""/>
                                             <span
-                                                className={`IranSansMedium text-[0.75rem] mr-2 ${!sentByMe ? "text-textDark" : "white"}`}>{moment(item.sentAt).format('hh:mm')}</span>
+                                                className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium w-full mr-3`}>درخواست</span>
+                                            <div
+                                                className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium whitespace-nowrap flex flex-row justify-center items-start`}>
+                                                    <span
+                                                        className={'ml-1 text-lg'}>{item.payRequest.price / 1000}</span>
+                                                <img src="/assets/svgs/thousand-tomans.svg" alt=""
+                                                     className={`ml-3 w-20 ${sentByMe ? '' : 'invert'}`}/>
+                                            </div>
                                         </div>
+                                        <p className={`IranSansMedium ${sentByMe ? 'text-white' : 'text-black'}  mt-2 text-justify text-sm w-full text-right`}>{item.payRequest.description}</p>
+                                        <div className={'w-full flex flex-row justify-between '}>
+                                            <div className={'flex mt-1 flex-row justify-start items-center '}>
+                                                <img src="/assets/svgs/check.svg"
+                                                     className={`w-2 z-10 h-2 ${sentByMe ? '' : 'invert-[0.5]'}`}
+                                                     alt=""/>
+                                                <span
+                                                    className={`IranSansMedium text-[0.75rem] mr-2 ${sentByMe ? "text-white" : "text-textDarker"}`}>{moment().format('hh:mm')}</span>
+                                            </div>
 
+
+                                        </div>
                                     </div>
+                                    {
+                                        sentByMe ?
+                                            <div
+                                                className={'flex flex-row justify-between items-center w-full  mt-1.5'}>
+                                                <Button id={'pay-btn'}
+                                                        className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                    <span className={'IranSansMedium '}>لغو</span>
+                                                </Button>
+                                                <Button id={'pay-btn'}
+                                                        className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center h-11 text-sm text-white rounded-xl'}>
+                                                    <span className={'IranSansMedium '}>ویرایش </span>
+                                                </Button>
+                                            </div>
+                                            :
+                                            <Button id={'pay-btn'}
+                                                    className={'bg-primary shadow w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                <span className={'IranSansMedium '}>پرداخت</span>
+                                            </Button>
+                                    }
 
                                 </div>
-
-                            )
-                        else if (item.type === "PAY_REQUEST") return <div
-                            className={`w-full flex flex-row ${sentByMe ? "justify-start " : "justify-end"} items-center my-3`}>
-                            <div className={'w-[80%] flex flex-col justify-start items-center px-2'}>
-                                <div
-                                    className={`h-auto w-full  ${sentByMe ? "bg-primary" : 'bg-white'} rounded-2xl flex flex-col justify-center items-center px-3 pb-1 pt-3`}>
-                                    <div className={'flex flex-row justify-between items-center w-full'}>
-                                        <img className={'w-10'}
-                                             src={sentByMe ? "/assets/svgs/pay-request.svg" : "/assets/svgs/pay-request-sender.svg"}
-                                             alt=""/>
-                                        <span
-                                            className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium w-full mr-3`}>درخواست</span>
-                                        <div
-                                            className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium whitespace-nowrap flex flex-row justify-center items-start`}>
-                                            <span className={'ml-1 text-lg'}>120</span>
-                                            <img src="/assets/svgs/thousand-tomans.svg" alt=""
-                                                 className={`ml-3 w-20 ${sentByMe ? '' : 'invert'}`}/>
-                                        </div>
-                                    </div>
-                                    <p className={`IranSansMedium ${sentByMe ? 'text-white' : 'text-black'}  mt-2 text-justify text-sm`}>عنوان
-                                        درخواست
-                                        وجه که میتونه اینجا
-                                        نوشته بشه
-                                        تا 150 کاراکتر میتونه باشه</p>
-                                    <div className={'w-full flex flex-row justify-between '}>
-                                        <div className={'flex mt-1 flex-row justify-start items-center '}>
-                                            <img src="/assets/svgs/check.svg"
-                                                 className={`w-2 z-10 h-2 ${sentByMe ? '' : 'invert-[0.5]'}`}
-                                                 alt=""/>
-                                            <span
-                                                className={`IranSansMedium text-[0.75rem] mr-2 ${sentByMe ? "text-white" : "text-textDarker"}`}>{moment().format('hh:mm')}</span>
-                                        </div>
-
-
-                                    </div>
-                                </div>
-                                {
-                                    sentByMe ?
-                                        <div className={'flex flex-row justify-between items-center w-full  mt-1.5'}>
-                                            <Button id={'pay-btn'}
-                                                    className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
-                                                <span className={'IranSansMedium '}>لغو</span>
-                                            </Button>
-                                            <Button id={'pay-btn'}
-                                                    className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center h-11 text-sm text-white rounded-xl'}>
-                                                <span className={'IranSansMedium '}>ویرایش </span>
-                                            </Button>
-                                        </div>
-                                        :
-                                        <Button id={'pay-btn'}
-                                                className={'bg-primary shadow w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
-                                            <span className={'IranSansMedium '}>پرداخت</span>
-                                        </Button>
-                                }
-
                             </div>
-                        </div>
-                    })
-                }
+                        })
+                    }
+                </div>
 
 
             </div>

@@ -131,60 +131,60 @@ const Index = () => {
                     }
 
                 }, index) => {
-                    console.log(chat)
 
-                    // if (chat.id !== UnimunID())
-                    return (
+                    // if (chat.id !== UnimunID())/
+                    if (chat.user)
+                        return (
 
-                        <div key={index}>
+                            <div key={index}>
 
-                            <Button rippleColor={"rgba(0,0,0,0.14)"} id={'chat-item' + index}
-                                    className={'w-full  overflow-y-scroll flex flex-col justify-start items-center px-3 pt-1'}
-                                    onClick={() => {
-                                        CurrentChatUserData(chat)
-                                        chatOnCLick((chat as any).id as string)
+                                <Button rippleColor={"rgba(0,0,0,0.14)"} id={'chat-item' + index}
+                                        className={'w-full  overflow-y-scroll flex flex-col justify-start items-center px-3 pt-1'}
+                                        onClick={() => {
+                                            CurrentChatUserData(chat)
+                                            chatOnCLick((chat as any).id as string)
 
-                                    }}>
-                                <div
-                                    className={'w-full  grid grid-cols-[4.5rem,auto,auto,auto,auto,auto] grid-rows-1 h-20'}>
+                                        }}>
                                     <div
-                                        className={'col-span-1 h-20 w-20 row-span-1 flex flex-row justify-start items-center'}>
+                                        className={'w-full  grid grid-cols-[4.5rem,auto,auto,auto,auto,auto] grid-rows-1 h-20'}>
                                         <div
-                                            className={'col-span-1 h-14 w-14  border-textDark row-span-1 rounded-2xl object-cover flex flex-col justify-center items-center overflow-hidden'}>
-                                            <img className={'rounded-2xl'}
-                                                 src={chat.user.profiles ? DOWNLOAD_HOST() + chat.user.profiles[0].thumbnail : "/assets/image/no-prof.png"}
-                                                 alt=""/>
-                                            {/*<span*/}
-                                            {/*    className={'IranSansMedium text-2xl pt-2 text-textDark'}> {chat.user.name[0]} </span>*/}
+                                            className={'col-span-1 h-20 w-20 row-span-1 flex flex-row justify-start items-center'}>
+                                            <div
+                                                className={'col-span-1 h-14 w-14  border-textDark row-span-1 rounded-2xl object-cover flex flex-col justify-center items-center overflow-hidden'}>
+                                                <img className={'rounded-2xl'}
+                                                     src={chat.user.profiles ? DOWNLOAD_HOST() + chat.user.profiles[0].thumbnail : "/assets/image/no-prof.png"}
+                                                     alt=""/>
+                                                {/*<span*/}
+                                                {/*    className={'IranSansMedium text-2xl pt-2 text-textDark'}> {chat.user.name[0]} </span>*/}
+                                            </div>
+                                            {/*<img src={""} alt={"chat unimun"}*/}
+                                            {/*     className={'col-span-1 h-16 w-16 row-span-1 rounded-2xl object-cover'}/>*/}
                                         </div>
-                                        {/*<img src={""} alt={"chat unimun"}*/}
-                                        {/*     className={'col-span-1 h-16 w-16 row-span-1 rounded-2xl object-cover'}/>*/}
-                                    </div>
-                                    <div
-                                        className={'col-span-5 border-b-2 flex flex-col justify-start items-start pt-3'}>
-                                        <div id={'name'} className={'flex flex-row justify-start items-center'}>
+                                        <div
+                                            className={'col-span-5 border-b-2 flex flex-col justify-start items-start pt-3'}>
+                                            <div id={'name'} className={'flex flex-row justify-start items-center'}>
                                                 <span
                                                     className={"IranSansMedium text-black"}>{chat.user.name}</span>
-                                        </div>
-                                        <div id={'status'}
-                                             className={'flex flex-row justify-between items-center mt-2 w-full'}>
-                                            <div
-                                                className={"IranSansMedium text-textDarker text-[0.7rem]  flex flex-row justify-start items-center"}>
-                                                <div className={'h-1 w-1 bg-primary rounded-full '}></div>
+                                            </div>
+                                            <div id={'status'}
+                                                 className={'flex flex-row justify-between items-center mt-2 w-full'}>
+                                                <div
+                                                    className={"IranSansMedium text-textDarker text-[0.7rem]  flex flex-row justify-start items-center"}>
+                                                    <div className={'h-1 w-1 bg-primary rounded-full '}></div>
+                                                    <span
+                                                        className={'mr-2 whitespace-nowrap w-[100px] overflow-hidden overflow-ellipsis text-right'}>{chat.lastMessage.text}</span>
+                                                </div>
+
                                                 <span
-                                                    className={'mr-2 whitespace-nowrap w-[100px] overflow-hidden overflow-ellipsis text-right'}>{chat.lastMessage.text}</span>
+                                                    className={'text-textDark IranSansMedium text-[0.7rem]'}>{passedTime(chat.lastMessage.sentAt)}</span>
                                             </div>
 
-                                            <span
-                                                className={'text-textDark IranSansMedium text-[0.7rem]'}>{passedTime(chat.lastMessage.sentAt)}</span>
                                         </div>
-
                                     </div>
-                                </div>
-                            </Button>
-                        </div>
+                                </Button>
+                            </div>
 
-                    )
+                        )
                     // else {
                     //     return (
                     //

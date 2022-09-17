@@ -19,9 +19,6 @@ export const NewMessageNotification = () => {
         { client:clientChat}
     );
 
-    if(data){
-        console.log(data);
-    }
 
     return (
         <div className={'fixed top-0'}>

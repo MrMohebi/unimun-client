@@ -135,8 +135,6 @@ const Item = () => {
 
                 }}
                 buttonOnClick={() => {
-
-                    console.log(appeal)
                 }}
                 show={contactAppealShow}
                 type={/[^0-9]/.test(appeal.connectWay) ? 'telegram' : 'phone'}

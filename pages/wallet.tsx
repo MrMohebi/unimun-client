@@ -5,10 +5,25 @@ import WalletSVG from '../assets/svgs/wallet.svg'
 import {currentNavActiveIndex} from "../store/navbar";
 import Drawer from "../components/view/Drawer/Drawer";
 import Button from "../components/view/Button/Button";
+import {gql, useQuery} from "@apollo/client";
 
 const Library = () => {
 
     const lottieRef = useRef<HTMLDivElement>(null)
+
+    const GET_WALLET_DATA_QUERY = gql`
+        {
+            __typename
+            wallet {
+                data {
+                    balance
+                    userID
+                }
+            }
+        }
+    `
+    const getWalletDataResult = useQuery(GET_WALLET_DATA_QUERY)
+
 
     useEffect(() => {
         if (lottieRef.current)
@@ -22,12 +37,22 @@ const Library = () => {
         currentNavActiveIndex(3)
 
     }, [])
-    useEffect(() => {
 
-    });
+    useEffect(() => {
+        if (getWalletDataResult.data) {
+            try {
+                setBalance(getWalletDataResult.data.wallet.data.balance)
+
+            } catch (e) {
+                alert('bad request')
+            }
+        }
+
+    }, [getWalletDataResult]);
 
     const [drawerMaxHeight, setDrawerMaxHeight] = useState(400);
     const [drawerInitLimit, setDrawerInitLimit] = useState(0);
+    const [balance, setBalance] = useState(0);
     const divRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -58,7 +83,8 @@ const Library = () => {
 
                             <div className={'flex flex-col justify-center items-center '}>
                                 <div className={'flex flex-row justify-center items-center'}>
-                                    <span className={'IranSansMedium text-white text-3xl'}>50,000</span>
+                                    <span
+                                        className={'IranSansMedium text-white text-3xl'}>{balance.toLocaleString()}</span>
                                     <div className={'flex flex-col justify-between items-center'}>
                                         <img src="/assets/svgs/toman.svg" className={'mr-2'} alt=""/>
 
