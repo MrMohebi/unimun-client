@@ -29,6 +29,9 @@ import ContactToast from "../../../components/view/ContactToast/ContactToast";
 import {UNIMUN_PROVIDERS, UnimunID} from "../../../store/GLOBAL_VARIABLES";
 import {clientChat} from "../../../apollo-client";
 import {TailSpin} from "react-loader-spinner";
+import {sendMessage} from "next/dist/client/dev/error-overlay/websocket";
+import {CurrentChatUserData} from "../../../store/chat";
+import {GET_SUPPORT_CHAT_QUERY, NEW_MESSAGE_MUTATION} from "../../../Requests/GlobalRequests/GlobalRequests";
 
 
 interface Props {
@@ -127,34 +130,31 @@ const Book = (props: Props) => {
     }, [])
 
 
-    const newMessageMutation = gql`
-        mutation($chatID:ID! $text:String) {
-            sendMessage(chatID: $chatID text:$text){
-                text
-                sentAt
-                id
-            }
-        }
-    `
-    const [newMessage, newMessageResult] = useMutation(newMessageMutation, {client: clientChat})
+    const [newMessage, newMessageResult] = useMutation(NEW_MESSAGE_MUTATION, {client: clientChat})
+
+
+    const [getSupportChat, supportChatResult] = useLazyQuery(GET_SUPPORT_CHAT_QUERY, {client: clientChat});
+
     const buyBookFromUnimun = () => {
-        if (UserId() && UserToken()) {
-            setBtnLoading(true)
-            
-            newMessage({
-                variables: {
-                    chatID: UnimunID(),
-                    text: `
-                    این کتاب رو میخوام 
+        getSupportChat().then((e) => {
+            console.log(e)
+            if (e.data && e.data.supportChat.id) {
+
+                newMessage({
+                    variables: {
+                        chatID: e.data.supportChat.id,
+                        text: `                   این کتاب رو میخوام
                     /library/book/${bookId}
                     `
-                }
-            }).then((value) => {
-                console.log(value)
-                router.push('/chat')
-            })
-        }
-
+                    }
+                }).then((value) => {
+                    console.log(value)
+                    CurrentChatUserData(e.data.supportChat)
+                    router.push('/chat/' + e.data.supportChat.id)
+                })
+            }
+        })
+        alert('main code commented')
     }
 
     return (

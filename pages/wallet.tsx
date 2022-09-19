@@ -5,9 +5,25 @@ import WalletSVG from '../assets/svgs/wallet.svg'
 import {currentNavActiveIndex} from "../store/navbar";
 import Drawer from "../components/view/Drawer/Drawer";
 import Button from "../components/view/Button/Button";
-import {gql, useQuery} from "@apollo/client";
+import {gql, useLazyQuery, useMutation, useQuery} from "@apollo/client";
+import FullScreenLoading from "../components/normal/FullScreenLoading/FullScreenLoading";
+import {GET_SUPPORT_CHAT_QUERY, NEW_MESSAGE_MUTATION} from "../Requests/GlobalRequests/GlobalRequests";
+import {CurrentChatUserData} from "../store/chat";
+import {clientChat} from "../apollo-client";
+import {useRouter} from "next/router";
+import Input from "../components/view/Input/Input";
+import BottomSheet from "../components/view/BottomSheet/BottomSheet";
 
 const Library = () => {
+
+
+    const [drawerMaxHeight, setDrawerMaxHeight] = useState(400);
+    const [drawerInitLimit, setDrawerInitLimit] = useState(0);
+    const [balance, setBalance] = useState(0);
+    const divRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [loading, setLoading] = useState(true);
+    const [payRequestLoading, setPayRequestLoading] = useState(false);
 
     const lottieRef = useRef<HTMLDivElement>(null)
 
@@ -23,7 +39,12 @@ const Library = () => {
         }
     `
     const getWalletDataResult = useQuery(GET_WALLET_DATA_QUERY)
+    const [getSupportChat] = useLazyQuery(GET_SUPPORT_CHAT_QUERY, {client: clientChat})
+    const [newMessage, newMessageResult] = useMutation(NEW_MESSAGE_MUTATION, {client: clientChat})
+    const router = useRouter()
 
+    const [payRequestPrice, setPayRequestPrice] = useState(0);
+    const [payRequestOpen, setPayRequestOpen] = useState(false);
 
     useEffect(() => {
         if (lottieRef.current)
@@ -36,6 +57,7 @@ const Library = () => {
             })
         currentNavActiveIndex(3)
 
+
     }, [])
 
     useEffect(() => {
@@ -43,6 +65,7 @@ const Library = () => {
             try {
                 setBalance(getWalletDataResult.data.wallet.data.balance)
 
+                setLoading(false)
             } catch (e) {
                 alert('bad request')
             }
@@ -50,11 +73,6 @@ const Library = () => {
 
     }, [getWalletDataResult]);
 
-    const [drawerMaxHeight, setDrawerMaxHeight] = useState(400);
-    const [drawerInitLimit, setDrawerInitLimit] = useState(0);
-    const [balance, setBalance] = useState(0);
-    const divRef = useRef<HTMLDivElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
 
     return (
         <div className={'h-full w-full'} onLoad={() => {
@@ -70,6 +88,65 @@ const Library = () => {
             }
 
         }} ref={containerRef}>
+            <FullScreenLoading dim={true} show={loading}/>
+            <BottomSheet open={payRequestOpen} onClose={() => {
+                setPayRequestOpen(false)
+            }}>
+                <div className={' w-full bg-transparent flex flex-col justify-start items-center pt-4 '}>
+                    <span
+                        className={'IranSansMedium text-textDarker text-right w-full text-md  pr-4 text-textDarker block'}>مبلغ درخواستی خود را وارد کنید</span>
+                    <div className={'relative w-full flex-col justify-center items-center mt-5'}>
+
+                        <div
+                            className={'absolute left-5  px-2 h-6  top-1/2 -translate-y-1/2 flex flex-col justify-center border-r-2 items-center'}>
+                            <img src="/assets/svgs/toman.svg" className={'invert scale-90'} alt=""/>
+                        </div>
+                        <Input onChange={(e: any) => {
+                            let el = e.currentTarget
+                            el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
+                            setPayRequestPrice(parseInt(el.value.replace(',', '')))
+
+                        }} id={'pay-req-input'} dir={'ltr'} numOnly={false}
+                               inputClassName={'pl-12 text-black IranSansMedium'}
+                               wrapperClassName={"w-11/12 h-12 m-auto "}/>
+
+                    </div>
+                    <div className={'w-full bg-background mt-3'}>
+                        <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>برای راحتی بیشتر میتونی از گزینه های بالا استفاده کنی</span>
+                    </div>
+                    <Button loading={payRequestLoading} onClick={() => {
+
+                        if (payRequestPrice !== 0) {
+                            setPayRequestLoading(true)
+                            getSupportChat().then((e) => {
+                                setPayRequestLoading(false)
+                                if (e.data && e.data.supportChat.id) {
+                                    newMessage({
+                                        variables: {
+                                            chatID: e.data.supportChat.id,
+                                            text:
+                                                `درخواست برداشت این مبلغ رو دارم:    
+                                                ${" " + payRequestPrice.toLocaleString() + " "}تومان
+                                            `
+                                        }
+                                    }).then((value) => {
+                                        CurrentChatUserData(e.data.supportChat)
+                                        router.push('/chat/' + e.data.supportChat.id)
+                                    })
+                                }
+                            })
+                        }
+
+
+                    }} className={'w-11/12 bg-primary h-14 text-white rounded-2xl mt-5'}>
+                        <span className={'IranSansMedium'}>درخواست وجه</span>
+                    </Button>
+
+                    <div className={'h-4'}></div>
+                </div>
+
+            </BottomSheet>
+
             <Drawer initScroll={900} initHeight={drawerInitLimit} minHeight={700} wrap={
                 <div className={'w-full grid grid-cols-3 px-3 pt-10'} ref={divRef}>
                     <div className={'col-span-2 p-2 relative'}>
@@ -148,8 +225,12 @@ const Library = () => {
                                 <img src="/assets/svgs/deposit.svg" alt=""/></div>
                             <span className={"IranSansMedium text-primary text-sm mr-3 ml-3"}>واریــز وجه</span>
                         </Button>
-                        <Button className={' h-10 rounded-xl bg-background flex flex-row justify-between items-center'}
-                                id={'withdraw'} rippleColor={'rgba(0,0,0,0.14)'}>
+                        <Button onClick={() => {
+                            setPayRequestOpen(true)
+                        }} className={' h-10 rounded-xl bg-background flex flex-row justify-between items-center'}
+                                id={'withdraw'} rippleColor={'rgba(0,0,0,0.14)'}
+
+                        >
                             <div
                                 className={'h-10 w-10 rounded-xl bg-primary flex flex-col justify-center items-center'}>
                                 <img src="/assets/svgs/withdraw.svg" alt=""/></div>
@@ -162,7 +243,7 @@ const Library = () => {
                         <span
                             className={'IranSansMedium text-textDarker mt-2 text-[0.8rem]'}>تراکنشی انجام نداده اید</span>
                     </div>
-                    <div className={'h-20'}></div>
+                    <div className={'h-20 no-transaction-centering'}></div>
                 </div>
             </Drawer>
         </div>

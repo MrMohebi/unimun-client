@@ -31,6 +31,8 @@ const ChatScreen = () => {
     const [currentChatStat, setCurrentChatStat] = useState('default');
     const [payRequestOpen, setPayRequestOpen] = useState(false);
     const [payRequestPrice, setPayRequestPrice] = useState(0);
+    const [loadinOlderMessages, setLoadinOlderMessages] = useState(false);
+    const [holdingShift, setHoldingShift] = useState(false);
     useEffect(() => {
         if (Object.keys(CurrentChatUserData()).length) {
             if (chatBoxRef.current!.classList.contains('scroll-auto')) {
@@ -43,7 +45,7 @@ const ChatScreen = () => {
     }, [])
 
 
-    const createRequestMutation = gql`
+    const CREATE_REQUEST_MUTATION = gql`
         mutation($chatID:ID! $acceptorID:ID! $price:Int! $description:String) {
             sendMessage(
                 chatID: $chatID
@@ -57,7 +59,24 @@ const ChatScreen = () => {
             }
         }
     `
-    const [sendMoneyRequest, sendMoneyRequestResult] = useMutation(createRequestMutation, {client: clientChat})
+    const EDIT_REQUEST_QUERY = gql`
+        mutation($id:ID! ) {
+            editMessage(id: $id, payRequest: {isCanceled: false,isAccepted: true}) {
+                chatID
+                payRequest {
+                    isAccepted
+
+                    acceptorID
+                    createdAt
+                    description
+                    status
+                }
+            }
+        }
+    `
+    const [editRequest, editRequestResult] = useMutation(EDIT_REQUEST_QUERY, {client: clientChat})
+
+    const [sendMoneyRequest, sendMoneyRequestResult] = useMutation(CREATE_REQUEST_MUTATION, {client: clientChat})
     const chatsSubscriptionRequest = gql`
 
         subscription onNewMessage {
@@ -99,6 +118,84 @@ const ChatScreen = () => {
         }
     }, [chatsSubscription.data]);
 
+    const EDIT_PRICE_MUTATION = gql`
+        mutation ($price: Int, $id: ID!, $description: String,$isAccepted:Boolean,$isCanceled:Boolean) {
+            editMessage(
+                payRequest: {price: $price, description: $description, isCanceled: $isCanceled, isAccepted: $isAccepted}
+                id: $id
+            ) {
+                id
+                payRequest {
+                    status
+                    description
+                    price
+                }
+            }
+        }
+
+
+    `
+    const [editPrice] = useMutation(EDIT_PRICE_MUTATION, {client: clientChat})
+
+    const EDIT_MESSAGE_SUBSCRIPTION = gql`
+
+        subscription {
+            editedMessage {
+                chatID
+                text
+                id
+                userID
+                type
+                payRequest {
+                    updatedAt
+                    status
+                    price
+                    paidAt
+                    isAccepted
+                    id
+                    description
+                    creatorID
+                    createdAt
+                    acceptorID
+                }
+                sentAt
+            }
+        }`
+
+    const editMessagesSubscription = useSubscription(EDIT_MESSAGE_SUBSCRIPTION, {client: clientChat})
+
+    useEffect(() => {
+        if (editMessagesSubscription.data) {
+            messages.forEach((item: any) => {
+                try {
+                    if (item.id === editMessagesSubscription.data.editedMessage.id) {
+
+                        setMessages(produce((draft: any) => {
+                            draft.forEach((message: any, index: any) => {
+                                if (message.id === editMessagesSubscription.data.editedMessage.id) {
+                                    draft[index] = editMessagesSubscription.data.editedMessage
+                                }
+                            })
+                            return draft;
+                        }))
+
+                    }
+                } catch (e) {
+
+                }
+
+            })
+            console.log('edited ')
+            console.log(editMessagesSubscription.data)
+            // setMessages(
+            //     produce((draft) => {
+            //         (draft as [any]).push(chatsSubscription.data.newMessage)
+            //         return draft
+            //     })
+            // );
+        }
+    }, [editMessagesSubscription.data]);
+
 
     const chatMessagesQuery = gql`
         query($chatID:ID!){
@@ -137,6 +234,7 @@ const ChatScreen = () => {
                     chatID: id
                 }
             }).then((value) => {
+                console.log(value)
 
                 try {
                     setChatLoading(false)
@@ -156,8 +254,24 @@ const ChatScreen = () => {
     }
 
     useEffect(() => {
-        if (payRequestOpen === false)
-            setCurrentChatStat('default')
+        if (!payRequestOpen) {
+            setCurrentChatStat('default');
+            (document.getElementById('pay-req-input') as HTMLInputElement).value = "";
+            (document.getElementById('text-chat') as HTMLTextAreaElement).value = "";
+            setCurrentEditPayRequestData(produce((draft) => {
+                draft.description = "";
+                draft.price = ""
+                return draft
+            }))
+        }
+
+        if (payRequestOpen) {
+
+
+            (document.getElementById('pay-req-input') as HTMLInputElement).value = currentEditPayRequestData.price.toString().split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '');
+            (document.getElementById('text-chat') as HTMLTextAreaElement).value = currentEditPayRequestData.description;
+            setPayRequestPrice(parseInt(currentEditPayRequestData.price))
+        }
     }, [payRequestOpen]);
     useEffect(() => {
         try {
@@ -191,6 +305,11 @@ const ChatScreen = () => {
     // 0, chatScrollerRef.current.getBoundingClientRect().height
 
     const [chatLoading, setChatLoading] = useState(true);
+    const [currentEditPayRequestData, setCurrentEditPayRequestData] = useState({
+        price: "",
+        description: "",
+        id: ''
+    });
     const scrollToBottom = () => {
         if (chatBoxRef && chatBoxRef.current && chatScrollerRef && chatScrollerRef.current) {
             chatBoxRef.current.scrollTo({
@@ -222,10 +341,9 @@ const ChatScreen = () => {
                             <img src="/assets/svgs/toman.svg" className={'invert scale-90'} alt=""/>
                         </div>
                         <Input onChange={(e: any) => {
-                            console.log(e.currentTarget.value)
                             let el = e.currentTarget
                             el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
-                            setPayRequestPrice(parseInt(el.value.replace(',', '')))
+                            setPayRequestPrice(parseInt(el.value.replaceAll(',', '')))
 
                         }} id={'pay-req-input'} dir={'ltr'} numOnly={false}
                                inputClassName={'pl-12 text-black IranSansMedium'}
@@ -249,7 +367,7 @@ const ChatScreen = () => {
                          className={' z-10   bottom-16 overflow-hidden bg-white rounded-xl right-4 shadow-md   fixed'}>
                         <Button onClick={() => {
                             setPayRequestOpen(true)
-                            setCurrentChatStat('payRequest')
+                            setCurrentChatStat('payRequest');
                         }} className={'w-full h-full flex flex-row justify-center px-3 py-3'}>
                             <img src="/assets/svgs/moneys.svg" alt=""/>
                             <span className={'IranSansMedium text-textBlack mr-4 z-30'}> درخواست وجه</span>
@@ -306,7 +424,8 @@ const ChatScreen = () => {
                                         }}
                                              className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]  `}>
                                             <p style={{
-                                                wordBreak: 'break-word'
+                                                wordBreak: 'break-word',
+                                                whiteSpace: 'pre-line'
                                             }}
                                                className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>{item.text}</p>
                                             <div className={'flex mt-1 flex-row justify-start items-center '}>
@@ -322,60 +441,130 @@ const ChatScreen = () => {
                                     </div>
 
                                 )
-                            else if (item.type === "PAY_REQUEST") return <div
-                                className={`w-full flex flex-row ${sentByMe ? "justify-start " : "justify-end"} items-center my-3`}>
-                                <div className={'w-[80%] flex flex-col justify-start items-center px-2'}>
-                                    <div
-                                        className={`h-auto w-full  ${sentByMe ? "bg-primary" : 'bg-white'} rounded-2xl flex flex-col justify-center items-center px-3 pb-1 pt-3`}>
-                                        <div className={'flex flex-row justify-between items-center w-full'}>
-                                            <img className={'w-10'}
-                                                 src={sentByMe ? "/assets/svgs/pay-request.svg" : "/assets/svgs/pay-request-sender.svg"}
-                                                 alt=""/>
-                                            <span
-                                                className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium w-full mr-3`}>درخواست</span>
-                                            <div
-                                                className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium whitespace-nowrap flex flex-row justify-center items-start`}>
-                                                    <span
-                                                        className={'ml-1 text-lg'}>{item.payRequest.price / 1000}</span>
-                                                <img src="/assets/svgs/thousand-tomans.svg" alt=""
-                                                     className={`ml-3 w-20 ${sentByMe ? '' : 'invert'}`}/>
-                                            </div>
-                                        </div>
-                                        <p className={`IranSansMedium ${sentByMe ? 'text-white' : 'text-black'}  mt-2 text-justify text-sm w-full text-right`}>{item.payRequest.description}</p>
-                                        <div className={'w-full flex flex-row justify-between '}>
-                                            <div className={'flex mt-1 flex-row justify-start items-center '}>
-                                                <img src="/assets/svgs/check.svg"
-                                                     className={`w-2 z-10 h-2 ${sentByMe ? '' : 'invert-[0.5]'}`}
+                            else if (item.type === "PAY_REQUEST") {
+
+
+                                let payRequest = item.payRequest;
+                                let payRequestIcon = '';
+                                switch (payRequest.status) {
+                                    case "CANCELED":
+                                        if (sentByMe)
+                                            payRequestIcon = "/assets/svgs/pay-request-canceled.svg"
+                                        else {
+                                            payRequestIcon = "/assets/svgs/pay-request-canceled-sender.svg"
+                                        }
+                                        break;
+
+                                    case "PENDING_ACCEPT":
+                                        if (sentByMe)
+                                            payRequestIcon = "/assets/svgs/pay-request.svg"
+                                        else {
+                                            payRequestIcon = "/assets/svgs/pay-request-sender.svg"
+                                        }
+                                        break;
+
+                                    case "ACCEPTED" :
+                                        if (sentByMe)
+                                            payRequestIcon = "/assets/svgs/pay-request-accepted.svg"
+                                        else {
+                                            payRequestIcon = "/assets/svgs/pay-request-accepted-sender.svg"
+                                        }
+                                        break
+
+
+                                }
+
+
+                                return <div
+                                    className={`w-full flex flex-row ${sentByMe ? "justify-start " : "justify-end"} items-center my-3`}>
+                                    <div className={'w-[80%] flex flex-col justify-start items-center px-2'}>
+                                        <div
+                                            className={`h-auto w-full  ${sentByMe ? "bg-primary" : 'bg-white'} rounded-2xl flex flex-col justify-center items-center px-3 pb-1 pt-3`}>
+                                            <div className={'flex flex-row justify-between items-center w-full'}>
+                                                <img className={'w-10'}
+                                                     src={payRequestIcon}
                                                      alt=""/>
                                                 <span
-                                                    className={`IranSansMedium text-[0.75rem] mr-2 ${sentByMe ? "text-white" : "text-textDarker"}`}>{moment().format('hh:mm')}</span>
+                                                    className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium w-full mr-3`}>درخواست</span>
+                                                <div
+                                                    className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium whitespace-nowrap flex flex-row justify-center items-start`}>
+                                                    <span
+                                                        className={'ml-1 text-lg'}>{item.payRequest.price / 1000}</span>
+                                                    <img src="/assets/svgs/thousand-tomans.svg" alt=""
+                                                         className={`ml-3 w-20 ${sentByMe ? '' : 'invert'}`}/>
+                                                </div>
                                             </div>
+                                            <p className={`IranSansMedium ${sentByMe ? 'text-white' : 'text-black'}  mt-2 text-justify text-sm w-full text-right`}>{item.payRequest.description}</p>
+                                            <div className={'w-full flex flex-row justify-between '}>
+                                                <div className={'flex mt-1 flex-row justify-start items-center '}>
+                                                    <img src="/assets/svgs/check.svg"
+                                                         className={`w-2 z-10 h-2 ${sentByMe ? '' : 'invert-[0.5]'}`}
+                                                         alt=""/>
+                                                    <span
+                                                        className={`IranSansMedium text-[0.75rem] mr-2 ${sentByMe ? "text-white" : "text-textDarker"}`}>{moment().format('hh:mm')}</span>
+                                                </div>
 
 
+                                            </div>
                                         </div>
-                                    </div>
-                                    {
-                                        sentByMe ?
-                                            <div
-                                                className={'flex flex-row justify-between items-center w-full  mt-1.5'}>
-                                                <Button id={'pay-btn'}
-                                                        className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
-                                                    <span className={'IranSansMedium '}>لغو</span>
-                                                </Button>
-                                                <Button id={'pay-btn'}
-                                                        className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center h-11 text-sm text-white rounded-xl'}>
-                                                    <span className={'IranSansMedium '}>ویرایش </span>
-                                                </Button>
-                                            </div>
-                                            :
-                                            <Button id={'pay-btn'}
-                                                    className={'bg-primary shadow w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
-                                                <span className={'IranSansMedium '}>پرداخت</span>
-                                            </Button>
-                                    }
+                                        {
+                                            sentByMe ?
+                                                payRequest.status === "CANCELED" ?
+                                                    <Button id={'pay-btn'}
+                                                            className={'bg-textDark shadow  w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl mt-1.5'}>
+                                                        <span className={'IranSansMedium '}>لغو شده</span>
+                                                    </Button>
+                                                    :
 
+                                                    <div
+                                                        className={'flex flex-row justify-between items-center w-full  mt-1.5'}>
+                                                        <Button id={'pay-btn'} onClick={() => {
+                                                            editPrice({
+                                                                variables: {
+                                                                    id: item.id,
+                                                                    isCanceled: true
+                                                                }
+                                                            }).then((value) => {
+                                                                console.log(value)
+
+                                                            })
+
+                                                        }}
+                                                                className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                            <span className={'IranSansMedium '}>لغو</span>
+                                                        </Button>
+                                                        <Button id={'pay-btn'} onClick={() => {
+                                                            try {
+                                                                console.log(item.payRequest.description)
+                                                                console.log(item.payRequest.price)
+                                                                setCurrentEditPayRequestData(produce((draft) => {
+                                                                    draft.description = item.payRequest.description;
+                                                                    draft.price = item.payRequest.price;
+                                                                    draft.id = item.id ?? item.tempID
+                                                                    return draft
+                                                                }))
+                                                                setPayRequestOpen(true)
+                                                                setCurrentChatStat('payRequest')
+
+                                                            } catch (e) {
+                                                                console.log('failde to change the price or desc')
+                                                            }
+
+                                                        }}
+                                                                className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center h-11 text-sm text-white rounded-xl'}>
+                                                            <span className={'IranSansMedium '}>ویرایش </span>
+                                                        </Button>
+                                                    </div>
+                                                :
+                                                <Button id={'pay-btn'}
+                                                        className={'bg-primary shadow w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                    <span className={'IranSansMedium '}>پرداخت</span>
+                                                </Button>
+                                        }
+
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         })
                     }
                 </div>
@@ -386,7 +575,7 @@ const ChatScreen = () => {
             <div style={{
                 boxShadow: "0px -1px 9px 0px #0000000f"
             }}
-                 className={'bottom-0 fixed left-0 w-full bg-white  z-[60]  border grid grid-cols-12 h-14 px-3'}>
+                 className={'bottom-0 fixed left-0 w-full bg-white  z-[60]  border grid grid-cols-12 h-12 px-3'}>
                 <div className={'send-and-voice col-span-1 flex flex-row justify-start items-center'}>
 
 
@@ -433,17 +622,30 @@ const ChatScreen = () => {
                                              onClick={() => {
                                                  let messageText = (document.getElementById('text-chat') as HTMLInputElement)!.value
 
-                                                 sendMoneyRequest({
-                                                     variables: {
-                                                         acceptorID: CurrentChatUserData().user.id,
-                                                         chatID: id,
-                                                         price: payRequestPrice,
-                                                         description: messageText
+                                                 if (currentEditPayRequestData.price) {
+                                                     editPrice({
+                                                         variables: {
+                                                             price: payRequestPrice,
+                                                             id: currentEditPayRequestData.id,
+                                                             description: messageText
+                                                         }
+                                                     }).then((value) => {
+                                                         setPayRequestOpen(false)
+                                                     });
+                                                 } else {
+                                                     sendMoneyRequest({
+                                                         variables: {
+                                                             acceptorID: CurrentChatUserData().user.id,
+                                                             chatID: id,
+                                                             price: payRequestPrice,
+                                                             description: messageText
 
-                                                     }
-                                                 }).then((value) => {
-                                                     setPayRequestOpen(false)
-                                                 });
+                                                         }
+                                                     }).then((value) => {
+                                                         setPayRequestOpen(false)
+                                                     });
+                                                 }
+
                                                  (document.getElementById('text-chat') as HTMLTextAreaElement)!.value = ""
                                              }}/>
                                         :
@@ -454,7 +656,34 @@ const ChatScreen = () => {
                     {/*     className={'w-6 h-6 mr-2'}/>*/}
                 </div>
                 <div className={'send-and-voice col-span-11 flex flex-row justify-start items-center mr-2 pr-2'}>
-                    <textarea onChange={(event) => {
+                    <textarea onKeyDown={(event) => {
+                        if (event.key === "Shift") {
+                            setHoldingShift(true)
+                        }
+                    }} onKeyUp={(event) => {
+                        if (event.key === "Shift") {
+                            setHoldingShift(false)
+                        }
+                    }} onKeyPress={(event) => {
+
+
+                        // let lht = parseInt($(event.currentTarget).css('lineHeight'), 10);
+
+
+                        if (!holdingShift)
+                            if (event.key == 'Enter') {
+                                event.preventDefault()
+                                sendMessageBtn.current!.click()
+                            }
+                    }} onChange={(event) => {
+                        // console.log(event.currentTarget.style.lineHeight)
+                        const style = getComputedStyle(event.currentTarget);
+                        let lht = parseInt(style.lineHeight, 10)
+                        let lines = event.currentTarget.scrollHeight / lht;
+                        console.log(Math.floor(lines));
+
+
+                        // console.log(event.currentTarget.value.split('\n'))
                         if (currentChatStat !== "payRequest")
                             if (event.currentTarget.value) {
                                 setCurrentChatStat('write')
@@ -462,16 +691,11 @@ const ChatScreen = () => {
                                 setCurrentChatStat('default')
                             }
                     }} id={'text-chat'} placeholder={currentChatStat === 'payRequest' ? 'متن درخواست' : 'بنویس'}
-                              className={'w-full IranSansMedium bg-transparent h-auto'}
+                              className={'w-full IranSansMedium bg-transparent h-auto leading-5'}
                               rows={1} name="Text1" onClick={() => {
 
                     }}></textarea>
-                    {/*<input onKeyPress={(event) => {*/}
-                    {/*    if (event.key == 'Enter') {*/}
-                    {/*        event.preventDefault()*/}
-                    {/*        sendMessageBtn.current!.click()*/}
-                    {/*    }*/}
-                    {/*}} id={'text-chat'} type="text" dir={'rtl'} placeholder={'بنویس'}*/}
+                    {/*<input  id={'text-chat'} type="text" dir={'rtl'} placeholder={'بنویس'}*/}
                     {/*       className={'w-full IranSansMedium bg-transparent'}/>*/}
                 </div>
                 {/*<div className={'send-and-voice col-span-1 flex flex-row justify-center items-center  '}>*/}
