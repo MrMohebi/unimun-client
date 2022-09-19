@@ -3,626 +3,111 @@
 schema {
     query: Query
     mutation: Mutation
+    subscription: Subscription
 }
 
-directive @response on FIELD_DEFINITION
-
-directive @userAuth(token: String) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-
-directive @userIdAuth(token: String) on FIELD_DEFINITION | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
-
-type Appeal {
-    attachments: [UploadedFile]
-    categoryID: String
-    connectWay: String
-    createdAt: Int
-    details: String
-    hashtagIDs: [ID]
-    hashtags: [String]
-    id: ID
-    link: String
-    modifiedContentAt: Int
-    priceEnd: Int
-    priceStart: Int
-    publishedAt: Int
-    seen: Int
-    status: String
-    tagLink: String
-    title: String
-    universityID: String
-    verifiedAt: Int
-    verifierID: String
+type Admin {
+    type: String!
+    userID: ID!
 }
 
-"A paginated list of Appeal edges."
-type AppealConnection {
-    "A list of Appeal edges."
-    edges: [AppealEdge!]!
-    "Pagination information about the list of edges."
-    pageInfo: PageInfo!
-}
-
-"An edge that contains a node of type Appeal and a cursor."
-type AppealEdge {
-    "A unique cursor that can be used for pagination."
-    cursor: String!
-    "The Appeal node."
-    node: Appeal!
-}
-
-type BankAccount {
-    accountNumber: String
-    accountOwner: String
-    bank: String
-    cardNumber: String
-    createdAt: Int!
+type Chat {
     id: ID!
-    isVerified: Boolean!
-    shaba: String
-}
-
-type Book {
-    ISBN: String
-    appearance: BookAppearance
-    appearanceID: ID
-    attachments: [UploadedFile]
-    bookFiles: [UploadedFile]
-    category: BookCategory
-    categoryID: ID
-    city: String
-    cityID: ID
-    connectWay: String
-    createdAt: Int
-    creator: UserProtected
-    details: String
-    edition: Int
-    id: ID
-    isBook: Boolean
-    isDownloadable: Boolean
-    isPurchasable: Boolean
-    language: String
-    lessen: String
-    modifiedContentAt: Int
-    pages: Int
-    price: Int
-    publishedAt: Int
-    publishedDate: Int
-    publisher: String
-    seen: Int
-    sizeMB: Int
-    status: String
-    teacher: String
-    templateId: String
-    term: String
-    title: String
-    university: String
-    universityID: ID
-    verifiedAt: Int
-    writer: String
-    wroteYear: Int
-}
-
-type BookAppearance {
-    details: String
-    id: ID
-    score: Int
-    title: String
-}
-
-type BookCategory {
-    hasChild: Boolean
-    id: ID
-    order: Int
-    parentID: ID
-    phrase: String
-    title: String
-}
-
-"A paginated list of Book edges."
-type BookConnection {
-    "A list of Book edges."
-    edges: [BookEdge!]!
-    "Pagination information about the list of edges."
-    pageInfo: PageInfo!
-}
-
-"An edge that contains a node of type Book and a cursor."
-type BookEdge {
-    "A unique cursor that can be used for pagination."
-    cursor: String!
-    "The Book node."
-    node: Book!
-}
-
-type CreatePayment {
-    url: String
-}
-
-type Login {
-    deviceToken: String
-    id: ID!
-    name: String
-    phone: String!
-    token: String!
-    username: String
-}
-
-type Mutation {
-    addBankAccount(shaba: String!): Response_addBankAccount_kzij
-    addSubscriber(age: String, email: String, name: String, phone: String): Int
-    appealConnectClick(appealID: ID!, userID: ID): Response_appealConnectClick_hwel
-    bookConnectClick(bookID: ID!, userID: ID!): Response_bookConnectClick_xpeo
-    chargeWallet(amount: Int!, walletID: String!): Response_chargeWallet_frtd
-    createAppeal(categoryID: String, connectWay: String!, details: String, files: [UploadedFileInput], hashtags: [String], priceEnd: Int!, priceStart: Int!, title: String!): Response_createAppeal_zvcv
-    createBook(ISBN: String, appearanceID: ID, attachments: [UploadedFileInput], bookFiles: [UploadedFileInput], categoryID: ID!, city: String, cityID: ID, connectWay: String!, details: String, edition: Int, isBook: Boolean!, isDownloadable: Boolean!, isPurchasable: Boolean!, language: String, lessen: String, pages: Int, price: Int, publishedDate: Int, publisher: String, sizeMB: Int, teacher: String, term: String, title: String, university: String, universityID: ID, writer: String, wroteYear: Int): Response_createBook_pbmw
-    createBookTemplate(ISBN: String, appearanceID: ID, attachments: [UploadedFileInput], bookFiles: [UploadedFileInput], categoryID: ID!, details: String, edition: Int, isBook: Boolean!, isDownloadable: Boolean!, isPurchasable: Boolean!, language: String, lessen: String, pages: Int, price: Int, publishedDate: Int, publisher: String, sizeMB: Int, teacher: String, term: String, title: String, university: String, universityID: ID, writer: String, wroteYear: Int): Response_createBookTemplate_thdf
-    seen(list: [Seen], type: String!): Response_seen_txfh
-    sendVCode(phone: String!, userAgent: String): Response_sendVCode_jhai
-    updateAppeal(categoryID: String, connectWay: String, details: String, files: [UploadedFileInput], hashtags: [String], id: ID!, priceEnd: Int, priceStart: Int, status: String, title: String): Response_updateAppeal_wbjq
-    updateBook(ISBN: String, appearanceID: ID, attachments: [UploadedFileInput], bookFiles: [UploadedFileInput], categoryID: ID, city: String, cityID: ID, connectWay: String, details: String, edition: Int, id: ID!, isDownloadable: Boolean, isPurchasable: Boolean, language: String, lessen: String, pages: Int, price: Int, publishedDate: Int, publisher: String, status: String, teacher: String, term: String, title: String, university: String, universityID: ID, writer: String, wroteYear: Int): Response_updateBook_msdq
-    updateUser(bio: String, birthAt: Int, cityID: ID, email: String, hasAppealsHistory: Boolean, hasAskHistory: Boolean, hasBookHistory: Boolean, hasLastSeen: Boolean, lastname: String, name: String, nationalId: String, universityID: ID, username: String): Response_updateUser_cioc
-    uploadPublicFileAccess(appealID: String, bookID: String, fileMime: String!, fileName: String!, filePath: String!, fileType: String!, previewPath: String, sizeMB: Int, thumbnailPath: String, type: String!, uploadedAsFile: Boolean): Response_uploadPublicFileAccess_nqyc
-    verifyAppeal(adminToken: String!, id: ID!, status: String!): Boolean
-    verifyBook(adminToken: String!, id: ID!, status: String!): Boolean
-    verifyVCode(phone: String!, referenceCode: String, vCode: String!): Response_verifyVCode_jwxq
-    withdrawRequest(amount: Int!, bankAccountID: ID, toBeDoneAt: Int): Response_withdrawRequest_ooaz
-}
-
-type Notification {
-    appeal: Appeal
-    book: Book
-    created_at: String
-    id: ID
-    sender: User
+    isPrivate: Boolean!
+    lastMessage: Message
+    members: [User]
+    profiles: [Profile]
+    title: String!
     type: String!
     user: User
 }
 
-"A paginated list of Notification edges."
-type NotificationConnection {
-    "A list of Notification edges."
-    edges: [NotificationEdge!]!
-    "Pagination information about the list of edges."
-    pageInfo: PageInfo!
-}
-
-"An edge that contains a node of type Notification and a cursor."
-type NotificationEdge {
-    "A unique cursor that can be used for pagination."
-    cursor: String!
-    "The Notification node."
-    node: Notification!
-}
-
-"Information about pagination using a Relay style cursor connection."
-type PageInfo {
-    "Number of nodes in the current page."
-    count: Int!
-    "Index of the current page."
-    currentPage: Int!
-    "The cursor to continue paginating forwards."
-    endCursor: String
-    "When paginating forwards, are there more items?"
-    hasNextPage: Boolean!
-    "When paginating backwards, are there more items?"
-    hasPreviousPage: Boolean!
-    "Index of the last available page."
-    lastPage: Int!
-    "The cursor to continue paginating backwards."
-    startCursor: String
-    "Total number of nodes in the paginated connection."
-    total: Int!
-}
-
-"Information about pagination using a fully featured paginator."
-type PaginatorInfo {
-    "Number of items in the current page."
-    count: Int!
-    "Index of the current page."
-    currentPage: Int!
-    "Index of the first item in the current page."
-    firstItem: Int
-    "Are there more pages after this one?"
-    hasMorePages: Boolean!
-    "Index of the last item in the current page."
-    lastItem: Int
-    "Index of the last available page."
-    lastPage: Int!
-    "Number of items per page."
-    perPage: Int!
-    "Number of total available items."
-    total: Int!
-}
-
-type Query {
-    appeal(id: ID!): Appeal
-    appeals(
-        "A cursor after which elements are returned."
-        after: String,
-        "Limits number of fetched items. Maximum allowed value: 100."
-        first: Int = 20,
-        searchText: String
-    ): AppealConnection
-    appealsUserCreated(
-        "A cursor after which elements are returned."
-        after: String,
-        "Limits number of fetched items. Maximum allowed value: 100."
-        first: Int = 20
-    ): AppealConnection
-    book(id: ID!): Response_book_psqv
-    bookAppearances: Response_bookAppearances_ridp
-    bookCategories(searchText: String): Response_bookCategories_hrhk
-    bookTemplate(templateId: String!): Book
-    books(
-        "A cursor after which elements are returned."
-        after: String,
-        "Limits number of fetched items. Maximum allowed value: 100."
-        first: Int = 20,
-        searchText: String
-    ): BookConnection
-    booksUserCreated(
-        "A cursor after which elements are returned."
-        after: String,
-        "Limits number of fetched items. Maximum allowed value: 100."
-        first: Int = 20
-    ): BookConnection
-    isReferenceCodeValid(referenceCode: String): Response_isReferenceCodeValid_njks
-    notifications(
-        "A cursor after which elements are returned."
-        after: String,
-        "Limits number of fetched items. Maximum allowed value: 100."
-        first: Int = 20
-    ): NotificationConnection
-    transactions(
-        "A cursor after which elements are returned."
-        after: String,
-        "Limits number of fetched items. Maximum allowed value: 100."
-        first: Int = 20
-    ): TransactionConnection
-    ttt(x: String): String
-    user: Response_user_jhhr
-    wallet: Response_wallet_gtan
-}
-
-type Response_addBankAccount_kzij {
-    data: BankAccount
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_appealConnectClick_hwel {
-    data: Boolean
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_bookAppearances_ridp {
-    data: [BookAppearance]
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_bookCategories_hrhk {
-    data: [BookCategory]
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_bookConnectClick_xpeo {
-    data: Boolean
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_book_psqv {
-    data: Book
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_chargeWallet_frtd {
-    data: CreatePayment
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_createAppeal_zvcv {
-    data: Appeal
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_createBookTemplate_thdf {
-    data: Book
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_createBook_pbmw {
-    data: Book
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_isReferenceCodeValid_njks {
-    data: Boolean
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_seen_txfh {
-    data: Boolean
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_sendVCode_jhai {
-    data: VCode
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_updateAppeal_wbjq {
-    data: Appeal
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_updateBook_msdq {
-    data: Book
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_updateUser_cioc {
-    data: User
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_uploadPublicFileAccess_nqyc {
-    data: Boolean
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_user_jhhr {
-    data: User
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_verifyVCode_jwxq {
-    data: Login
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_wallet_gtan {
-    data: Wallet
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_withdrawRequest_ooaz {
-    data: WithdrawRequest
-    errors: String
-    message: String
-    status: Status!
-}
-
-"Information about pagination using a simple paginator."
-type SimplePaginatorInfo {
-    "Number of items in the current page."
-    count: Int!
-    "Index of the current page."
-    currentPage: Int!
-    "Index of the first item in the current page."
-    firstItem: Int
-    "Are there more pages after this one?"
-    hasMorePages: Boolean!
-    "Index of the last item in the current page."
-    lastItem: Int
-    "Number of items per page."
-    perPage: Int!
-}
-
-type Transaction {
-    amountToman: Int
-    amountType: String!
-    createdAt: Int
-    fromWalletID: ID
+type Message {
+    chatID: ID!
+    editedAt: Int
     id: ID
-    toWalletID: ID
+    payRequest: PayRequest
+    request: Request
+    sentAt: Int!
+    tempId: String
+    text: String
     type: String!
-}
-
-"A paginated list of Transaction edges."
-type TransactionConnection {
-    "A list of Transaction edges."
-    edges: [TransactionEdge!]!
-    "Pagination information about the list of edges."
-    pageInfo: PageInfo!
-}
-
-"An edge that contains a node of type Transaction and a cursor."
-type TransactionEdge {
-    "A unique cursor that can be used for pagination."
-    cursor: String!
-    "The Transaction node."
-    node: Transaction!
-}
-
-type UploadedFile {
-    mime: String!
-    preview: String
-    thumbnail: String
-    type: String!
-    uploadedAsFile: Boolean
-    url: String!
-}
-
-type User {
-    bannerID: ID
-    bio: String
-    birthAt: Int
-    cityID: ID
-    code: String
-    created_at: String
-    email: String
-    expertiseIDs: [ID]
-    friendIDs: [ID]
-    hasAppealsHistory: Boolean
-    hasAskHistory: Boolean
-    hasBookHistory: Boolean
-    hasLastSeen: Boolean
-    id: ID
-    introducerID: ID
-    isEmailActivated: Boolean
-    isPhoneActivated: Boolean
-    lastname: String
-    level: Int
-    link: String
-    linkTag: String
-    name: String
-    nationalId: String
-    phone: String
-    profileIDs: [ID]
-    referenceCode: String
-    referenceCodeLeft: Int
-    savedAppealsIDs: [ID]
-    savedAskIDs: [ID]
-    savedBookIDs: [ID]
-    universityID: ID
-    username: String
-    verifiedAt: Int
-    wallet: Wallet
-    xp: Int
-    xpLevelPercentage: Int
-}
-
-type UserProtected {
-    id: ID
-    name: String
-    username: String
-    verifiedAt: Int
-}
-
-type VCode {
-    firstCharacter: String
-    hint: String
-    isSignup: Boolean
-    length: Int!
-    phone: String!
-    vCode: String!
-}
-
-type Wallet {
-    balance: Int!
-    blocked: Int!
-    coins: Int
-    id: ID!
-    totalWithdraw: Int
     userID: ID!
 }
 
-type WithdrawRequest {
-    amount: Int!
-    bankAccountID: ID
-    createdAt: Int!
+type Mutation {
+    createPV(receiverID: ID!, text: String): Chat
+    editMessage(id: ID, payRequest: PayRequestEditInp, tempId: String, text: String): Message
+    sendMessage(chatID: ID!, payRequest: PayRequestCreateInp, text: String): Message
+    sendRequest(appealID: ID, bookID: ID, description: String, price: Int): Request
+    updateRequestStatus(accepted: Boolean!, id: ID!): String!
+}
+
+type PayRequest {
+    acceptorID: ID!
+    createdAt: Int
+    creatorID: ID!
+    description: String
     id: ID!
-    isDone: Boolean
-    status: String!
-    toBeDoneAt: Int
-    walletID: ID!
+    isAccepted: Boolean
+    paidAt: Int
+    price: Int!
+    status: String
+    updatedAt: Int
 }
 
-"Aggregate functions when ordering by a relation without specifying a column."
-enum OrderByRelationAggregateFunction {
-    "Amount of items."
-    COUNT
+type Profile {
+    main: String
+    thumbnail: String
 }
 
-"Aggregate functions when ordering by a relation that may specify a column."
-enum OrderByRelationWithColumnAggregateFunction {
-    "Average."
-    AVG
-    "Amount of items."
-    COUNT
-    "Maximum."
-    MAX
-    "Minimum."
-    MIN
-    "Sum."
-    SUM
+type Query {
+    chat(id: ID!): Chat
+    chatMessages(chatID: ID!, limit: Int, next: Boolean, sentAt: Int): [Message]
+    chats: [Chat]
+    requests(createdAt: Int, limit: Int, next: Boolean): [Request]
+    supportChat: Chat
 }
 
-"Directions for ordering a list of records."
-enum SortOrder {
-    "Sort records in ascending order."
-    ASC
-    "Sort records in descending order."
-    DESC
-}
-
-enum Status {
-    ERROR
-    NOT_ACCESS
-    NOT_AUTH
-    NOT_FOUND
-    SUCCESS
-}
-
-"Specify if you want to include or exclude trashed results from a query."
-enum Trashed {
-    "Only return trashed results."
-    ONLY
-    "Return both trashed and non-trashed results."
-    WITH
-    "Only return non-trashed results."
-    WITHOUT
-}
-
-"Allows ordering a list of records."
-input OrderByClause {
-    "The column that is used for ordering."
-    column: String!
-    "The direction that is used for ordering."
-    order: SortOrder!
-}
-
-input Seen {
+type Request {
+    acceptorID: ID
+    appealID: ID
+    bookID: ID
+    createdAt: Int
+    creatorID: ID
+    description: String
     id: ID!
-    times: Int!
+    isAccepted: Boolean
+    price: Int
+    status: String
     type: String
 }
 
-input UploadedFileInput {
-    mime: String!
-    preview: String
-    sizeMB: Int
-    thumbnail: String
-    type: String!
-    uploadedAsFile: Boolean
-    url: String!
+type Subscription {
+    editedMessage: Message
+    newMessage: Message
+}
+
+type User {
+    bio: String
+    hasLastSeen: Boolean
+    id: ID!
+    isAdmin: Boolean
+    lastname: String
+    name: String!
+    profiles: [Profile]
+    verifiedAt: Int
+}
+
+input PayRequestCreateInp {
+    acceptorID: ID!
+    description: String
+    price: Int!
+}
+
+input PayRequestEditInp {
+    description: String
+    isAccepted: Boolean
+    isCanceled: Boolean
+    price: Int
 }

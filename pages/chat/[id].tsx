@@ -33,6 +33,7 @@ const ChatScreen = () => {
     const [payRequestPrice, setPayRequestPrice] = useState(0);
     const [loadinOlderMessages, setLoadinOlderMessages] = useState(false);
     const [holdingShift, setHoldingShift] = useState(false);
+    const getMessagesLimit = useRef(1000);
     useEffect(() => {
         if (Object.keys(CurrentChatUserData()).length) {
             if (chatBoxRef.current!.classList.contains('scroll-auto')) {
@@ -98,6 +99,7 @@ const ChatScreen = () => {
                     updatedAt
                 }
                 id
+                tempId
                 chatID
                 editedAt
             }
@@ -108,21 +110,23 @@ const ChatScreen = () => {
     useEffect(() => {
         if (chatsSubscription.data) {
             let arr = [chatsSubscription.data.newMessage]
-            setMessages(
-                produce((draft) => {
-                    (draft as [any]).push(chatsSubscription.data.newMessage)
-                    return draft
-                })
-            );
+            if (chatsSubscription.data.newMessage.chatID === id)
+                setMessages(
+                    produce((draft) => {
+                        (draft as [any]).push(chatsSubscription.data.newMessage)
+                        return draft
+                    })
+                );
             // scrollToBottom()
         }
     }, [chatsSubscription.data]);
 
     const EDIT_PRICE_MUTATION = gql`
-        mutation ($price: Int, $id: ID!, $description: String,$isAccepted:Boolean,$isCanceled:Boolean) {
+        mutation ($price: Int,$tempId:String $id: ID!, $description: String,$isAccepted:Boolean,$isCanceled:Boolean) {
             editMessage(
                 payRequest: {price: $price, description: $description, isCanceled: $isCanceled, isAccepted: $isAccepted}
-                id: $id
+                id: $id,
+                tempId:$tempId
             ) {
                 id
                 payRequest {
@@ -144,6 +148,7 @@ const ChatScreen = () => {
                 chatID
                 text
                 id
+                tempId
                 userID
                 type
                 payRequest {
@@ -167,22 +172,45 @@ const ChatScreen = () => {
     useEffect(() => {
         if (editMessagesSubscription.data) {
             messages.forEach((item: any) => {
-                try {
-                    if (item.id === editMessagesSubscription.data.editedMessage.id) {
 
-                        setMessages(produce((draft: any) => {
-                            draft.forEach((message: any, index: any) => {
-                                if (message.id === editMessagesSubscription.data.editedMessage.id) {
-                                    draft[index] = editMessagesSubscription.data.editedMessage
-                                }
-                            })
-                            return draft;
-                        }))
+                if (!editMessagesSubscription.data.editedMessage.id) {
+                    if (item.tempId === editMessagesSubscription.data.editedMessage.tempId) {
+                        try {
+                            if (item.tempId === editMessagesSubscription.data.editedMessage.tempId) {
+                                setMessages(produce((draft: any) => {
+                                    draft.forEach((message: any, index: any) => {
+                                        if (message.tempId === editMessagesSubscription.data.editedMessage.tempId) {
+                                            draft[index] = editMessagesSubscription.data.editedMessage
+                                        }
+                                    })
+                                    return draft;
+                                }))
 
+                            }
+                        } catch (e) {
+
+                        }
                     }
-                } catch (e) {
+                } else {
+                    if (item.id === editMessagesSubscription.data.editedMessage.id) {
+                        try {
+                            if (item.id === editMessagesSubscription.data.editedMessage.id) {
+                                setMessages(produce((draft: any) => {
+                                    draft.forEach((message: any, index: any) => {
+                                        if (message.id === editMessagesSubscription.data.editedMessage.id) {
+                                            draft[index] = editMessagesSubscription.data.editedMessage
+                                        }
+                                    })
+                                    return draft;
+                                }))
 
+                            }
+                        } catch (e) {
+
+                        }
+                    }
                 }
+
 
             })
             console.log('edited ')
@@ -199,11 +227,12 @@ const ChatScreen = () => {
 
     const chatMessagesQuery = gql`
         query($chatID:ID!){
-            chatMessages(chatID: $chatID, limit: 100){
+            chatMessages(chatID: $chatID, limit: ${getMessagesLimit.current}){
                 userID
                 text
                 type
                 sentAt
+                tempId
                 payRequest {
                     acceptorID
                     createdAt
@@ -308,7 +337,8 @@ const ChatScreen = () => {
     const [currentEditPayRequestData, setCurrentEditPayRequestData] = useState({
         price: "",
         description: "",
-        id: ''
+        id: '',
+        tempId: ''
     });
     const scrollToBottom = () => {
         if (chatBoxRef && chatBoxRef.current && chatScrollerRef && chatScrollerRef.current) {
@@ -540,9 +570,13 @@ const ChatScreen = () => {
                                                                 setCurrentEditPayRequestData(produce((draft) => {
                                                                     draft.description = item.payRequest.description;
                                                                     draft.price = item.payRequest.price;
-                                                                    draft.id = item.id ?? item.tempID
+                                                                    if (item.id)
+                                                                        draft.id = item.id
+                                                                    else if (item.tempId)
+                                                                        draft.tempId = item.tempId
                                                                     return draft
                                                                 }))
+                                                                console.log(item)
                                                                 setPayRequestOpen(true)
                                                                 setCurrentChatStat('payRequest')
 
@@ -622,16 +656,35 @@ const ChatScreen = () => {
                                              onClick={() => {
                                                  let messageText = (document.getElementById('text-chat') as HTMLInputElement)!.value
 
+                                                 let idObject = {
+                                                     id: '',
+                                                     tempId: ''
+                                                 } as any
+                                                 if (currentEditPayRequestData.id)
+                                                     idObject['id'] = currentEditPayRequestData.id
+                                                 else if (currentEditPayRequestData.tempId) {
+                                                     idObject['tempId'] = currentEditPayRequestData.tempId
+                                                 }
+
                                                  if (currentEditPayRequestData.price) {
+                                                     let requestParamsObject = {
+                                                         price: payRequestPrice,
+                                                         description: messageText,
+                                                     }
                                                      editPrice({
                                                          variables: {
-                                                             price: payRequestPrice,
-                                                             id: currentEditPayRequestData.id,
-                                                             description: messageText
+                                                             ...idObject,
+                                                             ...requestParamsObject
                                                          }
                                                      }).then((value) => {
                                                          setPayRequestOpen(false)
                                                      });
+                                                     setCurrentEditPayRequestData(produce((draft) => {
+                                                         draft.id = "";
+                                                         draft.description = "";
+                                                         draft.tempId = '0'
+
+                                                     }))
                                                  } else {
                                                      sendMoneyRequest({
                                                          variables: {
