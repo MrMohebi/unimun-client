@@ -173,6 +173,7 @@ const ChatScreen = () => {
                         }
                     }
                 })
+
             }, [editMessagesSubscription.data]
         )
         ;
