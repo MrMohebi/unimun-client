@@ -40,6 +40,10 @@ const Index = () => {
                 members {
                     name
                 }
+                title
+                profiles{
+                    thumbnail
+                }
                 user {
                     id
                     name
@@ -119,6 +123,8 @@ const Index = () => {
 
                 {chats.map((chat: {
                     id: string
+                    title: string
+                    profiles: [any]
                     members: any
                     user: {
                         id: string
@@ -152,7 +158,7 @@ const Index = () => {
                                             <div
                                                 className={'col-span-1 h-14 w-14  border-textDark row-span-1 rounded-2xl object-cover flex flex-col justify-center items-center overflow-hidden'}>
                                                 <img className={'rounded-2xl'}
-                                                     src={chat.user.profiles ? DOWNLOAD_HOST() + chat.user.profiles[0].thumbnail : "/assets/image/no-prof.png"}
+                                                     src={chat.user.profiles ? DOWNLOAD_HOST() + chat.profiles[0].thumbnail : "/assets/image/no-prof.png"}
                                                      alt=""/>
                                                 {/*<span*/}
                                                 {/*    className={'IranSansMedium text-2xl pt-2 text-textDark'}> {chat.user.name[0]} </span>*/}
@@ -164,7 +170,7 @@ const Index = () => {
                                             className={'col-span-5 border-b-2 flex flex-col justify-start items-start pt-3'}>
                                             <div id={'name'} className={'flex flex-row justify-start items-center'}>
                                                 <span
-                                                    className={"IranSansMedium text-black"}>{chat.user.name}</span>
+                                                    className={"IranSansMedium text-black"}>{chat.title}</span>
                                             </div>
                                             <div id={'status'}
                                                  className={'flex flex-row justify-between items-center mt-2 w-full'}>
