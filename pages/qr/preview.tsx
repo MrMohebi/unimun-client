@@ -3,7 +3,6 @@ import {useRouter} from "next/router";
 import Button from "../../components/view/Button/Button";
 import Toman from "../../assets/svgs/toman.svg";
 import Input from "../../components/view/Input/Input";
-import {fixPrice} from "../../helpers/fixPrice";
 import Header from "../../components/common/Header/Header";
 
 const Preview = () => {
@@ -14,7 +13,6 @@ const Preview = () => {
     const [name, setName] = useState('');
     const [writer, setWriter] = useState('');
     const [publisher, setPublisher] = useState('');
-    const [language, setLanguage] = useState('');
     const [price, setPrice] = useState(0);
     const [appereance, setAppereance] = useState("");
     const [category, setCategory] = useState("");
@@ -26,8 +24,6 @@ const Preview = () => {
 
             return item.includes('bookTemplate')
         })
-
-        console.log(filteredarr)
 
         setName(filteredarr.filter((item) => {
             return item.includes('title')

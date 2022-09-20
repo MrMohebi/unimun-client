@@ -1,29 +1,22 @@
 import React, {useEffect, useState} from 'react';
 import Header from "../../components/common/Header/Header";
-import Tab from "../../components/view/Tab/Tab";
 import {passedTime} from "../../helpers/passedTime";
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import {gql, useLazyQuery} from "@apollo/client";
 import {clientChat} from "../../apollo-client"
 import {UserId, UserToken} from "../../store/user";
-import Login from "../profile/login";
-import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
-import {InfinitySpin, TailSpin} from "react-loader-spinner";
 import {DOWNLOAD_HOST, UnimunID} from "../../store/GLOBAL_VARIABLES";
 import {CurrentChatUserData} from "../../store/chat";
-import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
 
 
 const Index = () => {
 
-    const [currentActiveIndex, setCurrentActiveIndex] = useState(0);
     const [render, setRender] = useState(false);
     const [chats, setChats] = useState([]);
     const [chatsArrived, setChatsArrived] = useState(false);
 
-    const [supportChat, setSupportChat] = useState({});
     const router = useRouter();
 
 
@@ -63,7 +56,6 @@ const Index = () => {
             setRender(true)
         } else {
             getChats().then((value) => {
-                console.log(value)
                 try {
                     setChats(value.data.chats)
                     setChatsArrived(true)

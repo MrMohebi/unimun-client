@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import lottie from "lottie-web";
 import books from "../assets/animations/books.json";
-import WalletSVG from '../assets/svgs/wallet.svg'
 import {currentNavActiveIndex} from "../store/navbar";
 import Drawer from "../components/view/Drawer/Drawer";
 import Button from "../components/view/Button/Button";
@@ -13,8 +12,9 @@ import {clientChat} from "../apollo-client";
 import {useRouter} from "next/router";
 import Input from "../components/view/Input/Input";
 import BottomSheet from "../components/view/BottomSheet/BottomSheet";
+import Toast from "../components/normal/Toast/Toast";
 
-const Library = () => {
+const Wallet = () => {
 
 
     const [drawerMaxHeight, setDrawerMaxHeight] = useState(400);
@@ -23,7 +23,7 @@ const Library = () => {
     const divRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [loading, setLoading] = useState(true);
-    const [payRequestLoading, setPayRequestLoading] = useState(false);
+    const [bottomSheetBtnLoading, setBottomSheetBtnLoading] = useState(false);
 
     const lottieRef = useRef<HTMLDivElement>(null)
 
@@ -32,19 +32,37 @@ const Library = () => {
             __typename
             wallet {
                 data {
+                    id
                     balance
                     userID
                 }
             }
         }
     `
+    const CHARGE_WALLLET_QUERY = gql`
+        mutation($amount:Int! $walletID:String!) {
+            chargeWallet(walletID: $walletID, amount: $amount) {
+                data {
+                    url
+                }
+                errors
+                message
+                status
+            }
+        }
+
+    `
     const getWalletDataResult = useQuery(GET_WALLET_DATA_QUERY)
+    const [chargeWallet] = useMutation(CHARGE_WALLLET_QUERY)
     const [getSupportChat] = useLazyQuery(GET_SUPPORT_CHAT_QUERY, {client: clientChat})
     const [newMessage, newMessageResult] = useMutation(NEW_MESSAGE_MUTATION, {client: clientChat})
+    const [chargeWalletOpen, setChargeWalletOpen] = useState(false);
+    const [chargeWalletAmount, setChargeWalletAmount] = useState(0);
     const router = useRouter()
 
     const [payRequestPrice, setPayRequestPrice] = useState(0);
     const [payRequestOpen, setPayRequestOpen] = useState(false);
+
 
     useEffect(() => {
         if (lottieRef.current)
@@ -114,12 +132,12 @@ const Library = () => {
                     <div className={'w-full bg-background mt-3'}>
                         <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>برای راحتی بیشتر میتونی از گزینه های بالا استفاده کنی</span>
                     </div>
-                    <Button loading={payRequestLoading} onClick={() => {
+                    <Button loading={bottomSheetBtnLoading} onClick={() => {
 
                         if (payRequestPrice !== 0) {
-                            setPayRequestLoading(true)
+                            setBottomSheetBtnLoading(true)
                             getSupportChat().then((e) => {
-                                setPayRequestLoading(false)
+                                setBottomSheetBtnLoading(false)
                                 if (e.data && e.data.supportChat.id) {
                                     newMessage({
                                         variables: {
@@ -129,7 +147,7 @@ const Library = () => {
                                                 ${" " + payRequestPrice.toLocaleString() + " "}تومان
                                             `
                                         }
-                                    }).then((value) => {
+                                    }).then(() => {
                                         CurrentChatUserData(e.data.supportChat)
                                         router.push('/chat/' + e.data.supportChat.id)
                                     })
@@ -146,6 +164,74 @@ const Library = () => {
                 </div>
 
             </BottomSheet>
+            {/*Charge wallet bottom sheet*/}
+
+            <BottomSheet open={chargeWalletOpen} onClose={() => {
+                setChargeWalletOpen(false)
+            }}>
+                <div className={' w-full bg-transparent flex flex-col justify-start items-center pt-4 '}>
+                    <span
+                        className={'IranSansMedium text-textDarker text-right w-full text-md  pr-4 text-textDarker block'}>مبلغ درخواستی خود را وارد کنید</span>
+                    <div className={'relative w-full flex-col justify-center items-center mt-5'}>
+
+                        <div
+                            className={'absolute left-5  px-2 h-6  top-1/2 -translate-y-1/2 flex flex-col justify-center border-r-2 items-center'}>
+                            <img src="/assets/svgs/toman.svg" className={'invert scale-90'} alt=""/>
+                        </div>
+                        <Input onChange={(e: any) => {
+                            let el = e.currentTarget
+                            el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
+                            setChargeWalletAmount(parseInt(el.value.replace(',', '')))
+
+                        }} id={'pay-req-input'} dir={'ltr'} numOnly={false}
+                               inputClassName={'pl-12 text-black IranSansMedium'}
+                               wrapperClassName={"w-11/12 h-12 m-auto "}/>
+
+                    </div>
+                    <div className={'w-full bg-background mt-3'}>
+                        <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>برای راحتی بیشتر میتونی از گزینه های بالا استفاده کنی</span>
+                    </div>
+                    <Button loading={bottomSheetBtnLoading} onClick={() => {
+
+                        if (chargeWalletAmount) {
+                            setBottomSheetBtnLoading(true)
+                            chargeWallet({
+                                variables: {
+                                    amount: chargeWalletAmount,
+                                    walletID: getWalletDataResult.data.wallet.data.id
+                                }
+                            }).then((value) => {
+                                try {
+                                    Toast("خطا هنگام درخواست واریز")
+
+                                    if (value.data.chargeWallet.data.url) {
+                                        window.open(value.data.chargeWallet.data.url, "_self")
+                                        setChargeWalletOpen(false)
+                                    } else {
+                                        Toast("خطا هنگام درخواست واریز")
+
+                                    }
+                                } catch (e) {
+                                    setChargeWalletOpen(false);
+                                    Toast("خطا هنگام درخواست واریز")
+                                }
+
+                            })
+
+
+                            //
+                        }
+
+
+                    }} className={'w-11/12 bg-primary h-14 text-white rounded-2xl mt-5'}>
+                        <span className={'IranSansMedium'}>درخواست وجه</span>
+                    </Button>
+
+                    <div className={'h-4'}></div>
+                </div>
+
+            </BottomSheet>
+
 
             <Drawer initScroll={900} initHeight={drawerInitLimit} minHeight={700} wrap={
                 <div className={'w-full grid grid-cols-3 px-3 pt-10'} ref={divRef}>
@@ -218,7 +304,9 @@ const Library = () => {
                     height: drawerMaxHeight + "px"
                 }} className={'w-full bg-white flex flex-col justify-between items-center'}>
                     <div className={'w-full flex flex-row justify-around items-center px-4'}>
-                        <Button className={' h-10 rounded-xl bg-background flex flex-row justify-between items-center'}
+                        <Button onClick={() => {
+                            setChargeWalletOpen(true)
+                        }} className={' h-10 rounded-xl bg-background flex flex-row justify-between items-center'}
                                 id={'withdraw'} rippleColor={'rgba(0,0,0,0.14)'}>
                             <div
                                 className={'h-10 w-10 rounded-xl bg-primary flex flex-col justify-center items-center'}>
@@ -251,4 +339,4 @@ const Library = () => {
     );
 };
 
-export default Library;
+export default Wallet;

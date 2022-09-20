@@ -52,21 +52,7 @@ const ChatScreen = () => {
                 }
             }
         `
-        const EDIT_REQUEST_QUERY = gql`
-            mutation($id:ID! ) {
-                editMessage(id: $id, payRequest: {isCanceled: false,isAccepted: true}) {
-                    chatID
-                    payRequest {
-                        isAccepted
 
-                        acceptorID
-                        createdAt
-                        description
-                        status
-                    }
-                }
-            }
-        `
 
         const [sendMoneyRequest, sendMoneyRequestResult] = useMutation(CREATE_REQUEST_MUTATION, {client: clientChat})
         const chatsSubscriptionRequest = gql`
@@ -100,7 +86,6 @@ const ChatScreen = () => {
 
         useEffect(() => {
             if (chatsSubscription.data) {
-                let arr = [chatsSubscription.data.newMessage]
                 if (chatsSubscription.data.newMessage.chatID === id)
                     setMessages(
                         produce((draft) => {
@@ -108,7 +93,7 @@ const ChatScreen = () => {
                             return draft
                         })
                     );
-                // scrollToBottom()
+                scrollToBottom()
             }
         }, [chatsSubscription.data]);
 
@@ -217,7 +202,6 @@ const ChatScreen = () => {
                         chatID: id
                     }
                 }).then((value) => {
-                    console.log(value)
 
                     try {
                         setChatLoading(false)
@@ -309,7 +293,7 @@ const ChatScreen = () => {
         }
 
         return (
-            <div ref={chatBoxRef} className={'w-full h-full overflow-scroll scroll-auto pb-12'}>
+            <div ref={chatBoxRef} className={'w-full h-full overflow-scroll  pb-12 scroll-smooth'}>
 
                 <BottomSheet open={payRequestOpen} onClose={() => {
                     setPayRequestOpen(false)
@@ -402,11 +386,11 @@ const ChatScreen = () => {
                                 if (item.type === 'TEXT')
                                     return (
                                         <div key={'chat-bubble-' + index}
-                                             className={` w-full h-auto flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
+                                             className={` w-full h-auto flex flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
                                             <div style={{
                                                 // animationDelay: index * 50 + 'ms'
                                             }}
-                                                 className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]  `}>
+                                                 className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]   `}>
                                                 <p style={{
                                                     wordBreak: 'break-word',
                                                     whiteSpace: 'pre-line'
@@ -515,8 +499,6 @@ const ChatScreen = () => {
                                                                         isCanceled: true
                                                                     }
                                                                 }).then((value) => {
-                                                                    console.log(value)
-
                                                                 })
 
                                                             }}
@@ -525,8 +507,6 @@ const ChatScreen = () => {
                                                             </Button>
                                                             <Button id={'pay-btn'} onClick={() => {
                                                                 try {
-                                                                    console.log(item.payRequest.description)
-                                                                    console.log(item.payRequest.price)
                                                                     setCurrentEditPayRequestData(produce((draft) => {
                                                                         draft.description = item.payRequest.description;
                                                                         draft.price = item.payRequest.price;
@@ -536,7 +516,6 @@ const ChatScreen = () => {
                                                                             draft.tempId = item.tempId
                                                                         return draft
                                                                     }))
-                                                                    console.log(item)
                                                                     setPayRequestOpen(true)
                                                                     setCurrentChatStat('payRequest')
 
@@ -550,10 +529,62 @@ const ChatScreen = () => {
                                                             </Button>
                                                         </div>
                                                     :
-                                                    <Button id={'pay-btn'}
-                                                            className={'bg-primary shadow w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
-                                                        <span className={'IranSansMedium '}>پرداخت</span>
-                                                    </Button>
+                                                    payRequest.status === "ACCEPTED" ?
+                                                        <Button id={'pay-btn'}
+                                                                className={'bg-textDark shadow  w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl mt-1.5'}>
+                                                            <span className={'IranSansMedium '}>پرداخت شده</span>
+                                                        </Button>
+
+                                                        :
+
+                                                        payRequest.status === "CANCELED" ?
+                                                            <Button id={'pay-btn'}
+                                                                    className={'bg-textDark shadow  w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl mt-1.5'}>
+                                                                <span className={'IranSansMedium '}>لغو شده</span>
+                                                            </Button>
+                                                            :
+                                                            payRequest.status === "ACCEPTED" ?
+                                                                <Button id={'pay-btn'}
+                                                                        className={'bg-textDark shadow  w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl mt-1.5'}>
+                                                                    <span
+                                                                        className={'IranSansMedium '}>پرداخت شده</span>
+                                                                </Button>
+                                                                :
+
+
+                                                                <Button onClick={() => {
+                                                                    try {
+
+
+                                                                        editPrice({
+                                                                            variables: {
+                                                                                isAccepted: true,
+                                                                                id: item.id ?? "",
+                                                                                tempId: item.tempId ?? ""
+                                                                            }
+                                                                        }).then((value) => {
+                                                                            console.log(value)
+                                                                        })
+                                                                        // console.log(item.payRequest.description)
+                                                                        // console.log(item.payRequest.price)
+                                                                        // setCurrentEditPayRequestData(produce((draft) => {
+                                                                        //     draft.description = item.payRequest.description;
+                                                                        //     draft.price = item.payRequest.price;
+                                                                        //     if (item.id)
+                                                                        //         draft.id = item.id
+                                                                        //     else if (item.tempId)
+                                                                        //         draft.tempId = item.tempId
+                                                                        //     return draft
+                                                                        // }))
+                                                                        // setCurrentChatStat('payRequest')
+
+                                                                    } catch (e) {
+                                                                        console.log('failde to change the price or desc')
+                                                                    }
+                                                                }} id={'pay-btn'}
+                                                                        className={'bg-primary shadow w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                                    <span className={'IranSansMedium '}>پرداخت</span>
+                                                                </Button>
                                             }
 
                                         </div>
@@ -587,7 +618,6 @@ const ChatScreen = () => {
                                                  text: messageText
                                              }
                                          }).then((value) => {
-                                             console.log(value)
                                          });
                                          //     // addMessage((document.getElementById('text-chat') as HTMLInputElement)!.value);
                                          (document.getElementById('text-chat') as HTMLInputElement)!.value = ""

@@ -3,7 +3,6 @@ import CircularProgressBar from "../../view/CircularProgressBar/CircularProgress
 import GallerySVG from "../../../assets/svgs/gallery.svg";
 import {uploadBookImages} from "../../../Requests/uploadRequests";
 import Toast from "../Toast/Toast";
-import {DOWNLOAD_HOST} from "../../../store/GLOBAL_VARIABLES";
 import NewPhotoSVG from "../../../assets/svgs/newPhoto.svg";
 // @ts-ignore
 
@@ -62,7 +61,6 @@ const BookImageUpload = (props: {
                                 props.onError(error)
                             },
                             (progressEvent: any) => {
-                                console.log(progressEvent)
                                 setUploading(false)
                                 let percentCompleted = Math.round(
                                     (progressEvent.loaded * 100) / progressEvent.total
