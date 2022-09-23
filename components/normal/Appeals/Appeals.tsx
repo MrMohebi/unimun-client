@@ -1,7 +1,13 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {UIEvent, useEffect, useRef, useState} from 'react';
 import Eye from "../../../assets/svgCodes/Eye";
-import {gql, useLazyQuery, useReactiveVar} from "@apollo/client";
-import {cameFromAppeal, lastAppealSubmitSuccess, lastGottenAppeals} from "../../../store/appeals";
+import {gql, useLazyQuery, useQuery, useReactiveVar} from "@apollo/client";
+import {
+    cameFromAppeal,
+    lastAppealSubmitSuccess,
+    AppealsStore,
+    EndCursor,
+    LastAppealsScrollPosition
+} from "../../../store/appeals";
 import {getAppealsQuery} from "../../../Requests/normal/appeals";
 import NewAppealButton from "../NewAppealButton/NewAppealButton";
 import ThousandTomans from '../../../assets/svgs/thousandTomans.svg';
@@ -15,6 +21,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 import Toast from "../Toast/Toast";
 import {useRouter} from "next/router";
+import {useDebouncedCallback} from "use-debounce";
 
 
 const Appeals = () => {
@@ -68,7 +75,9 @@ const Appeals = () => {
             }
         }
     `
-    const [gtAppeals, appealsResult] = useLazyQuery(_getAppealsQuery)
+    // const [gtAppeals, appealsResult] = useLazyQuery(_getAppealsQuery)
+
+    const gtAppeals = useQuery(_getAppealsQuery)
 
     // useEffect(() => {
     //     gtAppeals().then((value) => {
@@ -77,7 +86,7 @@ const Appeals = () => {
     //     })
     // }, [])
 
-    const lastGottenAppealsState = useReactiveVar(lastGottenAppeals)
+    const reactiveAppeals = useReactiveVar(AppealsStore)
 
     useEffect(() => {
         if (lastAppealSubmitSuccess().length) {
@@ -96,34 +105,54 @@ const Appeals = () => {
             rect.right <= (window.innerWidth || document.documentElement.clientWidth)
         );
     }
+    const firstCatch = useRef(true);
+    useEffect(() => {
 
+
+        if (AppealsStore().length > 0 && firstCatch.current) {
+
+        } else {
+            if (gtAppeals.data) {
+                try {
+
+                    if (gtAppeals.data && gtAppeals.data.hasOwnProperty('appeals') && gtAppeals.data.appeals.hasOwnProperty('edges')) {
+
+                        let apls = reactiveAppeals.concat(gtAppeals.data.appeals.edges)
+                        EndCursor(gtAppeals.data.appeals.pageInfo.endCursor)
+                        setAppeals(apls)
+                        AppealsStore(apls)
+                        reachedEnd.current = true;
+                        setReachedEndState(true)
+
+                        if (!gtAppeals.data.appeals.pageInfo.hasNextPage)
+                            ShasMore(false)
+                    }
+
+                } catch (e) {
+
+                }
+            }
+        }
+
+        firstCatch.current = false;
+    }, [gtAppeals.data]);
 
     useEffect(() => {
         if (!data && !loading) {
 
-            gtAppeals().then((e) => {
-                if (e.data.appeals === null) {
 
-                } else {
-                    if (e.error === undefined) {
+            // gtAppeals().then((e) => {
+            //     if (e.data.appeals === null) {
+            //
+            //     } else {
 
-
-                        if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
-
-                            let apls = appeals.concat(e.data.appeals.edges)
-                            setEndCursor(e.data.appeals.pageInfo.endCursor)
-                            setAppeals(apls)
-                            lastGottenAppeals(apls)
-                            reachedEnd.current = true;
-                            setReachedEndState(true)
-                        }
-                    } else {
-                    }
-
-                }
-
-
-            })
+            //         } else {
+            //         }
+            //
+            //     }
+            //
+            //
+            // })
 
             //     getAppeals()
             //         .then((e) => {
@@ -164,34 +193,40 @@ const Appeals = () => {
     const getNewerAppeals = () => {
         // setReachedEndState(false)
 
-        appealsResult.refetch({
-            after: endCursor
-        }).then((e) => {
-            if (e.data.appeals === null) {
-            } else {
-                if (e.error === undefined) {
 
-                    if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
-                        if (!e.data.appeals.pageInfo.hasNextPage)
-                            ShasMore(false)
-
-
-                        let apls = appeals.concat(e.data.appeals.edges)
-                        setEndCursor(e.data.appeals.pageInfo.endCursor)
-                        setAppeals(apls)
-                        lastGottenAppeals(apls)
-                        reachedEnd.current = true;
-                        setReachedEndState(true)
-
-
-                    }
-                } else {
-                }
-
-            }
-
+        gtAppeals.refetch({after: EndCursor(),}).then((value) => {
+            console.log(value.data.appeals.edges[value.data.appeals.edges.length - 1])
+            console.log(reactiveAppeals[reactiveAppeals.length - 1])
 
         })
+        // appealsResult.refetch({
+        //     after: endCursor
+        // }).then((e) => {
+        //     if (e.data.appeals === null) {
+        //     } else {
+        //         if (e.error === undefined) {
+        //
+        //             if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
+        //                 if (!e.data.appeals.pageInfo.hasNextPage)
+        //                     ShasMore(false)
+        //
+        //
+        //                 let apls = appeals.concat(e.data.appeals.edges)
+        //                 setEndCursor(e.data.appeals.pageInfo.endCursor)
+        //                 setAppeals(apls)
+        //                 lastGottenAppeals(apls)
+        //                 reachedEnd.current = true;
+        //                 setReachedEndState(true)
+        //
+        //
+        //             }
+        //         } else {
+        //         }
+        //
+        //     }
+        //
+        //
+        // })
         // if (!loading && appeals.length > 19) {
         //     if (lastCursor != appeals[appeals.length - 1]['cursor']) {
         //         lastCursor.current = (appeals[appeals.length - 1]['cursor'])
@@ -353,7 +388,7 @@ const Appeals = () => {
     }
 
 
-    let searchInput = (e: React.BaseSyntheticEvent) => {
+    let searchDebouncedFunction = useDebouncedCallback((e) => {
         setNothingFound(false)
         searcheText.current = e.target.value
         if (searcheText.current.length)
@@ -361,6 +396,7 @@ const Appeals = () => {
                 if (!e.error) {
                     if (e.data.appeals.edges.length === 0)
                         setNothingFound(true)
+                    console.log(e.data.appeals.edges)
                     setSearchedAppeals(e.data.appeals.edges)
                 }
             })
@@ -368,8 +404,18 @@ const Appeals = () => {
             setSearchLoading(false)
             setNothingFound(false)
         }
+    }, 600)
+
+    function onAppealScrollerScroll(event: UIEvent<HTMLDivElement>) {
+        LastAppealsScrollPosition(event.currentTarget.scrollTop)
     }
-    let searchDeb = _.debounce(searchInput, 1000)
+
+    useEffect(() => {
+        console.log(LastAppealsScrollPosition());
+        if (scrollerRef.current)
+            (scrollerRef.current as HTMLDivElement).scrollTo(0, LastAppealsScrollPosition())
+    }, []);
+
     return (
         <div className={'h-full relative overflow-scroll '} onScroll={onAdSectionScroll}>
             <ToastContainer transition={Slide}/>
@@ -381,10 +427,11 @@ const Appeals = () => {
                         }
 
                         setSearchLoading(true)
-                        searchDeb(e)
+                        searchDebouncedFunction(e)
                     }}/>
             <NewAppealButton hidden={scrollingToBottom}/>
-            <div className={'h-full overflow-scroll pb-32 pt-32'} ref={scrollerRef} id={'scrollable'}>
+            <div className={'h-full overflow-scroll pb-32 pt-32'} ref={scrollerRef} id={'scrollable'}
+                 onScroll={onAppealScrollerScroll}>
                 {nothingFound ?
                     <div className={'w-full flex flex-col items-center justify-center mt-44'}>
                         <span className={'IranSansMedium opacity-50'}>نتیجه ای یافت نشد</span>
@@ -406,35 +453,47 @@ const Appeals = () => {
                             _refreshLoading(() => {
                                 return true
                             })
-                            gtAppeals().then((e) => {
-                                _refreshLoading(() => {
-                                    return false
-                                })
-                                if (e.data.appeals === null) {
 
-                                } else {
-                                    if (e.error === undefined) {
-
-                                        _refreshLoading(() => {
-                                            return false
-                                        })
-
-                                        if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
-
-                                            let apls = appeals.concat(e.data.appeals.edges)
-                                            setEndCursor(e.data.appeals.pageInfo.endCursor)
-                                            setAppeals(e.data.appeals.edges)
-                                            lastGottenAppeals(e.data.appeals.edges)
-                                            reachedEnd.current = true;
-                                            setReachedEndState(true)
-                                        }
-                                    } else {
-                                    }
-
-                                }
+                            firstCatch.current = true;
+                            gtAppeals.refetch().then((value) => {
+                                let tempAppeals = reactiveAppeals
+                                tempAppeals.reverse()
+                                tempAppeals.concat(_.difference(value.data.appeals.edges, reactiveAppeals))
+                                tempAppeals.reverse()
+                                AppealsStore(tempAppeals)
+                                _refreshLoading(false)
 
 
                             })
+                            // gtAppeals().then((e) => {
+                            //     _refreshLoading(() => {
+                            //         return false
+                            //     })
+                            //     if (e.data.appeals === null) {
+                            //
+                            //     } else {
+                            //         if (e.error === undefined) {
+                            //
+                            //             _refreshLoading(() => {
+                            //                 return false
+                            //             })
+                            //
+                            //             if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
+                            //
+                            //                 let apls = appeals.concat(e.data.appeals.edges)
+                            //                 setEndCursor(e.data.appeals.pageInfo.endCursor)
+                            //                 setAppeals(e.data.appeals.edges)
+                            //                 lastGottenAppeals(e.data.appeals.edges)
+                            //                 reachedEnd.current = true;
+                            //                 setReachedEndState(true)
+                            //             }
+                            //         } else {
+                            //         }
+                            //
+                            //     }
+                            //
+                            //
+                            // })
 
 
                         }}
@@ -456,38 +515,68 @@ const Appeals = () => {
                                 <LoadingDialog wrapperClassName={'w-4 h-4 mr-2'} strokeWidth={4}/>
                             </div>
                         }
-                        {
-                            searchedAppeals.length ?
-                                searchedAppeals.map((ad: any, index: number) => {
-                                        let Appeal = ad.node
-                                        if (Appeal.status && Appeal.status !== "DELETED")
-                                            return (appealUI(Appeal, index, index + 'i', Appeal.id))
-                                    }
-                                )
-                                :
-                                appeals.length && !nothingFound ?
-                                    appeals.map((ad: any, index: number) => {
 
-
-                                            let Appeal = ad.node
-                                            if (Appeal.status && Appeal.status !== "DELETED")
-                                                return (appealUI(Appeal, index, index + 'i1', Appeal.id))
-                                        }
-                                    )
-                                    : lastGottenAppealsState ?
-                                        lastGottenAppealsState.map((ad: any, index: number) => {
-                                                let Appeal = ad.node
-                                                if (Appeal.status && Appeal.status !== "DELETED")
-                                                    return (appealUI(Appeal, index, index + 'i2', Appeal.id))
-                                            }
-                                        ) : null
-
+                        {searchedAppeals.length ?
+                            searchedAppeals.map((ad: any, index: number) => {
+                                console.log(ad)
+                                console.log('this is searched')
+                                let Appeal = ad.node
+                                console.log(Appeal.status)
+                                if (Appeal.status !== "DELETED")
+                                    return (appealUI(Appeal, index, index + 'i', Appeal.id))
+                            })
+                            :
+                            reactiveAppeals.map((ad: any, index: number) => {
+                                let Appeal = ad.node
+                                if (Appeal.status && Appeal.status !== "DELETED")
+                                    return (appealUI(Appeal, index, index + 'i', Appeal.id))
+                            })
                         }
+
                         {
-                            loading && !appeals.length ?
-                                appealsSkeleton(5)
-                                : null
                         }
+                        {/*{*/}
+                        {/*    gtAppeals.data ?*/}
+                        {/*        gtAppeals.data.appeals.edges.map((ad: any, index: number) => {*/}
+                        {/*            let Appeal = ad.node*/}
+                        {/*            if (Appeal.status && Appeal.status !== "DELETED")*/}
+                        {/*                return (appealUI(Appeal, index, index + 'i', Appeal.id))*/}
+                        {/*        })*/}
+                        {/*        :*/}
+                        {/*        <div></div>*/}
+                        {/*}*/}
+                        {/*{*/}
+                        {/*    searchedAppeals.length ?*/}
+                        {/*        searchedAppeals.map((ad: any, index: number) => {*/}
+                        {/*                let Appeal = ad.node*/}
+                        {/*                if (Appeal.status && Appeal.status !== "DELETED")*/}
+                        {/*                    return (appealUI(Appeal, index, index + 'i', Appeal.id))*/}
+                        {/*            }*/}
+                        {/*        )*/}
+                        {/*        :*/}
+                        {/*        appeals.length && !nothingFound ?*/}
+                        {/*            appeals.map((ad: any, index: number) => {*/}
+
+
+                        {/*                    let Appeal = ad.node*/}
+                        {/*                    if (Appeal.status && Appeal.status !== "DELETED")*/}
+                        {/*                        return (appealUI(Appeal, index, index + 'i1', Appeal.id))*/}
+                        {/*                }*/}
+                        {/*            )*/}
+                        {/*            : lastGottenAppealsState ?*/}
+                        {/*                lastGottenAppealsState.map((ad: any, index: number) => {*/}
+                        {/*                        let Appeal = ad.node*/}
+                        {/*                        if (Appeal.status && Appeal.status !== "DELETED")*/}
+                        {/*                            return (appealUI(Appeal, index, index + 'i2', Appeal.id))*/}
+                        {/*                    }*/}
+                        {/*                ) : null*/}
+
+                        {/*}*/}
+                        {/*{*/}
+                        {/*    loading && !appeals.length ?*/}
+                        {/*        appealsSkeleton(5)*/}
+                        {/*        : null*/}
+                        {/*}*/}
                     </InfiniteScroll>
                 }
                 {/*{*/}

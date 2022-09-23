@@ -3,15 +3,15 @@ import Search from "../../components/normal/Search/Search";
 import Add from '../../assets/svgs/add.svg'
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
-import {EditBookData, lastBookSubmitSuccess} from "../../store/books";
+import {BooksEndCursor, EditBookData, LastBooksScrollPosition, lastBookSubmitSuccess} from "../../store/books";
 import Toast from "../../components/normal/Toast/Toast";
-import {gql, useLazyQuery} from "@apollo/client";
+import {gql, useLazyQuery, useQuery, useReactiveVar} from "@apollo/client";
 import ThousandTomans from "../../assets/svgs/thousandTomans.svg";
 import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
 import GalleryImageSVG from "../../assets/svgs/galleryImageW.svg";
 import DownloadOutline from "../../assets/svgs/downloadOutline.svg";
 import SkeletonElement from "../../components/view/Skeleton/Skeleton";
-import {lastGottenBooks} from "../../store/books";
+import {BooksStore} from "../../store/books";
 import InfiniteScroll from "react-infinite-scroll-component";
 import _ from 'lodash';
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
@@ -21,6 +21,8 @@ import NoPic from "../../components/normal/NoPic/NoPic";
 import Free from '../../assets/svgs/free.svg'
 import {UNIMUN_PROVIDERS} from "../../store/GLOBAL_VARIABLES";
 import {currentNavActiveIndex} from "../../store/navbar";
+import {EndCursor} from "../../store/appeals";
+import {useDebouncedCallback} from "use-debounce";
 
 const Index = () => {
 
@@ -33,11 +35,15 @@ const Index = () => {
     const [searchLoading, _searchLoading] = useState(false);
     const [nothingFound, _nothingFound] = useState(false);
     const [refreshLoading, _refreshLoading] = useState(false)
-
-
+    const reactiveBooks = useReactiveVar(BooksStore)
+    const [searchedBooks, setSearchedBooks] = useState([] as any);
     const getBooksQuery = gql`
         query getBooks($first:Int $searchText:String $after:String){
             books(first: $first,searchText: $searchText,after: $after){
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
                 edges {
                     cursor
                     node {
@@ -74,37 +80,34 @@ const Index = () => {
     `;
 
 
-    const [getBooks, getBooksResult] = useLazyQuery(getBooksQuery);
+    const getBooks = useQuery(getBooksQuery);
+    const [searchBooks] = useLazyQuery(getBooksQuery);
+
 
     useEffect(() => {
-
-        if (lastGottenBooks().length) {
-            _books(lastGottenBooks() as never[])
-        }
-
-        getBooks({
-            variables: {
-                after: books.length ? books[books.length - 1]['cursor'] : ''
-            }
-        }).then(e => {
-
-            console.log(e)
-
+        if (getBooks.data) {
             try {
-                if (e.data.books.edges) {
+                if (getBooks.data.books.edges) {
 
                     let Books = [] as object[]
-                    e.data.books.edges.forEach((book: { node: any }) => {
+                    getBooks.data.books.edges.forEach((book: { node: any }) => {
                         Books.push(book.node)
                     })
                     _books(Books as never[])
-                    lastGottenBooks(Books as never[])
+                    BooksStore(Books as never[])
+                    BooksEndCursor(getBooks.data.books.pageInfo.endCursor)
                 }
+                if (!getBooks.data.books.pageInfo.hasNextPage)
+                    _hasMore(false)
 
             } catch (e) {
                 console.log(e)
             }
-        })
+
+        }
+    }, [getBooks.data]);
+
+    useEffect(() => {
 
 
         if (lastBookSubmitSuccess().length) {
@@ -166,6 +169,7 @@ const Index = () => {
 
 
     const onAdSectionScroll = (event: any) => {
+        LastBooksScrollPosition(event.currentTarget.scrollTop)
         try {
             let scroll = event.target.scrollTop
 
@@ -180,26 +184,108 @@ const Index = () => {
             console.log(e)
         }
     }
+    useEffect(() => {
+        if (booksDivRef.current)
+            booksDivRef.current.scrollTo(0, LastBooksScrollPosition())
+    }, []);
 
-    const searchDeb = _.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    // const searchDeb = _.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    //
+    //     getBooks({
+    //         variables: {
+    //             searchText: e.target.value,
+    //             first: 20,
+    //             after: ''
+    //         }
+    //     }).then((result) => {
+    //         console.log(result)
+    //
+    //         try {
+    //
+    //             let Books = [] as object[]
+    //             result.data.books.edges.forEach((book: { node: any }) => {
+    //                 Books.push(book.node)
+    //             })
+    //             _books(Books as never[])
+    //
+    //
+    //             if (result.data.books.edges.length === 0) {
+    //                 _nothingFound(true)
+    //             } else {
+    //                 _nothingFound(false)
+    //             }
+    //
+    //
+    //         } catch (e) {
+    //             Toast('خطا هنگام دریافت کتاب ها')
+    //         }
+    //
+    //         _searchLoading(false)
+    //     })
+    //
+    // }, 1000)
 
-        getBooks({
+
+    const getNewBooks = () => {
+        if (hasMore) {
+
+            getBooks.refetch({
+                searchText: '',
+                first: 10,
+                after: EndCursor()
+            }).then((value) => {
+                console.log(value)
+
+            })
+            // getBooks({
+            //     variables: {
+            //         searchText: '',
+            //         first: 10,
+            //         after: books.length ? books[books.length - 1]['cursor'] : ''
+            //     }
+            // }).then((result) => {
+            //         console.log(result)
+            //
+            //         try {
+            //             let Books = [] as object[]
+            //             result.data.books.edges.forEach((book: { node: any }) => {
+            //                 Books.push(book.node)
+            //             })
+            //             //get last element of books
+            //             let lastBook = books[books.length - 1]
+            //             if ((lastBook as {
+            //                 cursor: string
+            //             }).cursor === (Books[Books.length - 1] as {
+            //                 cursor: string
+            //             })['cursor']) {
+            //                 _hasMore(false)
+            //             } else
+            //                 _books(books.concat(Books as never[]))
+            //         } catch (e) {
+            //             Toast('خطا هنگام دریافت کتاب ها')
+            //         }
+            //     }
+            // )
+        }
+
+    }
+
+    const searchDeb = useDebouncedCallback((e) => {
+
+        searchBooks({
             variables: {
                 searchText: e.target.value,
                 first: 20,
                 after: ''
             }
-        }).then((result) => {
-            console.log(result)
-
+        }).then((result: any) => {
             try {
 
                 let Books = [] as object[]
                 result.data.books.edges.forEach((book: { node: any }) => {
                     Books.push(book.node)
                 })
-                _books(Books as never[])
-
+                setSearchedBooks(Books as never[])
 
                 if (result.data.books.edges.length === 0) {
                     _nothingFound(true)
@@ -215,42 +301,8 @@ const Index = () => {
             _searchLoading(false)
         })
 
-    }, 1000)
-
-
-    const getNewBooks = () => {
-        if (hasMore)
-            getBooks({
-                variables: {
-                    searchText: '',
-                    first: 10,
-                    after: books.length ? books[books.length - 1]['cursor'] : ''
-                }
-            }).then((result) => {
-                    console.log(result)
-
-                    try {
-                        let Books = [] as object[]
-                        result.data.books.edges.forEach((book: { node: any }) => {
-                            Books.push(book.node)
-                        })
-                        //get last element of books
-                        let lastBook = books[books.length - 1]
-                        if ((lastBook as {
-                            cursor: string
-                        }).cursor === (Books[Books.length - 1] as {
-                            cursor: string
-                        })['cursor']) {
-                            _hasMore(false)
-                        } else
-                            _books(books.concat(Books as never[]))
-                    } catch (e) {
-                        Toast('خطا هنگام دریافت کتاب ها')
-                    }
-                }
-            )
-    }
-
+    }, 600)
+    const booksDivRef = useRef<HTMLDivElement>(null);
     return (
         <div className={'h-full relative '}>
             <div id={'dimmer'}
@@ -264,13 +316,12 @@ const Index = () => {
             <Search lib={true} onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 if (e.target.value.replace(/ /g, '') === '') {
                     _searchLoading(false)
-                    _books(lastGottenBooks())
-                    _nothingFound(true)
+                    _nothingFound(false)
+                    setSearchedBooks([])
                 } else {
                     _searchLoading(true)
-
+                    searchDeb(e)
                 }
-                searchDeb(e)
 
             }} collapse={scrollingToBottom} searchLoading={searchLoading}/>
 
@@ -279,7 +330,7 @@ const Index = () => {
 
 
             <div className={'h-full overflow-scroll pb-32 pt-32'} onScroll={onAdSectionScroll}
-                 id={'scroller-library'}>
+                 id={'scroller-library'} ref={booksDivRef}>
                 {
                     nothingFound ?
                         <div className={'w-full flex flex-col items-center justify-center mt-44'}>
@@ -287,7 +338,7 @@ const Index = () => {
                         </div> :
 
                         <InfiniteScroll
-                            pullDownToRefresh={!refreshLoading && !getBooksResult.loading}
+                            pullDownToRefresh={!refreshLoading && !getBooks.loading}
                             releaseToRefreshContent={<div
                                 className={'h-12 pb-4  w-full text-center IranSansMedium text-sm flex flex-col items-center justify-center'}>
                                 رها کنید
@@ -298,9 +349,9 @@ const Index = () => {
                             </div>}
                             pullDownToRefreshThreshold={70}
                             refreshFunction={() => {
-                                if (!getBooksResult.loading)
+                                if (!getBooks.loading)
                                     _refreshLoading(true)
-                                getBooksResult.refetch().then((result) => {
+                                getBooks.refetch().then((result) => {
 
                                     console.log(result)
                                     try {
@@ -334,14 +385,14 @@ const Index = () => {
                             {
 
                                 <div
-                                    className={`${(refreshLoading || getBooksResult.loading) ? 'pt-3 h-8' : 'h-0 overflow-hidden '}  duration-100 eas-in-out w-full text-center IranSansMedium text-sm  flex flex-row items-center justify-center `}>
+                                    className={`${(refreshLoading || getBooks.loading) ? 'pt-3 h-8' : 'h-0 overflow-hidden '}  duration-100 eas-in-out w-full text-center IranSansMedium text-sm  flex flex-row items-center justify-center `}>
                                     دریافت کتاب ها
                                     <LoadingDialog wrapperClassName={'w-4 h-4 mr-2'} strokeWidth={4}/>
                                 </div>
                             }
 
                             {
-                                books.map((book: {
+                                (searchedBooks.length ? searchedBooks : reactiveBooks).map((book: {
                                     title: string
                                     category: { title: string }
                                     appearance: {
@@ -357,7 +408,8 @@ const Index = () => {
                                     writer: string
                                     id: string
                                     creator: { name: string, id: string }
-                                }, index) => {
+                                }, index: number) => {
+                                    console.log(book)
 
                                     if (book.status === 'DELETED')
                                         return null
@@ -532,7 +584,7 @@ const Index = () => {
                             }
 
                             {
-                                getBooksResult.loading ?
+                                getBooks.loading ?
                                     bookSkeleton(8)
                                     :
                                     null
