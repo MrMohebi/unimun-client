@@ -43,7 +43,6 @@ const Appeals = () => {
     const [endCursor, setEndCursor] = useState('');
     const dragPos = useRef({top: 0, left: 0, x: 0, y: 0});
     const router = useRouter();
-
     const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen', 'id', 'hashtags', 'status'])
 
 
