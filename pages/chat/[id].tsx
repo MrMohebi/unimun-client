@@ -54,7 +54,7 @@ const ChatScreen = () => {
         `
 
 
-        const [sendMoneyRequest, sendMoneyRequestResult] = useMutation(CREATE_REQUEST_MUTATION, {client: clientChat})
+        const [sendMoneyRequest] = useMutation(CREATE_REQUEST_MUTATION, {client: clientChat})
         const chatsSubscriptionRequest = gql`
 
             subscription onNewMessage {
@@ -190,7 +190,7 @@ const ChatScreen = () => {
                 }
             }
         `
-        const [chatMessages, chatMessagesResult] = useLazyQuery(chatMessagesQuery, {client: clientChat})
+        const [chatMessages] = useLazyQuery(chatMessagesQuery, {client: clientChat})
 
         const firstCatch = useRef(true)
 
@@ -267,7 +267,7 @@ const ChatScreen = () => {
                 }
             }
         `
-        const [newMessage, newMessageResult] = useMutation(newMessageMutation, {client: clientChat})
+        const [newMessage] = useMutation(newMessageMutation, {client: clientChat})
         const sendMessageBtn = useRef<HTMLImageElement>(null);
 // 0, chatScrollerRef.current.getBoundingClientRect().height
 
@@ -288,9 +288,7 @@ const ChatScreen = () => {
         }
 
 
-        function moreOnClick() {
-            scrollToBottom()
-        }
+
 
         return (
             <div ref={chatBoxRef} className={'w-full h-full overflow-scroll  pb-12 scroll-smooth'}>
@@ -498,7 +496,7 @@ const ChatScreen = () => {
                                                                         tempId: item.tempId,
                                                                         isCanceled: true
                                                                     }
-                                                                }).then((value) => {
+                                                                }).then(() => {
                                                                 })
 
                                                             }}
@@ -606,7 +604,7 @@ const ChatScreen = () => {
 
                         {
                             currentChatStat === 'write' ?
-                                <img src={'/assets/svgs/send.svg'}
+                                <img alt={'Send Message'} src={'/assets/svgs/send.svg'}
                                      className={'text-primary IranSansMedium text-sm h-6 w-6 animate__animated'}
                                      onClick={() => {
                                          let messageText = (document.getElementById('text-chat') as HTMLInputElement)!.value
@@ -617,7 +615,7 @@ const ChatScreen = () => {
                                                  chatID: id,
                                                  text: messageText
                                              }
-                                         }).then((value) => {
+                                         }).then(() => {
                                          });
                                          //     // addMessage((document.getElementById('text-chat') as HTMLInputElement)!.value);
                                          (document.getElementById('text-chat') as HTMLInputElement)!.value = ""
@@ -641,7 +639,7 @@ const ChatScreen = () => {
                                         :
                                         currentChatStat === 'payRequest' ?
 
-                                            <img src={'/assets/svgs/send.svg'}
+                                            <img alt={'Send Pay Request'} src={'/assets/svgs/send.svg'}
                                                  className={'text-primary IranSansMedium text-sm h-6 w-6  animate__animated '}
                                                  onClick={() => {
                                                      let messageText = (document.getElementById('text-chat') as HTMLInputElement)!.value
@@ -666,7 +664,7 @@ const ChatScreen = () => {
                                                                  ...idObject,
                                                                  ...requestParamsObject
                                                              }
-                                                         }).then((value) => {
+                                                         }).then(() => {
                                                              setPayRequestOpen(false)
                                                          });
                                                          setCurrentEditPayRequestData(produce((draft) => {
@@ -684,7 +682,7 @@ const ChatScreen = () => {
                                                                  description: messageText
 
                                                              }
-                                                         }).then((value) => {
+                                                         }).then(() => {
                                                              setPayRequestOpen(false)
                                                          });
                                                      }

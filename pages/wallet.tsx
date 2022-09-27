@@ -85,7 +85,7 @@ const Wallet = () => {
     const getTransactions = useQuery(GET_TRANSACTIONS_QUERY)
     const [chargeWallet] = useMutation(CHARGE_WALLLET_QUERY)
     const [getSupportChat] = useLazyQuery(GET_SUPPORT_CHAT_QUERY, {client: clientChat})
-    const [newMessage, newMessageResult] = useMutation(NEW_MESSAGE_MUTATION, {client: clientChat})
+    const [newMessage] = useMutation(NEW_MESSAGE_MUTATION, {client: clientChat})
     const [chargeWalletOpen, setChargeWalletOpen] = useState(false);
     const [chargeWalletAmount, setChargeWalletAmount] = useState(0);
     const router = useRouter()
@@ -283,7 +283,7 @@ const Wallet = () => {
             <Drawer initScroll={900} initHeight={drawerInitLimit} minHeight={700} wrap={
                 <div className={'w-full grid grid-cols-3 px-3 pt-10'} ref={divRef}>
                     <div className={'col-span-2 p-2 relative'}>
-                        <img className={'relative rounded-2xl overflow-hidden w-full  '} src="assets/svgs/jib-back.png"
+                        <img className={'relative rounded-2xl overflow-hidden w-full  '} src="/assets/svgs/jib-back.png"
                              alt=""/>
                         <div
                             className={'absolute top-0 left-0 w-full h-full px-4 pt-2 pb-5 flex flex-col justify-between items-center'}>
@@ -342,7 +342,7 @@ const Wallet = () => {
 
                     <div className={'col-span-1 flex flex-col-reverse justify-center items-center'}>
                         <img className={' rounded-2xl overflow-hidden w-full h-full py-2  '}
-                             src="assets/svgs/unicoin.png" alt=""/>
+                             src="/assets/svgs/unicoin.png" alt=""/>
 
                     </div>
 
@@ -384,23 +384,26 @@ const Wallet = () => {
                                 deposit = true;
 
                             return (
-                                <Button className={"w-full flex flex-row justify-between items-center px-3"}>
+                                <div key={'in' + index} className={'contents'}>
+                                    <Button className={"w-full flex flex-row justify-between items-center px-3"}>
 
-                                    <div className={'flex flex-row justify-start items-center h-14 IranSans'}>
-                                        <img
-                                            src={`/assets/svgs/${deposit ? 'deposit-transaction.svg' : 'withdraw-transaction.svg'}`}
-                                            alt=""/>
-                                        <span>{deposit ? 'واریز به حساب' : 'برداشت از حساب'}</span>
-                                        <span
-                                            className={'text-gray-400 text-sm mr-2'}>{passedTime(transaction.createdAt)}</span>
-                                    </div>
+                                        <div className={'flex flex-row justify-start items-center h-14 IranSans'}>
+                                            <img
+                                                src={`/assets/svgs/${deposit ? 'deposit-transaction.svg' : 'withdraw-transaction.svg'}`}
+                                                alt=""/>
+                                            <span>{deposit ? 'واریز به حساب' : 'برداشت از حساب'}</span>
+                                            <span
+                                                className={'text-gray-400 text-sm mr-2'}>{passedTime(transaction.createdAt)}</span>
+                                        </div>
 
-                                    <div className={'flex flex-row justify-end items-center'}>
+                                        <div className={'flex flex-row justify-end items-center'}>
                                 <span
                                     className={'IranSans ml-2'}>{transaction.amountToman ? transaction.amountToman.toLocaleString() : 0}</span>
-                                        <img className={'invert-[0.5]'} src="/assets/svgs/toman.svg" alt=""/>
-                                    </div>
-                                </Button>)
+                                            <img className={'invert-[0.5]'} src="/assets/svgs/toman.svg" alt=""/>
+                                        </div>
+                                    </Button>
+                                </div>
+                            )
                         })}
                         {
                             !transactions.length ?

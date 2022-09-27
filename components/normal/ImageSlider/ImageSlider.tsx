@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import gsap from 'gsap'
 import {ScrollTrigger} from 'gsap/dist/ScrollTrigger'
+import {DOWNLOAD_HOST} from "../../../store/GLOBAL_VARIABLES";
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -11,13 +12,12 @@ interface Props {
 const ImageSlider = (props: Props) => {
 
         let bookImages = useRef([] as Array<HTMLDivElement>);
-        let trigger = useRef(null);
         const imageScroller = useRef<HTMLDivElement>(null);
         const [images, setImages] = useState(['', '', '', '', '']);
 
         useEffect(() => {
                 let imgCopy = [] as Array<string>;
-                props.images.forEach((item, index) => {
+                props.images.forEach((item) => {
                     imgCopy.push(item.preview);
                 })
 
@@ -35,8 +35,9 @@ const ImageSlider = (props: Props) => {
                     images.map((image, index) => {
                         return (
                             <div key={index + 'ed'} className={'relative contents'}>
-                                <img key={'image' + index} src={"https://dl.unimun.me/" + images[index]}
-                                     className={`h-44 w-32 ${true ? 'h-44 w-32' : 'h-40 w-28'} overflow-hidden  rounded-xl mx-2 mt-10 snap-center`}
+                                <img alt={index + "image"} key={'image' + index}
+                                     src={DOWNLOAD_HOST() + images[index]}
+                                     className={`h-44 w-32 h-44 w-32 overflow-hidden  rounded-xl mx-2 mt-10 snap-center`}
                                      ref={(el) => {
                                          if (el)
                                              bookImages.current[index] = el

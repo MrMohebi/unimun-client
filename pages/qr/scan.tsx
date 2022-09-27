@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Library from '../../assets/svgs/library.svg';
 // @ts-ignore
 import ImageCapture from "react-image-data-capture";
@@ -6,12 +6,10 @@ import {useRouter} from "next/router";
 import {UserToken} from "../../store/user";
 import dynamic from "next/dynamic";
 import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
-import Header from "../../components/common/Header/Header";
 
 // @ts-ignore
 const QrScan = dynamic(() => import('react-qr-reader'), {ssr: false})
 const Scan = () => {
-    const [data, setData] = useState("")
     const router = useRouter()
     const [loadingDialog, setLoadingDialog] = useState(false);
 
@@ -31,7 +29,6 @@ const Scan = () => {
 
     }, [])
 
-    const config = useMemo(() => ({video: true}), []);
 
 
     return (
@@ -44,7 +41,7 @@ const Scan = () => {
                     router.push('/')
                 }} className={'w-8 h-8 rotate-180'} alt=""/>
             </div>
-            <img src={''} id={'dasf'}></img>
+            <img alt={'Library'} src={''} id={'dasf'}></img>
             <div className={'w-full pt-16  flex flex-col justify-center items-center  '}>
                 <div className={'w-24'}>
                     <Library/>
@@ -68,7 +65,6 @@ const Scan = () => {
                             console.log(e)
                         }}
                         onScan={(e: any) => {
-                            let local = true
                             if (e) {
                                 if (e.toString().includes('qr.unimun')) {
                                     console.log(e)
@@ -77,7 +73,6 @@ const Scan = () => {
                                 }
 
 
-                                // router.push("/qr/preview")
                             }
 
                         }}
