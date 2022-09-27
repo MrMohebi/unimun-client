@@ -13,7 +13,6 @@ import DownloadOutline from "../../assets/svgs/downloadOutline.svg";
 import SkeletonElement from "../../components/view/Skeleton/Skeleton";
 import {BooksStore} from "../../store/books";
 import InfiniteScroll from "react-infinite-scroll-component";
-import _ from 'lodash';
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 import Unimun from '../../assets/svgs/unimun.svg'
 import {UserToken} from "../../store/user";
@@ -614,7 +613,7 @@ const Index = () => {
 
 
             <div
-                className={`fixed right-7 bottom-40 flex flex-col items-start justify-center transition-all z-50 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
+                className={`fixed right-7 bottom-40 flex flex-col items-start justify-center  transition-all z-50 duration-200 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
                 <Button id={'new-note-option'} rippleColor={'rgba(0,0,0,0.24)'} onClick={() => {
                     // isBrochure(true)
                     if (UserToken())
@@ -623,7 +622,7 @@ const Index = () => {
                         router.push('profile/login')
 
                 }}
-                        className={`h-14 w-32 mb-4 bg-white rounded-2xl flex flex-col justify-center items-center px-5 IranSansMedium transition-all  ease-in-out duration-200 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>اسکن
+                        className={`h-14 w-32 mb-4 bg-white rounded-2xl flex flex-col justify-center items-center px-5   IranSansMedium transition-all  ease-in-out duration-300 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>اسکن
                     بارکد</Button>
                 <Button onClick={() => {
                     EditBookData({})
@@ -633,7 +632,7 @@ const Index = () => {
                         router.push('profile/login')
 
                 }} id={'new-book-option'} rippleColor={'rgba(0,0,0,0.24)'}
-                        className={`h-14 w-32 bg-white rounded-2xl flex flex-col justify-center items-center px-5 IranSansMedium delay-75 transition-all ease-in-out duration-200 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
+                        className={`h-14 w-32 bg-white rounded-2xl flex flex-col justify-center items-center px-5 IranSansMedium  transition-all ease-in-out duration-200 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
                     افزودن کتاب
                 </Button>
                 <Button id={'new-note-option'} rippleColor={'rgba(0,0,0,0.24)'} onClick={() => {
@@ -644,7 +643,7 @@ const Index = () => {
                         router.push('profile/login')
 
                 }}
-                        className={`h-14 w-32 mt-4 bg-white rounded-2xl flex flex-col justify-center items-center px-5 IranSansMedium transition-all  ease-in-out duration-200 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
+                        className={`h-14 w-32 mt-4 bg-white rounded-2xl flex flex-col justify-center items-center px-5 IranSansMedium transition-all  ease-in-out duration-75 ${newBookButtonOpened ? "opacity-100 scale-100 -translate-y-0" : "translate-y-full opacity-0 scale-50 pointer-events-none"}`}>
                     افزودن جزوه
                 </Button>
 

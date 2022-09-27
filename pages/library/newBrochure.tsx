@@ -6,11 +6,7 @@ import Step from "../../components/view/StepperFtagment/Step/Step";
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import Dimmer from "../../components/view/Dimmer/Dimmer";
-import GallerySVG from "../../assets/svgs/gallery.svg";
 import {uploadBookFile, uploadBookImages, uploadImage} from "../../Requests/uploadRequests";
-import NewPhotoSVG from "../../assets/svgs/newPhoto.svg";
-import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
-import GalleryImageSVG from "../../assets/svgs/galleryImage.svg";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 import FileUploadSVG from "../../assets/svgs/fileUpload.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
@@ -29,7 +25,6 @@ import {ToastContainer} from "react-toastify";
 import Semesters from "../../components/normal/Semesters/Semesters";
 import _ from "lodash";
 import {fixPrice} from "../../helpers/fixPrice";
-import Book from "./book/[id]";
 import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUpload";
 
 const NewBrochure = () => {
@@ -291,7 +286,7 @@ const NewBrochure = () => {
                     term: BookData.term,
                     university: BookData.university,
                     price: BookData.price,
-                    pages: parseInt(BookData.pages),
+                    pages: 100,
                 }
             }).then((e) => {
                 try {
@@ -541,7 +536,9 @@ const NewBrochure = () => {
                                         console.log(BookData)
 
                                         return <div key={index + 'imageUpload'} className={'contents'}>
-                                            <BookImageUpload defaultImage={uploadedImages[index]} isFirst={index === 0}
+                                            <BookImageUpload onImageClick={() => {
+
+                                            }} defaultImage={uploadedImages[index]} isFirst={index === 0}
                                                              id={index.toString()}
                                                              onUploadComplete={(e: any) => {
                                                                  let _bookAttachments: any[] = BookData.attachments;
@@ -785,6 +782,7 @@ const NewBrochure = () => {
                                        placeHolder={'تعداد'}
                                        onChange={(e: InputEvent) => {
                                            let el = e.currentTarget as HTMLTextAreaElement
+                                           console.log(el.value)
                                            updateBookData('pages', el.value)
                                        }}
                                 />

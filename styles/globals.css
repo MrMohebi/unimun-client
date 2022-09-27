@@ -410,8 +410,8 @@ body * {
 }
 
 * {
-    user-select: none;
-    scroll-behavior: auto;
+  user-select: none;
+  scroll-behavior: auto;
 }
 
 .english {
@@ -543,9 +543,14 @@ input:focus {
     max-height: 200px;
   }
 }
+
 .white-scan section section div {
-    box-shadow: rgba(255, 255, 255, 0.7) 0px 0px 0px 5px inset !important;
-    border-radius: 70px;
+  box-shadow: rgba(255, 255, 255, 0.7) 0px 0px 0px 5px inset !important;
+  border-radius: 70px;
+}
+
+.free-checkbox {
+  @apply flex flex-col justify-center items-center relative border-2 border-gray-400 after:w-full  checked:border-0 after:h-full after:content-[] checked:after:content-[url("/assets/svgs/check-box.svg")] h-5 w-5 rounded;
 }
 
 /*# sourceMappingURL=globals.css.map */

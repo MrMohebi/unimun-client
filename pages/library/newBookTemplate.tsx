@@ -6,11 +6,7 @@ import Step from "../../components/view/StepperFtagment/Step/Step";
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import Dimmer from "../../components/view/Dimmer/Dimmer";
-import GallerySVG from "../../assets/svgs/gallery.svg";
-import {uploadBookFile, uploadBookImages, uploadImage} from "../../Requests/uploadRequests";
-import NewPhotoSVG from "../../assets/svgs/newPhoto.svg";
-import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
-import GalleryImageSVG from "../../assets/svgs/galleryImage.svg";
+import {uploadBookFile} from "../../Requests/uploadRequests";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 import FileUploadSVG from "../../assets/svgs/fileUpload.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
@@ -19,7 +15,6 @@ import {gql, useMutation} from "@apollo/client";
 import Toman from '../../assets/svgs/toman.svg'
 import BookCategories from "../../components/normal/BookCategories/BookCategories";
 import BookAppearance from "../../components/normal/BookAppearance/BookAppearance";
-import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
 import {EditBookData, isBrochure, lastBookSubmitSuccess} from "../../store/books";
 import Trash from '../../assets/svgs/trash.svg'
 import TelInputSVG from "../../assets/svgs/telInput.svg";
@@ -541,7 +536,9 @@ const NewBook = () => {
                                     console.log(BookData)
 
                                     return <div key={index + 'imageUpload'} className={'contents'}>
-                                        <BookImageUpload defaultImage={uploadedImages[index]} isFirst={index === 0}
+                                        <BookImageUpload onImageClick={() => {
+                                            alert('nothing happens here yet...')
+                                        }} defaultImage={uploadedImages[index]} isFirst={index === 0}
                                                          id={index.toString()}
                                                          onUploadComplete={(e: any) => {
                                                              let backBook = produce(BookData.attachments, (draft: any) => {

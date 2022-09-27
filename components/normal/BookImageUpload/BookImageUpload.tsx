@@ -13,7 +13,9 @@ const BookImageUpload = (props: {
     onError: Function,
     id: string,
     isFirst: boolean,
-    defaultImage: string
+    defaultImage: string,
+    onImageClick: Function,
+    index?: number
 }) => {
 
     const [uploadingProgress, setUploadingProgress] = useState(0);
@@ -35,6 +37,8 @@ const BookImageUpload = (props: {
 
     return (
         <div className={'relative h-36 w-24 pointer-events-none overflow-hidden mt-4'}>
+
+
             {!uploadedImageURL ?
 
                 <input type={'file'}
@@ -75,12 +79,17 @@ const BookImageUpload = (props: {
                 }}/>
 
                 :
-                null
+                <div className={'w-full h-full absolute opacity-0 pointer-events-auto'} onClick={() => {
+                    props.onImageClick(props.index)
+                    console.log('clicked')
+                }}></div>
             }
 
 
-            <div
-                className={`new-photo relative overflow-hidden h-36 w-24 flex flex-col justify-center items-center rounded-2xl ${props.isFirst ? "border" : "border-dashed"} border-2  relative `}>
+            <div onClick={() => {
+                props.onImageClick()
+            }}
+                 className={`new-photo relative overflow-hidden h-36 w-24 flex flex-col justify-center items-center rounded-2xl ${props.isFirst ? "border" : "border-dashed"} border-2  relative `}>
                 {
                     uploadedImageURL ?
                         <img className={'w-full h-full scale-[1.1] object-cover'} src={uploadedImageURL}

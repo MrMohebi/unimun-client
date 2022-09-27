@@ -4,7 +4,9 @@ import Tab from "../../components/view/Tab/Tab";
 import Edit from '../../assets/svgs/edit.svg'
 import Delete from '../../assets/svgs/delete.svg'
 import Seen from '../../assets/svgs/eye.svg'
+import FreeSVG from '../../assets/svgs/free.svg'
 import Toman from '../../assets/svgs/toman.svg'
+
 import {gql, useLazyQuery, useMutation} from "@apollo/client";
 import {useRouter} from "next/router";
 import {UserToken} from "../../store/user";
@@ -14,6 +16,7 @@ import {ToastContainer} from "react-toastify";
 import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
 import DropDown from "../../components/view/DropDown/DropDown";
 import {EditBookData} from "../../store/books";
+
 
 const MyBooks = () => {
 
@@ -319,12 +322,26 @@ const MyBooks = () => {
 
                                         </DropDown>
 
+
                                         <div dir={'ltr'}
                                              className={'IranSansMedium text-sm text-textBlack text-left col-span-1 w-full  self-center ml-2 flex flex-grow justify-start items-center'}>
-                                            <div className={' w-4 h-4 '}><Toman/></div>
-                                            <span
-                                                className={'block ml-1'}>{book.price ? book.price.toString().split('').reverse().join('').replace(/(\d{3}(?!$))/g, '$1,').split('').reverse().join('') : '0'}</span>
+
+                                            {
+                                                book.price ?
+                                                    <div className={'contents'}>
+                                                        <div className={' w-4 h-4 '}><Toman/></div>
+                                                        <span
+                                                            className={'block ml-1'}>{book.price ? book.price.toString().split('').reverse().join('').replace(/(\d{3}(?!$))/g, '$1,').split('').reverse().join('') : '0'}</span>
+
+                                                    </div>
+                                                    :
+                                                    <div
+                                                        className={'h-8 w-8 flex flex-row justify-center items-center'}>
+                                                        <FreeSVG/></div>
+
+                                            }
                                         </div>
+
 
                                     </div>
                                 </div>

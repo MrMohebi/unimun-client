@@ -45,12 +45,7 @@ const Appeals = () => {
     const router = useRouter();
 
     const AppealsQuery = getAppealsQuery(['title', 'createdAt', 'details', 'priceStart', 'priceEnd', 'seen', 'id', 'hashtags', 'status'])
-    const [getAppeals, {
-        data,
-        loading,
-        error,
-        refetch
-    }] = useLazyQuery(gql`${AppealsQuery.query}`);
+
 
     const _getAppealsQuery = gql`
         query getAppeals($after:String){
@@ -137,46 +132,6 @@ const Appeals = () => {
         firstCatch.current = false;
     }, [gtAppeals.data]);
 
-    useEffect(() => {
-        if (!data && !loading) {
-
-
-            // gtAppeals().then((e) => {
-            //     if (e.data.appeals === null) {
-            //
-            //     } else {
-
-            //         } else {
-            //         }
-            //
-            //     }
-            //
-            //
-            // })
-
-            //     getAppeals()
-            //         .then((e) => {
-            //             if (e.data.appeals === null) {
-            //
-            //             } else {
-            //                 if (e.error === undefined) {
-            //                     if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
-            //                         setAppeals(e.data.appeals.edges)
-            //                         lastGottenAppeals(e.data.appeals.edges)
-            //                         reachedEnd.current = true;
-            //                         setReachedEndState(true)
-            //                     }
-            //                 } else {
-            //                 }
-            //
-            //             }
-            //
-            //
-            //         })
-        }
-
-
-    }, [])
 
     const checkLastCursor = (res: any) => {
         if (res.data.appeals.edges[res.data.appeals.edges.length - 1]['cursor'] !== lastCursor.current) {
@@ -437,7 +392,7 @@ const Appeals = () => {
                         <span className={'IranSansMedium opacity-50'}>نتیجه ای یافت نشد</span>
                     </div> :
                     <InfiniteScroll
-                        pullDownToRefresh={!refreshLoading && !loading}
+                        pullDownToRefresh={!refreshLoading}
                         releaseToRefreshContent={<div
                             className={'h-12 pb-4  w-full text-center IranSansMedium text-sm flex flex-col items-center justify-center'}>
 
@@ -510,7 +465,7 @@ const Appeals = () => {
                         {
 
                             <div
-                                className={`${(refreshLoading || loading) ? 'pt-3' : 'h-0 overflow-hidden '}  duration-100 eas-in-out w-full text-center IranSansMedium text-sm h-8 flex flex-row items-center justify-center `}>
+                                className={`${(refreshLoading || gtAppeals.loading) ? 'pt-3  h-8' : 'h-0 overflow-hidden '}  duration-100 eas-in-out w-full text-center IranSansMedium text-sm flex flex-row items-center justify-center `}>
                                 دریافت آگهی ها
                                 <LoadingDialog wrapperClassName={'w-4 h-4 mr-2'} strokeWidth={4}/>
                             </div>

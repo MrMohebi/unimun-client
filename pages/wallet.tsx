@@ -13,6 +13,8 @@ import {useRouter} from "next/router";
 import Input from "../components/view/Input/Input";
 import BottomSheet from "../components/view/BottomSheet/BottomSheet";
 import Toast from "../components/normal/Toast/Toast";
+import {ToastContainer} from "react-toastify";
+import {passedTime} from "../helpers/passedTime";
 
 const Wallet = () => {
 
@@ -20,6 +22,9 @@ const Wallet = () => {
     const [drawerMaxHeight, setDrawerMaxHeight] = useState(400);
     const [drawerInitLimit, setDrawerInitLimit] = useState(0);
     const [balance, setBalance] = useState(0);
+    const [blocked, setBlocked] = useState(0);
+    const [walletID, setWalletID] = useState("");
+    const [transactions, setTransactions] = useState([]);
     const divRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [loading, setLoading] = useState(true);
@@ -35,6 +40,7 @@ const Wallet = () => {
                     id
                     balance
                     userID
+                    blocked
                 }
             }
         }
@@ -52,13 +58,38 @@ const Wallet = () => {
         }
 
     `
+    const GET_TRANSACTIONS_QUERY = gql`
+        {
+            __typename
+            transactions(first: 10) {
+                edges {
+                    node {
+                        amountToman
+                        amountType
+                        createdAt
+                        fromWalletID
+                        toWalletID
+                        type
+                    }
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+            }
+        }
+
+
+    `
     const getWalletDataResult = useQuery(GET_WALLET_DATA_QUERY)
+    const getTransactions = useQuery(GET_TRANSACTIONS_QUERY)
     const [chargeWallet] = useMutation(CHARGE_WALLLET_QUERY)
     const [getSupportChat] = useLazyQuery(GET_SUPPORT_CHAT_QUERY, {client: clientChat})
     const [newMessage, newMessageResult] = useMutation(NEW_MESSAGE_MUTATION, {client: clientChat})
     const [chargeWalletOpen, setChargeWalletOpen] = useState(false);
     const [chargeWalletAmount, setChargeWalletAmount] = useState(0);
     const router = useRouter()
+
 
     const [payRequestPrice, setPayRequestPrice] = useState(0);
     const [payRequestOpen, setPayRequestOpen] = useState(false);
@@ -80,8 +111,11 @@ const Wallet = () => {
 
     useEffect(() => {
         if (getWalletDataResult.data) {
+            console.log(getWalletDataResult.data)
             try {
                 setBalance(getWalletDataResult.data.wallet.data.balance)
+                setBlocked(getWalletDataResult.data.wallet.data.blocked)
+                setWalletID(getWalletDataResult.data.wallet.data.id)
 
                 setLoading(false)
             } catch (e) {
@@ -90,6 +124,16 @@ const Wallet = () => {
         }
 
     }, [getWalletDataResult]);
+    useEffect(() => {
+
+        if (getTransactions.data) {
+
+            setTransactions(getTransactions.data.transactions.edges)
+            console.log(getTransactions.data.transactions.edges)
+
+        }
+
+    }, [getTransactions.data]);
 
 
     return (
@@ -110,6 +154,7 @@ const Wallet = () => {
             <BottomSheet open={payRequestOpen} onClose={() => {
                 setPayRequestOpen(false)
             }}>
+                <ToastContainer/>
                 <div className={' w-full bg-transparent flex flex-col justify-start items-center pt-4 '}>
                     <span
                         className={'IranSansMedium text-textDarker text-right w-full text-md  pr-4 text-textDarker block'}>مبلغ درخواستی خود را وارد کنید</span>
@@ -134,7 +179,7 @@ const Wallet = () => {
                     </div>
                     <Button loading={bottomSheetBtnLoading} onClick={() => {
 
-                        if (payRequestPrice !== 0) {
+                        if (payRequestPrice !== 0 && payRequestPrice <= getWalletDataResult.data.wallet.balance) {
                             setBottomSheetBtnLoading(true)
                             getSupportChat().then((e) => {
                                 setBottomSheetBtnLoading(false)
@@ -153,6 +198,8 @@ const Wallet = () => {
                                     })
                                 }
                             })
+                        } else {
+                            Toast('مقدار اشتباه', '', 2000, '', 18)
                         }
 
 
@@ -267,7 +314,8 @@ const Wallet = () => {
                                         <span className={'IranSans text-[0.3rem] whitespace-nowrap text-white'}> قابل استفاده</span>
                                     </div>
                                     <div className={'w-full flex flex-row  justify-end items-center'}>
-                                        <span className={'IranSansMedium text-white text-sm'}>50,000</span>
+                                        <span
+                                            className={'IranSansMedium text-white text-sm'}>{balance.toLocaleString()}</span>
                                         <img src="/assets/svgs/toman.svg" className={'-mr-0.5 w-5 h-3'} alt=""/>
                                     </div>
                                 </div>
@@ -280,7 +328,8 @@ const Wallet = () => {
 
                                     </div>
                                     <div className={'w-full flex flex-row  justify-end items-center'}>
-                                        <span className={'IranSansMedium text-white text-sm'}>50,000</span>
+                                        <span
+                                            className={'IranSansMedium text-white text-sm'}>{blocked.toLocaleString()}</span>
                                         <img src="/assets/svgs/toman.svg" className={'-mr-0.5 w-5 h-3'} alt=""/>
                                     </div>
                                 </div>
@@ -302,7 +351,7 @@ const Wallet = () => {
             }>
                 <div style={{
                     height: drawerMaxHeight + "px"
-                }} className={'w-full bg-white flex flex-col justify-between items-center'}>
+                }} className={'w-full bg-white flex flex-col justify-start items-center'}>
                     <div className={'w-full flex flex-row justify-around items-center px-4'}>
                         <Button onClick={() => {
                             setChargeWalletOpen(true)
@@ -326,12 +375,48 @@ const Wallet = () => {
                         </Button>
                     </div>
 
-                    <div className={'flex flex-col justify-center items-center mt-10'}>
-                        <img src="/assets/image/no-transactions.png" className={'w-14'} alt=""/>
-                        <span
-                            className={'IranSansMedium text-textDarker mt-2 text-[0.8rem]'}>تراکنشی انجام نداده اید</span>
+
+                    <div className={'w-full h-full overflow-scroll'}>
+                        {transactions.map((item: any, index) => {
+                            let transaction = item.node;
+                            let deposit = false;
+                            if (transaction.toWallet === walletID)
+                                deposit = true;
+
+                            return (
+                                <Button className={"w-full flex flex-row justify-between items-center px-3"}>
+
+                                    <div className={'flex flex-row justify-start items-center h-14 IranSans'}>
+                                        <img
+                                            src={`/assets/svgs/${deposit ? 'deposit-transaction.svg' : 'withdraw-transaction.svg'}`}
+                                            alt=""/>
+                                        <span>{deposit ? 'واریز به حساب' : 'برداشت از حساب'}</span>
+                                        <span
+                                            className={'text-gray-400 text-sm mr-2'}>{passedTime(transaction.createdAt)}</span>
+                                    </div>
+
+                                    <div className={'flex flex-row justify-end items-center'}>
+                                <span
+                                    className={'IranSans ml-2'}>{transaction.amountToman ? transaction.amountToman.toLocaleString() : 0}</span>
+                                        <img className={'invert-[0.5]'} src="/assets/svgs/toman.svg" alt=""/>
+                                    </div>
+                                </Button>)
+                        })}
+                        {
+                            !transactions.length ?
+                                <div className={'flex flex-col justify-center items-center mt-20'}>
+                                    <img src={"/assets/image/no-transactions.png"} className={'w-14'} alt=""/>
+                                    <span
+                                        className={'IranSansMedium text-textDarker mt-2 text-[0.8rem]'}>تراکنشی انجام نداده اید</span>
+                                </div>
+                                :
+                                null
+                        }
+
+
                     </div>
-                    <div className={'h-20 no-transaction-centering'}></div>
+
+
                 </div>
             </Drawer>
         </div>

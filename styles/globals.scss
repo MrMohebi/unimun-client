@@ -308,3 +308,7 @@ input {
   }
 }
 
+.free-checkbox {
+  @apply flex flex-col justify-center items-center relative border-2 border-gray-400 after:w-full  checked:border-0 after:h-full after:content-[] checked:after:content-[url("/assets/svgs/check-box.svg")] h-5 w-5 rounded;
+}
+

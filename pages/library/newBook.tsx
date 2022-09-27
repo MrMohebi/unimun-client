@@ -6,21 +6,15 @@ import Step from "../../components/view/StepperFtagment/Step/Step";
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import Dimmer from "../../components/view/Dimmer/Dimmer";
-import GallerySVG from "../../assets/svgs/gallery.svg";
-import {uploadBookFile, uploadBookImages, uploadImage} from "../../Requests/uploadRequests";
-import NewPhotoSVG from "../../assets/svgs/newPhoto.svg";
-import SVGModifier from "../../components/common/SVGModifier/SVGModifier";
-import GalleryImageSVG from "../../assets/svgs/galleryImage.svg";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 import FileUploadSVG from "../../assets/svgs/fileUpload.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
 import FileSVG from "../../assets/svgs/file.svg";
-import {gql, useMutation} from "@apollo/client";
+import {gql, useMutation, useReactiveVar} from "@apollo/client";
 import Toman from '../../assets/svgs/toman.svg'
 import BookCategories from "../../components/normal/BookCategories/BookCategories";
 import BookAppearance from "../../components/normal/BookAppearance/BookAppearance";
-import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
-import {EditBookData, isBrochure, lastBookSubmitSuccess} from "../../store/books";
+import {BookDataStore, EditBookData, isBrochure, lastBookSubmitSuccess} from "../../store/books";
 import Trash from '../../assets/svgs/trash.svg'
 import TelInputSVG from "../../assets/svgs/telInput.svg";
 import BoldMobile from "../../assets/svgs/boldMobile.svg";
@@ -32,6 +26,7 @@ import {fixPrice} from "../../helpers/fixPrice";
 import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUpload";
 import produce from "immer";
 import {DOWNLOAD_HOST} from "../../store/GLOBAL_VARIABLES";
+import BottomSheet from "../../components/view/BottomSheet/BottomSheet";
 
 const NewBook = () => {
 
@@ -99,7 +94,7 @@ const NewBook = () => {
 
     const [createBook, createBookResult] = useMutation(createBookMutation)
     const [updateBook, updateBookResult] = useMutation(updateBookMutation)
-
+    const [imageOptionsOpen, setImageOptionsOpen] = useState(false);
 
     const router = useRouter()
     const [currentStep, ScurrentStep] = useState(0)
@@ -129,6 +124,8 @@ const NewBook = () => {
     const [fileName, setFileName] = useState("");
     const [editing, setEditing] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [currentSelectedImage, setCurrentSelectedImage] = useState(0);
+    const reactiveBookData = useReactiveVar(BookDataStore)
 
     const [BookData, setBookData] = useState({
         type: 'physical',
@@ -244,23 +241,23 @@ const NewBook = () => {
 
             updateBook({
                 variables: {
-                    id: BookData.id,
-                    title: BookData.title,
-                    categoryID: BookData.categoryID,
-                    details: BookData.details,
-                    isPurchasable: BookData.price ? BookData.price !== 0 : false,
-                    isDownloadable: BookData.type === 'pdf',
+                    id: reactiveBookData.id,
+                    title: reactiveBookData.title,
+                    categoryID: reactiveBookData.categoryID,
+                    details: reactiveBookData.details,
+                    isPurchasable: reactiveBookData.price ? parseInt(reactiveBookData.price) !== 0 : false,
+                    isDownloadable: reactiveBookData.type === 'pdf',
                     isBook: true,
-                    bookFiles: BookData.files,
-                    attachments: BookData.attachments,
+
+                    attachments: reactiveBookData.attachments,
                     connectWay: connectWay,
-                    appearanceID: BookData.appearanceID,
-                    pages: BookData.pages,
-                    publishedDate: BookData.publishedDate,
-                    publisher: BookData.publisher,
-                    price: isBookFree ? "0" : BookData.price,
-                    writer: BookData.writer,
-                    language: BookData.language
+                    appearanceID: reactiveBookData.appearanceID,
+                    pages: reactiveBookData.pages,
+                    publishedDate: reactiveBookData.publishedDate,
+                    publisher: reactiveBookData.publisher,
+                    price: isBookFree ? "0" : reactiveBookData.price,
+                    writer: reactiveBookData.writer,
+                    language: reactiveBookData.language
                 }
             }).then((e) => {
                 try {
@@ -275,26 +272,29 @@ const NewBook = () => {
                 }
             })
         } else {
-            console.log(BookData)
+            console.log(reactiveBookData)
 
             createBook({
+                // variables: {
+                //     title: reactiveBookData.title,
+                //     categoryID: reactiveBookData.categoryID,
+                //     details: reactiveBookData.details,
+                //     isPurchasable: reactiveBookData.price ? reactiveBookData.price !== 0 : false,
+                //     isDownloadable: reactiveBookData.type === 'pdf',
+                //     isBook: true,
+                //     bookFiles: reactiveBookData.files,
+                //     attachments: reactiveBookData.attachments,
+                //     connectWay: connectWay,
+                //     appearanceID: reactiveBookData.appearanceID,
+                //     pages: reactiveBookData.pages,
+                //     publishedDate: reactiveBookData.publishedDate,
+                //     publisher: reactiveBookData.publisher,
+                //     price: isBookFree ? "0" : reactiveBookData.price,
+                //     writer: reactiveBookData.writer,
+                //     language: reactiveBookData.language
+                // }
                 variables: {
-                    title: BookData.title,
-                    categoryID: BookData.categoryID,
-                    details: BookData.details,
-                    isPurchasable: BookData.price ? BookData.price !== 0 : false,
-                    isDownloadable: BookData.type === 'pdf',
-                    isBook: true,
-                    bookFiles: BookData.files,
-                    attachments: BookData.attachments,
-                    connectWay: connectWay,
-                    appearanceID: BookData.appearanceID,
-                    pages: BookData.pages,
-                    publishedDate: BookData.publishedDate,
-                    publisher: BookData.publisher,
-                    price: isBookFree ? "0" : BookData.price,
-                    writer: BookData.writer,
-                    language: BookData.language
+                    ...BookDataStore()
                 }
             }).then((e) => {
                 try {
@@ -324,29 +324,38 @@ const NewBook = () => {
     }
 
     const updateBookData = (param: string | any, value: string | any) => {
-        // let updatedBookData = BookData;
+        // let updatedBookData = reactiveBookData;
         // updatedBookData[`${param}`] = value;
         // setBookData({...updatedBookData});
 
-
-        setBookData(produce((draft) => {
-            //@ts-ignore
-            draft[`${param}`] = value;
-        }))
+        const newBookData = produce(BookDataStore(), (draft: any) => {
+            draft[param] = value
+        })
+        BookDataStore(newBookData)
+        // setBookData(produce((draft) => {
+        //     //@ts-ignore
+        //     draft[`${param}`] = value;
+        // }))
     }
+
+    useEffect(() => {
+
+        console.log('changed')
+        console.log(reactiveBookData)
+    }, [reactiveBookData]);
 
     const bookVerification = () => {
 
-        if (currentStep === 0 && BookData.title && BookData.title.length > 2 && BookData.categoryID) {
+        if (currentStep === 0 && reactiveBookData.title && reactiveBookData.title.length > 2 && reactiveBookData.categoryID) {
             return true
         }
-        if (currentStep === 1 && BookData.appearance)
+        if (currentStep === 1 && reactiveBookData.appearance)
             return true
-        if (currentStep === 2 && BookData.price) {
-            if (contactType === 'phone' && connectWay.length === 11) {
+        if (currentStep === 2) {
+            if (contactType === 'phone' && reactiveBookData.connectWay.length === 11) {
                 return true
             }
-            if (contactType === 'telegram' && connectWay.length > 3) {
+            if (contactType === 'telegram' && reactiveBookData.connectWay.length > 3) {
                 return true
             }
         }
@@ -358,13 +367,28 @@ const NewBook = () => {
     return (
         <div ref={mainScroller} className={'pb-20 overflow-scroll h-full'}>
             <ToastContainer/>
+            <BottomSheet open={imageOptionsOpen} onClose={() => {
+
+                setImageOptionsOpen(false)
+            }}>
+                <Button className={'h-14 mb-3 w-full flex flex-row justify-start items-center px-4'} onClick={() => {
+                    let attachments = BookDataStore().attachments
+                    attachments.filter((item) => {
+                        return item.url !== BookDataStore().attachments[currentSelectedImage];
+
+                    })
+                    console.log(attachments)
+                }}>
+                    <img src="/assets/svgs/remove-image.svg" alt=""/>
+                    <span className={"IranSansMedium text-sm mr-2"}>حذف عکس</span>
+                </Button>
+            </BottomSheet>
 
             <Dimmer onClose={() => {
                 Sdimmer(false)
                 SlangDropDown(false)
             }} show={dimmer}/>
             <Header backOnClick={() => {
-                console.log(currentStep)
                 if (currentStep > 0)
                     ScurrentStep(currentStep - 1)
                 else
@@ -429,7 +453,8 @@ const NewBook = () => {
                                                     <span className={' should-be-filled'}>*</span>
 
                             </span>
-                            <span className={'text-textDark'}>{BookData.categoryPersian ?? "انتخاب دسته بندی"}</span>
+                            <span
+                                className={'text-textDark'}>{reactiveBookData.categoryPersian ?? "انتخاب دسته بندی"}</span>
                         </div>
 
                         <div className={'new-divider mt-5'}/>
@@ -441,7 +466,7 @@ const NewBook = () => {
                         <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl  '}
                                wrapperClassName={'px-3 h-14'}
                                placeHolder={'کتابِ...'}
-                               defaultValue={BookData.title}
+                               defaultValue={reactiveBookData.title}
                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                    updateBookData('title', e.currentTarget.value)
                                }}
@@ -457,7 +482,7 @@ const NewBook = () => {
                         <Input id={'input'} numOnly={false}
                                inputClassName={' h-14  mt-5 rounded-xl transition-all  '}
                                wrapperClassName={'px-3 mx-3 h-14'}
-                               defaultValue={BookData.writer}
+                               defaultValue={reactiveBookData.writer}
                                placeHolder={'کی نوشته کتاب رو ؟'}
                                onClick={(e: any) => {
                                    // try {
@@ -491,13 +516,12 @@ const NewBook = () => {
                             <div
                                 className={`p-2 shadow overflow-hidden new-book-dropdown absolute left-20 top-[6rem]  transition-all -translate-x-1/2 -translate-y-1/2  bg-white z-50 flex flex-col justify-center items-center rounded-2xl w-36 ${langDropDown ? 'opacity-100 scale-100 ' : 'opacity-0 scale-0'} `}>
                                 <Button onClick={() => {
-                                    // let updatedBookData = BookData
+                                    // let updatedBookData = reactiveBookData
                                     // updatedBookData.language = 'فارسی'
                                     SlangDropDown(false)
 
-                                    setBookData(produce((draft) => {
-                                        draft.language = "فارسی"
-                                    }))
+
+                                    updateBookData('language', 'فارسی')
                                     Sdimmer(false)
                                 }} id={'book-lang-f'} rippleColor={'rgba(0,0,0,0.3)'}
                                         className={'w-full h-10 flex flex-col justify-center items-start IranSansMedium pr-3'}>
@@ -505,9 +529,9 @@ const NewBook = () => {
                                 </Button>
                                 <div className={'new-divider'}/>
                                 <Button onClick={() => {
-                                    setBookData(produce((draft) => {
-                                        draft.language = "اینگلیسی"
-                                    }))
+                                    updateBookData('language', 'فارسی')
+
+
                                     Sdimmer(false)
                                     SlangDropDown(false)
                                 }} id={'book-lang-e'} rippleColor={'rgba(0,0,0,0.3)'}
@@ -518,7 +542,7 @@ const NewBook = () => {
 
                             <span>زبان <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
                             <span id={'lang-chose'} ref={selectLangRef}
-                                  className={'text-textDark'}>{!BookData.language ? "انتخاب  کنید" : BookData.language === "فارسی" ? "فارسی" : "انگلیسی"}</span>
+                                  className={'text-textDark'}>{!reactiveBookData.language ? "انتخاب  کنید" : reactiveBookData.language === "فارسی" ? "فارسی" : "انگلیسی"}</span>
                         </div>
                         <div className={'new-divider '}/>
                         <div className={'IranSansMedium text-textDarker pt-5 mx-3'}>مترجم <span
@@ -545,32 +569,37 @@ const NewBook = () => {
                             </div>
 
                             <span
-                                className={'text-primary IranSansMedium text-sm'}>{`${BookData.attachments.length}/5`}</span>
+                                className={'text-primary IranSansMedium text-sm'}>{`${reactiveBookData.attachments.length}/5`}</span>
                         </div>
+
 
                         <div
                             className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-1 max-w-sm mx-auto'}>
                             {
                                 Array(6).fill('').map((photos, index) => {
-                                    console.log(BookData)
 
                                     return <div key={index + 'imageUpload'} className={'contents'}>
-                                        <BookImageUpload defaultImage={uploadedImages[index]} isFirst={index === 0}
+                                        <BookImageUpload index={index} onImageClick={(indexOfSelectedImage: number) => {
+                                            setCurrentSelectedImage(indexOfSelectedImage)
+                                            console.log(indexOfSelectedImage)
+
+                                            setImageOptionsOpen(true)
+                                        }}
+                                                         defaultImage={reactiveBookData.attachments[index] ? DOWNLOAD_HOST() + reactiveBookData.attachments[index].preview : ""}
+                                                         isFirst={index === 0}
                                                          id={index.toString()}
                                                          onUploadComplete={(e: any) => {
-                                                             let backBook = produce(BookData.attachments, (draft: any) => {
-                                                                 draft.push(e.data)
-                                                             })
-                                                             console.log(backBook)
-                                                             updateBookData('attachments', backBook)
-                                                             setUploadedImages(produce(draft => {
-                                                                 draft[index] = DOWNLOAD_HOST() + (e.data.preview ?? e.data.thumbnail)
-                                                             }))
-                                                             console.log(e)
-                                                             setTimeout(() => {
-                                                                 console.log(BookData)
-                                                             }, 1000)
-                                                             console.log(e)
+                                                             if (typeof e.data !== 'number') {
+                                                                 let backBook = produce(BookDataStore().attachments, (draft: any) => {
+                                                                     draft.push(e.data)
+                                                                 })
+                                                                 console.log(e.data)
+                                                                 updateBookData('attachments', backBook)
+
+                                                                 console.log(e)
+
+                                                             }
+
                                                          }} onError={(e: any) => {
                                             console.log(e)
                                         }} bookID={currentBookId.current} setUploading={setUploading}/>
@@ -598,14 +627,14 @@ const NewBook = () => {
                             </span>
                             <span
 
-                                className={'text-textDark'}>{!BookData.appearance ? "انتخاب  کنید" : BookData.appearance}</span>
+                                className={'text-textDark'}>{!reactiveBookData.appearance ? "انتخاب  کنید" : reactiveBookData.appearance}</span>
                         </div>
                         <div className={'new-divider mt-5'}/>
 
                         <div className={'IranSansMedium text-textDarker pt-5'}>درباره کتاب <span
                             className={'text-tiny text-textDarker'}>اختیاری</span></div>
 
-                        <Input defaultValue={BookData.details} multiLine={true} id={'input'} numOnly={false}
+                        <Input defaultValue={reactiveBookData.details} multiLine={true} id={'input'} numOnly={false}
                                inputClassName={'IranSans rounded-xl h-32 mt-5  border-primary border-2 pt-2 px-3 w-full outline-0 '}
                                wrapperClassName={''}
                                placeHolder={'کتابِ...'}
@@ -623,7 +652,7 @@ const NewBook = () => {
                         {/*        // Sdimmer(true)*/}
                         {/*        // SlangDropDown(true)*/}
                         {/*    }}*/}
-                        {/*          className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
+                        {/*          className={'text-textDark'}>{!reactiveBookData.language ? "انتخاب کنید" : reactiveBookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
                         {/*</div>*/}
                         {/*<div className={'new-divider mt-5'}/>*/}
                         {/*<div*/}
@@ -633,7 +662,7 @@ const NewBook = () => {
                         {/*        // Sdimmer(true)*/}
                         {/*        // SlangDropDown(true)*/}
                         {/*    }}*/}
-                        {/*          className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
+                        {/*          className={'text-textDark'}>{!reactiveBookData.language ? "انتخاب کنید" : reactiveBookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
                         {/*</div>*/}
                         {/*<div className={'new-divider mt-5'}/>*/}
 
@@ -644,7 +673,7 @@ const NewBook = () => {
                             <Input id={'author'} numOnly={false} wrapperClassName={'col-span-5 h-12'}
                                    placeHolder={'اسم انتشارات'}
                                    inputClassName={"rounded-xl"}
-                                   defaultValue={BookData.publisher}
+                                   defaultValue={reactiveBookData.publisher}
                                    onChange={(e: InputEvent) => {
                                        let el = e.currentTarget as HTMLTextAreaElement
                                        updateBookData('publisher', el.value)
@@ -653,7 +682,7 @@ const NewBook = () => {
 
                             <Input id={'author'} numOnly={true} maxLength={4}
                                    inputClassName={'center-placeholder rounded-xl px-3 text-center'}
-                                   defaultValue={BookData.publishedDate}
+                                   defaultValue={reactiveBookData.publishedDate}
                                    wrapperClassName={'col-span-2 h-12'} placeHolder={'سال'}
                                    onChange={(e: InputEvent) => {
                                        let el = e.currentTarget as HTMLTextAreaElement
@@ -679,9 +708,9 @@ const NewBook = () => {
                         <div
                             className={'bg-background w-4/5 mx-auto p-0 pt-1 flex flex-row mt-3 items-center justify-between overflow-hidden rounded-lg relative  border-primary h-12'}>
                             <div
-                                className={`absolute w-1/2  top-0 h-full bg-primary transition-all ease-in-out ${BookData.type === 'physical' ? 'left-0' : 'left-1/2'}`}></div>
+                                className={`absolute w-1/2  top-0 h-full bg-primary transition-all ease-in-out ${reactiveBookData.type === 'physical' ? 'left-0' : 'left-1/2'}`}></div>
                             <div
-                                className={`relative IranSansMedium relative transition-all h-full leading-9 ${BookData.type === 'pdf' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
+                                className={`relative IranSansMedium relative transition-all h-full leading-9 ${reactiveBookData.type === 'pdf' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                 onClick={() => {
                                     // updateBookData('type', 'pdf')
                                     (pdfSoonRef.current as HTMLInputElement).style.opacity = "1";
@@ -712,7 +741,7 @@ const NewBook = () => {
                                 </div>
                             </div>
                             <div
-                                className={`IranSansMedium transition-all h-full leading-9 ${BookData.type === 'physical' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
+                                className={`IranSansMedium transition-all h-full leading-9 ${reactiveBookData.type === 'physical' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                 onClick={() => {
                                     updateBookData('type', 'physical')
                                 }}>کتابِ فیـزیکـی
@@ -727,7 +756,7 @@ const NewBook = () => {
 
 
                     <section
-                        className={`bg-white w-full transition-all  ${BookData.type !== 'pdf' ? 'h-0 overflow-hidden ' : 'px-3  pt-5 pb-5'} `}>
+                        className={`bg-white w-full transition-all  ${reactiveBookData.type !== 'pdf' ? 'h-0 overflow-hidden ' : 'px-3  pt-5 pb-5'} `}>
                         <div
                             className={'new-file  flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
                             <input type={"file"}
@@ -749,42 +778,42 @@ const NewBook = () => {
                                            setBookUploadState('uploading')
 
 
-                                           uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {
-                                                   _fileUploadingPercentage('0')
-                                                   if (response.data.validMimes) {
-                                                       Toast("فرمت فایل معتبر نیست")
-                                                   } else if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
-                                                       let files = [];
-                                                       files = BookData.files
-
-                                                       files.push({
-                                                           url: response.data.url as never,
-                                                           type: 'pdf' as never,
-                                                           mime: 'pdf' as never,
-                                                       } as never)
-                                                       let fileNames = []
-                                                       fileNames.push(fileName)
-                                                       updateBookData('files', [...files])
-                                                       updateBookData('fileNames', [...fileNames])
-                                                       removeEmptyProgresses()
-                                                       setBookUploadState('uploaded')
-
-                                                   } else {
-                                                       Toast('خطا در آپلود فایل، دوبره تلاش کنید')
-                                                       setBookUploadState('')
-
-                                                   }
-                                               }, (error: any) => {
-                                                   Sdimmer(false)
-                                                   setBookUploadState('')
-                                               },
-                                               (progressEvent: any) => {
-                                                   let percentCompleted = Math.round(
-                                                       (progressEvent.loaded * 100) / progressEvent.total
-                                                   );
-                                                   _fileUploadingPercentage(percentCompleted as any)
-                                               }
-                                           )
+                                           // uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {
+                                           //         _fileUploadingPercentage('0')
+                                           //         if (response.data.validMimes) {
+                                           //             Toast("فرمت فایل معتبر نیست")
+                                           //         } else if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
+                                           //             let files = [];
+                                           //             files = reactiveBookData.files
+                                           //
+                                           //             files.push({
+                                           //                 url: response.data.url as never,
+                                           //                 type: 'pdf' as never,
+                                           //                 mime: 'pdf' as never,
+                                           //             } as never)
+                                           //             let fileNames = []
+                                           //             fileNames.push(fileName)
+                                           //             updateBookData('files', [...files])
+                                           //             updateBookData('fileNames', [...fileNames])
+                                           //             removeEmptyProgresses()
+                                           //             setBookUploadState('uploaded')
+                                           //
+                                           //         } else {
+                                           //             Toast('خطا در آپلود فایل، دوبره تلاش کنید')
+                                           //             setBookUploadState('')
+                                           //
+                                           //         }
+                                           //     }, (error: any) => {
+                                           //         Sdimmer(false)
+                                           //         setBookUploadState('')
+                                           //     },
+                                           //     (progressEvent: any) => {
+                                           //         let percentCompleted = Math.round(
+                                           //             (progressEvent.loaded * 100) / progressEvent.total
+                                           //         );
+                                           //         _fileUploadingPercentage(percentCompleted as any)
+                                           //     }
+                                           // )
                                        }
 
                                        // e.currentTarget.value = '';
@@ -868,7 +897,7 @@ const NewBook = () => {
                         </div>
 
                         {/*{*/}
-                        {/*    BookData.fileNames.map((file: { name: string }) => {*/}
+                        {/*    reactiveBookData.fileNames.map((file: { name: string }) => {*/}
 
                         {/*        return (*/}
                         {/*            <div key={file.name}*/}
@@ -923,7 +952,7 @@ const NewBook = () => {
                     </section>
 
                     <div
-                        className={`w-full  IranSans text-textDarker text-sm  ${BookData.type !== 'pdf' ? 'h-0 hidden overflow-hidden ' : 'px-3 mt-3 mb-3'} `}>
+                        className={`w-full  IranSans text-textDarker text-sm  ${reactiveBookData.type !== 'pdf' ? 'h-0 hidden overflow-hidden ' : 'px-3 mt-3 mb-3'} `}>
                         محدودیت آپلود برای کتاب ها 500 مگابایت است
                     </div>
 
@@ -948,21 +977,23 @@ const NewBook = () => {
                                 className={' IranSansMedium h-10 w-24 px-2 flex flex-row justify-around items-center bg-background rounded-lg'}>
                                 <input name={'free'} id={'free-book'}
 
-                                       className={'free-checkbox flex flex-col justify-center items-center relative border-2 border-text-darker  after:w-full  checked:border-0 after:h-full after:content-[] checked:after:content-[url("/assets/svgs/check-box.svg")] h-5 w-5 rounded  '}
+                                       className={'free-checkbox '}
                                        type={'checkbox'}
-                                    // defaultValue={BookData.price}
+                                    // defaultValue={reactiveBookData.price}
                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 
                                            if (e.currentTarget.checked) {
                                                if (priceInputRef.current)
                                                    (priceInputRef.current as HTMLInputElement).value = "0"
                                                //todo this state just added
+                                               updateBookData('price', 0)
                                                setIsBookFree(true)
 
 
                                            } else if (priceInputRef.current) {
                                                setIsBookFree(false);
-                                               (priceInputRef.current as HTMLInputElement).value = (BookData.price.toString() ?? "").split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
+
+                                               (priceInputRef.current as HTMLInputElement).value = (reactiveBookData.price.toString() ?? "").split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
 
                                            }
                                        }}/>
@@ -979,7 +1010,7 @@ const NewBook = () => {
 
                             <div className={'h-3/5 bg-gray-400 w-0 border'}/>
                             <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'}
-                                   defaultValue={fixPrice(BookData.price) ?? '20,000'}
+                                   defaultValue={fixPrice(parseInt(reactiveBookData.price)) ?? '20,000'}
                                    numOnly={false}
 
                                    inputClassName={'border-0 border-transparent text-left text-lg IranSansBold rounded-xl'}
@@ -1026,7 +1057,7 @@ const NewBook = () => {
                             <Input dir={'ltr'} placeHolder={''}
                                    inputClassName={'text-left pl-12 rounded-xl border-2'} maxLength={30}
                                    id={'title'} numOnly={false}
-                                   defaultValue={connectWay}
+                                   defaultValue={reactiveBookData.connectWay}
                                    wrapperClassName={'w-11/12 h-14 '}
                                    onChange={(e: any) => {
                                        if (e.currentTarget.value.length > 0) {
@@ -1044,8 +1075,9 @@ const NewBook = () => {
                                        } else
                                            setContactType('')
                                        setContactAddress(e.currentTarget.value)
+                                       updateBookData('connectWay', e.currentTarget.value)
 
-                                       setConnectWay(e.currentTarget.value)
+                                       // setConnectWay(e.currentTarget.value)
                                    }}
 
                                    labelText={'شماره تلفن یا آیدی تلگرام'}/>
