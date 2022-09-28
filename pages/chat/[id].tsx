@@ -14,8 +14,10 @@ import BottomSheet from "../../components/view/BottomSheet/BottomSheet";
 import Input from "../../components/view/Input/Input";
 import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
+import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 
 const ChatScreen = () => {
+
 
     const chatBoxRef = useRef<HTMLDivElement>(null)
     const router = useRouter();
@@ -24,28 +26,30 @@ const ChatScreen = () => {
     const [messages, setMessages] = useState([] as any);
     const [currentChatStat, setCurrentChatStat] = useState('default');
     const [payRequestOpen, setPayRequestOpen] = useState(false);
-        const [payRequestPrice, setPayRequestPrice] = useState(0);
-        const [holdingShift, setHoldingShift] = useState(false);
-        const getMessagesLimit = useRef(1000);
+    const [payRequestPrice, setPayRequestPrice] = useState(0);
+    const [holdingShift, setHoldingShift] = useState(false);
+    const [payRequestLoading, setPayRequestLoading] = useState(false);
+    const [loadingButtonIds, setLoadingButtonIds] = useState([""]);
+    const getMessagesLimit = useRef(1000);
 
-        useEffect(() => {
-            if (Object.keys(CurrentChatUserData()).length) {
-                if (chatBoxRef.current!.classList.contains('scroll-auto')) {
-                    chatBoxRef.current!.classList.remove('scroll-auto')
-                }
-                // scrollToBottom()
-            } else {
-                router.push('/chat')
+    useEffect(() => {
+        if (Object.keys(CurrentChatUserData()).length) {
+            if (chatBoxRef.current!.classList.contains('scroll-auto')) {
+                chatBoxRef.current!.classList.remove('scroll-auto')
             }
-        }, [])
+            // scrollToBottom()
+        } else {
+            router.push('/chat')
+        }
+    }, [])
 
 
-        const CREATE_REQUEST_MUTATION = gql`
-            mutation($chatID:ID! $acceptorID:ID! $price:Int! $description:String) {
-                sendMessage(
-                    chatID: $chatID
-                    payRequest: {acceptorID: $acceptorID, price: $price, description: $description}
-                    text: ""
+    const CREATE_REQUEST_MUTATION = gql`
+        mutation($chatID:ID! $acceptorID:ID! $price:Int! $description:String) {
+            sendMessage(
+                chatID: $chatID
+                payRequest: {acceptorID: $acceptorID, price: $price, description: $description}
+                text: ""
                 ) {
                     chatID
                     editedAt
@@ -120,7 +124,9 @@ const ChatScreen = () => {
         `
     const [editPrice] = useMutation(EDIT_PRICE_MUTATION, {
         client: clientChat, onError: (e) => {
+            console.log(e)
             Toast("موجودی کافی نمیباشد", '', 3000, '', 70)
+            removeAllBtnLoadings()
         }
     })
 
@@ -133,22 +139,22 @@ const ChatScreen = () => {
                 id
                 tempId
                 userID
-                    type
-                    payRequest {
-                        updatedAt
-                        status
-                        price
-                        paidAt
-                        isAccepted
-                        id
-                        description
-                        creatorID
-                        createdAt
-                        acceptorID
-                    }
-                    sentAt
+                type
+                payRequest {
+                    updatedAt
+                    status
+                    price
+                    paidAt
+                    isAccepted
+                    id
+                    description
+                    creatorID
+                    createdAt
+                    acceptorID
                 }
-            }`
+                sentAt
+            }
+        }`
 
         const editMessagesSubscription = useSubscription(EDIT_MESSAGE_SUBSCRIPTION, {client: clientChat})
 
@@ -274,44 +280,55 @@ const ChatScreen = () => {
             }
         `
         const [newMessage] = useMutation(newMessageMutation, {client: clientChat})
-        const sendMessageBtn = useRef<HTMLImageElement>(null);
+    const sendMessageBtn = useRef<HTMLImageElement>(null);
 
 
-        const [chatLoading, setChatLoading] = useState(true);
-        const [currentEditPayRequestData, setCurrentEditPayRequestData] = useState({
-            price: "",
-            description: "",
-            id: '',
-            tempId: ''
-        });
-        const scrollToBottom = () => {
-            if (chatBoxRef && chatBoxRef.current && chatScrollerRef && chatScrollerRef.current) {
-                chatBoxRef.current.scrollTo({
-                    top: chatScrollerRef.current.getBoundingClientRect().height,
-                    behavior: 'auto'
-                })
-            }
+    const [chatLoading, setChatLoading] = useState(true);
+    const [currentEditPayRequestData, setCurrentEditPayRequestData] = useState({
+        price: "",
+        description: "",
+        id: '',
+        tempId: ''
+    });
+    const scrollToBottom = () => {
+        if (chatBoxRef && chatBoxRef.current && chatScrollerRef && chatScrollerRef.current) {
+            chatBoxRef.current.scrollTo({
+                top: chatScrollerRef.current.getBoundingClientRect().height,
+                behavior: 'auto'
+            })
         }
+    }
+
+    const removeAllBtnLoadings = () => {
+        setLoadingButtonIds([])
+    }
+    const removeLoadingButton = (item: any) => {
+        setLoadingButtonIds(produce((draft) => {
+            draft.filter((id) => {
+                return id !== item.id;
+            })
+        }))
+    }
 
 
-        return (
-            <div ref={chatBoxRef} className={'w-full h-full overflow-scroll  pb-12 scroll-smooth'}>
-                <ToastContainer/>
+    return (
+        <div ref={chatBoxRef} className={'w-full h-full overflow-scroll  pb-12 scroll-smooth'}>
+            <ToastContainer/>
 
-                <BottomSheet open={payRequestOpen} onClose={() => {
-                    setPayRequestOpen(false)
-                    setCurrentChatStat('default')
-                }}>
-                    <div className={' w-full bg-transparent flex flex-col justify-start items-center pt-4 '}>
+            <BottomSheet open={payRequestOpen} onClose={() => {
+                setPayRequestOpen(false)
+                setCurrentChatStat('default')
+            }}>
+                <div className={' w-full bg-transparent flex flex-col justify-start items-center pt-4 '}>
                     <span
                         className={'IranSansMedium text-textDarker text-right w-full text-md  pr-4 text-textDarker block'}>مبلغ درخواستی خود را وارد کنید</span>
-                        <div className={'relative w-full flex-col justify-center items-center mt-5'}>
+                    <div className={'relative w-full flex-col justify-center items-center mt-5'}>
 
-                            <div
-                                className={'absolute left-5  px-2 h-6  top-1/2 -translate-y-1/2 flex flex-col justify-center border-r-2 items-center'}>
-                                <img src="/assets/svgs/toman.svg" className={'invert scale-90'} alt=""/>
-                            </div>
-                            <Input onChange={(e: any) => {
+                        <div
+                            className={'absolute left-5  px-2 h-6  top-1/2 -translate-y-1/2 flex flex-col justify-center border-r-2 items-center'}>
+                            <img src="/assets/svgs/toman.svg" className={'invert scale-90'} alt=""/>
+                        </div>
+                        <Input onChange={(e: any) => {
                                 let el = e.currentTarget
                                 if (el.value.replaceAll(',', '') > 999999)
                                     el.value = el.value.substring(0, el.value.length - 1)
@@ -324,7 +341,7 @@ const ChatScreen = () => {
 
                         </div>
                         <div className={'w-full bg-background mt-3'}>
-                            <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>برای راحتی بیشتر میتونی از گزینه های بالا استفاده کنی</span>
+                            <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>سقف مبلغ قابل درخواست یک میلیون تومان میباشد</span>
                         </div>
 
                         <div className={'h-20'}></div>
@@ -498,12 +515,17 @@ const ChatScreen = () => {
 
                                                             <div
                                                                 className={'flex flex-row justify-between items-center w-full  mt-1.5'}>
-                                                                <Button id={'pay-btn'} onClick={() => {
+                                                                <Button loading={loadingButtonIds.includes(item.id)}
+                                                                        id={'pay-btn'} onClick={() => {
                                                                     let idObject = {id: '', tempId: ''} as any
                                                                     if (item.id)
                                                                         idObject.id = item.id
                                                                     else if (item.tempId)
                                                                         idObject.tempId = item.tempId
+
+                                                                    setLoadingButtonIds(produce((draft) => {
+                                                                        draft.push(item.id)
+                                                                    }))
                                                                     editPrice({
                                                                         variables: {
                                                                             ...idObject,
@@ -511,6 +533,7 @@ const ChatScreen = () => {
                                                                             isCanceled: true
                                                                         }
                                                                     }).then(() => {
+                                                                        removeLoadingButton(item)
                                                                     })
 
                                                                 }}
@@ -564,36 +587,45 @@ const ChatScreen = () => {
                                                                 :
 
 
-                                                                <Button onClick={() => {
-                                                                    try {
+                                                                <Button loading={loadingButtonIds.includes(item.id)}
+                                                                        onClick={() => {
+                                                                            setLoadingButtonIds(produce((draft) => {
+                                                                                draft.push(item.id)
+                                                                            }))
+
+                                                                            try {
 
 
-                                                                        editPrice({
-                                                                            variables: {
-                                                                                isAccepted: true,
-                                                                                id: item.id ?? "",
-                                                                                tempId: item.tempId ?? ""
+                                                                                editPrice({
+                                                                                    variables: {
+                                                                                        isAccepted: true,
+                                                                                        id: item.id ?? "",
+                                                                                        tempId: item.tempId ?? ""
+                                                                                    }
+                                                                                }).then((value) => {
+                                                                                    console.log(value)
+
+                                                                                    removeLoadingButton(item)
+
+
+                                                                                })
+                                                                                // console.log(item.payRequest.description)
+                                                                                // console.log(item.payRequest.price)
+                                                                                // setCurrentEditPayRequestData(produce((draft) => {
+                                                                                //     draft.description = item.payRequest.description;
+                                                                                //     draft.price = item.payRequest.price;
+                                                                                //     if (item.id)
+                                                                                //         draft.id = item.id
+                                                                                //     else if (item.tempId)
+                                                                                //         draft.tempId = item.tempId
+                                                                                //     return draft
+                                                                                // }))
+                                                                                // setCurrentChatStat('payRequest')
+
+                                                                            } catch (e) {
+                                                                                console.log('failde to change the price or desc')
                                                                             }
-                                                                        }).then((value) => {
-                                                                            console.log(value)
-                                                                        })
-                                                                        // console.log(item.payRequest.description)
-                                                                        // console.log(item.payRequest.price)
-                                                                        // setCurrentEditPayRequestData(produce((draft) => {
-                                                                        //     draft.description = item.payRequest.description;
-                                                                        //     draft.price = item.payRequest.price;
-                                                                        //     if (item.id)
-                                                                        //         draft.id = item.id
-                                                                        //     else if (item.tempId)
-                                                                        //         draft.tempId = item.tempId
-                                                                        //     return draft
-                                                                        // }))
-                                                                        // setCurrentChatStat('payRequest')
-
-                                                                    } catch (e) {
-                                                                        console.log('failde to change the price or desc')
-                                                                    }
-                                                                }} id={'pay-btn'}
+                                                                        }} id={'pay-btn'}
                                                                         className={'bg-primary shadow w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
                                                                     <span className={'IranSansMedium '}>پرداخت</span>
                                                                 </Button>
@@ -609,29 +641,29 @@ const ChatScreen = () => {
 
                 </div>
 
-                <div style={{
-                    boxShadow: "0px -1px 9px 0px #0000000f"
-                }}
-                     className={'bottom-0 fixed left-0 w-full bg-white  z-[60]  border grid grid-cols-12 h-12 px-3'}>
-                    <div className={'send-and-voice col-span-1 flex flex-row justify-start items-center'}>
+            <div style={{
+                boxShadow: "0px -1px 9px 0px #0000000f"
+            }}
+                 className={'bottom-0 fixed left-0 w-full bg-white  z-[60]  border grid grid-cols-12 h-14 px-3'}>
+                <div className={'send-and-voice col-span-1 flex flex-row justify-start items-center'}>
 
 
-                        {
-                            currentChatStat === 'write' ?
-                                <img alt={'Send Message'} src={'/assets/svgs/send.svg'}
-                                     className={'text-primary IranSansMedium text-sm h-6 w-6 animate__animated'}
-                                     onClick={() => {
-                                         let messageText = (document.getElementById('text-chat') as HTMLInputElement)!.value
+                    {
+                        currentChatStat === 'write' ?
+                            <img alt={'Send Message'} src={'/assets/svgs/send.svg'}
+                                 className={'text-primary IranSansMedium text-sm h-6 w-6 animate__animated'}
+                                 onClick={() => {
+                                     let messageText = (document.getElementById('text-chat') as HTMLInputElement)!.value
 
 
-                                         newMessage({
-                                             variables: {
-                                                 chatID: id,
-                                                 text: messageText
-                                             }
-                                         }).then(() => {
-                                         });
-                                         //     // addMessage((document.getElementById('text-chat') as HTMLInputElement)!.value);
+                                     newMessage({
+                                         variables: {
+                                             chatID: id,
+                                             text: messageText
+                                         }
+                                     }).then(() => {
+                                     });
+                                     //     // addMessage((document.getElementById('text-chat') as HTMLInputElement)!.value);
                                          (document.getElementById('text-chat') as HTMLInputElement)!.value = ""
                                          setCurrentChatStat('default');
                                          try {
@@ -653,57 +685,66 @@ const ChatScreen = () => {
                                         :
                                         currentChatStat === 'payRequest' ?
 
-                                            <img alt={'Send Pay Request'} src={'/assets/svgs/send.svg'}
-                                                 className={'text-primary IranSansMedium text-sm h-6 w-6  animate__animated '}
-                                                 onClick={() => {
-                                                     let messageText = (document.getElementById('text-chat') as HTMLInputElement)!.value
+                                            payRequestLoading ?
+                                                <div className={'w-6 h-6'}>
+                                                    <LoadingDialog wrapperClassName={'w-6 h-6 '} color={'#1da1f2'}/>
+                                                </div>
+                                                :
 
-                                                     let idObject = {
-                                                         id: '',
-                                                         tempId: ''
-                                                     } as any
-                                                     if (currentEditPayRequestData.id)
-                                                         idObject['id'] = currentEditPayRequestData.id
-                                                     else if (currentEditPayRequestData.tempId) {
-                                                         idObject['tempId'] = currentEditPayRequestData.tempId
-                                                     }
+                                                <img alt={'Send Pay Request'} src={'/assets/svgs/send.svg'}
+                                                     className={'text-primary IranSansMedium text-sm h-6 w-6  animate__animated '}
+                                                     onClick={() => {
+                                                         let messageText = (document.getElementById('text-chat') as HTMLInputElement)!.value
 
-                                                     if (currentEditPayRequestData.price) {
-                                                         let requestParamsObject = {
-                                                             price: payRequestPrice,
-                                                             description: messageText,
+                                                         setPayRequestLoading(true)
+                                                         let idObject = {
+                                                             id: '',
+                                                             tempId: ''
+                                                         } as any
+                                                         if (currentEditPayRequestData.id)
+                                                             idObject['id'] = currentEditPayRequestData.id
+                                                         else if (currentEditPayRequestData.tempId) {
+                                                             idObject['tempId'] = currentEditPayRequestData.tempId
                                                          }
-                                                         editPrice({
-                                                             variables: {
-                                                                 ...idObject,
-                                                                 ...requestParamsObject
-                                                             }
-                                                         }).then(() => {
-                                                             setPayRequestOpen(false)
-                                                         });
-                                                         setCurrentEditPayRequestData(produce((draft) => {
-                                                             draft.id = "";
-                                                             draft.description = "";
-                                                             draft.tempId = '0'
 
-                                                         }))
-                                                     } else {
-                                                         sendMoneyRequest({
-                                                             variables: {
-                                                                 acceptorID: CurrentChatUserData().user.id,
-                                                                 chatID: id,
+                                                         if (currentEditPayRequestData.price) {
+                                                             let requestParamsObject = {
                                                                  price: payRequestPrice,
-                                                                 description: messageText
+                                                                 description: messageText,
+                                                             }
+                                                             editPrice({
+                                                                 variables: {
+                                                                     ...idObject,
+                                                                     ...requestParamsObject
+                                                                 }
+                                                             }).then(() => {
+                                                                 setPayRequestOpen(false)
+                                                                 setPayRequestLoading(false)
+                                                             });
+                                                             setCurrentEditPayRequestData(produce((draft) => {
+                                                                 draft.id = "";
+                                                                 draft.description = "";
+                                                                 draft.tempId = '0'
 
-                                                             },
+                                                             }))
+                                                         } else {
+                                                             sendMoneyRequest({
+                                                                 variables: {
+                                                                     acceptorID: CurrentChatUserData().user.id,
+                                                                     chatID: id,
+                                                                     price: payRequestPrice,
+                                                                     description: messageText
 
-                                                         }).then(() => {
-                                                             setPayRequestOpen(false)
-                                                         });
-                                                     }
+                                                                 },
 
-                                                     (document.getElementById('text-chat') as HTMLTextAreaElement)!.value = ""
-                                                 }}/>
+                                                             }).then(() => {
+                                                                 setPayRequestOpen(false)
+                                                                 setPayRequestLoading(false)
+                                                             });
+                                                         }
+
+                                                         (document.getElementById('text-chat') as HTMLTextAreaElement)!.value = ""
+                                                     }}/>
                                             :
                                             <div></div>
                         }

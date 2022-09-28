@@ -342,10 +342,12 @@ const Index = () => {
                                 className={'h-12 pb-4  w-full text-center IranSansMedium text-sm flex flex-col items-center justify-center'}>
                                 رها کنید
                             </div>}
-                            pullDownToRefreshContent={<div
-                                className={'h-12 pb-4  w-full text-center IranSansMedium text-sm flex flex-col items-center justify-center'}>
-                                بکشید
-                            </div>}
+                            pullDownToRefreshContent={
+                                <div
+                                    className={'h-12 pb-4  w-full text-center IranSansMedium text-sm flex flex-col items-center justify-center'}>
+                                    بکشید
+                                </div>
+                            }
                             pullDownToRefreshThreshold={70}
                             refreshFunction={() => {
                                 if (!getBooks.loading)

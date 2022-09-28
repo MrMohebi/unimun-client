@@ -200,11 +200,14 @@ const Wallet = () => {
 
                     </div>
                     <div className={'w-full bg-background mt-3'}>
-                        <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>برای راحتی بیشتر میتونی از گزینه های بالا استفاده کنی</span>
+                        <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>سقف مبلغ قابل درخواست یک میلیون تومان میباشد</span>
                     </div>
                     <Button loading={bottomSheetBtnLoading} onClick={() => {
+                        console.log(balance)
+                        console.log(payRequestPrice)
 
-                        if (payRequestPrice !== 0 && payRequestPrice <= getWalletDataResult.data.wallet.balance) {
+                        if (payRequestPrice !== 0 && payRequestPrice <= balance) {
+
                             setBottomSheetBtnLoading(true)
                             getSupportChat().then((e) => {
                                 setBottomSheetBtnLoading(false)
@@ -243,7 +246,7 @@ const Wallet = () => {
             }}>
                 <div className={' w-full bg-transparent flex flex-col justify-start items-center pt-4 '}>
                     <span
-                        className={'IranSansMedium text-textDarker text-right w-full text-md  pr-4 text-textDarker block'}>مبلغ درخواستی خود را وارد کنید</span>
+                        className={'IranSansMedium text-textDarker text-right w-full text-md  pr-4 text-textDarker block'}>افزایش موجودی</span>
                     <div className={'relative w-full flex-col justify-center items-center mt-5'}>
 
                         <div
@@ -260,9 +263,9 @@ const Wallet = () => {
                                wrapperClassName={"w-11/12 h-12 m-auto "}/>
 
                     </div>
-                    <div className={'w-full bg-background mt-3'}>
-                        <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>برای راحتی بیشتر میتونی از گزینه های بالا استفاده کنی</span>
-                    </div>
+                    {/*<div className={'w-full bg-background mt-3'}>*/}
+                    {/*    <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>سقف مبلغ قابل درخواست یک میلیون تومان میباشد</span>*/}
+                    {/*</div>*/}
                     <Button loading={bottomSheetBtnLoading} onClick={() => {
 
                         if (chargeWalletAmount) {
