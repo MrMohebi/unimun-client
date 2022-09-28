@@ -61,10 +61,10 @@ const ChatScreen = () => {
     `
 
 
-        const [sendMoneyRequest] = useMutation(CREATE_REQUEST_MUTATION, {client: clientChat})
-        const chatsSubscriptionRequest = gql`
+    const [sendMoneyRequest] = useMutation(CREATE_REQUEST_MUTATION, {client: clientChat})
+    const chatsSubscriptionRequest = gql`
 
-            subscription onNewMessage {
+        subscription onNewMessage {
                 newMessage{
                     userID
                     text
@@ -276,15 +276,15 @@ const ChatScreen = () => {
         }, [messages]);
 
 
-        const newMessageMutation = gql`
-            mutation($chatID:ID! $text:String) {
-                sendMessage(chatID: $chatID text:$text){
-                    text
-                    sentAt
-                    id
-                }
+    const newMessageMutation = gql`
+        mutation($chatID:ID! $text:String) {
+            sendMessage(chatID: $chatID text:$text){
+                text
+                sentAt
+                id
             }
-        `
+        }
+    `
     const [newMessage] = useMutation(newMessageMutation, {client: clientChat})
     const sendMessageBtn = useRef<HTMLImageElement>(null);
 
@@ -320,7 +320,7 @@ const ChatScreen = () => {
     return (
         <div ref={chatBoxRef} className={'w-full h-full overflow-scroll  pb-12 scroll-smooth'}>
             <img src="/assets/svgs/chat-back.svg"
-                 className={'w-full h-full fixed top-0 left-0 pointer-events-none opacity-20'} alt=""/>
+                 className={'w-full h-full fixed top-0 left-0 pointer-events-none opacity-20 object-cover'} alt=""/>
             <img onClick={() => {
                 if (chatScrollerRef.current) {
                     chatScrollerRef.current.scrollTo(0, chatScrollerRef.current.scrollHeight)
@@ -356,10 +356,10 @@ const ChatScreen = () => {
                                inputClassName={'pl-12 text-black IranSansMedium'}
                                wrapperClassName={"w-11/12 h-12 m-auto "}/>
 
-                        </div>
-                        <div className={'w-full bg-background mt-3'}>
-                            <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>سقف مبلغ قابل درخواست یک میلیون تومان میباشد</span>
-                        </div>
+                    </div>
+                    <div className={'w-full bg-background mt-3'}>
+                        <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>سقف مبلغ قابل درخواست یک میلیون تومان میباشد</span>
+                    </div>
 
                         <div className={'h-20'}></div>
                     </div>
@@ -439,16 +439,16 @@ const ChatScreen = () => {
                                         <div style={{
                                             // animationDelay: index * 50 + 'ms'
                                         }}
-                                                 className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]   `}>
-                                                <p style={{
-                                                    wordBreak: 'break-word',
-                                                    whiteSpace: 'pre-line'
-                                                }}
-                                                   className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>{item.text}</p>
-                                                <div className={'flex mt-1 flex-row justify-start items-center '}>
-                                                    <img src="/assets/svgs/check.svg"
-                                                         className={`w-2  h-2 ${sentByMe ? '' : "invert-[0.5]"}`}
-                                                         alt=""/>
+                                             className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]   `}>
+                                            <p style={{
+                                                wordBreak: 'break-word',
+                                                whiteSpace: 'pre-line'
+                                            }}
+                                               className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>{item.text}</p>
+                                            <div className={'flex mt-1 flex-row justify-start items-center '}>
+                                                <img src="/assets/svgs/check.svg"
+                                                     className={`w-2  h-2 ${sentByMe ? '' : "invert-[0.5]"}`}
+                                                     alt=""/>
                                                     <span
                                                         className={`IranSansMedium text-[0.75rem] mr-2 ${!sentByMe ? "text-textDark" : "white"}`}>{moment(item.sentAt).format('hh:mm')}</span>
                                                 </div>
@@ -564,7 +564,7 @@ const ChatScreen = () => {
                                                                     })
 
                                                                 }}
-                                                                        className={'bg-glassButtonColor shadow w-[49%] flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                                        className={'bg-glassButtonColor  w-[49%] flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
                                                                     <span className={'IranSansMedium '}>لغو</span>
                                                                 </Button>
                                                                 <Button id={'pay-btn'} onClick={() => {
@@ -586,7 +586,7 @@ const ChatScreen = () => {
                                                                     }
 
                                                                 }}
-                                                                        className={'bg-glassButtonColor shadow w-[49%] flex flex-row justify-center items-center h-11 text-sm text-white rounded-xl'}>
+                                                                        className={'bg-glassButtonColor  w-[49%] flex flex-row justify-center items-center h-11 text-sm text-white rounded-xl'}>
                                                                     <span className={'IranSansMedium '}>ویرایش </span>
                                                                 </Button>
                                                             </div>
@@ -653,7 +653,7 @@ const ChatScreen = () => {
                                                                                 console.log('failde to change the price or desc')
                                                                             }
                                                                         }} id={'pay-btn'}
-                                                                        className={'bg-glassButtonColor shadow w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                                        className={'bg-glassButtonColor  w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
                                                                     <span className={'IranSansMedium '}>پرداخت</span>
                                                                 </Button>
                                             }
