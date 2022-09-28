@@ -30,6 +30,7 @@ const ChatScreen = () => {
     const [holdingShift, setHoldingShift] = useState(false);
     const [payRequestLoading, setPayRequestLoading] = useState(false);
     const [loadingButtonIds, setLoadingButtonIds] = useState([""]);
+    const [scrollToBottomBtn, setScrollToBottomBtn] = useState(false);
     const getMessagesLimit = useRef(1000);
 
     useEffect(() => {
@@ -50,14 +51,14 @@ const ChatScreen = () => {
                 chatID: $chatID
                 payRequest: {acceptorID: $acceptorID, price: $price, description: $description}
                 text: ""
-                ) {
-                    chatID
-                    editedAt
-                    id
+            ) {
+                chatID
+                editedAt
+                id
 
-                }
             }
-        `
+        }
+    `
 
 
         const [sendMoneyRequest] = useMutation(CREATE_REQUEST_MUTATION, {client: clientChat})
@@ -159,17 +160,22 @@ const ChatScreen = () => {
         const editMessagesSubscription = useSubscription(EDIT_MESSAGE_SUBSCRIPTION, {client: clientChat})
 
         useEffect(() => {
-                messages.forEach((item: any, index: number) => {
-                    if (editMessagesSubscription.data.editedMessage.id === item.id || editMessagesSubscription.data.editedMessage.tempId === item.tempId) {
-                        try {
-                            setMessages(produce((draft: any) => {
-                                draft[index] = editMessagesSubscription.data.editedMessage
-                                return draft;
-                            }))
-                        } catch (e) {
+                try {
+                    messages.forEach((item: any, index: number) => {
+                        if (editMessagesSubscription.data.editedMessage.id === item.id || editMessagesSubscription.data.editedMessage.tempId === item.tempId) {
+                            try {
+                                setMessages(produce((draft: any) => {
+                                    draft[index] = editMessagesSubscription.data.editedMessage
+                                    return draft;
+                                }))
+                            } catch (e) {
+                            }
                         }
-                    }
-                })
+                    })
+                } catch (e) {
+
+                }
+
 
             }, [editMessagesSubscription.data]
         )
@@ -279,7 +285,7 @@ const ChatScreen = () => {
                 }
             }
         `
-        const [newMessage] = useMutation(newMessageMutation, {client: clientChat})
+    const [newMessage] = useMutation(newMessageMutation, {client: clientChat})
     const sendMessageBtn = useRef<HTMLImageElement>(null);
 
 
@@ -313,6 +319,15 @@ const ChatScreen = () => {
 
     return (
         <div ref={chatBoxRef} className={'w-full h-full overflow-scroll  pb-12 scroll-smooth'}>
+            <img onClick={() => {
+                if (chatScrollerRef.current) {
+                    chatScrollerRef.current.scrollTo(0, chatScrollerRef.current.scrollHeight)
+
+                    console.log(chatScrollerRef.current)
+                }
+            }} src="/assets/svgs/scroll-to-bottom.svg"
+                 className={`fixed bottom-16 z-50 right-3 transition-all drop-shadow ${scrollToBottomBtn && currentChatStat !== 'more' ? "opacity-100 " : 'opacity-0 pointer-events-none'}`}
+                 alt=""/>
             <ToastContainer/>
 
             <BottomSheet open={payRequestOpen} onClose={() => {
@@ -329,15 +344,15 @@ const ChatScreen = () => {
                             <img src="/assets/svgs/toman.svg" className={'invert scale-90'} alt=""/>
                         </div>
                         <Input onChange={(e: any) => {
-                                let el = e.currentTarget
-                                if (el.value.replaceAll(',', '') > 999999)
-                                    el.value = el.value.substring(0, el.value.length - 1)
-                                el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
-                                setPayRequestPrice(parseInt(el.value.replaceAll(',', '')))
+                            let el = e.currentTarget
+                            if (el.value.replaceAll(',', '') > 999999)
+                                el.value = el.value.substring(0, el.value.length - 1)
+                            el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
+                            setPayRequestPrice(parseInt(el.value.replaceAll(',', '')))
 
-                            }} id={'pay-req-input'} dir={'ltr'} numOnly={false}
-                                   inputClassName={'pl-12 text-black IranSansMedium'}
-                                   wrapperClassName={"w-11/12 h-12 m-auto "}/>
+                        }} id={'pay-req-input'} dir={'ltr'} numOnly={false}
+                               inputClassName={'pl-12 text-black IranSansMedium'}
+                               wrapperClassName={"w-11/12 h-12 m-auto "}/>
 
                         </div>
                         <div className={'w-full bg-background mt-3'}>
@@ -397,18 +412,27 @@ const ChatScreen = () => {
                 </div>
 
 
-                <div className={'chat-box w-full  h-full overflow-scroll flex flex-col-reverse  pt-20 pb-2'}
-                     ref={chatScrollerRef}>
+            <div className={'chat-box w-full scroll-smooth  h-full overflow-scroll flex flex-col-reverse  pt-20 pb-2'}
+                 ref={chatScrollerRef}
+                 onScroll={(event) => {
+                     console.log(Math.abs(event.currentTarget.scrollTop))
+                     if (Math.abs(event.currentTarget.scrollTop) > 100) {
+                         setScrollToBottomBtn(true)
+                     } else {
+                         setScrollToBottomBtn(false)
+                     }
+                 }}
+            >
 
 
-                    <div className={' bottom-0 h-auto '}>
-                        {
-                            messages.map((item: any, index: number) => {
-                                let sentByMe = item.userID === UserId()
-                                if (item.type === 'TEXT')
-                                    return (
-                                        <div key={'chat-bubble-' + index}
-                                             className={` w-full h-auto flex flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
+                <div className={' bottom-0 h-auto '}>
+                    {
+                        messages.map((item: any, index: number) => {
+                            let sentByMe = item.userID === UserId()
+                            if (item.type === 'TEXT')
+                                return (
+                                    <div key={'chat-bubble-' + index}
+                                         className={` w-full h-auto flex flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
                                             <div style={{
                                                 // animationDelay: index * 50 + 'ms'
                                             }}
@@ -537,7 +561,7 @@ const ChatScreen = () => {
                                                                     })
 
                                                                 }}
-                                                                        className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                                        className={'bg-glassButtonColor shadow w-[49%] flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
                                                                     <span className={'IranSansMedium '}>لغو</span>
                                                                 </Button>
                                                                 <Button id={'pay-btn'} onClick={() => {
@@ -559,7 +583,7 @@ const ChatScreen = () => {
                                                                     }
 
                                                                 }}
-                                                                        className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center h-11 text-sm text-white rounded-xl'}>
+                                                                        className={'bg-glassButtonColor shadow w-[49%] flex flex-row justify-center items-center h-11 text-sm text-white rounded-xl'}>
                                                                     <span className={'IranSansMedium '}>ویرایش </span>
                                                                 </Button>
                                                             </div>
@@ -626,20 +650,20 @@ const ChatScreen = () => {
                                                                                 console.log('failde to change the price or desc')
                                                                             }
                                                                         }} id={'pay-btn'}
-                                                                        className={'bg-primary shadow w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                                        className={'bg-glassButtonColor shadow w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
                                                                     <span className={'IranSansMedium '}>پرداخت</span>
                                                                 </Button>
                                             }
 
                                         </div>
                                     </div>
-                                }
-                            })
-                        }
-                    </div>
-
-
+                            }
+                        })
+                    }
                 </div>
+
+
+            </div>
 
             <div style={{
                 boxShadow: "0px -1px 9px 0px #0000000f"
@@ -664,15 +688,15 @@ const ChatScreen = () => {
                                      }).then(() => {
                                      });
                                      //     // addMessage((document.getElementById('text-chat') as HTMLInputElement)!.value);
-                                         (document.getElementById('text-chat') as HTMLInputElement)!.value = ""
-                                         setCurrentChatStat('default');
-                                         try {
-                                             document.getElementById('text-chat')!.focus()
+                                     (document.getElementById('text-chat') as HTMLInputElement)!.value = ""
+                                     setCurrentChatStat('default');
+                                     try {
+                                         document.getElementById('text-chat')!.focus()
 
-                                         } catch (e) {
+                                     } catch (e) {
 
-                                         }
-                                     }} ref={sendMessageBtn}/>
+                                     }
+                                 }} ref={sendMessageBtn}/>
                                 : currentChatStat === 'default' ?
                                     <img src="/assets/svgs/chat-add.svg" alt="" onClick={() => {
                                         setCurrentChatStat('more')
