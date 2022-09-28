@@ -319,6 +319,8 @@ const ChatScreen = () => {
 
     return (
         <div ref={chatBoxRef} className={'w-full h-full overflow-scroll  pb-12 scroll-smooth'}>
+            <img src="/assets/svgs/chat-back.svg"
+                 className={'w-full h-full fixed top-0 left-0 pointer-events-none opacity-20'} alt=""/>
             <img onClick={() => {
                 if (chatScrollerRef.current) {
                     chatScrollerRef.current.scrollTo(0, chatScrollerRef.current.scrollHeight)
@@ -412,20 +414,21 @@ const ChatScreen = () => {
                 </div>
 
 
-            <div className={'chat-box w-full scroll-smooth  h-full overflow-scroll flex flex-col-reverse  pt-20 pb-2'}
-                 ref={chatScrollerRef}
-                 onScroll={(event) => {
-                     console.log(Math.abs(event.currentTarget.scrollTop))
-                     if (Math.abs(event.currentTarget.scrollTop) > 100) {
-                         setScrollToBottomBtn(true)
-                     } else {
-                         setScrollToBottomBtn(false)
-                     }
-                 }}
+            <div
+                className={'chat-box z-10 w-full scroll-smooth  h-full overflow-scroll flex flex-col-reverse  pt-20 pb-2'}
+                ref={chatScrollerRef}
+                onScroll={(event) => {
+                    console.log(Math.abs(event.currentTarget.scrollTop))
+                    if (Math.abs(event.currentTarget.scrollTop) > 100) {
+                        setScrollToBottomBtn(true)
+                    } else {
+                        setScrollToBottomBtn(false)
+                    }
+                }}
             >
 
 
-                <div className={' bottom-0 h-auto '}>
+                <div className={' bottom-0 h-auto  z-10'}>
                     {
                         messages.map((item: any, index: number) => {
                             let sentByMe = item.userID === UserId()
@@ -433,9 +436,9 @@ const ChatScreen = () => {
                                 return (
                                     <div key={'chat-bubble-' + index}
                                          className={` w-full h-auto flex flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
-                                            <div style={{
-                                                // animationDelay: index * 50 + 'ms'
-                                            }}
+                                        <div style={{
+                                            // animationDelay: index * 50 + 'ms'
+                                        }}
                                                  className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]   `}>
                                                 <p style={{
                                                     wordBreak: 'break-word',
