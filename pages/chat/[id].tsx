@@ -12,16 +12,18 @@ import {DOWNLOAD_HOST} from "../../store/GLOBAL_VARIABLES";
 import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
 import BottomSheet from "../../components/view/BottomSheet/BottomSheet";
 import Input from "../../components/view/Input/Input";
+import Toast from "../../components/normal/Toast/Toast";
+import {ToastContainer} from "react-toastify";
 
 const ChatScreen = () => {
 
-        const chatBoxRef = useRef<HTMLDivElement>(null)
-        const router = useRouter();
-        const id = router.query.id
-        const chatScrollerRef = useRef<HTMLDivElement>(null);
-        const [messages, setMessages] = useState([] as any);
-        const [currentChatStat, setCurrentChatStat] = useState('default');
-        const [payRequestOpen, setPayRequestOpen] = useState(false);
+    const chatBoxRef = useRef<HTMLDivElement>(null)
+    const router = useRouter();
+    const id = router.query.id
+    const chatScrollerRef = useRef<HTMLDivElement>(null);
+    const [messages, setMessages] = useState([] as any);
+    const [currentChatStat, setCurrentChatStat] = useState('default');
+    const [payRequestOpen, setPayRequestOpen] = useState(false);
         const [payRequestPrice, setPayRequestPrice] = useState(0);
         const [holdingShift, setHoldingShift] = useState(false);
         const getMessagesLimit = useRef(1000);
@@ -116,17 +118,21 @@ const ChatScreen = () => {
 
 
         `
-        const [editPrice] = useMutation(EDIT_PRICE_MUTATION, {client: clientChat})
+    const [editPrice] = useMutation(EDIT_PRICE_MUTATION, {
+        client: clientChat, onError: (e) => {
+            Toast("موجودی کافی نمیباشد", '', 3000, '', 70)
+        }
+    })
 
-        const EDIT_MESSAGE_SUBSCRIPTION = gql`
+    const EDIT_MESSAGE_SUBSCRIPTION = gql`
 
-            subscription {
-                editedMessage {
-                    chatID
-                    text
-                    id
-                    tempId
-                    userID
+        subscription {
+            editedMessage {
+                chatID
+                text
+                id
+                tempId
+                userID
                     type
                     payRequest {
                         updatedAt
@@ -269,7 +275,7 @@ const ChatScreen = () => {
         `
         const [newMessage] = useMutation(newMessageMutation, {client: clientChat})
         const sendMessageBtn = useRef<HTMLImageElement>(null);
-// 0, chatScrollerRef.current.getBoundingClientRect().height
+
 
         const [chatLoading, setChatLoading] = useState(true);
         const [currentEditPayRequestData, setCurrentEditPayRequestData] = useState({
@@ -288,10 +294,9 @@ const ChatScreen = () => {
         }
 
 
-
-
         return (
             <div ref={chatBoxRef} className={'w-full h-full overflow-scroll  pb-12 scroll-smooth'}>
+                <ToastContainer/>
 
                 <BottomSheet open={payRequestOpen} onClose={() => {
                     setPayRequestOpen(false)
@@ -308,6 +313,8 @@ const ChatScreen = () => {
                             </div>
                             <Input onChange={(e: any) => {
                                 let el = e.currentTarget
+                                if (el.value.replaceAll(',', '') > 999999)
+                                    el.value = el.value.substring(0, el.value.length - 1)
                                 el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
                                 setPayRequestPrice(parseInt(el.value.replaceAll(',', '')))
 
@@ -335,7 +342,7 @@ const ChatScreen = () => {
                                 setPayRequestOpen(true)
                                 setCurrentChatStat('payRequest');
                             }} className={'w-full h-full flex flex-row justify-center px-3 py-3'}>
-                                <img src="/assets/svgs/moneys.svg" alt=""/>
+                                <img className={'invert'} src="/assets/svgs/moneys.svg" alt=""/>
                                 <span className={'IranSansMedium text-textBlack mr-4 z-30'}> درخواست وجه</span>
                             </Button>
 
@@ -455,7 +462,7 @@ const ChatScreen = () => {
                                                     <div
                                                         className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium whitespace-nowrap flex flex-row justify-center items-start`}>
                                                     <span
-                                                        className={'ml-1 text-lg'}>{item.payRequest.price / 1000}</span>
+                                                        className={'ml-1 text-lg'}>{(item.payRequest.price / 1000).toLocaleString()}</span>
                                                         <img src="/assets/svgs/thousand-tomans.svg" alt=""
                                                              className={`ml-3 w-20 ${sentByMe ? '' : 'invert'}`}/>
                                                     </div>
@@ -467,7 +474,7 @@ const ChatScreen = () => {
                                                              className={`w-2 z-10 h-2 ${sentByMe ? '' : 'invert-[0.5]'}`}
                                                              alt=""/>
                                                         <span
-                                                            className={`IranSansMedium text-[0.75rem] mr-2 ${sentByMe ? "text-white" : "text-textDarker"}`}>{moment().format('hh:mm')}</span>
+                                                            className={`IranSansMedium text-[0.75rem] mr-2 ${sentByMe ? "text-white" : "text-textDarker"}`}>{moment(item.sentAt).format('hh:mm')}</span>
                                                     </div>
 
 
@@ -481,51 +488,58 @@ const ChatScreen = () => {
                                                             <span className={'IranSansMedium '}>لغو شده</span>
                                                         </Button>
                                                         :
+                                                        payRequest.status === "ACCEPTED" ?
+                                                            <Button id={'pay-btn'}
+                                                                    className={'bg-textDark shadow  w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl mt-1.5'}>
+                                                                    <span
+                                                                        className={'IranSansMedium '}>پرداخت شده</span>
+                                                            </Button>
+                                                            :
 
-                                                        <div
-                                                            className={'flex flex-row justify-between items-center w-full  mt-1.5'}>
-                                                            <Button id={'pay-btn'} onClick={() => {
-                                                                let idObject = {id: '', tempId: ''} as any
-                                                                if (item.id)
-                                                                    idObject.id = item.id
-                                                                else if (item.tempId)
-                                                                    idObject.tempId = item.tempId
-                                                                editPrice({
-                                                                    variables: {
-                                                                        ...idObject,
-                                                                        tempId: item.tempId,
-                                                                        isCanceled: true
+                                                            <div
+                                                                className={'flex flex-row justify-between items-center w-full  mt-1.5'}>
+                                                                <Button id={'pay-btn'} onClick={() => {
+                                                                    let idObject = {id: '', tempId: ''} as any
+                                                                    if (item.id)
+                                                                        idObject.id = item.id
+                                                                    else if (item.tempId)
+                                                                        idObject.tempId = item.tempId
+                                                                    editPrice({
+                                                                        variables: {
+                                                                            ...idObject,
+                                                                            tempId: item.tempId,
+                                                                            isCanceled: true
+                                                                        }
+                                                                    }).then(() => {
+                                                                    })
+
+                                                                }}
+                                                                        className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                                    <span className={'IranSansMedium '}>لغو</span>
+                                                                </Button>
+                                                                <Button id={'pay-btn'} onClick={() => {
+                                                                    try {
+                                                                        setCurrentEditPayRequestData(produce((draft) => {
+                                                                            draft.description = item.payRequest.description;
+                                                                            draft.price = item.payRequest.price;
+                                                                            if (item.id)
+                                                                                draft.id = item.id
+                                                                            else if (item.tempId)
+                                                                                draft.tempId = item.tempId
+                                                                            return draft
+                                                                        }))
+                                                                        setPayRequestOpen(true)
+                                                                        setCurrentChatStat('payRequest')
+
+                                                                    } catch (e) {
+                                                                        console.log('failde to change the price or desc')
                                                                     }
-                                                                }).then(() => {
-                                                                })
 
-                                                            }}
-                                                                    className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
-                                                                <span className={'IranSansMedium '}>لغو</span>
-                                                            </Button>
-                                                            <Button id={'pay-btn'} onClick={() => {
-                                                                try {
-                                                                    setCurrentEditPayRequestData(produce((draft) => {
-                                                                        draft.description = item.payRequest.description;
-                                                                        draft.price = item.payRequest.price;
-                                                                        if (item.id)
-                                                                            draft.id = item.id
-                                                                        else if (item.tempId)
-                                                                            draft.tempId = item.tempId
-                                                                        return draft
-                                                                    }))
-                                                                    setPayRequestOpen(true)
-                                                                    setCurrentChatStat('payRequest')
-
-                                                                } catch (e) {
-                                                                    console.log('failde to change the price or desc')
-                                                                }
-
-                                                            }}
-                                                                    className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center h-11 text-sm text-white rounded-xl'}>
-                                                                <span className={'IranSansMedium '}>ویرایش </span>
-                                                            </Button>
-                                                        </div>
+                                                                }}
+                                                                        className={'bg-primary shadow w-[49%] flex flex-row justify-center items-center h-11 text-sm text-white rounded-xl'}>
+                                                                    <span className={'IranSansMedium '}>ویرایش </span>
+                                                                </Button>
+                                                            </div>
                                                     :
                                                     payRequest.status === "ACCEPTED" ?
                                                         <Button id={'pay-btn'}
@@ -681,7 +695,8 @@ const ChatScreen = () => {
                                                                  price: payRequestPrice,
                                                                  description: messageText
 
-                                                             }
+                                                             },
+
                                                          }).then(() => {
                                                              setPayRequestOpen(false)
                                                          });
@@ -731,6 +746,8 @@ const ChatScreen = () => {
                             } else {
                                 setCurrentChatStat('default')
                             }
+
+
                     }} id={'text-chat'} placeholder={currentChatStat === 'payRequest' ? 'متن درخواست' : 'بنویس'}
                               className={'w-full IranSansMedium bg-transparent h-auto leading-5'}
                               rows={1} name="Text1" onClick={() => {

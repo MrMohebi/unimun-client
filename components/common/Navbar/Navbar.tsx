@@ -32,7 +32,7 @@ const Navbar = (props: { children: any }) => {
             svg: 'home'
         },
         {
-            name: 'کیف پول',
+            name: 'یونی جیب',
             path: '/wallet',
             svg: 'wallet'
         },
@@ -63,7 +63,7 @@ const Navbar = (props: { children: any }) => {
         <div className={'contents'}>
 
             <div
-                className={`navbar z-40 ${allowedToShowRoutes.includes(router.pathname.replace('/', '')) ? '' : "hidden"}`}>
+                className={`navbar z-[51] ${allowedToShowRoutes.includes(router.pathname.replace('/', '')) ? '' : "hidden"}`}>
 
                 <Tab indicatorSizeDivider={2} activeIndex={globalCurrentNavActiveIndex}>
                     {

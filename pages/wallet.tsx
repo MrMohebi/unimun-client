@@ -15,6 +15,8 @@ import BottomSheet from "../components/view/BottomSheet/BottomSheet";
 import Toast from "../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
 import {passedTime} from "../helpers/passedTime";
+import HelpSvg from "../assets/svgs/help.svg";
+import {UserToken} from "../store/user";
 
 const Wallet = () => {
 
@@ -94,8 +96,15 @@ const Wallet = () => {
     const [payRequestPrice, setPayRequestPrice] = useState(0);
     const [payRequestOpen, setPayRequestOpen] = useState(false);
 
+    useEffect(() => {
+        getWalletDataResult.refetch()
+        getTransactions.refetch()
+    }, []);
 
     useEffect(() => {
+
+        if (!UserToken())
+            router.push('/profile/login')
         if (lottieRef.current)
             lottie.loadAnimation({
                 container: lottieRef.current,
@@ -112,15 +121,18 @@ const Wallet = () => {
     useEffect(() => {
         if (getWalletDataResult.data) {
             console.log(getWalletDataResult.data)
-            try {
-                setBalance(getWalletDataResult.data.wallet.data.balance)
-                setBlocked(getWalletDataResult.data.wallet.data.blocked)
-                setWalletID(getWalletDataResult.data.wallet.data.id)
+            if (!UserToken())
+                router.push('/profile/login')
+            else
+                try {
+                    setBalance(getWalletDataResult.data.wallet.data.balance)
+                    setBlocked(getWalletDataResult.data.wallet.data.blocked)
+                    setWalletID(getWalletDataResult.data.wallet.data.id)
 
-                setLoading(false)
-            } catch (e) {
-                alert('bad request')
-            }
+                    setLoading(false)
+                } catch (e) {
+                    alert('bad request')
+                }
         }
 
     }, [getWalletDataResult]);
@@ -150,12 +162,25 @@ const Wallet = () => {
             }
 
         }} ref={containerRef}>
-            <FullScreenLoading dim={true} show={loading}/>
+            <div className={'w-full px-4  flex flex-row justify-between'}>
+                <div className={'IranSansBold text-[1rem] pt-4'}>
+                    <span>یونیـ<span className={'text-primary -mr-1'}>جیب</span></span>
+                </div>
+                <div className={'h-6 w-6 opacity-0'} onClick={() => {
+                    //help on click
+                }}>
+                    <HelpSvg/>
+                </div>
+            </div>
+
+            <FullScreenLoading whiteBack={true} show={loading}/>
             <BottomSheet open={payRequestOpen} onClose={() => {
                 setPayRequestOpen(false)
             }}>
+
                 <ToastContainer/>
                 <div className={' w-full bg-transparent flex flex-col justify-start items-center pt-4 '}>
+
                     <span
                         className={'IranSansMedium text-textDarker text-right w-full text-md  pr-4 text-textDarker block'}>مبلغ درخواستی خود را وارد کنید</span>
                     <div className={'relative w-full flex-col justify-center items-center mt-5'}>
@@ -288,7 +313,7 @@ const Wallet = () => {
                         <div
                             className={'absolute top-0 left-0 w-full h-full px-4 pt-2 pb-5 flex flex-col justify-between items-center'}>
                             <div className={'w-full '}>
-                                <span className={'IranSansMedium text-white text-sm'}>یـونی بانک</span>
+                                <span className={'IranSansMedium text-white text-sm'}>یـونی کارت</span>
                             </div>
 
                             <div className={'flex flex-col justify-center items-center '}>
@@ -355,29 +380,33 @@ const Wallet = () => {
                     <div className={'w-full flex flex-row justify-around items-center px-4'}>
                         <Button onClick={() => {
                             setChargeWalletOpen(true)
-                        }} className={' h-10 rounded-xl bg-background flex flex-row justify-between items-center'}
+                        }} className={' h-12 rounded-xl bg-background flex flex-row justify-between items-center'}
                                 id={'withdraw'} rippleColor={'rgba(0,0,0,0.14)'}>
                             <div
-                                className={'h-10 w-10 rounded-xl bg-primary flex flex-col justify-center items-center'}>
+                                className={'h-12 w-12 rounded-xl bg-primary flex flex-col justify-center items-center'}>
                                 <img src="/assets/svgs/deposit.svg" alt=""/></div>
-                            <span className={"IranSansMedium text-primary text-sm mr-3 ml-3"}>واریــز وجه</span>
+                            <span className={"IranSansMedium text-primary text-sm mr-4 ml-4"}>واریــز وجه</span>
                         </Button>
                         <Button onClick={() => {
                             setPayRequestOpen(true)
-                        }} className={' h-10 rounded-xl bg-background flex flex-row justify-between items-center'}
+                        }} className={' h-12 rounded-xl bg-background flex flex-row justify-between items-center'}
                                 id={'withdraw'} rippleColor={'rgba(0,0,0,0.14)'}
 
                         >
                             <div
-                                className={'h-10 w-10 rounded-xl bg-primary flex flex-col justify-center items-center'}>
+                                className={'h-12 w-12 rounded-xl bg-primary flex flex-col justify-center items-center'}>
                                 <img src="/assets/svgs/withdraw.svg" alt=""/></div>
-                            <span className={"IranSansMedium text-primary text-sm mr-3 ml-3"}>برداشت وجه</span>
+                            <span className={"IranSansMedium text-primary text-sm mr-4 ml-4"}>برداشت وجه</span>
                         </Button>
                     </div>
 
 
+                    <div className={'w-full text-right mt-4 mb-2'}>
+                        <span className={'text-primary IranSansMedium pr-4 pt-4 mt-2 text-sm mt-2 '}> تراکنش ها</span>
+                    </div>
                     <div className={'w-full h-full overflow-scroll'}>
                         {transactions.map((item: any, index) => {
+                            console.log(item)
                             let transaction = item.node;
                             let deposit = false;
                             if (transaction.toWallet === walletID)
@@ -388,9 +417,9 @@ const Wallet = () => {
                                     <Button className={"w-full flex flex-row justify-between items-center px-3"}>
 
                                         <div className={'flex flex-row justify-start items-center h-14 IranSans'}>
-                                            <img
-                                                src={`/assets/svgs/${deposit ? 'deposit-transaction.svg' : 'withdraw-transaction.svg'}`}
-                                                alt=""/>
+                                            <img className={'rotate-180'}
+                                                 src={`/assets/svgs/${deposit ? 'deposit-transaction.svg' : 'withdraw-transaction.svg'}`}
+                                                 alt=""/>
                                             <span>{deposit ? 'واریز به حساب' : 'برداشت از حساب'}</span>
                                             <span
                                                 className={'text-gray-400 text-sm mr-2'}>{passedTime(transaction.createdAt)}</span>
@@ -399,7 +428,7 @@ const Wallet = () => {
                                         <div className={'flex flex-row justify-end items-center'}>
                                 <span
                                     className={'IranSans ml-2'}>{transaction.amountToman ? transaction.amountToman.toLocaleString() : 0}</span>
-                                            <img className={'invert-[0.5]'} src="/assets/svgs/toman.svg" alt=""/>
+                                            <img className={'invert-[0.8]'} src="/assets/svgs/toman.svg" alt=""/>
                                         </div>
                                     </Button>
                                 </div>

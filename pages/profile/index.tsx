@@ -107,8 +107,8 @@ const Index = () => {
             <Drawer minHeight={drawerMinHeight[0]} initHeight={drawerInitHeight[0]}
                     wrap={
                         <div className={'w-full h-full IranSansMedium text-textBlack text-sm overflow-scroll '}>
-                            <div className={'w-full px-4 pt-3 flex flex-row justify-between'}>
-                                <div className={'IranSansBlack text-md pt-4'}>
+                            <div className={'w-full px-4  flex flex-row justify-between'}>
+                                <div className={'IranSansBold text-[1rem] pt-4'}>
                                     <span>پرو <span className={'text-primary -mr-1'}>فایل</span></span>
                                 </div>
                                 <div className={'h-6 w-6 opacity-0'} onClick={() => {
@@ -116,15 +116,15 @@ const Index = () => {
                                 }}>
                                     <HelpSvg/>
                                 </div>
-                    </div>
-                    <div className={'w-full flex flex-col justify-center items-center'}>
-                        <div
-                            className={'w-24 h-24 bg-white shadow-lg rounded-3xl mt-10 flex flex-col justify-center items-center'}>
-                            <div className={'w-10 h-10'}>
-                                <UserOutlineSvg/>
                             </div>
-                        </div>
-                    </div>
+                            <div className={'w-full flex flex-col justify-center items-center'}>
+                                <div
+                                    className={'w-24 h-24 bg-white shadow-lg rounded-3xl mt-10 flex flex-col justify-center items-center'}>
+                                    <div className={'w-10 h-10'}>
+                                        <UserOutlineSvg/>
+                                    </div>
+                                </div>
+                            </div>
 
                     {UserToken() ?
                         data && data.user && data.user.data ?
