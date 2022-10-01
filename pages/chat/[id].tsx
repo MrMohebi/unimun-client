@@ -371,7 +371,7 @@ const ChatScreen = () => {
                 {
                     currentChatStat === 'more' ?
                         <div id={'test-pay'}
-                             className={' z-10   bottom-16 overflow-hidden bg-white rounded-xl right-4 shadow-md   fixed'}>
+                             className={' z-20   bottom-16 overflow-hidden bg-white rounded-xl right-4 shadow-md   fixed'}>
                             <Button onClick={() => {
                                 setPayRequestOpen(true)
                                 setCurrentChatStat('payRequest');
