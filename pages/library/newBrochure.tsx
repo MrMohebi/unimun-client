@@ -28,8 +28,7 @@ import {fixPrice} from "../../helpers/fixPrice";
 import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUpload";
 
 const NewBrochure = () => {
-
-
+    
     //queries
 
     const createBookMutation = gql`
