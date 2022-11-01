@@ -11,7 +11,6 @@ const Navbar = (props: { children: any }) => {
     const router = useRouter();
     const globalCurrentNavActiveIndex = useReactiveVar(currentNavActiveIndex)
     const allowedToShowRoutes = ['', 'profile', 'ask', 'library', 'wallet']
-    const hideInThisRoutes = ['login', 'newBook']
     const [svg, _svg] = useState(<h1>Mokafelam</h1>)
 
 
@@ -84,10 +83,15 @@ const Navbar = (props: { children: any }) => {
                                          className={'navbar-Button relative w-20 m-0 flex flex-col justify-center items-center ' + (active ? 'nav-active' : '')}>
 
 
-                                        <SVG
-                                            svgPath={'navbar/' + item.svg + '-' + (active ? 'bold' : 'outline')}
-                                            svgOnLoad={(svg: any) => {
-                                            }} wrapperClassName={''}/>
+                                        {
+                                            <img
+                                                src={`/assets/svgs/navbar/${item.svg}-${active ? "bold" : 'outline'}.svg`}
+                                                className={`w-8 pt-1 h-10 ${active ? "nav-active" : ''}`} alt=""/>
+                                        }
+                                        {/*<SVG*/}
+                                        {/*    svgPath={'navbar/' + item.svg + '-' + (active ? 'bold' : 'outline')}*/}
+                                        {/*    svgOnLoad={(svg: any) => {*/}
+                                        {/*    }} wrapperClassName={''}/>*/}
 
                                         <span className={'IranSansMedium text-tiny mt-1'}>{item.name}</span>
                                     </div>

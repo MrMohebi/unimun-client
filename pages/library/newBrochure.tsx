@@ -6,12 +6,12 @@ import Step from "../../components/view/StepperFtagment/Step/Step";
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import Dimmer from "../../components/view/Dimmer/Dimmer";
-import {uploadBookFile, uploadBookImages, uploadImage} from "../../Requests/uploadRequests";
+import {uploadBookFile} from "../../Requests/uploadRequests";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 import FileUploadSVG from "../../assets/svgs/fileUpload.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
 import FileSVG from "../../assets/svgs/file.svg";
-import {gql, useLazyQuery, useMutation} from "@apollo/client";
+import {gql, useMutation} from "@apollo/client";
 import Toman from '../../assets/svgs/toman.svg'
 import BookCategories from "../../components/normal/BookCategories/BookCategories";
 import BookAppearance from "../../components/normal/BookAppearance/BookAppearance";
@@ -660,6 +660,7 @@ const NewBrochure = () => {
                                                        _fileUploadingPercentage('')
                                                        if (response.data.validMimes) {
                                                            Toast("فرمت فایل معتبر نیست")
+                                                           return 0
                                                        }
                                                        if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
                                                            // setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
@@ -793,7 +794,7 @@ const NewBrochure = () => {
                                 <span className={'IranSansMedium'}>فروش به قیمت</span>
                                 <div
                                     className={'IranSansMedium h-10 w-20 flex flex-row justify-around items-center bg-background rounded-lg'}>
-                                    <input id={'free-book'} className={'scale-150 rounded border-2 border-primary'}
+                                    <input id={'free-book'} className={'free-checkbox'}
                                            defaultValue={fixPrice(BookData.price)}
                                            type={'checkbox'} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                         if (e.currentTarget.checked)

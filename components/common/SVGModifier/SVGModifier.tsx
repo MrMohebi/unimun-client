@@ -1,5 +1,4 @@
 import React, {useEffect, useRef} from 'react';
-
 interface Props {
     SVGName: string,
     elementClass: string,

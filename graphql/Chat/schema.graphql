@@ -22,10 +22,25 @@ type Chat {
     user: User
 }
 
+type InlineKeyboard {
+    action: String
+    data: String
+    text: String!
+    url: String
+}
+
+type Location {
+    lat: String!
+    lon: String!
+    text: String
+}
+
 type Message {
     chatID: ID!
     editedAt: Int
     id: ID
+    inlineKeyboard: [InlineKeyboard]
+    location: Location
     payRequest: PayRequest
     request: Request
     sentAt: Int!
@@ -38,9 +53,7 @@ type Message {
 type Mutation {
     createPV(receiverID: ID!, text: String): Chat
     editMessage(id: ID, payRequest: PayRequestEditInp, tempId: String, text: String): Message
-    sendMessage(chatID: ID!, payRequest: PayRequestCreateInp, text: String): Message
-    sendRequest(appealID: ID, bookID: ID, description: String, price: Int): Request
-    updateRequestStatus(accepted: Boolean!, id: ID!): String!
+    sendMessage(chatID: ID!, location: LocationInp, payRequest: PayRequestCreateInp, text: String): Message
 }
 
 type PayRequest {
@@ -65,7 +78,6 @@ type Query {
     chat(id: ID!): Chat
     chatMessages(chatID: ID!, limit: Int, next: Boolean, sentAt: Int): [Message]
     chats: [Chat]
-    requests(createdAt: Int, limit: Int, next: Boolean): [Request]
     supportChat: Chat
 }
 
@@ -97,6 +109,12 @@ type User {
     name: String!
     profiles: [Profile]
     verifiedAt: Int
+}
+
+input LocationInp {
+    lat: String!
+    lon: String!
+    text: String
 }
 
 input PayRequestCreateInp {

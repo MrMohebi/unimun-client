@@ -11,6 +11,7 @@ import {setId, setToken} from "../../helpers/TokenHelper";
 import Promoter from "../../assets/svgs/postbox.svg";
 import {updateUser} from "../../Requests/withAuthentication/user";
 import {currentNavActiveIndex} from "../../store/navbar";
+import {phoneNumberValidation} from "../../helpers/phoneNumberValidation";
 
 const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState('00000000000')
@@ -38,14 +39,7 @@ const Login = () => {
     const [verifyReferral, verifyReferralResult] = useLazyQuery(gql`${isReferenceCodeValid().query}`, {variables: isReferenceCodeValid().variables})
     const [setName, setNameResult] = useMutation(gql`${updateUser({name:''}).query}`, {variables: updateUser({name: ''}).variables})
 
-    let phoneNumberValidation = (phone: string) => {
-        if (phone[0] === '0' && phone[1] === '9') {
-            if (phone.length === 11) {
-                return true;
-            }
-        }
-        return false;
-    }
+
 
     let codeValidation = (code: string) => {
         return code.length === 4;
@@ -431,7 +425,7 @@ const Login = () => {
                             submitButtonClick()
 
                         }} disabled={!allowForNextStep} rippleColor={'rgba(255,255,255,0.62)'}
-                        className={`${currentStep === 0 ? 'w-2/4' : 'w-full'} ${currentStep === 3 && allowForNextStep ? ' bg-primary ' : ''}${allowForNextStep ? 'bg-primary' : 'bg-textDark'}  ${allowForNextStep && !vCodeError ? 'bg-primary' : !vCodeError ? 'bg-textDark' : ''} ${vCodeError && currentStep === 1 ? 'bg-errorRed' : ''} transition-all text-md duration-500 h-14 rounded-xl `}>
+                        className={` ${vCodeError && currentStep === 1 ? 'bg-errorRed' : ''} ${currentStep === 0 ? 'w-2/4' : 'w-full'} ${currentStep === 3 && allowForNextStep ? ' bg-primary ' : ''} ${allowForNextStep ? 'bg-primary' : 'bg-textDark'} ${allowForNextStep && !vCodeError ? 'bg-primary' : !vCodeError ? 'bg-textDark' : ''}  transition-all text-md duration-500 h-14 rounded-xl `}>
                     <span className={'text-md text-white IranSansMedium'}>
 
                         {

@@ -5,13 +5,13 @@ import {createClient} from 'graphql-ws';
 import {setContext} from "@apollo/client/link/context";
 import {UserToken} from "./store/user";
 
-const env = process.env.NODE_ENV
 
-let uri = 'https://tttapi.unimun.me/graphql'
-let uriChat = 'https://tttchat.unimun.me/graphql'
-let urlChatWss = 'wss://tttchat.unimun.me/graphql'
+let isTesting = process.env.NODE_ENV || process.env.NEXT_PUBLIC_IS_DEV_MOD;
+// isTesting = false;
 
-
+let uri = isTesting ? 'https://tttapi.unimun.me/graphql' : 'https://api.unimun.me/graphql'
+let uriChat = isTesting ? 'https://tttchat.unimun.me/graphql' : 'https://chat.unimun.me/graphql'
+let urlChatWss = isTesting ? 'wss://tttchat.unimun.me/graphql' : 'wss://chat.unimun.me/graphql'
 
 
 const httpLink = createHttpLink({
@@ -22,17 +22,17 @@ const httpLinkChat = createHttpLink({
 });
 const wssLinkChat = typeof window !== "undefined" ?
     new GraphQLWsLink(createClient({
-        url: ()=>{
+        url: () => {
             const token = UserToken()
             return urlChatWss + "?token=" + token
         }
     }))
-    : 
+    :
     null;
 
 const createSplitLinkChat = () => {
     return split(
-        ({ query,getContext}) => {
+        ({query, getContext}) => {
             const def = getMainDefinition(query);
             return (def.kind === "OperationDefinition" && def.operation === "subscription");
         },
@@ -43,7 +43,7 @@ const createSplitLinkChat = () => {
 
 
 const splitLinkChat = (typeof window !== "undefined" && typeof wssLinkChat !== "undefined") ?
-    createSplitLinkChat() 
+    createSplitLinkChat()
     :
     httpLinkChat;
 

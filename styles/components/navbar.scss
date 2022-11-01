@@ -7,6 +7,7 @@
 }
 .nav-active {
   @apply text-primary;
+  filter: brightness(1) invert(.7) sepia(1) hue-rotate(160deg) saturate(360%);
 }
 .nav-indicator{
   @apply bg-primary;

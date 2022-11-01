@@ -43,7 +43,8 @@
 }
 
 .nav-active {
-  @apply text-primary;
+    @apply text-primary;
+    filter: brightness(1) invert(0.7) sepia(1) hue-rotate(160deg) saturate(360%);
 }
 
 .nav-indicator {
@@ -543,7 +544,6 @@ input:focus {
     max-height: 200px;
   }
 }
-
 .white-scan section section div {
   box-shadow: rgba(255, 255, 255, 0.7) 0px 0px 0px 5px inset !important;
   border-radius: 70px;

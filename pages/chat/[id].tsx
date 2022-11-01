@@ -15,10 +15,12 @@ import Input from "../../components/view/Input/Input";
 import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
+import LocationBottomSheet from "../../components/normal/LocationBottomSheet/LocationBottomSheet";
 
 const ChatScreen = () => {
 
 
+    const lastMessageGroupDate = useRef('')
     const chatBoxRef = useRef<HTMLDivElement>(null)
     const router = useRouter();
     const id = router.query.id
@@ -32,6 +34,7 @@ const ChatScreen = () => {
     const [loadingButtonIds, setLoadingButtonIds] = useState([""]);
     const [scrollToBottomBtn, setScrollToBottomBtn] = useState(false);
     const getMessagesLimit = useRef(1000);
+    const [userData, setUserData] = useState({});
 
     useEffect(() => {
         if (Object.keys(CurrentChatUserData()).length) {
@@ -42,7 +45,14 @@ const ChatScreen = () => {
         } else {
             router.push('/chat')
         }
+
     }, [])
+
+    useEffect(() => {
+
+
+        setUserData(CurrentChatUserData())
+    }, []);
 
 
     const CREATE_REQUEST_MUTATION = gql`
@@ -60,34 +70,58 @@ const ChatScreen = () => {
         }
     `
 
+    const GET_CHAT_QUERY = gql`
+        query($chatID:ID!) {
+            __typename
+            chat(id: $chatID) {
+                title
+                profiles {
+                    thumbnail
+                }
+            }
+        }
+
+    `
+
+    const [getChat] = useLazyQuery(GET_CHAT_QUERY, {client: clientChat})
+
+    useEffect(() => {
+        getChat({
+            variables: {
+                chatID: id,
+            }
+        }).then((result) => {
+        })
+    }, []);
+
 
     const [sendMoneyRequest] = useMutation(CREATE_REQUEST_MUTATION, {client: clientChat})
     const chatsSubscriptionRequest = gql`
 
         subscription onNewMessage {
-                newMessage{
-                    userID
-                    text
-                    type
-                    sentAt
-                    payRequest {
-                        acceptorID
-                        createdAt
-                        creatorID
-                        description
-                        id
-                        isAccepted
-                        paidAt
-                        price
-                        status
-                        updatedAt
-                    }
+            newMessage{
+                userID
+                text
+                type
+                sentAt
+                payRequest {
+                    acceptorID
+                    createdAt
+                    creatorID
+                    description
                     id
-                    tempId
-                    chatID
-                    editedAt
+                    isAccepted
+                    paidAt
+                    price
+                    status
+                    updatedAt
                 }
-            }`
+                id
+                tempId
+                chatID
+                editedAt
+            }
+        }`
 
         const chatsSubscription = useSubscription(chatsSubscriptionRequest, {client: clientChat})
 
@@ -125,7 +159,6 @@ const ChatScreen = () => {
         `
     const [editPrice] = useMutation(EDIT_PRICE_MUTATION, {
         client: clientChat, onError: (e) => {
-            console.log(e)
             Toast("موجودی کافی نمیباشد", '', 3000, '', 70)
             removeAllBtnLoadings()
         }
@@ -190,6 +223,12 @@ const ChatScreen = () => {
                     type
                     sentAt
                     tempId
+                    inlineKeyboard {
+                        action
+                        data
+                        text
+                        url
+                    }
                     payRequest {
                         acceptorID
                         createdAt
@@ -258,22 +297,22 @@ const ChatScreen = () => {
                 setPayRequestPrice(parseInt(currentEditPayRequestData.price))
             }
         }, [payRequestOpen]);
-        useEffect(() => {
-            try {
+    useEffect(() => {
+        try {
+            getMessages()
+        } catch (e) {
+            setTimeout(() => {
                 getMessages()
-            } catch (e) {
-                setTimeout(() => {
-                    getMessages()
-                }, 500)
-            }
-        }, []);
+            }, 500)
+        }
+    }, []);
 
-        useEffect(() => {
-            if (firstCatch.current) {
-                // scrollToBottom()
-            }
+    useEffect(() => {
+        if (firstCatch.current) {
+            // scrollToBottom()
+        }
 
-        }, [messages]);
+    }, [messages]);
 
 
     const newMessageMutation = gql`
@@ -319,13 +358,14 @@ const ChatScreen = () => {
 
     return (
         <div ref={chatBoxRef} className={'w-full h-full overflow-scroll  pb-12 scroll-smooth'}>
+
+            {/*<LocationBottomSheet/>*/}
             <img src="/assets/svgs/chat-back.svg"
                  className={'w-full h-full fixed top-0 left-0 pointer-events-none opacity-20 object-cover'} alt=""/>
             <img onClick={() => {
                 if (chatScrollerRef.current) {
                     chatScrollerRef.current.scrollTo(0, chatScrollerRef.current.scrollHeight)
 
-                    console.log(chatScrollerRef.current)
                 }
             }} src="/assets/svgs/scroll-to-bottom.svg"
                  className={`fixed bottom-16 z-50 right-3 transition-all drop-shadow ${scrollToBottomBtn && currentChatStat !== 'more' ? "opacity-100 " : 'opacity-0 pointer-events-none'}`}
@@ -361,8 +401,8 @@ const ChatScreen = () => {
                         <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>سقف مبلغ قابل درخواست یک میلیون تومان میباشد</span>
                     </div>
 
-                        <div className={'h-20'}></div>
-                    </div>
+                    <div className={'h-20'}></div>
+                </div>
 
                 </BottomSheet>
 
@@ -397,7 +437,7 @@ const ChatScreen = () => {
                                 className={'w-10 mr-2  h-10 rounded-lg flex flex-col justify-center items-center '}>
                                 {/*@ts-ignore*/}
                                 <img className={'rounded-lg'}
-                                     src={CurrentChatUserData().user?.profiles ? DOWNLOAD_HOST() + CurrentChatUserData().user?.profiles[0].thumbnail : "/assets/image/no-prof.png"}
+                                     src={CurrentChatUserData().profiles ? DOWNLOAD_HOST() + CurrentChatUserData().profiles[0].thumbnail : "/assets/image/no-prof.png"}
                                      alt=""/>
 
                             </div>
@@ -407,8 +447,9 @@ const ChatScreen = () => {
 
                         <span className={'IranSansMedium'}>
                             {/*@ts-ignore*/}
-                            {CurrentChatUserData().user?.name}</span>
-                            <span className={'IranSansMedium text-textDark text-[0.7rem]'}>چند لحظه پیش</span>
+                            {CurrentChatUserData().title ?? ""}</span>
+                            <span
+                                className={'IranSansMedium text-textDark text-[0.7rem]'}>{CurrentChatUserData().title === "یونیمون" ? "پشتیبانی" : 'آخرین بازدید اخیرا'}</span>
                         </div>
                     </div>
                 </div>
@@ -418,7 +459,6 @@ const ChatScreen = () => {
                 className={'chat-box z-10 w-full scroll-smooth  h-full overflow-scroll flex flex-col-reverse  pt-20 pb-2'}
                 ref={chatScrollerRef}
                 onScroll={(event) => {
-                    console.log(Math.abs(event.currentTarget.scrollTop))
                     if (Math.abs(event.currentTarget.scrollTop) > 100) {
                         setScrollToBottomBtn(true)
                     } else {
@@ -431,7 +471,92 @@ const ChatScreen = () => {
                 <div className={' bottom-0 h-auto  z-10'}>
                     {
                         messages.map((item: any, index: number) => {
+
                             let sentByMe = item.userID === UserId()
+
+                            let itemText = item.text;
+                            let textWithLink = <div key={index + 'keyOfLink'} className={'contents'}>
+                                <a target={'_blank'} rel={'noreferrer'} className={'text-primary underline '}
+                                   href="http://google.co">this is a text with
+                                    link</a>
+                            </div>;
+
+                            if (!lastMessageGroupDate) {
+                                (lastMessageGroupDate as any).current = moment(item.sentAt * 1000).format('jDD/jMM');
+                            } else {
+                                if (lastMessageGroupDate.current !== moment(item.sentAt * 1000).format('jDD/jMM')) {
+                                    lastMessageGroupDate.current = moment(item.sentAt * 1000).format('jDD/jMM');
+
+                                    try {
+                                        return <div
+                                            className={'w-full h-12 text-sm flex flex-col justify-center items-center IranSansMedium'}>
+                                            <div className={'bg-glassButtonColor text-white px-4 py-1 rounded-2xl'}>{
+
+
+                                                moment(messages[index + 1].sentAt * 1000).format('jYYYY/jMM/jDD') === moment().format('jYYYY/jMM/jDD') ?
+                                                    "امروز" :
+                                                    moment(messages[index + 1].sentAt * 1000).format('jYYYY/jMM/jDD')
+
+
+                                            }
+                                            </div>
+                                        </div>
+                                    } catch (e) {
+
+                                    }
+
+                                }
+                            }
+
+                            let unix_timestamp = item.sentAt
+                            let date = new Date(unix_timestamp * 1000);
+                            let hours = date.getHours();
+                            let minutes = "0" + date.getMinutes();
+                            let formattedTime = hours + ':' + minutes.substr(-2)
+
+
+                            if (itemText)
+
+
+                                try {
+
+
+                                    let textSplit = itemText.split(' ');
+
+                                    textWithLink = <div className={'contents'}>
+                                        {
+                                            (textSplit as [string]).map((phrase) => {
+                                                if (phrase) {
+                                                    if (phrase.includes('http://') || phrase.includes('https://')) {
+                                                        return <a target={'_blank'} rel={'noreferrer'}
+                                                                  className={'text-linkColor underline text-left '}
+                                                                  href={phrase}>{phrase}</a>
+                                                    } else {
+                                                        return <span
+                                                            className={'inline-block mx-[1px] text-right'}>{phrase}</span>
+                                                    }
+
+                                                }
+
+                                            })
+                                        }
+
+                                    </div>
+
+                                    (textSplit as [string]).forEach((word) => {
+                                        if (word.includes('http://') || word.includes('https://')) {
+                                            itemText = itemText.replace(word,)
+                                        }
+                                    })
+
+
+                                } catch (e) {
+
+                                }
+
+
+                            // if (index === messages.length - 3)
+
                             if (item.type === 'TEXT')
                                 return (
                                     <div key={'chat-bubble-' + index}
@@ -444,41 +569,45 @@ const ChatScreen = () => {
                                                 wordBreak: 'break-word',
                                                 whiteSpace: 'pre-line'
                                             }}
-                                               className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>{item.text}</p>
+                                               className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>
+
+                                                {/*<a href="/route">this is a test route</a>*/}
+                                                {textWithLink}
+                                            </p>
                                             <div className={'flex mt-1 flex-row justify-start items-center '}>
                                                 <img src="/assets/svgs/check.svg"
                                                      className={`w-2  h-2 ${sentByMe ? '' : "invert-[0.5]"}`}
                                                      alt=""/>
-                                                    <span
-                                                        className={`IranSansMedium text-[0.75rem] mr-2 ${!sentByMe ? "text-textDark" : "white"}`}>{moment(item.sentAt).format('hh:mm')}</span>
-                                                </div>
-
+                                                <span
+                                                    className={`IranSansMedium text-[0.75rem] mr-2 ${!sentByMe ? "text-textDark" : "white"}`}>{formattedTime}</span>
                                             </div>
 
                                         </div>
 
-                                    )
-                                else if (item.type === "PAY_REQUEST") {
+                                    </div>
+
+                                )
+                            else if (item.type === "PAY_REQUEST") {
 
 
-                                    let payRequest = item.payRequest;
-                                    let payRequestIcon = '';
-                                    switch (payRequest.status) {
-                                        case "CANCELED":
-                                            if (sentByMe)
-                                                payRequestIcon = "/assets/svgs/pay-request-canceled.svg"
-                                            else {
-                                                payRequestIcon = "/assets/svgs/pay-request-canceled-sender.svg"
-                                            }
-                                            break;
+                                let payRequest = item.payRequest;
+                                let payRequestIcon = '';
+                                switch (payRequest.status) {
+                                    case "CANCELED":
+                                        if (sentByMe)
+                                            payRequestIcon = "/assets/svgs/pay-request-canceled.svg"
+                                        else {
+                                            payRequestIcon = "/assets/svgs/pay-request-canceled-sender.svg"
+                                        }
+                                        break;
 
-                                        case "PENDING_ACCEPT":
-                                            if (sentByMe)
-                                                payRequestIcon = "/assets/svgs/pay-request.svg"
-                                            else {
-                                                payRequestIcon = "/assets/svgs/pay-request-sender.svg"
-                                            }
-                                            break;
+                                    case "PENDING_ACCEPT":
+                                        if (sentByMe)
+                                            payRequestIcon = "/assets/svgs/pay-request.svg"
+                                        else {
+                                            payRequestIcon = "/assets/svgs/pay-request-sender.svg"
+                                        }
+                                        break;
 
                                         case "ACCEPTED" :
                                             if (sentByMe)
@@ -518,7 +647,7 @@ const ChatScreen = () => {
                                                              className={`w-2 z-10 h-2 ${sentByMe ? '' : 'invert-[0.5]'}`}
                                                              alt=""/>
                                                         <span
-                                                            className={`IranSansMedium text-[0.75rem] mr-2 ${sentByMe ? "text-white" : "text-textDarker"}`}>{moment(item.sentAt).format('hh:mm')}</span>
+                                                            className={`IranSansMedium text-[0.75rem] mr-2 ${sentByMe ? "text-white" : "text-textDarker"}`}>{formattedTime}</span>
                                                     </div>
 
 
@@ -630,24 +759,9 @@ const ChatScreen = () => {
                                                                                         tempId: item.tempId ?? ""
                                                                                     }
                                                                                 }).then((value) => {
-                                                                                    console.log(value)
-
                                                                                     removeLoadingButton(item)
-
-
                                                                                 })
-                                                                                // console.log(item.payRequest.description)
-                                                                                // console.log(item.payRequest.price)
-                                                                                // setCurrentEditPayRequestData(produce((draft) => {
-                                                                                //     draft.description = item.payRequest.description;
-                                                                                //     draft.price = item.payRequest.price;
-                                                                                //     if (item.id)
-                                                                                //         draft.id = item.id
-                                                                                //     else if (item.tempId)
-                                                                                //         draft.tempId = item.tempId
-                                                                                //     return draft
-                                                                                // }))
-                                                                                // setCurrentChatStat('payRequest')
+
 
                                                                             } catch (e) {
                                                                                 console.log('failde to change the price or desc')
@@ -800,14 +914,11 @@ const ChatScreen = () => {
                                 sendMessageBtn.current!.click()
                             }
                     }} onChange={(event) => {
-                        // console.log(event.currentTarget.style.lineHeight)
                         const style = getComputedStyle(event.currentTarget);
                         let lht = parseInt(style.lineHeight, 10)
                         let lines = event.currentTarget.scrollHeight / lht;
                         console.log(Math.floor(lines));
 
-
-                        // console.log(event.currentTarget.value.split('\n'))
                         if (currentChatStat !== "payRequest")
                             if (event.currentTarget.value) {
                                 setCurrentChatStat('write')

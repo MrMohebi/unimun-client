@@ -1,37 +1,28 @@
 import React, {useEffect, useRef, useState} from 'react';
 import ImageSlider from "../../../components/normal/ImageSlider/ImageSlider";
-import Header from "../../../components/common/Header/Header";
 import {gql, useLazyQuery, useMutation} from "@apollo/client";
 import Button from "../../../components/view/Button/Button";
 import Toman from '../../../assets/svgs/toman.svg'
-import Downlad from '../../../assets/svgs/downloadOutline.svg'
 import Pdf from '../../../assets/svgs/pdf.svg'
-import Dimmer from "../../../components/view/Dimmer/Dimmer";
-import LoadingDialog from "../../../components/view/LoadingDialog/LoadingDialog";
 import {useRouter} from "next/router";
 import {passedTime} from "../../../helpers/passedTime";
 import ArrowUp from '../../../assets/svgs/arrowUp.svg';
 import Unimun from "../../../assets/svgs/unimun.svg";
 import DownloadBold from "../../../assets/svgs/download-bold.svg";
-import More from "../../../assets/svgs/more.svg";
-import BookmarkBook from "../../../assets/svgs/bookmark-book.svg";
 import BackButton from "../../../assets/svgCodes/BackButton";
-import Toast from "../../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
-import {UserData, UserId, UserToken} from "../../../store/user";
-import {getAndSetUserData} from "../../../helpers/GetAndSetUserData";
+import {UserToken} from "../../../store/user";
 import {getUserQuery} from "../../../Requests/normal/user";
 import {fixPrice} from "../../../helpers/fixPrice";
 import NoPic from "../../../components/normal/NoPic/NoPic";
 import Free from "../../../assets/svgs/free.svg";
-import Copy from "../../../assets/svgs/copy-icon.svg";
-import ContactToast from "../../../components/view/ContactToast/ContactToast";
-import {UNIMUN_PROVIDERS, UnimunID} from "../../../store/GLOBAL_VARIABLES";
+import {DOWNLOAD_HOST, UNIMUN_PROVIDERS, UnimunID} from "../../../store/GLOBAL_VARIABLES";
 import {clientChat} from "../../../apollo-client";
 import {TailSpin} from "react-loader-spinner";
-import {sendMessage} from "next/dist/client/dev/error-overlay/websocket";
 import {CurrentChatUserData} from "../../../store/chat";
 import {GET_SUPPORT_CHAT_QUERY, NEW_MESSAGE_MUTATION} from "../../../Requests/GlobalRequests/GlobalRequests";
+import LoginBottomSheet from "../../../components/normal/LoginBottomSheet/LoginBottomSheet";
+import FullScreenLoading from "../../../components/normal/FullScreenLoading/FullScreenLoading";
 
 
 interface Props {
@@ -105,10 +96,10 @@ const Book = (props: Props) => {
     const [getUser, getUserResults] = useLazyQuery(gql`${getUserQuery(['id', 'name', 'created_at', 'phone', 'referenceCode','username','bio','level','xpLevelPercentage']).query}`)
 
     const [getBook, getBookResults] = useLazyQuery(getBookQuery)
+    const [fullScreenLoading, setFullScreenLoading] = useState(false);
 
     const [contactAppealShow, setContactAppealShow] = useState(false);
-
-
+    const [loginOpen, setLoginOpen] = useState(false);
     const [book, _book] = useState({} as any);
     const [bookDetails, _bookDetails] = useState(false)
     const phoneInputRef = useRef<HTMLInputElement>(null)
@@ -135,80 +126,121 @@ const Book = (props: Props) => {
 
     const [getSupportChat, supportChatResult] = useLazyQuery(GET_SUPPORT_CHAT_QUERY, {client: clientChat});
 
-    const buyBookFromUnimun = () => {
+
+    const downloadBook = () => {
+        if (UserToken()) {
+            window.open(DOWNLOAD_HOST() + book.bookFiles[0].url, '_blank')
+        } else {
+            setLoginOpen(true)
+        }
+    }
+
+    const requestBookFromChat = () => {
+
+        setBtnLoading(true)
         getSupportChat().then((e) => {
-            console.log(e)
+            setBtnLoading(false)
             if (e.data && e.data.supportChat.id) {
 
+                // console.log(router.route)
                 newMessage({
                     variables: {
                         chatID: e.data.supportChat.id,
                         text: `                   این کتاب رو میخوام
-                    /library/book/${bookId}
+                    
+                    ${window.location.origin}/library/book/${bookId}
                     `
                     }
                 }).then((value) => {
-                    console.log(value)
+
                     CurrentChatUserData(e.data.supportChat)
                     router.push('/chat/' + e.data.supportChat.id)
                 })
             }
         })
-        alert('main code commented')
+    }
+    const buyBookFromUnimun = () => {
+
+        if (UserToken()) {
+            if (book.bookFiles && book.bookFiles.length) {
+                downloadBook()
+                return 0
+            }
+
+            requestBookFromChat()
+
+
+        } else {
+            setLoginOpen(true)
+        }
+
+
     }
 
     return (
         <div className={'overflow-scroll h-full'}>
 
+            <LoginBottomSheet open={loginOpen} onClose={() => {
+                setLoginOpen(false)
+            }} onLoginComplete={() => {
+                window.location.reload();
+                setLoginOpen(false)
 
-            <ContactToast
-                onClose={(command: string) => {
-                    if (command === 'copyPhone') {
-                        setTimeout(() => {
-                            Toast("شماره تلفن کپی شد", '', 1000, <div className={'w-5 h-5 '}><Copy/></div>, 70)
+            }}
+            />
 
-                        }, 300)
-                    }
 
-                    if (command === 'copyTel') {
-                        setTimeout(() => {
-                            Toast("آیدی تلگرام کپی شد", '', 1000, <div className={'w-5 h-5 '}><Copy/></div>, 70)
+            {/*<ContactToast*/}
+            {/*    onClose={(command: string) => {*/}
+            {/*        if (command === 'copyPhone') {*/}
+            {/*            setTimeout(() => {*/}
+            {/*                Toast("شماره تلفن کپی شد", '', 1000, <div className={'w-5 h-5 '}><Copy/></div>, 70)*/}
 
-                        }, 300)
-                    }
-                    setContactAppealShow(false)
+            {/*            }, 300)*/}
+            {/*        }*/}
 
-                }}
-                buttonOnClick={() => {
+            {/*        if (command === 'copyTel') {*/}
+            {/*            setTimeout(() => {*/}
+            {/*                Toast("آیدی تلگرام کپی شد", '', 1000, <div className={'w-5 h-5 '}><Copy/></div>, 70)*/}
 
-                    console.log(book)
-                }}
-                show={contactAppealShow}
-                type={/[^0-9]/.test(book.connectWay) ? 'telegram' : 'phone'}
-                value={book.connectWay}
-            />book
+            {/*            }, 300)*/}
+            {/*        }*/}
+            {/*        setContactAppealShow(false)*/}
+
+            {/*    }}*/}
+            {/*    buttonOnClick={() => {*/}
+
+            {/*        console.log(book)*/}
+            {/*    }}*/}
+            {/*    show={contactAppealShow}*/}
+            {/*    type={/[^0-9]/.test(book.connectWay) ? 'telegram' : 'phone'}*/}
+            {/*    value={book.connectWay}*/}
+            {/*/>book*/}
 
             <ToastContainer/>
-            <Dimmer show={getBookResults.loading} onClose={() => {
+            <FullScreenLoading dim={true} show={fullScreenLoading || getBookResults.loading}/>
+            {/*    <Dimmer show={getBookResults.loading} onClose={() => {*/}
 
 
-            }}/>
+            {/*}}/>*/}
 
-            {getBookResults.loading ?
-                // <div className={'fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'}> </div>
-                <LoadingDialog
-                    color={'#3498db'}
-                    wrapperClassName={'m-auto  w-20 h-20 bg-white rounded-xl fixed  top-1/2  -translate-y-1/2 z-50'}/>
-                :
-                null
-            }
+            {/*{getBookResults.loading ?*/}
+            {/*    // <div className={'fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'}> </div>*/}
+            {/*    <LoadingDialog*/}
+            {/*        color={'#3498db'}*/}
+            {/*        wrapperClassName={'m-auto  w-20 h-20 bg-white rounded-xl fixed  top-1/2  -translate-y-1/2 z-50'}/>*/}
+            {/*    :*/}
+            {/*    null*/}
+            {/*}*/}
 
 
             <div
                 className={'absolute z-40 -top-1 w-full h-14 backdrop-blur  flex flex-row justify-between items-center'}
                 style={{background: 'rgba(245,248,250,0.83)'}}>
                 <div className={'px-1 mr-4'} onClick={() => {
-                    router.push('/library')
+                    router.push
+                    (
+                        '/library')
 
                 }}>
                     {BackButton}
@@ -403,16 +435,15 @@ const Book = (props: Props) => {
 
 
                         </div>
-                        <div className={'fixed bottom-2 w-full left-1/2 -translate-x-1/2 px-2'}>
+                        <div
+                            className={'fixed bottom-2 flex flex-col justify-center items-center w-full left-1/2 -translate-x-1/2 px-2'}>
 
 
                             <Button id={'buy-book'} className={'w-full h-12 bg-primary rounded-xl  bottom-0 '}
                                     rippleColor={'rgba(255,255,255,0.4)'}
                                     onClick={() => {
-
-                                        buyBookFromUnimun()
-                                        // setContactAppealShow(true)
-
+                                        if (!btnLoading)
+                                            buyBookFromUnimun()
 
                                     }}
 
@@ -473,7 +504,8 @@ const Book = (props: Props) => {
 
 
         </div>
-    );
+    )
+        ;
 };
 
 export default Book;

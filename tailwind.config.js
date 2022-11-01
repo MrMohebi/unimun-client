@@ -55,6 +55,7 @@ module.exports = {
                 textBright: '#E1E8ED',
                 background: '#F6F8FA',
                 errorRed: '#FF1E60',
+                linkColor: '#BBE3FB',
                 glassButtonColor: "rgba(177,199,214,0.7)",
                 inputNotActive: '#FF1E60',
 

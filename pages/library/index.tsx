@@ -230,7 +230,7 @@ const Index = () => {
 
             getBooks.refetch({
                 searchText: '',
-                first: 10,
+                first: 100,
                 after: EndCursor()
             }).then((value) => {
                 console.log(value)
