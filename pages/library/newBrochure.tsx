@@ -30,7 +30,6 @@ import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUp
 const NewBrochure = () => {
     
     //queries
-
     const createBookMutation = gql`
         mutation createBook($isBook:Boolean! $term:String $university:String $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String! $teacher:String){
             createBook(
