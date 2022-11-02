@@ -6,7 +6,7 @@ import {setContext} from "@apollo/client/link/context";
 import {UserToken} from "./store/user";
 
 
-let isTesting = (process.env.NODE_ENV === 'development') || process.env.NEXT_PUBLIC_IS_DEV_MOD;
+let isTesting = (process.env.NODE_ENV === 'development') || (process.env.NEXT_PUBLIC_IS_DEV_MOD === '1');
 console.log('is dev mode:')
 console.log(process.env.NEXT_PUBLIC_IS_DEV_MOD)
 console.log('env:')
