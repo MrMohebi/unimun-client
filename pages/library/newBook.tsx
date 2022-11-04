@@ -160,7 +160,7 @@ const NewBook = () => {
                 return true
             })
 
-            console.log(EditBookData())
+            // console.log(EditBookData())
             try {
 
                 updateBookData('title', EditBookData()?.title)
@@ -226,13 +226,18 @@ const NewBook = () => {
         if (isBookFree)
             freeCheckboxRef!.current!.checked = true
 
-        console.log(isBookFree)
+        // console.log(isBookFree)
 
     }, [isBookFree]);
     const pdfSoonRef = useRef<HTMLDivElement>(null);
 
 
     const submitBook = () => {
+
+        if (reactiveBookData.isDownloadable) {
+            updateBookData('isPurchasable', false)
+            updateBookData('price', 0)
+        }
 
         updateBookData('price', parseInt(reactiveBookData.price))
 
@@ -277,7 +282,7 @@ const NewBook = () => {
                 }
             })
         } else {
-            console.log(reactiveBookData)
+            // console.log(reactiveBookData)
 
             createBook({
                 // variables: {
@@ -343,11 +348,12 @@ const NewBook = () => {
         // }))
     }
 
-    useEffect(() => {
-
-        console.log('changed')
-        console.log(reactiveBookData)
-    }, [reactiveBookData]);
+    //todo here is the changed trigger commented
+    // useEffect(() => {
+    //
+    //     console.log('changed')
+    //     console.log(reactiveBookData)
+    // }, [reactiveBookData]);
 
     const bookVerification = () => {
 
@@ -357,6 +363,11 @@ const NewBook = () => {
         if (currentStep === 1 && reactiveBookData.appearance)
             return true
         if (currentStep === 2) {
+            if (reactiveBookData.isDownloadable && reactiveBookData.bookFiles.length) {
+
+            } else {
+                return false;
+            }
             if (contactType === 'phone' && reactiveBookData.connectWay.length === 11) {
                 return true
             }
@@ -534,7 +545,7 @@ const NewBook = () => {
                                 </Button>
                                 <div className={'new-divider'}/>
                                 <Button onClick={() => {
-                                    updateBookData('language', 'فارسی')
+                                    updateBookData('language', 'انگلیسی')
 
 
                                     Sdimmer(false)
@@ -718,6 +729,9 @@ const NewBook = () => {
                                 className={`relative IranSansMedium relative transition-all h-full leading-9 ${reactiveBookData.type === 'pdf' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                 onClick={() => {
                                     updateBookData('type', 'pdf')
+                                    updateBookData('isDownloadable', true)
+                                    updateBookData('price', 0)
+
                                     setIsBookFree(true)
                                     // (pdfSoonRef.current as HTMLInputElement).style.opacity = "1";
                                     //
@@ -750,6 +764,8 @@ const NewBook = () => {
                                 className={`IranSansMedium transition-all h-full leading-9 ${reactiveBookData.type === 'physical' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                 onClick={() => {
                                     updateBookData('type', 'physical')
+                                    updateBookData('isDownloadable', false)
+                                    updateBookData('price', lastPrice.current)
                                 }}>کتابِ فیـزیکـی
                             </div>
                         </div>
@@ -992,7 +1008,7 @@ const NewBook = () => {
                             <span className={'IranSansMedium'}>فروش به قیمت</span>
                             <div
                                 className={' IranSansMedium h-10 w-24 px-2 flex flex-row justify-around items-center bg-background rounded-lg'}>
-                                <input name={'free'} id={'free-book'}
+                                <input disabled={reactiveBookData.isDownloadable} name={'free'} id={'free-book'}
 
                                        className={'free-checkbox '}
                                        type={'checkbox'}
