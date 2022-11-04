@@ -12,7 +12,8 @@ export const BookDataStore = makeVar({
     type: 'physical',
     isBook: true,
     isDownloadable: false,
-    isPurchasable: true
+    isPurchasable: true,
+    bookFiles: []
 
 } as {
     categoryPersian: string
@@ -21,7 +22,7 @@ export const BookDataStore = makeVar({
     appearance: string
     appearanceID: string
     attachments: [] | [any]
-    bookFiles: [any]
+    bookFiles: [] | [any]
     category: string
     categoryID: string
     city: string

@@ -27,6 +27,7 @@ import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUp
 import produce from "immer";
 import {DOWNLOAD_HOST} from "../../store/GLOBAL_VARIABLES";
 import BottomSheet from "../../components/view/BottomSheet/BottomSheet";
+import {uploadBookFile} from "../../Requests/uploadRequests";
 
 const NewBook = () => {
 
@@ -99,12 +100,9 @@ const NewBook = () => {
     const router = useRouter()
     const [currentStep, ScurrentStep] = useState(0)
     const [isBook, _isBook] = useState(false)
-    const [loading, Sloading] = useState(false)
     const [dimmer, Sdimmer] = useState(false)
     const [langDropDown, SlangDropDown] = useState(false)
-    const [uploadedImages, setUploadedImages] = useState([] as string[])
     const [uploadingProgress, setUploadingProgress] = useState([] as number[])
-    const [loadingDialog, setLoadingDialog] = useState(false)
     const priceInputRef = useRef(null)
     const [isBookFree, setIsBookFree] = useState(false)
     const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
@@ -126,6 +124,7 @@ const NewBook = () => {
     const [uploading, setUploading] = useState(false);
     const [currentSelectedImage, setCurrentSelectedImage] = useState(0);
     const reactiveBookData = useReactiveVar(BookDataStore)
+    const freeCheckboxRef = useRef<HTMLInputElement>(null);
 
     const [BookData, setBookData] = useState({
         type: 'physical',
@@ -218,18 +217,24 @@ const NewBook = () => {
     }, [])
 
     useEffect(() => {
-
-
         if (isBrochure()) {
             updateBookData('isBook', false);
         }
-
-
     }, [])
+
+    useEffect(() => {
+        if (isBookFree)
+            freeCheckboxRef!.current!.checked = true
+
+        console.log(isBookFree)
+
+    }, [isBookFree]);
     const pdfSoonRef = useRef<HTMLDivElement>(null);
 
 
     const submitBook = () => {
+
+        updateBookData('price', parseInt(reactiveBookData.price))
 
         if (uploading) {
             Toast('در حال آپلود فایل یا عکس...')
@@ -712,14 +717,15 @@ const NewBook = () => {
                             <div
                                 className={`relative IranSansMedium relative transition-all h-full leading-9 ${reactiveBookData.type === 'pdf' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                 onClick={() => {
-                                    // updateBookData('type', 'pdf')
-                                    (pdfSoonRef.current as HTMLInputElement).style.opacity = "1";
-
-
-                                    setTimeout(() => {
-                                        (pdfSoonRef.current as HTMLInputElement).style.opacity = "0";
-
-                                    }, 1000)
+                                    updateBookData('type', 'pdf')
+                                    setIsBookFree(true)
+                                    // (pdfSoonRef.current as HTMLInputElement).style.opacity = "1";
+                                    //
+                                    //
+                                    // setTimeout(() => {
+                                    //     (pdfSoonRef.current as HTMLInputElement).style.opacity = "0";
+                                    //
+                                    // }, 1000)
 
                                 }}>
                                 <div style={{
@@ -778,45 +784,56 @@ const NewBook = () => {
                                            setBookUploadState('uploading')
 
 
-                                           // uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {
-                                           //         _fileUploadingPercentage('0')
-                                           //         if (response.data.validMimes) {
-                                           //             Toast("فرمت فایل معتبر نیست")
-                                           //         } else if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
-                                           //             let files = [];
-                                           //             files = reactiveBookData.files
-                                           //
-                                           //             files.push({
-                                           //                 url: response.data.url as never,
-                                           //                 type: 'pdf' as never,
-                                           //                 mime: 'pdf' as never,
-                                           //             } as never)
-                                           //             let fileNames = []
-                                           //             fileNames.push(fileName)
-                                           //             updateBookData('files', [...files])
-                                           //             updateBookData('fileNames', [...fileNames])
-                                           //             removeEmptyProgresses()
-                                           //             setBookUploadState('uploaded')
-                                           //
-                                           //         } else {
-                                           //             Toast('خطا در آپلود فایل، دوبره تلاش کنید')
-                                           //             setBookUploadState('')
-                                           //
-                                           //         }
-                                           //     }, (error: any) => {
-                                           //         Sdimmer(false)
-                                           //         setBookUploadState('')
-                                           //     },
-                                           //     (progressEvent: any) => {
-                                           //         let percentCompleted = Math.round(
-                                           //             (progressEvent.loaded * 100) / progressEvent.total
-                                           //         );
-                                           //         _fileUploadingPercentage(percentCompleted as any)
-                                           //     }
-                                           // )
+                                           uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {
+                                                   console.log(response)
+                                                   _fileUploadingPercentage('0')
+                                                   if (response.data.validMimes) {
+                                                       Toast("فرمت فایل معتبر نیست")
+                                                   } else if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
+                                                       console.log('request success')
+                                                       console.log(response.data.url)
+                                                       let files = [] as any;
+
+                                                       files.concat(reactiveBookData.bookFiles)
+
+                                                       try {
+                                                           files.push({
+                                                               url: response.data.url as never,
+                                                               type: 'pdf' as never,
+                                                               mime: 'pdf' as never,
+                                                           } as never);
+                                                       } catch (e) {
+                                                           console.log(e)
+                                                       }
+
+                                                       console.log(files)
+                                                       console.log("was files")
+                                                       let fileNames = []
+                                                       fileNames.push(fileName)
+                                                       updateBookData('bookFiles', [...files])
+                                                       // updateBookData('fileNames', [...fileNames])
+                                                       removeEmptyProgresses()
+                                                       setBookUploadState('uploaded')
+
+                                                   } else {
+                                                       Toast('خطا در آپلود فایل، دوبره تلاش کنید')
+                                                       setBookUploadState('')
+
+                                                   }
+                                               }, (error: any) => {
+                                                   Sdimmer(false)
+                                                   setBookUploadState('')
+                                               },
+                                               (progressEvent: any) => {
+                                                   let percentCompleted = Math.round(
+                                                       (progressEvent.loaded * 100) / progressEvent.total
+                                                   );
+                                                   _fileUploadingPercentage(percentCompleted as any)
+                                               }
+                                           )
                                        }
 
-                                       // e.currentTarget.value = '';
+                                       e.currentTarget.value = '';
 
 
                                    }}/>
@@ -870,7 +887,7 @@ const NewBook = () => {
                                                         className={'flex flex-row-reverse justify-center items-center'}>
 
                                                         <div onClick={() => {
-                                                            updateBookData('files', [])
+                                                            updateBookData('bookFiles', [])
                                                             updateBookData('fileNames', [])
                                                             setBookUploadState('')
 
@@ -981,6 +998,7 @@ const NewBook = () => {
                                        type={'checkbox'}
                                     // defaultValue={reactiveBookData.price}
                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                           setIsBookFree(e.currentTarget.checked)
 
                                            if (e.currentTarget.checked) {
                                                if (priceInputRef.current)
@@ -996,7 +1014,7 @@ const NewBook = () => {
                                                (priceInputRef.current as HTMLInputElement).value = (reactiveBookData.price.toString() ?? "").split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
 
                                            }
-                                       }}/>
+                                       }} ref={freeCheckboxRef}/>
                                 <label htmlFor={'free-book'}> رایگان</label>
                             </div>
                         </div>
