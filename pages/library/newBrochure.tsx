@@ -26,9 +26,11 @@ import Semesters from "../../components/normal/Semesters/Semesters";
 import _ from "lodash";
 import {fixPrice} from "../../helpers/fixPrice";
 import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUpload";
+import Trash from "../../assets/svgs/trash.svg";
+import {DOWNLOAD_HOST} from "../../store/GLOBAL_VARIABLES";
 
 const NewBrochure = () => {
-    
+
     //queries
     const createBookMutation = gql`
         mutation createBook($isBook:Boolean! $term:String $university:String $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String! $teacher:String){
@@ -123,14 +125,23 @@ const NewBrochure = () => {
     const [editing, setEditing] = useState(false);
     const [uploading, setUploading] = useState(false);
 
+
+    const [fileSize, setFileSize] = useState(0);
+    const [bookUploadState, setBookUploadState] = useState('');
+    const [fileName, setFileName] = useState("");
+
+
     const [BookData, setBookData] = useState({
         type: 'physical',
         price: 20000,
+        bookFiles: [],
         attachments: [],
         files: [],
         fileNames: [],
         term: ''
+
     } as {
+        bookFiles: [] | [any]
         id: string
         isBook: boolean
         title: string
@@ -152,6 +163,8 @@ const NewBrochure = () => {
         fileNames: []
         term: string
         university: string
+        isDownloadable: boolean
+        isPurchasable: boolean
     })
 
 
@@ -228,6 +241,7 @@ const NewBrochure = () => {
         }
 
     }, [])
+    const freeCheckBox = useRef<HTMLInputElement>(null);
 
 
     const submitBook = () => {
@@ -322,13 +336,21 @@ const NewBrochure = () => {
             }
             if (currentStep === 1)
                 return true
-            if (currentStep === 2 && BookData.price) {
-                if (contactType === 'phone' && connectWay.length === 11) {
+            if (currentStep === 2) {
+                // if (contactType === 'phone' && connectWay.length === 11) {
+                //     return true
+                // }
+                // if (contactType === 'telegram' && connectWay.length > 3) {
+                //     return true
+                // }
+
+                if (BookData.isDownloadable && BookData.bookFiles.length) {
                     return true
+                } else if (BookData.isDownloadable && !BookData.bookFiles.length) {
+                    return false
                 }
-                if (contactType === 'telegram' && connectWay.length > 3) {
-                    return true
-                }
+                return true
+
             }
 
             return false
@@ -536,7 +558,9 @@ const NewBrochure = () => {
                                         return <div key={index + 'imageUpload'} className={'contents'}>
                                             <BookImageUpload onImageClick={() => {
 
-                                            }} defaultImage={uploadedImages[index]} isFirst={index === 0}
+                                            }}
+                                                             defaultImage={BookData.attachments[index] ? DOWNLOAD_HOST() + (BookData.attachments[index] as { preview: string }).preview : ""}
+                                                             isFirst={index === 0}
                                                              id={index.toString()}
                                                              onUploadComplete={(e: any) => {
                                                                  let _bookAttachments: any[] = BookData.attachments;
@@ -614,6 +638,11 @@ const NewBrochure = () => {
                                     className={`IranSansMedium relative transition-all h-full leading-9 ${BookData.type === 'pdf' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                     onClick={() => {
                                         updateBookData('type', 'pdf')
+                                        updateBookData('isDownloadable', true)
+                                        updateBookData('isPurchasable', false)
+                                        updateBookData('price', 0)
+                                        freeCheckBox!.current!.checked = true;
+
                                     }}>
                                     <div
                                         className={'block relative mx-auto overflow-hidden flex flex-col justify-center items-center'}>
@@ -630,6 +659,10 @@ const NewBrochure = () => {
                                     className={`IranSansMedium transition-all h-full leading-9 ${BookData.type === 'physical' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                     onClick={() => {
                                         updateBookData('type', 'physical')
+
+                                        updateBookData('isDownloadable', false)
+
+
                                     }}>جـزوه فیـزیکـی
                                 </div>
                             </div>
@@ -641,58 +674,142 @@ const NewBrochure = () => {
 
                         <section
                             className={`bg-white w-full  ${BookData.type !== 'pdf' ? 'h-0 overflow-hidden ' : 'px-3 pt-5 pb-5'} `}>
+                            {/*<div*/}
+                            {/*    className={'new-file  flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>*/}
+                            {/*    <input type={"file"} className={'absolute w-full h-full top-0 left-0 opacity-0 z-10'}*/}
+                            {/*           onInput={(e: React.ChangeEvent<HTMLInputElement>) => {*/}
+                            {/*               // if (e && e.currentTarget && e.currentTarget.files)*/}
+                            {/*               //     uploadFile(e.currentTarget.files[0])*/}
+
+                            {/*               if (e.currentTarget.files) {*/}
+                            {/*                   let fileName = e.currentTarget.files[0].name*/}
+                            {/*                   Sdimmer(true)*/}
+
+                            {/*                   uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {*/}
+                            {/*                           console.log(response)*/}
+                            {/*                           Sdimmer(false)*/}
+                            {/*                           _fileUploadingPercentage('')*/}
+                            {/*                           if (response.data.validMimes) {*/}
+                            {/*                               Toast("فرمت فایل معتبر نیست")*/}
+                            {/*                               return 0*/}
+                            {/*                           }*/}
+                            {/*                           if (response.data !== 500 && response.data !== 401 && response.data !== 400) {*/}
+                            {/*                               // setUploadedImages([...uploadedImages, JSON.stringify(response.data)])*/}
+                            {/*                               // let updateUploadingProgress = [...uploadingProgress]*/}
+                            {/*                               // updateUploadingProgress[uploadingProgress.length] = 0;*/}
+                            {/*                               // setUploadingProgress(updateUploadingProgress)*/}
+                            {/*                               let files = [];*/}
+                            {/*                               files = BookData.files*/}
+
+                            {/*                               files.push({*/}
+                            {/*                                   url: response.data.url as never,*/}
+                            {/*                                   type: 'pdf' as never,*/}
+                            {/*                                   mime: 'pdf' as never,*/}
+                            {/*                               } as never)*/}
+                            {/*                               let fileNames = []*/}
+                            {/*                               fileNames.push(fileName)*/}
+                            {/*                               updateBookData('files', [...files])*/}
+                            {/*                               updateBookData('fileNames', [...fileNames])*/}
+                            {/*                               console.log(BookData)*/}
+                            {/*                               removeEmptyProgresses()*/}
+                            {/*                           }*/}
+                            {/*                       }, (error: any) => {*/}
+                            {/*                           console.log(error)*/}
+                            {/*                           Sdimmer(false)*/}
+
+                            {/*                           // showError('خطا در آپلود فایل، دوبره تلاش کنید')*/}
+
+                            {/*                           // let updateUploadingProgress = [...uploadingProgress]*/}
+                            {/*                           // updateUploadingProgress[uploadingProgress.length] = 0;*/}
+                            {/*                           // setUploadingProgress(updateUploadingProgress)*/}
+                            {/*                           // removeEmptyProgresses()*/}
+                            {/*                       },*/}
+                            {/*                       (progressEvent: any) => {*/}
+                            {/*                           console.log(progressEvent)*/}
+                            {/*                           let percentCompleted = Math.round(*/}
+                            {/*                               (progressEvent.loaded * 100) / progressEvent.total*/}
+                            {/*                           );*/}
+                            {/*                           _fileUploadingPercentage(percentCompleted as any)*/}
+                            {/*                       }*/}
+                            {/*                   )*/}
+                            {/*               }*/}
+
+                            {/*               // e.currentTarget.value = '';*/}
+
+                            {/*           }}/>*/}
+                            {/*    <div className={'file w-full flex flex-row justify-between items-center my-3'}>*/}
+                            {/*        <div className={'file-right flex flex-row justify-center items-center'}>*/}
+                            {/*            <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><EmptyFileSVG/>*/}
+                            {/*            </div>*/}
+                            {/*            <div className={'IranSansMedium mr-4 opacity-60'}> افزودن فایل کتاب</div>*/}
+                            {/*        </div>*/}
+                            {/*        <div dir={'ltr'} className={'IranSans w-7 h-7 '}><FileUploadSVG/></div>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+
+
                             <div
                                 className={'new-file  flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
-                                <input type={"file"} className={'absolute w-full h-full top-0 left-0 opacity-0 z-10'}
+                                <input type={"file"}
+                                       className={`absolute w-full h-full top-0 left-0 opacity-0 z-10 ${bookUploadState === "uploaded" ? 'pointer-events-none' : ''}`}
                                        onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
                                            // if (e && e.currentTarget && e.currentTarget.files)
                                            //     uploadFile(e.currentTarget.files[0])
 
-                                           if (e.currentTarget.files) {
+
+                                           if (e.currentTarget.files && e.currentTarget.files[0]) {
+
                                                let fileName = e.currentTarget.files[0].name
-                                               Sdimmer(true)
+                                               let fileSize = e.currentTarget.files[0].size
+
+                                               fileSize = parseFloat((fileSize / 1000000).toFixed(2))
+
+                                               setFileSize(fileSize)
+                                               setFileName(fileName)
+                                               setBookUploadState('uploading')
+
 
                                                uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {
                                                        console.log(response)
-                                                       Sdimmer(false)
-                                                       _fileUploadingPercentage('')
+                                                       _fileUploadingPercentage('0')
                                                        if (response.data.validMimes) {
                                                            Toast("فرمت فایل معتبر نیست")
-                                                           return 0
-                                                       }
-                                                       if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
-                                                           // setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
-                                                           // let updateUploadingProgress = [...uploadingProgress]
-                                                           // updateUploadingProgress[uploadingProgress.length] = 0;
-                                                           // setUploadingProgress(updateUploadingProgress)
-                                                           let files = [];
-                                                           files = BookData.files
+                                                       } else if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
+                                                           console.log('request success')
+                                                           console.log(response.data.url)
+                                                           let files = [] as any;
 
-                                                           files.push({
-                                                               url: response.data.url as never,
-                                                               type: 'pdf' as never,
-                                                               mime: 'pdf' as never,
-                                                           } as never)
+                                                           files.concat(BookData.bookFiles)
+
+                                                           try {
+                                                               files.push({
+                                                                   url: response.data.url as never,
+                                                                   type: 'pdf' as never,
+                                                                   mime: 'pdf' as never,
+                                                               } as never);
+                                                           } catch (e) {
+                                                               console.log(e)
+                                                           }
+
+                                                           console.log(files)
+                                                           console.log("was files")
                                                            let fileNames = []
                                                            fileNames.push(fileName)
-                                                           updateBookData('files', [...files])
-                                                           updateBookData('fileNames', [...fileNames])
-                                                           console.log(BookData)
+                                                           updateBookData('bookFiles', [...files])
+                                                           // updateBookData('fileNames', [...fileNames])
                                                            removeEmptyProgresses()
+                                                           setBookUploadState('uploaded')
+
+                                                       } else {
+                                                           Toast('خطا در آپلود فایل، دوبره تلاش کنید')
+                                                           setBookUploadState('')
+
                                                        }
                                                    }, (error: any) => {
-                                                       console.log(error)
                                                        Sdimmer(false)
-
-                                                       // showError('خطا در آپلود فایل، دوبره تلاش کنید')
-
-                                                       // let updateUploadingProgress = [...uploadingProgress]
-                                                       // updateUploadingProgress[uploadingProgress.length] = 0;
-                                                       // setUploadingProgress(updateUploadingProgress)
-                                                       // removeEmptyProgresses()
+                                                       setBookUploadState('')
                                                    },
                                                    (progressEvent: any) => {
-                                                       console.log(progressEvent)
                                                        let percentCompleted = Math.round(
                                                            (progressEvent.loaded * 100) / progressEvent.total
                                                        );
@@ -701,18 +818,86 @@ const NewBrochure = () => {
                                                )
                                            }
 
-                                           // e.currentTarget.value = '';
+                                           e.currentTarget.value = '';
+
 
                                        }}/>
+
                                 <div className={'file w-full flex flex-row justify-between items-center my-3'}>
                                     <div className={'file-right flex flex-row justify-center items-center'}>
-                                        <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><EmptyFileSVG/>
+                                        <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}>
+                                            {!bookUploadState ?
+                                                <EmptyFileSVG/>
+                                                :
+                                                <FileSVG/>
+                                            }
                                         </div>
-                                        <div className={'IranSansMedium mr-4 opacity-60'}> افزودن فایل کتاب</div>
+                                        <div
+                                            className={'IranSansMedium mr-4 opacity-60 whitespace-nowrap '} style={{
+                                            width: '100px ',
+                                            textOverflow: `${bookUploadState ? 'ellipsis' : ''}`,
+                                            overflow: `${bookUploadState ? 'hidden' : ''}`
+                                        }}>{!bookUploadState ? ' افزودن فایل جزوه' : fileName}</div>
                                     </div>
-                                    <div dir={'ltr'} className={'IranSans w-7 h-7 '}><FileUploadSVG/></div>
+                                    <div id={'file-upload-state-holder'}
+                                         className={'flex flex-row  justify-center items-center'}>
+                                        {
+                                            bookUploadState ?
+
+                                                bookUploadState === "uploading" ?
+                                                    <div
+                                                        className={'flex flex-row-reverse justify-center items-center'}>
+                                                        <div
+                                                            className={"relative flex flex-col justify-center items-center mr-3"}>
+                                                            <CircularProgressBar sqSize={30} strokeWidth={3}
+                                                                                 percentage={parseInt(fileUploadingPercentage)}
+                                                                                 color={'#1DA1F2'}/>
+
+                                                            <span
+                                                                className={'block text-textDarker absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 IranSansMedium scale-90'}>{fileUploadingPercentage}</span>
+                                                        </div>
+                                                        {
+                                                            parseInt(fileUploadingPercentage) ?
+                                                                <span dir={'ltr'}
+                                                                      className={'IranSansMedium text-sm'}>{`${(fileSize * parseInt(fileUploadingPercentage) / 100).toFixed(2)} MB / ${fileSize} MB`}</span> :
+                                                                <span dir={'ltr'}
+                                                                      className={'IranSansMedium text-sm'}>{`0MB / ${fileSize} MB`}</span>
+
+                                                        }
+                                                    </div>
+
+                                                    :
+                                                    bookUploadState === 'uploaded' ?
+                                                        <div
+                                                            className={'flex flex-row-reverse justify-center items-center'}>
+
+                                                            <div onClick={() => {
+                                                                updateBookData('bookFiles', [])
+                                                                updateBookData('fileNames', [])
+                                                                setBookUploadState('')
+
+                                                            }} className={'w-8 h-8 mr-2 p-1 bg-background rounded'}>
+                                                                <Trash/>
+                                                            </div>
+
+
+                                                            <span dir={'ltr'}
+                                                                  className={'IranSansMedium text-sm'}>{`${fileSize} MB`}</span>
+
+
+                                                        </div>
+                                                        :
+
+                                                        null
+                                                :
+                                                <div dir={'ltr'} className={'IranSans w-7 h-7  '}><FileUploadSVG/></div>
+
+                                        }
+
+                                    </div>
                                 </div>
                             </div>
+
                             {
                                 BookData.fileNames.map((file: { name: string }) => {
 
@@ -792,7 +977,8 @@ const NewBrochure = () => {
                                 <span className={'IranSansMedium'}>فروش به قیمت</span>
                                 <div
                                     className={'IranSansMedium h-10 w-20 flex flex-row justify-around items-center bg-background rounded-lg'}>
-                                    <input id={'free-book'} className={'free-checkbox'}
+                                    <input disabled={BookData.isDownloadable} id={'free-book'}
+                                           className={'free-checkbox'}
                                            defaultValue={fixPrice(BookData.price)}
                                            type={'checkbox'} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                         if (e.currentTarget.checked)
@@ -801,7 +987,7 @@ const NewBrochure = () => {
                                             updateBookData('price', 20000)
 
 
-                                    }}/>
+                                    }} ref={freeCheckBox}/>
                                     <label htmlFor={'free-book'}> رایگان</label>
                                 </div>
                             </div>

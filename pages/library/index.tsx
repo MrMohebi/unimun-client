@@ -49,6 +49,9 @@ const Index = () => {
                         title
                         writer
                         status
+                        teacher
+                        term
+                        university
                         creator {
                             name
                             id
@@ -68,6 +71,7 @@ const Index = () => {
                         isDownloadable
                         attachments {
                             url
+                            preview
                         }
                         bookFiles {
                             url
@@ -408,6 +412,8 @@ const Index = () => {
                                     price: number
                                     writer: string
                                     id: string
+                                    term: string
+                                    teacher: string
                                     creator: { name: string, id: string }
                                 }, index: number) => {
                                     console.log(book)
@@ -431,26 +437,51 @@ const Index = () => {
                                                     <div
                                                         className={'flex flex-col justify-between mt-2 h-full items-start'}>
 
-                                                        <div
-                                                            className={'IranSansMedium text-sm  whitespace-nowrap'}><span
-                                                            className={'text-textDark'}>نویسنده:</span> {book.writer ? book.writer ?? "-" : '-'}
-                                                        </div>
+                                                        {
+                                                            book.isBook ?
+                                                                <div
+                                                                    className={'IranSansMedium text-sm  whitespace-nowrap'}><span
+                                                                    className={'text-textDark'}>نویسنده:</span> {book.writer ? book.writer ?? "-" : '-'}
+                                                                </div>
+                                                                :
+                                                                <div
+                                                                    className={'IranSansMedium text-sm  whitespace-nowrap'}><span
+                                                                    className={'text-textDark'}>استاد:</span> {book.teacher ? book.teacher ?? "-" : '-'}
+                                                                </div>
+                                                        }
+
 
                                                         <div
                                                             className={'IranSansMedium text-sm  whitespace-nowrap'}><span
                                                             className={'text-textDark'}>دسته بندی: </span> {book.category ? book.category.title : '-'}
                                                         </div>
-                                                        <div style={{}}
-                                                             className={'IranSansMedium flex flex-row items-center text-sm  whitespace-nowrap'}>
+
+                                                        {
+                                                            book.isBook ?
+                                                                <div style={{}}
+                                                                     className={'IranSansMedium flex flex-row items-center text-sm  whitespace-nowrap'}>
                                                             <span
                                                                 className={'text-textDark'}>
                                                                 وضعیت ظاهری:</span>
-                                                            <span
-                                                                className={'overflow-hidden text-ellipsis  inline-block mr-1'}>
+                                                                    <span
+                                                                        className={'overflow-hidden text-ellipsis  inline-block mr-1'}>
                                                                                                                             {book.appearance ? book.appearance.title ?? "-" : "-"}
 
                                                             </span>
-                                                        </div>
+                                                                </div>
+                                                                :
+                                                                <div style={{}}
+                                                                     className={'IranSansMedium flex flex-row items-center text-sm  whitespace-nowrap'}>
+                                                            <span
+                                                                className={'text-textDark'}>
+                                                                وضعیت ظاهری:</span>
+                                                                    <span
+                                                                        className={'overflow-hidden text-ellipsis  inline-block mr-1'}>
+                                                                                                                            {book.term ? book.term ?? "-" : "-"}
+
+                                                            </span>
+                                                                </div>
+                                                        }
 
 
                                                         <div

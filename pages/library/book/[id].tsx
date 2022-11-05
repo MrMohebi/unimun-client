@@ -67,7 +67,10 @@ const Book = (props: Props) => {
                     createdAt
                     publisher
                     publishedDate
+                    teacher
+                    university
                     publishedAt
+                    term
                     language
                     bookFiles {
                         url
@@ -98,6 +101,7 @@ const Book = (props: Props) => {
     const [getBook, getBookResults] = useLazyQuery(getBookQuery)
     const [fullScreenLoading, setFullScreenLoading] = useState(false);
 
+    const [isBook, setIsBook] = useState(true);
     const [contactAppealShow, setContactAppealShow] = useState(false);
     const [loginOpen, setLoginOpen] = useState(false);
     const [book, _book] = useState({} as any);
@@ -112,6 +116,7 @@ const Book = (props: Props) => {
         getBook({variables: {id: bookId}}).then((e) => {
             try {
                 _book(e.data.book.data)
+                setIsBook(e.data.book.data.isBook)
             } catch (e) {
                 console.log(e)
             }
@@ -327,27 +332,64 @@ const Book = (props: Props) => {
 
                     </div>
 
-                    <div className={'mt-2'}>
-                        <span className={'text-textDark IranSansMedium text-sm inline-block'}> وضعیت ظاهری:</span>
+                    {
+                        isBook ?
+                            <div className={'mt-2'}>
+                                <span
+                                    className={'text-textDark IranSansMedium text-sm inline-block'}> وضعیت ظاهری:</span>
 
-                        <span
-                            className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{book.appearance ? book.appearance.title : '-'}</span>
-                    </div>
+                                <span
+                                    className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{book.appearance ? book.appearance.title : '-'}</span>
+                            </div>
+                            :
+                            <div className={'mt-2'}>
+                                <span
+                                    className={'text-textDark IranSansMedium text-sm inline-block'}>نام استاد:</span>
+
+                                <span
+                                    className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{book.teacher ? book.teacher : '-'}</span>
+                            </div>
+
+                    }
 
 
-                    <div className={'mt-2'}>
-                        <span className={'text-textDark IranSansMedium text-sm inline-block'}> ناشر:</span>
+                    {
+                        isBook ?
+                            <div className={'mt-2'}>
+                                <span className={'text-textDark IranSansMedium text-sm inline-block'}> ناشر:</span>
 
-                        <span
-                            className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{book.publisher ?? '-'}</span>
-                    </div>
+                                <span
+                                    className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{book.publisher ?? '-'}</span>
+                            </div>
+                            :
+                            <div className={'mt-2'}>
+                                <span className={'text-textDark IranSansMedium text-sm inline-block'}>  دانشگاه ارائه درس:</span>
 
-                    <div className={'mt-2'}>
-                        <span className={'text-textDark IranSansMedium text-sm inline-block'}> سال انتشار:</span>
+                                <span
+                                    className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{book.university ?? '-'}</span>
+                            </div>
+                    }
 
-                        <span
-                            className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{book.publishedDate ?? '-'}</span>
-                    </div>
+
+                    {
+                        isBook ?
+                            <div className={'mt-2'}>
+                                <span
+                                    className={'text-textDark IranSansMedium text-sm inline-block'}> سال انتشار:</span>
+
+                                <span
+                                    className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{book.publishedDate ?? '-'}</span>
+                            </div>
+                            :
+                            <div className={'mt-2'}>
+                                <span className={'text-textDark IranSansMedium text-sm inline-block'}> ترم - سال ارائه درس:</span>
+
+                                <span
+                                    className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{book.term ?? '-'}</span>
+                            </div>
+                    }
+
+
                     <div className={'mt-2'}>
                         <span className={'text-textDark IranSansMedium text-sm inline-block'}>زبان:</span>
 
