@@ -24,7 +24,8 @@ const Home: NextPage = () => {
         <div className={'bg-background h-full'}>
             <Head>
                 <title>Unimun</title>
-                <meta name="description" content="Unimun"/>
+                <meta name="description" content="213382"/>
+                <meta name="enamad" content="213382"/>
             </Head>
             <main className={'h-full'}>
                 <Appeals/>
