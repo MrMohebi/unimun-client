@@ -23,8 +23,8 @@ const Home: NextPage = () => {
     return (
         <div className={'bg-background h-full'}>
             <Head>
-                <title>213382</title>
-                <meta name="description" content="Unimun"/>
+                <title>Unimun</title>
+                <meta name="description" content="213382"/>
                 <meta name="enamad" content="213382"/>
             </Head>
             <main className={'h-full'}>
