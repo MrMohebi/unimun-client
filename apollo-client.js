@@ -14,7 +14,6 @@ let uri = isTesting ? 'https://tttapi.unimun.me/graphql' : 'https://api.unimun.m
 let uriChat = isTesting ? 'https://tttchat.unimun.me/graphql' : 'https://chat.unimun.me/graphql'
 let urlChatWss = isTesting ? 'wss://tttchat.unimun.me/graphql' : 'wss://chat.unimun.me/graphql'
 
-
 const httpLink = createHttpLink({
     uri: uri,
 });
