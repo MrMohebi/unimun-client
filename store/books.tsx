@@ -5,17 +5,9 @@ export const isBrochure = makeVar(false)
 export const BooksStore = makeVar([])
 export const BooksEndCursor = makeVar("")
 export const LastBooksScrollPosition = makeVar(0)
-export const BookDataStore = makeVar({
 
-    attachments: [],
-    price: '20000',
-    type: 'physical',
-    isBook: true,
-    isDownloadable: false,
-    isPurchasable: true,
-    bookFiles: []
 
-} as {
+interface Book {
     categoryPersian: string
     type: string
     ISBN: string
@@ -56,7 +48,30 @@ export const BookDataStore = makeVar({
     verifiedAt: string
     writer: string
     wroteYear: string
-})
+}
+
+export const EmptyBook = makeVar({
+
+    attachments: [],
+    price: '20000',
+    type: 'physical',
+    isBook: true,
+    isDownloadable: false,
+    isPurchasable: true,
+    bookFiles: []
+
+} as Book);
+export const BookDataStore = makeVar({
+
+    attachments: [],
+    price: '20000',
+    type: 'physical',
+    isBook: true,
+    isDownloadable: false,
+    isPurchasable: true,
+    bookFiles: []
+
+} as Book)
 
 // export const EditBookData = makeVar({} as {
 //     title:string

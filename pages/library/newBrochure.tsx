@@ -298,7 +298,7 @@ const NewBrochure = () => {
                     term: BookData.term,
                     university: BookData.university,
                     price: BookData.price,
-                    pages: 100,
+                    pages: BookData.pages,
                 }
             }).then((e) => {
                 try {

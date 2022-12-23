@@ -3,7 +3,13 @@ import Search from "../../components/normal/Search/Search";
 import Add from '../../assets/svgs/add.svg'
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
-import {BooksEndCursor, EditBookData, LastBooksScrollPosition, lastBookSubmitSuccess} from "../../store/books";
+import {
+    BooksEndCursor,
+    EditBookData,
+    EmptyBook,
+    LastBooksScrollPosition,
+    lastBookSubmitSuccess
+} from "../../store/books";
 import Toast from "../../components/normal/Toast/Toast";
 import {gql, useLazyQuery, useQuery, useReactiveVar} from "@apollo/client";
 import ThousandTomans from "../../assets/svgs/thousandTomans.svg";
@@ -659,6 +665,7 @@ const Index = () => {
                     بارکد</Button>
                 <Button onClick={() => {
                     EditBookData({})
+                    BooksStore(EmptyBook());
                     if (UserToken())
                         router.push('library/newBook')
                     else

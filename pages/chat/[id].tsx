@@ -475,6 +475,8 @@ const ChatScreen = () => {
                             let sentByMe = item.userID === UserId()
 
                             let itemText = item.text;
+                            let toBeRenderedElements = [];
+                            let lastWasDateIndicator = false;
                             let textWithLink = <div key={index + 'keyOfLink'} className={'contents'}>
                                 <a target={'_blank'} rel={'noreferrer'} className={'text-primary underline '}
                                    href="http://google.co">this is a text with
@@ -488,19 +490,24 @@ const ChatScreen = () => {
                                     lastMessageGroupDate.current = moment(item.sentAt * 1000).format('jDD/jMM');
 
                                     try {
-                                        return <div
-                                            className={'w-full h-12 text-sm flex flex-col justify-center items-center IranSansMedium'}>
-                                            <div className={'bg-glassButtonColor text-white px-4 py-1 rounded-2xl'}>{
+
+                                        toBeRenderedElements.push(
+                                            <div
+                                                className={'w-full h-12 text-sm flex flex-col justify-center items-center IranSansMedium'}>
+                                                <div
+                                                    className={'bg-glassButtonColor text-white px-4 py-1 rounded-2xl'}>{
 
 
-                                                moment(messages[index + 1].sentAt * 1000).format('jYYYY/jMM/jDD') === moment().format('jYYYY/jMM/jDD') ?
-                                                    "امروز" :
-                                                    moment(messages[index + 1].sentAt * 1000).format('jYYYY/jMM/jDD')
+                                                    moment(messages[index + 1].sentAt * 1000).format('jYYYY/jMM/jDD') === moment().format('jYYYY/jMM/jDD') ?
+                                                        "امروز" :
+                                                        moment(messages[index + 1].sentAt * 1000).format('jYYYY/jMM/jDD')
 
 
-                                            }
+                                                }
+                                                </div>
                                             </div>
-                                        </div>
+                                        )
+
                                     } catch (e) {
 
                                     }
@@ -558,7 +565,7 @@ const ChatScreen = () => {
                             // if (index === messages.length - 3)
 
                             if (item.type === 'TEXT')
-                                return (
+                                return toBeRenderedElements.concat(
                                     <div key={'chat-bubble-' + index}
                                          className={` w-full h-auto flex flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
                                         <div style={{
@@ -585,7 +592,6 @@ const ChatScreen = () => {
                                         </div>
 
                                     </div>
-
                                 )
                             else if (item.type === "PAY_REQUEST") {
 
@@ -609,29 +615,29 @@ const ChatScreen = () => {
                                         }
                                         break;
 
-                                        case "ACCEPTED" :
-                                            if (sentByMe)
-                                                payRequestIcon = "/assets/svgs/pay-request-accepted.svg"
-                                            else {
-                                                payRequestIcon = "/assets/svgs/pay-request-accepted-sender.svg"
-                                            }
-                                            break
+                                    case "ACCEPTED" :
+                                        if (sentByMe)
+                                            payRequestIcon = "/assets/svgs/pay-request-accepted.svg"
+                                        else {
+                                            payRequestIcon = "/assets/svgs/pay-request-accepted-sender.svg"
+                                        }
+                                        break
 
 
                                     }
 
 
-                                    return <div
-                                        className={`w-full flex flex-row ${sentByMe ? "justify-start " : "justify-end"} items-center my-3`}>
-                                        <div className={'w-[80%] flex flex-col justify-start items-center px-2'}>
-                                            <div
-                                                className={`h-auto w-full  ${sentByMe ? "bg-primary" : 'bg-white'} rounded-2xl flex flex-col justify-center items-center px-3 pb-1 pt-3`}>
-                                                <div className={'flex flex-row justify-between items-center w-full'}>
-                                                    <img className={'w-10'}
-                                                         src={payRequestIcon}
-                                                         alt=""/>
-                                                    <span
-                                                        className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium w-full mr-3`}>درخواست</span>
+                                return toBeRenderedElements.concat(<div
+                                    className={`w-full flex flex-row ${sentByMe ? "justify-start " : "justify-end"} items-center my-3`}>
+                                    <div className={'w-[80%] flex flex-col justify-start items-center px-2'}>
+                                        <div
+                                            className={`h-auto w-full  ${sentByMe ? "bg-primary" : 'bg-white'} rounded-2xl flex flex-col justify-center items-center px-3 pb-1 pt-3`}>
+                                            <div className={'flex flex-row justify-between items-center w-full'}>
+                                                <img className={'w-10'}
+                                                     src={payRequestIcon}
+                                                     alt=""/>
+                                                <span
+                                                    className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium w-full mr-3`}>درخواست</span>
                                                     <div
                                                         className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium whitespace-nowrap flex flex-row justify-center items-start`}>
                                                     <span
@@ -772,8 +778,8 @@ const ChatScreen = () => {
                                                                 </Button>
                                             }
 
-                                        </div>
                                     </div>
+                                </div>)
                             }
                         })
                     }

@@ -16,16 +16,18 @@ import {ToastContainer} from "react-toastify";
 import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
 import DropDown from "../../components/view/DropDown/DropDown";
 import {EditBookData} from "../../store/books";
+import produce from "immer";
 
 
 const MyBooks = () => {
 
     const [currentActivePart, _currentActivePart] = useState(1)
     const [myBooks, _myBooks] = useState([])
-    const [myBrochures, _myBrochures] = useState([])
     let [booksLength, _booksLength] = useState(0)
-
+    const [myBrochures, _myBrochures] = useState([])
+    const [loading, setLoading] = useState(false);
     const myBooksQuery = gql`
+
         query getMyBooks($first: Int, $after: String) {
             booksUserCreated(
                 first:$first,
@@ -98,8 +100,6 @@ const MyBooks = () => {
             if (!getMyBooksData.loading) {
                 getMyBooksData.loading = true;
             }
-
-
             if (UserToken()) {
                 getMyBooks({
                     variables: {
@@ -160,7 +160,7 @@ const MyBooks = () => {
     return (
         <div className={'h-full pb-20 '}>
 
-            <FullScreenLoading show={getMyBooksData.loading}/>
+            <FullScreenLoading show={getMyBooksData.loading || loading}/>
             <ToastContainer/>
 
             <Header noShadow={true} backOnClick={() => {
@@ -299,13 +299,26 @@ const MyBooks = () => {
                                                     :
                                                     <div
                                                         onClick={() => {
+                                                            setLoading(true)
+
                                                             removeBook({
                                                                 variables: {
                                                                     id: book.id,
                                                                     status: 'DELETED'
                                                                 }
+
                                                             }).then((value) => {
-                                                                console.log(value)
+                                                                setLoading(false)
+                                                                console.log(value);
+                                                                _myBooks(produce(draft => {
+
+                                                                    draft.forEach((item: { id: string, status: string }) => {
+                                                                        if (item.id === book.id) {
+                                                                            item.status = "DELETED"
+                                                                        }
+                                                                    })
+                                                                    return draft;
+                                                                }))
 
                                                             })
                                                         }}
