@@ -4,6 +4,7 @@ import Add from '../../assets/svgs/add.svg'
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import {
+    BookDataStore,
     BooksEndCursor,
     EditBookData,
     EmptyBook,
@@ -57,6 +58,8 @@ const Index = () => {
                         status
                         teacher
                         term
+                        isLiked
+                        likes
                         university
                         creator {
                             name
@@ -103,7 +106,7 @@ const Index = () => {
                         Books.push(book.node)
                     })
                     _books(Books as never[])
-                    BooksStore(Books as never[])
+                    BooksStore(Books as object[])
                     BooksEndCursor(getBooks.data.books.pageInfo.endCursor)
                 }
                 if (!getBooks.data.books.pageInfo.hasNextPage)
@@ -417,6 +420,8 @@ const Index = () => {
                                     attachments: [{ preview: string }]
                                     price: number
                                     writer: string
+                                    isLiked: string
+                                    likes: number
                                     id: string
                                     term: string
                                     teacher: string
@@ -518,24 +523,62 @@ const Index = () => {
 
                                                          }}>
 
-                                                        {book.isDownloadable ?
-                                                            <div
-                                                                className={'  w-11/12   flex flex-row h-7 justify-between items-center absolute  left-1/2 -translate-x-1/2 py-1 rounded-lg px-2 '}
-                                                                style={{
-                                                                    bottom: '0.4rem',
-                                                                    background: 'rgba(83,82,85,0.61)'
-                                                                }}>
 
-                                                                <div dir={'ltr'} className={'IranSans w-3 h-3 '}>
-                                                                    <DownloadOutline/>
+                                                        {book.isDownloadable ?
+
+                                                            book.likes ?
+                                                                <div
+                                                                    className={'absolute h-7 left-1/2 -translate-x-1/2 flex flex-row justify-between items-center bottom-0 px-1 w-full'}>
+                                                                    <div
+                                                                        className={'w-7 flex flex-row h-7 justify-between items-center    py-1 rounded-lg px-2 '}
+                                                                        style={{
+                                                                            bottom: '0.4rem',
+                                                                            background: 'rgba(83,82,85,0.61)'
+                                                                        }}>
+
+                                                                        <div dir={'ltr'}
+                                                                             className={'IranSans w-full flex flex-col justify-center items-center h-full  '}>
+                                                                            <DownloadOutline/>
+                                                                        </div>
+                                                                        {/*<span*/}
+                                                                        {/*    className={'text-white whitespace-nowrap text-tiny IranSans'}>قـابـل دانـلـود</span>*/}
+
+                                                                    </div>
+                                                                    <div
+                                                                        className={'w-12 flex flex-row h-7 justify-between items-center  py-1 rounded-lg px-2 '}
+                                                                        style={{
+                                                                            bottom: '0.4rem',
+                                                                            background: 'rgba(83,82,85,0.61)'
+                                                                        }}>
+
+                                                                        <span
+                                                                            className={'text-white IranSans text-sm'}>{book.likes}</span>
+                                                                        <img
+                                                                            src={`/assets/svgs/${book.isLiked ? 'filled-heart' : 'heart'}.svg`}
+                                                                            className={'h-4 w-4'} alt=""/>
+                                                                        {/*<span*/}
+                                                                        {/*    className={'text-white whitespace-nowrap text-tiny IranSans'}>قـابـل دانـلـود</span>*/}
+
+                                                                    </div>
+
                                                                 </div>
-                                                                <span
-                                                                    className={'text-white whitespace-nowrap text-tiny IranSans'}>قـابـل دانـلـود</span>
-                                                                <div dir={'ltr'}
-                                                                     className={'IranSans w-1 h-3 opacity-0 '}>
-                                                                    <DownloadOutline/>
+
+                                                                :
+                                                                <div
+                                                                    className={'gap-2 w-11/12 flex flex-row h-7 justify-start items-center absolute  left-1/2 -translate-x-1/2 py-1 rounded-lg px-1 '}
+                                                                    style={{
+                                                                        bottom: '0.4rem',
+                                                                        background: 'rgba(83,82,85,0.61)'
+                                                                    }}>
+
+                                                                    <div dir={'ltr'}
+                                                                         className={'IranSans w-5 flex flex-col justify-center items-center h-5  '}>
+                                                                        <DownloadOutline/>
+                                                                    </div>
+                                                                    <span
+                                                                        className={'text-white whitespace-nowrap text-tiny IranSans'}>قـابـل دانـلـود</span>
+
                                                                 </div>
-                                                            </div>
                                                             :
                                                             null
                                                         }
@@ -665,7 +708,7 @@ const Index = () => {
                     بارکد</Button>
                 <Button onClick={() => {
                     EditBookData({})
-                    BooksStore(EmptyBook());
+                    BookDataStore(EmptyBook());
                     if (UserToken())
                         router.push('library/newBook')
                     else

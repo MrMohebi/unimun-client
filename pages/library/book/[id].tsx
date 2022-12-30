@@ -63,6 +63,8 @@ const Book = (props: Props) => {
                     isPurchasable
                     price
                     pages
+                    isLiked
+                    likes
                     writer
                     createdAt
                     publisher
@@ -78,8 +80,20 @@ const Book = (props: Props) => {
                 }
             }
         }
+    `
+
+    const LIKE_BOOK_MUTATIOn = gql`
+        mutation likeBook($id:ID!) {
+            likeBook(id: $id, isLiked: false){
+                message
+                data
+                status
+            }
+        }
 
     `
+
+    const [likeBook, likeBookResult] = useMutation(LIKE_BOOK_MUTATIOn);
 
     let bookConnectQuery = gql`
         mutation bookConnect($bookId:ID!,$userId:ID!){
@@ -109,6 +123,7 @@ const Book = (props: Props) => {
     const phoneInputRef = useRef<HTMLInputElement>(null)
     const [bookId, setBookId] = useState("");
     const [btnLoading, setBtnLoading] = useState(false);
+    const [bookIsLiked, setBookIsLiked] = useState(false);
     useEffect(() => {
 
         let bookId = window.location.href.split('/')[window.location.href.split('/').length - 1]
@@ -117,6 +132,10 @@ const Book = (props: Props) => {
             try {
                 _book(e.data.book.data)
                 setIsBook(e.data.book.data.isBook)
+                console.log(e.data.book.data)
+                if (e.data.book.data.isLiked) {
+                    setBookIsLiked(true)
+                }
             } catch (e) {
                 console.log(e)
             }
@@ -258,6 +277,26 @@ const Book = (props: Props) => {
                     {/*<div className={'w-6 h-6 '}>*/}
                     {/*    <More/>*/}
                     {/*</div>*/}
+                    <img onClick={() => {
+                        if (!bookIsLiked) {
+
+                            setBookIsLiked(true)
+                            likeBook({
+                                variables: {
+                                    id: bookId
+                                }
+                            }).then((value) => {
+                                if (value.data.likeBook.status === "SUCCESS") {
+                                    setBookIsLiked(true)
+                                } else {
+                                    setBookIsLiked(false)
+                                }
+                                console.log(value)
+
+                            })
+                        }
+                    }} className={'w-6'}
+                         src={`/assets/svgs/${book.isLiked || bookIsLiked ? "filled-heart" : "heart"}.svg`} alt=""/>
                 </div>
 
 

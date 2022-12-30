@@ -106,7 +106,7 @@ type User {
     id: ID!
     isAdmin: Boolean
     lastname: String
-    name: String!
+    name: String
     profiles: [Profile]
     verifiedAt: Int
 }

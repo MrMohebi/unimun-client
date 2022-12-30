@@ -2,12 +2,12 @@ import {makeVar} from "@apollo/client";
 
 export const lastBookSubmitSuccess = makeVar('')
 export const isBrochure = makeVar(false)
-export const BooksStore = makeVar([])
+export const BooksStore = makeVar([] as object[])
 export const BooksEndCursor = makeVar("")
 export const LastBooksScrollPosition = makeVar(0)
 
 
-interface Book {
+export interface Book {
     categoryPersian: string
     type: string
     ISBN: string
