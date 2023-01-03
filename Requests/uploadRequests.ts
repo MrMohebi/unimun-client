@@ -63,15 +63,17 @@ export const uploadBookFile = (image: any, removeEmptyProgresses: Function, curr
     removeEmptyProgresses()
 
     let data = new FormData();
-    data.append('token', UserToken());
+    // data.append('token', UserToken());
+    data.append('id', currentBookId);
     data.append('file', image);
-    data.append('bookID', currentBookId);
     data.append('uploadedAsFile', '1');
 
     let config: AxiosRequestConfig = {
         method: 'post',
-        url: 'https://apidl.unimun.me/bookUpload.php',
-        headers: {},
+        url: 'https://dl.unimun.me/public/book',
+        headers: {
+            token: UserToken()
+        },
         data: data,
         onUploadProgress: (progressEvent: any) => {
             onUploadProgress(progressEvent)
@@ -88,3 +90,70 @@ export const uploadBookFile = (image: any, removeEmptyProgresses: Function, curr
         });
 
 }
+export const uploadPublicBookFile = (file: any, removeEmptyProgresses: Function, currentBookId: string, success: Function, error: Function, onUploadProgress: Function) => {
+    removeEmptyProgresses()
+
+    let data = new FormData();
+    // data.append('token', UserToken());
+    data.append('id', currentBookId);
+    data.append('file', file);
+    data.append('uploadedAsFile', '1');
+
+    let config: AxiosRequestConfig = {
+        method: 'post',
+        url: 'https://dl.unimun.me/public/book',
+        headers: {
+            token: UserToken()
+        },
+        data: data,
+        onUploadProgress: (progressEvent: any) => {
+            onUploadProgress(progressEvent)
+        }
+    };
+
+    axios(config)
+        .then(function (response: any) {
+            success(response)
+        })
+
+        .catch(function (er: any) {
+            error(er)
+        });
+
+}
+export const uploadPrivateBookFile = (file: any, removeEmptyProgresses: Function, currentBookId: string, success: Function, error: Function, onUploadProgress: Function) => {
+    removeEmptyProgresses()
+
+    let data = new FormData();
+    // data.append('token', UserToken());
+    data.append('id', currentBookId);
+    data.append('file', file);
+    data.append('uploadedAsFile', '1');
+
+    let config: AxiosRequestConfig = {
+        method: 'post',
+        url: 'https://dl.unimun.me/private/book',
+        headers: {
+            token: UserToken()
+        },
+        data: data,
+        onUploadProgress: (progressEvent: any) => {
+            onUploadProgress(progressEvent)
+        }
+    };
+
+    axios(config)
+        .then(function (response: any) {
+            success(response)
+        })
+
+        .catch(function (er: any) {
+            error(er)
+        });
+
+}
+
+
+
+
+

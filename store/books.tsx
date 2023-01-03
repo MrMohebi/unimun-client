@@ -48,6 +48,11 @@ export interface Book {
     verifiedAt: string
     writer: string
     wroteYear: string
+    location: {
+        text: string
+        lon: string
+        lat: string
+    }
 }
 
 export const EmptyBook = makeVar({
@@ -69,7 +74,12 @@ export const BookDataStore = makeVar({
     isBook: true,
     isDownloadable: false,
     isPurchasable: true,
-    bookFiles: []
+    bookFiles: [],
+    location: {
+        text: '',
+        lat: '',
+        lon: ''
+    }
 
 } as Book)
 

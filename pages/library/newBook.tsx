@@ -16,9 +16,6 @@ import BookCategories from "../../components/normal/BookCategories/BookCategorie
 import BookAppearance from "../../components/normal/BookAppearance/BookAppearance";
 import {BookDataStore, EditBookData, isBrochure, lastBookSubmitSuccess} from "../../store/books";
 import Trash from '../../assets/svgs/trash.svg'
-import TelInputSVG from "../../assets/svgs/telInput.svg";
-import BoldMobile from "../../assets/svgs/boldMobile.svg";
-import RightSquareSVG from "../../assets/svgs/rightSquare.svg";
 import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
 import _ from 'lodash'
@@ -27,7 +24,10 @@ import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUp
 import produce from "immer";
 import {DOWNLOAD_HOST} from "../../store/GLOBAL_VARIABLES";
 import BottomSheet from "../../components/view/BottomSheet/BottomSheet";
-import {uploadBookFile} from "../../Requests/uploadRequests";
+import {uploadPrivateBookFile, uploadPublicBookFile} from "../../Requests/uploadRequests";
+import dynamic from "next/dynamic";
+import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
+import UploadingFileLoading from "../../components/normal/UploadingFileLoading/UploadingFileLoading";
 
 const NewBook = () => {
 
@@ -35,7 +35,7 @@ const NewBook = () => {
     //queries
 
     const createBookMutation = gql`
-        mutation createBook($isBook:Boolean! $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
+        mutation createBook($text:String!,$lat:String!,$lon:String!, $isBook:Boolean! $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
             createBook(
                 isBook:$isBook,
                 isDownloadable: $isDownloadable,
@@ -53,6 +53,7 @@ const NewBook = () => {
                 attachments: $attachments,
                 connectWay:$connectWay
                 pages:$pages
+                location: {text: $text, lat: $lat, lon: $lon}
             ){
                 status
                 data {
@@ -63,6 +64,8 @@ const NewBook = () => {
             }
         }
     `
+
+    const [locationBottomSheetOpen, setLocationBottomSheetOpen] = useState(false);
 
     const updateBookMutation = gql`
         mutation updateBook($id:ID!  $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
@@ -93,13 +96,15 @@ const NewBook = () => {
         }
     `
 
+
+    const [bookLocalFiles, setBookLocalFiles] = useState(null);
     const [createBook, createBookResult] = useMutation(createBookMutation)
     const [updateBook, updateBookResult] = useMutation(updateBookMutation)
     const [imageOptionsOpen, setImageOptionsOpen] = useState(false);
 
+    const [loading, setLoading] = useState(false);
     const router = useRouter()
     const [currentStep, ScurrentStep] = useState(0)
-    const [isBook, _isBook] = useState(false)
     const [dimmer, Sdimmer] = useState(false)
     const [langDropDown, SlangDropDown] = useState(false)
     const [uploadingProgress, setUploadingProgress] = useState([] as number[])
@@ -108,10 +113,8 @@ const NewBook = () => {
     const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
     const [categoryComponent, _categoryComponent] = useState(false)
     const [appearanceComponent, _appearanceComponent] = useState(false)
-    const [uploadedFile, _uploadedFile] = useState('')
     const [fileUploadingPercentage, _fileUploadingPercentage] = useState('0')
     const [contactType, setContactType] = useState('')
-    const [contactAddress, setContactAddress] = useState('')
     const [connectWay, setConnectWay] = useState('')
     const [langPosition, _langPosition] = useState([1000, 1000]);
     const selectLangRef = useRef<HTMLSpanElement>(null);
@@ -126,13 +129,24 @@ const NewBook = () => {
     const reactiveBookData = useReactiveVar(BookDataStore)
     const freeCheckboxRef = useRef<HTMLInputElement>(null);
 
+    const address = useRef<string>('');
+    const lat = useRef<string>('');
+    const lon = useRef<string>('');
+
+
     const [BookData, setBookData] = useState({
         type: 'physical',
         price: 20000,
         attachments: [],
         files: [],
-        fileNames: []
+        fileNames: [],
+
     } as {
+        location: {
+            text: string,
+            lat: string
+            lon: string
+        }
         id: string
         isBook: boolean
         title: string
@@ -232,12 +246,58 @@ const NewBook = () => {
     const pdfSoonRef = useRef<HTMLDivElement>(null);
 
 
+    const removeEmptyProgresses = () => {
+        let updateUploadingProgress = [...uploadingProgress];
+        updateUploadingProgress.filter(item => {
+            return item !== 100 && item !== 0;
+        })
+        setUploadingProgress(updateUploadingProgress)
+    }
+
+    const updateBookData = (param: string | any, value: string | any) => {
+        // let updatedBookData = reactiveBookData;
+        // updatedBookData[`${param}`] = value;
+        // setBookData({...updatedBookData});
+
+        const newBookData = produce(BookDataStore(), (draft: any) => {
+            draft[param] = value
+        })
+        BookDataStore(newBookData)
+        // setBookData(produce((draft) => {
+        //     //@ts-ignore
+        //     draft[`${param}`] = value;
+        // }))
+    }
+
+    //todo here is the changed trigger commented
+    // useEffect(() => {
+    //
+    //     console.log('changed')
+    //     console.log(reactiveBookData)
+    // }, [reactiveBookData]);
+
+
     const submitBook = () => {
 
-        if (reactiveBookData.isDownloadable) {
-            updateBookData('isPurchasable', false)
-            updateBookData('price', 0)
+        if (!reactiveBookData.isDownloadable && !locationBottomSheetOpen) {
+            console.log('open')
+            setLocationBottomSheetOpen(true)
+            return;
         }
+        if (!reactiveBookData.isDownloadable) {
+            updateBookData('location', {
+                lat: lat.current.toString(),
+                lon: lon.current.toString(),
+                text: address.current
+            })
+        }
+
+
+        if (parseInt(reactiveBookData.price) === 0) {
+            setIsBookFree(true)
+        }
+        updateBookData('isPurchasable', !isBookFree)
+
 
         updateBookData('price', parseInt(reactiveBookData.price))
 
@@ -246,7 +306,10 @@ const NewBook = () => {
             // return 0
         }
 
+        console.log('data')
+        console.log(BookDataStore())
 
+        // return;
         if (editing) {
 
             updateBook({
@@ -282,80 +345,157 @@ const NewBook = () => {
                 }
             })
         } else {
+
+            //
+            //     let axios = require('axios');
+            //     let data = JSON.stringify({
+            //         query: `mutation createBook($text:String!,$lat:String!,$lon:String!, $isBook:Boolean! $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
+            //     createBook(
+            //         isBook:$isBook,
+            //         isDownloadable: $isDownloadable,
+            //         isPurchasable: $isPurchasable,
+            //         categoryID: $categoryID,
+            //         title: $title,
+            //         details: $details,
+            //         price: $price,
+            //         language: $language,
+            //         writer: $writer,
+            //         publisher: $publisher,
+            //         publishedDate: $publishedDate,
+            //         appearanceID: $appearanceID
+            //         bookFiles: $bookFiles,
+            //         attachments: $attachments,
+            //         connectWay:$connectWay
+            //         pages:$pages
+            //         location: {text: $text, lat: $lat, lon: $lon}
+            //     ){
+            //         status
+            //         data {
+            //             title
+            //             id
+            //         }
+            //         message
+            //     }
+            // }`,
+            //         variables: {
+            //             ...BookDataStore()
+            //             ,
+            //
+            //
+            //         }
+            //     });
+            //
+            //     var config = {
+            //         method: 'post',
+            //         url: 'https://api.unimun.me/graphql',
+            //         headers: {
+            //             'token': UserToken(),
+            //             'Content-Type': 'application/json'
+            //         },
+            //         data: data
+            //     };
+            //
+            //     axios(config)
+            //         .then(function (response: any) {
+            //             console.log(JSON.stringify(response.data));
+            //         })
+            //         .catch(function (error: any) {
+            //             console.log(error);
+            //         });
+
+
             // console.log(reactiveBookData)
 
-            createBook({
-                // variables: {
-                //     title: reactiveBookData.title,
-                //     categoryID: reactiveBookData.categoryID,
-                //     details: reactiveBookData.details,
-                //     isPurchasable: reactiveBookData.price ? reactiveBookData.price !== 0 : false,
-                //     isDownloadable: reactiveBookData.type === 'pdf',
-                //     isBook: true,
-                //     bookFiles: reactiveBookData.files,
-                //     attachments: reactiveBookData.attachments,
-                //     connectWay: connectWay,
-                //     appearanceID: reactiveBookData.appearanceID,
-                //     pages: reactiveBookData.pages,
-                //     publishedDate: reactiveBookData.publishedDate,
-                //     publisher: reactiveBookData.publisher,
-                //     price: isBookFree ? "0" : reactiveBookData.price,
-                //     writer: reactiveBookData.writer,
-                //     language: reactiveBookData.language
-                // }
-                variables: {
-                    ...BookDataStore()
-                }
-            }).then((e) => {
-                try {
-                    console.log(e)
-                    if (e.data.createBook.status === 'SUCCESS') {
-                        lastBookSubmitSuccess(e.data.createBook.data.id)
-                        router.push('/library')
-                    } else {
-                        Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
-                    }
-                } catch (e) {
-                    console.log(e)
+            setShowUploadingFileLoading(true)
 
-                }
-                console.log(e.data.createBook.status)
-            })
+            if (isBookFree) {
+
+                uploadPublicBookFile(bookLocalFiles, () => {
+
+                }, "Book_" + Math.random() * 99999999, (result: any) => {
+                    console.log(result)
+                    setShowUploadingFileLoading(false)
+                    createBookFunc()
+
+                }, (er: any) => {
+                    setShowUploadingFileLoading(false)
+                }, (uploadProgress: any) => {
+                    console.log(uploadProgress)
+                    // setFileUploadPercentage(uploadProgress)
+
+                })
+            } else {
+                uploadPrivateBookFile(bookLocalFiles, () => {
+                }, "Book_" + Math.random() * 99999999, (result: any) => {
+                    console.log(result)
+                    createBookFunc()
+
+                }, (er: any) => {
+
+                }, (uploadProgress: any) => {
+
+                    // setFileUploadPercentage(uploadProgress)
+                })
+            }
+
+
+            let createBookFunc = () => {
+
+                setLoading(true)
+
+
+                createBook({
+                    // variables: {
+                    //     title: reactiveBookData.title,
+                    //     categoryID: reactiveBookData.categoryID,
+                    //     details: reactiveBookData.details,
+                    //     isPurchasable: reactiveBookData.price ? reactiveBookData.price !== 0 : false,
+                    //     isDownloadable: reactiveBookData.type === 'pdf',
+                    //     isBook: true,
+                    //     bookFiles: reactiveBookData.files,
+                    //     attachments: reactiveBookData.attachments,
+                    //     connectWay: connectWay,
+                    //     appearanceID: reactiveBookData.appearanceID,
+                    //     pages: reactiveBookData.pages,
+                    //     publishedDate: reactiveBookData.publishedDate,
+                    //     publisher: reactiveBookData.publisher,
+                    //     price: isBookFree ? "0" : reactiveBookData.price,
+                    //     writer: reactiveBookData.writer,
+                    //     language: reactiveBookData.language
+                    // }
+                    variables: {
+                        ...BookDataStore(),
+                        text: address.current,
+                        lat: lat.current.toString(),
+                        lon: lon.current.toString(),
+                        connectWay: '@mokafela'
+                    }
+                }).then((e) => {
+                    try {
+                        console.log(e)
+                        if (e.data.createBook.status === 'SUCCESS') {
+                            lastBookSubmitSuccess(e.data.createBook.data.id)
+                            router.push('/library')
+                        } else {
+                            Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
+                        }
+                    } catch (e) {
+                        console.log(e)
+
+                    }
+                    console.log(e.data.createBook.status)
+                })
+
+            }
+
+
         }
 
 
     }
-    const removeEmptyProgresses = () => {
-        let updateUploadingProgress = [...uploadingProgress];
-        updateUploadingProgress.filter(item => {
-            return item !== 100 && item !== 0;
-        })
-        setUploadingProgress(updateUploadingProgress)
-    }
-
-    const updateBookData = (param: string | any, value: string | any) => {
-        // let updatedBookData = reactiveBookData;
-        // updatedBookData[`${param}`] = value;
-        // setBookData({...updatedBookData});
-
-        const newBookData = produce(BookDataStore(), (draft: any) => {
-            draft[param] = value
-        })
-        BookDataStore(newBookData)
-        // setBookData(produce((draft) => {
-        //     //@ts-ignore
-        //     draft[`${param}`] = value;
-        // }))
-    }
-
-    //todo here is the changed trigger commented
-    // useEffect(() => {
-    //
-    //     console.log('changed')
-    //     console.log(reactiveBookData)
-    // }, [reactiveBookData]);
 
     const bookVerification = () => {
+        console.log(reactiveBookData)
 
         if (currentStep === 0 && reactiveBookData.title && reactiveBookData.title.length > 2 && reactiveBookData.categoryID) {
             return true
@@ -363,25 +503,81 @@ const NewBook = () => {
         if (currentStep === 1 && reactiveBookData.appearance)
             return true
         if (currentStep === 2) {
-            if (reactiveBookData.isDownloadable && reactiveBookData.bookFiles.length) {
-
+            if (!reactiveBookData.isDownloadable) {
+                return true
+            }
+            if (reactiveBookData.isDownloadable && bookLocalFiles) {
+                return true
             } else {
                 return false;
             }
-            if (contactType === 'phone' && reactiveBookData.connectWay.length === 11) {
-                return true
-            }
-            if (contactType === 'telegram' && reactiveBookData.connectWay.length > 3) {
-                return true
-            }
+
+
+            // if (contactType === 'phone' && reactiveBookData.connectWay.length === 11) {
+            //     return true
+            // }
+            // if (contactType === 'telegram' && reactiveBookData.connectWay.length > 3) {
+            //     return true
+            // }
+
         }
 
         return false
     }
 
 
+    const DynamicMap = dynamic(() => import('../../components/normal/LocationBottomSheet/LocationBottomSheet'), {
+        ssr: false
+    });
+
+
+    const [fileUploadPercentage, setFileUploadPercentage] = useState(0);
+    const [showUploadingFileLoading, setShowUploadingFileLoading] = useState(false);
+
     return (
         <div ref={mainScroller} className={'pb-20 overflow-scroll h-full'}>
+
+            <UploadingFileLoading uploadPercentage={fileUploadPercentage} show={showUploadingFileLoading} dim={true}/>
+
+            <FullScreenLoading show={loading} dim={true}/>
+
+
+            {
+                locationBottomSheetOpen ?
+                    <DynamicMap
+                        onClose={() => {
+                            setLocationBottomSheetOpen(false)
+                        }}
+                        onLatChanged={(val: string) => {
+                            lat.current = val;
+                        }}
+                        onLngChanged={(val: string) => {
+                            lon.current = val;
+                            console.log(lon)
+                        }}
+                        onTextChanged={(text: string) => {
+                            address.current = text
+                        }}
+                        onSubmit={(e: any) => {
+                            console.log(address.current)
+                            if (!address.current) {
+                                Toast("لطفا فیلد آدرس را پر کنید", '', 2000, '', 50)
+                                return;
+                            }
+                            if (!(lat.current && lon.current)) {
+                                Toast("لطفا مکان را مشخص کنید", '', 2000, '', 50)
+                                return;
+                            }
+                            submitBook()
+
+
+                        }}/>
+                    :
+                    null
+
+            }
+
+
             <ToastContainer/>
             <BottomSheet open={imageOptionsOpen} onClose={() => {
 
@@ -730,9 +926,9 @@ const NewBook = () => {
                                 onClick={() => {
                                     updateBookData('type', 'pdf')
                                     updateBookData('isDownloadable', true)
-                                    updateBookData('price', 0)
+                                    // updateBookData('price', 0)
 
-                                    setIsBookFree(true)
+                                    // setIsBookFree(true)
                                     // (pdfSoonRef.current as HTMLInputElement).style.opacity = "1";
                                     //
                                     //
@@ -747,7 +943,7 @@ const NewBook = () => {
                                 }}
                                      className={'absolute transition-all ease-in-out w-full h-full bg-background z-10 flex flex-row justify-center items-center'}
                                      ref={pdfSoonRef}>
-                                    <span className={'IranSansMedium pb-2'}>به زودی</span>
+                                    {/*<span className={'IranSansMedium pb-2'}>به زودی</span>*/}
                                 </div>
                                 <div
                                     className={'block relative mx-auto overflow-hidden flex flex-col justify-center items-center'}>
@@ -799,54 +995,57 @@ const NewBook = () => {
                                            setFileName(fileName)
                                            setBookUploadState('uploading')
 
+                                           setBookLocalFiles(e.currentTarget.files[0] as any)
+                                           return 0
 
-                                           uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {
-                                                   console.log(response)
-                                                   _fileUploadingPercentage('0')
-                                                   if (response.data.validMimes) {
-                                                       Toast("فرمت فایل معتبر نیست")
-                                                   } else if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
-                                                       console.log('request success')
-                                                       console.log(response.data.url)
-                                                       let files = [] as any;
 
-                                                       files.concat(reactiveBookData.bookFiles)
-
-                                                       try {
-                                                           files.push({
-                                                               url: response.data.url as never,
-                                                               type: 'pdf' as never,
-                                                               mime: 'pdf' as never,
-                                                           } as never);
-                                                       } catch (e) {
-                                                           console.log(e)
-                                                       }
-
-                                                       console.log(files)
-                                                       console.log("was files")
-                                                       let fileNames = []
-                                                       fileNames.push(fileName)
-                                                       updateBookData('bookFiles', [...files])
-                                                       // updateBookData('fileNames', [...fileNames])
-                                                       removeEmptyProgresses()
-                                                       setBookUploadState('uploaded')
-
-                                                   } else {
-                                                       Toast('خطا در آپلود فایل، دوبره تلاش کنید')
-                                                       setBookUploadState('')
-
-                                                   }
-                                               }, (error: any) => {
-                                                   Sdimmer(false)
-                                                   setBookUploadState('')
-                                               },
-                                               (progressEvent: any) => {
-                                                   let percentCompleted = Math.round(
-                                                       (progressEvent.loaded * 100) / progressEvent.total
-                                                   );
-                                                   _fileUploadingPercentage(percentCompleted as any)
-                                               }
-                                           )
+                                           // uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {
+                                           //         console.log(response)
+                                           //         _fileUploadingPercentage('0')
+                                           //         if (response.data.validMimes) {
+                                           //             Toast("فرمت فایل معتبر نیست")
+                                           //         } else if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
+                                           //             console.log('request success')
+                                           //             console.log(response.data.url)
+                                           //             let files = [] as any;
+                                           //
+                                           //             files.concat(reactiveBookData.bookFiles)
+                                           //
+                                           //             try {
+                                           //                 files.push({
+                                           //                     url: response.data.url as never,
+                                           //                     type: 'pdf' as never,
+                                           //                     mime: 'pdf' as never,
+                                           //                 } as never);
+                                           //             } catch (e) {
+                                           //                 console.log(e)
+                                           //             }
+                                           //
+                                           //             console.log(files)
+                                           //             console.log("was files")
+                                           //             let fileNames = []
+                                           //             fileNames.push(fileName)
+                                           //             updateBookData('bookFiles', [...files])
+                                           //             // updateBookData('fileNames', [...fileNames])
+                                           //             removeEmptyProgresses()
+                                           //             setBookUploadState('uploaded')
+                                           //
+                                           //         } else {
+                                           //             Toast('خطا در آپلود فایل، دوبره تلاش کنید')
+                                           //             setBookUploadState('')
+                                           //
+                                           //         }
+                                           //     }, (error: any) => {
+                                           //         Sdimmer(false)
+                                           //         setBookUploadState('')
+                                           //     },
+                                           //     (progressEvent: any) => {
+                                           //         let percentCompleted = Math.round(
+                                           //             (progressEvent.loaded * 100) / progressEvent.total
+                                           //         );
+                                           //         _fileUploadingPercentage(percentCompleted as any)
+                                           //     }
+                                           // )
                                        }
 
                                        e.currentTarget.value = '';
@@ -880,21 +1079,19 @@ const NewBook = () => {
                                                     className={'flex flex-row-reverse justify-center items-center'}>
                                                     <div
                                                         className={"relative flex flex-col justify-center items-center mr-3"}>
-                                                        <CircularProgressBar sqSize={30} strokeWidth={3}
-                                                                             percentage={parseInt(fileUploadingPercentage)}
-                                                                             color={'#1DA1F2'}/>
+                                                        {/*<CircularProgressBar sqSize={30} strokeWidth={3}*/}
+                                                        {/*                     percentage={parseInt(fileUploadingPercentage)}*/}
+                                                        {/*                     color={'#1DA1F2'}/>*/}
 
-                                                        <span
-                                                            className={'block text-textDarker absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 IranSansMedium scale-90'}>{fileUploadingPercentage}</span>
+                                                        {/*<span*/}
+                                                        {/*    className={'block text-textDarker absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 IranSansMedium scale-90'}>{fileUploadingPercentage}</span>*/}
                                                     </div>
-                                                    {
-                                                        parseInt(fileUploadingPercentage) ?
-                                                            <span dir={'ltr'}
-                                                                  className={'IranSansMedium text-sm'}>{`${(fileSize * parseInt(fileUploadingPercentage) / 100).toFixed(2)} MB / ${fileSize} MB`}</span> :
-                                                            <span dir={'ltr'}
-                                                                  className={'IranSansMedium text-sm'}>{`0MB / ${fileSize} MB`}</span>
 
-                                                    }
+
+                                                    <span dir={'ltr'}
+                                                          className={'IranSansMedium text-sm'}>{`${fileSize} MB`}</span>
+
+
                                                 </div>
 
                                                 :
@@ -1008,7 +1205,7 @@ const NewBook = () => {
                             <span className={'IranSansMedium'}>فروش به قیمت</span>
                             <div
                                 className={' IranSansMedium h-10 w-24 px-2 flex flex-row justify-around items-center bg-background rounded-lg'}>
-                                <input disabled={reactiveBookData.isDownloadable} name={'free'} id={'free-book'}
+                                <input name={'free'} id={'free-book'}
 
                                        className={'free-checkbox '}
                                        type={'checkbox'}
@@ -1017,17 +1214,17 @@ const NewBook = () => {
                                            setIsBookFree(e.currentTarget.checked)
 
                                            if (e.currentTarget.checked) {
-                                               if (priceInputRef.current)
-                                                   (priceInputRef.current as HTMLInputElement).value = "0"
                                                //todo this state just added
                                                updateBookData('price', 0)
                                                setIsBookFree(true)
-
-
                                            } else if (priceInputRef.current) {
                                                setIsBookFree(false);
+                                               if (priceInputRef.current)
+                                                   if (parseInt((priceInputRef.current as HTMLInputElement).value) > 0) {
+                                                       updateBookData('price', '5000');
+                                                       (priceInputRef.current as HTMLInputElement).value = ('5000' ?? "").split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
 
-                                               (priceInputRef.current as HTMLInputElement).value = (reactiveBookData.price.toString() ?? "").split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
+                                                   }
 
                                            }
                                        }} ref={freeCheckboxRef}/>
@@ -1036,7 +1233,7 @@ const NewBook = () => {
                         </div>
 
                         <div
-                            className={`${isBookFree ? 'opacity-70 grayscale pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
+                            className={`transition-all ${isBookFree ? 'opacity-0 overflow-hidden border-none h-0 grayscale pointer-events-none' : 'opacity-100'} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
                             <div className={'w-10 h-10 mx-2 p-2'}>
                                 <Toman/>
                             </div>
@@ -1060,64 +1257,64 @@ const NewBook = () => {
                         </div>
                     </section>
 
-                    <div className={'w-full h-40 bg-white mt-4 px-4 pt-3 new-section'}>
+                    {/*<div className={'w-full h-40 bg-white mt-4 px-4 pt-3 new-section'}>*/}
 
-                        <span className={'text-textBlack text-md IranSansMedium  '}>اطلاعات تماس
-                                                <span className={' should-be-filled'}>*</span>
+                    {/*    <span className={'text-textBlack text-md IranSansMedium  '}>اطلاعات تماس*/}
+                    {/*                            <span className={' should-be-filled'}>*</span>*/}
 
-                        </span>
-                        <div className={'w-full flex items-center justify-center relative mt-4'}>
-                            <div
-                                className={`absolute  left-6 top-1/2 -translate-y-1/2 flex flex-col justify-center items-center w-8 h-8`}>
+                    {/*    </span>*/}
+                    {/*    <div className={'w-full flex items-center justify-center relative mt-4'}>*/}
+                    {/*        <div*/}
+                    {/*            className={`absolute  left-6 top-1/2 -translate-y-1/2 flex flex-col justify-center items-center w-8 h-8`}>*/}
 
-                                <div
-                                    className={`w-full relative  h-full bg-background rounded-md p-2 flex flex-col justify-center items-center `}>
-                                    <div
-                                        className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'telegram' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
-                                        <TelInputSVG/>
-                                    </div>
-                                    <div
-                                        className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'phone' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
-                                        <BoldMobile/>
-                                    </div>
-                                    <div
-                                        className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === '' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
-                                        <RightSquareSVG/>
-                                    </div>
-                                </div>
+                    {/*            <div*/}
+                    {/*                className={`w-full relative  h-full bg-background rounded-md p-2 flex flex-col justify-center items-center `}>*/}
+                    {/*                <div*/}
+                    {/*                    className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'telegram' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>*/}
+                    {/*                    <TelInputSVG/>*/}
+                    {/*                </div>*/}
+                    {/*                <div*/}
+                    {/*                    className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'phone' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>*/}
+                    {/*                    <BoldMobile/>*/}
+                    {/*                </div>*/}
+                    {/*                <div*/}
+                    {/*                    className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === '' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>*/}
+                    {/*                    <RightSquareSVG/>*/}
+                    {/*                </div>*/}
+                    {/*            </div>*/}
 
 
-                            </div>
-                            <Input dir={'ltr'} placeHolder={''}
-                                   inputClassName={'text-left pl-12 rounded-xl border-2'} maxLength={30}
-                                   id={'title'} numOnly={false}
-                                   defaultValue={reactiveBookData.connectWay}
-                                   wrapperClassName={'w-11/12 h-14 '}
-                                   onChange={(e: any) => {
-                                       if (e.currentTarget.value.length > 0) {
-                                           if (contactType === 'phone') {
-                                               e.currentTarget.value = e.currentTarget.value.replaceAll(/[^0-9]/g, '')
-                                           }
-                                           if (/[^0-9]/.test(e.currentTarget.value)) {
-                                               setContactType('telegram')
-                                               e.currentTarget.value = '@' + e.currentTarget.value.replaceAll(/[^a-zA-z0-9]/g, '')
-                                               // e.currentTarget.value =  e.currentTarget.value.replaceAll(/[^0-9]/g, '')
+                    {/*        </div>*/}
+                    {/*        <Input dir={'ltr'} placeHolder={''}*/}
+                    {/*               inputClassName={'text-left pl-12 rounded-xl border-2'} maxLength={30}*/}
+                    {/*               id={'title'} numOnly={false}*/}
+                    {/*               defaultValue={reactiveBookData.connectWay}*/}
+                    {/*               wrapperClassName={'w-11/12 h-14 '}*/}
+                    {/*               onChange={(e: any) => {*/}
+                    {/*                   if (e.currentTarget.value.length > 0) {*/}
+                    {/*                       if (contactType === 'phone') {*/}
+                    {/*                           e.currentTarget.value = e.currentTarget.value.replaceAll(/[^0-9]/g, '')*/}
+                    {/*                       }*/}
+                    {/*                       if (/[^0-9]/.test(e.currentTarget.value)) {*/}
+                    {/*                           setContactType('telegram')*/}
+                    {/*                           e.currentTarget.value = '@' + e.currentTarget.value.replaceAll(/[^a-zA-z0-9]/g, '')*/}
+                    {/*                           // e.currentTarget.value =  e.currentTarget.value.replaceAll(/[^0-9]/g, '')*/}
 
-                                           } else {
-                                               setContactType('phone')
-                                           }
-                                       } else
-                                           setContactType('')
-                                       setContactAddress(e.currentTarget.value)
-                                       updateBookData('connectWay', e.currentTarget.value)
+                    {/*                       } else {*/}
+                    {/*                           setContactType('phone')*/}
+                    {/*                       }*/}
+                    {/*                   } else*/}
+                    {/*                       setContactType('')*/}
+                    {/*                   setContactAddress(e.currentTarget.value)*/}
+                    {/*                   updateBookData('connectWay', e.currentTarget.value)*/}
 
-                                       // setConnectWay(e.currentTarget.value)
-                                   }}
+                    {/*                   // setConnectWay(e.currentTarget.value)*/}
+                    {/*               }}*/}
 
-                                   labelText={'شماره تلفن یا آیدی تلگرام'}/>
-                        </div>
+                    {/*               labelText={'شماره تلفن یا آیدی تلگرام'}/>*/}
+                    {/*    </div>*/}
 
-                    </div>
+                    {/*</div>*/}
 
 
                     <div className={'h-32'}></div>
