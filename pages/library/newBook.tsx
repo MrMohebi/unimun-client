@@ -277,6 +277,56 @@ const NewBook = () => {
     // }, [reactiveBookData]);
 
 
+    const createBookFunc = () => {
+
+        setLoading(true)
+
+
+        createBook({
+            // variables: {
+            //     title: reactiveBookData.title,
+            //     categoryID: reactiveBookData.categoryID,
+            //     details: reactiveBookData.details,
+            //     isPurchasable: reactiveBookData.price ? reactiveBookData.price !== 0 : false,
+            //     isDownloadable: reactiveBookData.type === 'pdf',
+            //     isBook: true,
+            //     bookFiles: reactiveBookData.files,
+            //     attachments: reactiveBookData.attachments,
+            //     connectWay: connectWay,
+            //     appearanceID: reactiveBookData.appearanceID,
+            //     pages: reactiveBookData.pages,
+            //     publishedDate: reactiveBookData.publishedDate,
+            //     publisher: reactiveBookData.publisher,
+            //     price: isBookFree ? "0" : reactiveBookData.price,
+            //     writer: reactiveBookData.writer,
+            //     language: reactiveBookData.language
+            // }
+            variables: {
+                ...BookDataStore(),
+                text: address.current,
+                lat: lat.current.toString(),
+                lon: lon.current.toString(),
+                connectWay: '@mokafela'
+            }
+        }).then((e) => {
+            try {
+                console.log(e)
+                if (e.data.createBook.status === 'SUCCESS') {
+                    lastBookSubmitSuccess(e.data.createBook.data.id)
+                    router.push('/library')
+                } else {
+                    Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
+                }
+            } catch (e) {
+                console.log(e)
+
+            }
+            console.log(e.data.createBook.status)
+        })
+
+    }
+
+
     const submitBook = () => {
 
         if (!reactiveBookData.isDownloadable && !locationBottomSheetOpen) {
@@ -406,86 +456,40 @@ const NewBook = () => {
 
             // console.log(reactiveBookData)
 
-            setShowUploadingFileLoading(true)
+            if (reactiveBookData.isDownloadable) {
+                setShowUploadingFileLoading(true)
 
-            if (isBookFree) {
+                if (isBookFree) {
 
-                uploadPublicBookFile(bookLocalFiles, () => {
+                    uploadPublicBookFile(bookLocalFiles, () => {
 
-                }, "Book_" + Math.random() * 99999999, (result: any) => {
-                    console.log(result)
-                    setShowUploadingFileLoading(false)
-                    createBookFunc()
+                    }, "Book_" + Math.random() * 99999999, (result: any) => {
+                        console.log(result)
+                        setShowUploadingFileLoading(false)
+                        createBookFunc()
 
-                }, (er: any) => {
-                    setShowUploadingFileLoading(false)
-                }, (uploadProgress: any) => {
-                    console.log(uploadProgress)
-                    // setFileUploadPercentage(uploadProgress)
+                    }, (er: any) => {
+                        setShowUploadingFileLoading(false)
+                    }, (uploadProgress: any) => {
+                        console.log(uploadProgress)
+                        // setFileUploadPercentage(uploadProgress)
 
-                })
+                    })
+                } else {
+                    uploadPrivateBookFile(bookLocalFiles, () => {
+                    }, "Book_" + Math.random() * 99999999, (result: any) => {
+                        console.log(result)
+                        createBookFunc()
+
+                    }, (er: any) => {
+
+                    }, (uploadProgress: any) => {
+
+                        // setFileUploadPercentage(uploadProgress)
+                    })
+                }
             } else {
-                uploadPrivateBookFile(bookLocalFiles, () => {
-                }, "Book_" + Math.random() * 99999999, (result: any) => {
-                    console.log(result)
-                    createBookFunc()
-
-                }, (er: any) => {
-
-                }, (uploadProgress: any) => {
-
-                    // setFileUploadPercentage(uploadProgress)
-                })
-            }
-
-
-            let createBookFunc = () => {
-
-                setLoading(true)
-
-
-                createBook({
-                    // variables: {
-                    //     title: reactiveBookData.title,
-                    //     categoryID: reactiveBookData.categoryID,
-                    //     details: reactiveBookData.details,
-                    //     isPurchasable: reactiveBookData.price ? reactiveBookData.price !== 0 : false,
-                    //     isDownloadable: reactiveBookData.type === 'pdf',
-                    //     isBook: true,
-                    //     bookFiles: reactiveBookData.files,
-                    //     attachments: reactiveBookData.attachments,
-                    //     connectWay: connectWay,
-                    //     appearanceID: reactiveBookData.appearanceID,
-                    //     pages: reactiveBookData.pages,
-                    //     publishedDate: reactiveBookData.publishedDate,
-                    //     publisher: reactiveBookData.publisher,
-                    //     price: isBookFree ? "0" : reactiveBookData.price,
-                    //     writer: reactiveBookData.writer,
-                    //     language: reactiveBookData.language
-                    // }
-                    variables: {
-                        ...BookDataStore(),
-                        text: address.current,
-                        lat: lat.current.toString(),
-                        lon: lon.current.toString(),
-                        connectWay: '@mokafela'
-                    }
-                }).then((e) => {
-                    try {
-                        console.log(e)
-                        if (e.data.createBook.status === 'SUCCESS') {
-                            lastBookSubmitSuccess(e.data.createBook.data.id)
-                            router.push('/library')
-                        } else {
-                            Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
-                        }
-                    } catch (e) {
-                        console.log(e)
-
-                    }
-                    console.log(e.data.createBook.status)
-                })
-
+                createBookFunc()
             }
 
 
