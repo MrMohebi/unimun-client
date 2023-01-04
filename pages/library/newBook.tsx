@@ -245,6 +245,7 @@ const NewBook = () => {
     }, [isBookFree]);
     const pdfSoonRef = useRef<HTMLDivElement>(null);
 
+
     const removeEmptyProgresses = () => {
         let updateUploadingProgress = [...uploadingProgress];
         updateUploadingProgress.filter(item => {
