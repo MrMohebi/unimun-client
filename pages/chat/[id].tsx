@@ -15,8 +15,29 @@ import Input from "../../components/view/Input/Input";
 import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
-import LocationBottomSheet from "../../components/normal/LocationBottomSheet/LocationBottomSheet";
-import Badge from "../../components/view/Badge/Badge";
+import dynamic from "next/dynamic";
+
+
+const DynamicMap = dynamic(() => {
+    return import('../../components/normal/LocationBottomSheet/LocationBottomSheet')
+}, {
+    ssr: false
+})
+const MapMessage = dynamic(() => {
+    return import('../../components/view/MapMessage/MapMessage')
+}, {
+    ssr: false
+})
+
+
+// const Map = dynamic(
+//     () => import('./MapMessage'), // replace '@components/map' with your component's location
+//     {ssr: false} // This line is important. It's what prevents server-side render
+// )
+
+
+// const DynamicMessageMap = dynamic(() => import("../chat/MapMessage"), { ssr:false })
+
 
 const ChatScreen = () => {
 
@@ -98,7 +119,6 @@ const ChatScreen = () => {
 
     const [sendMoneyRequest] = useMutation(CREATE_REQUEST_MUTATION, {client: clientChat})
     const chatsSubscriptionRequest = gql`
-
         subscription onNewMessage {
             newMessage{
                 userID
@@ -121,6 +141,11 @@ const ChatScreen = () => {
                 tempId
                 chatID
                 editedAt
+                location {
+                    text
+                    lat
+                    lon
+                }
                 inlineKeyboard {
                     text
                     action
@@ -130,29 +155,28 @@ const ChatScreen = () => {
             }
         }`
 
-        const chatsSubscription = useSubscription(chatsSubscriptionRequest, {client: clientChat})
+    const chatsSubscription = useSubscription(chatsSubscriptionRequest, {client: clientChat})
 
-        useEffect(() => {
-            if (chatsSubscription.data) {
-                if (chatsSubscription.data.newMessage.chatID === id)
-                    setMessages(
-                        produce((draft) => {
-                            (draft as [any]).push(chatsSubscription.data.newMessage)
-                            return draft
-                        })
-                    );
-                if (chatScrollerRef.current) {
-                    chatScrollerRef.current.scrollTo(0, chatScrollerRef.current.scrollHeight)
+    useEffect(() => {
+        if (chatsSubscription.data) {
+            if (chatsSubscription.data.newMessage.chatID === id)
+                setMessages(
+                    produce((draft) => {
+                        (draft as [any]).push(chatsSubscription.data.newMessage)
+                        return draft
+                    })
+                );
+            if (chatScrollerRef.current) {
+                chatScrollerRef.current.scrollTo(0, chatScrollerRef.current.scrollHeight)
 
-                }
-                setTimeout(() => {
-                    scrollToBottom()
-
-                }, 300)
             }
-        }, [chatsSubscription.data]);
+            setTimeout(() => {
+                scrollToBottom()
 
-    const [unreadMessages, setUnreadMessages] = useState(false);
+            }, 300)
+        }
+    }, [chatsSubscription.data]);
+
     const EDIT_PRICE_MUTATION = gql`
         mutation ($price: Int,$tempId:String $id: ID!, $description: String,$isAccepted:Boolean,$isCanceled:Boolean) {
             editMessage(
@@ -173,7 +197,7 @@ const ChatScreen = () => {
 
     `
     const [editPrice] = useMutation(EDIT_PRICE_MUTATION, {
-        client: clientChat, onError: (e) => {
+        client: clientChat, onError: () => {
             Toast("موجودی کافی نمیباشد", '', 3000, '', 70)
             removeAllBtnLoadings()
         }
@@ -255,6 +279,11 @@ const ChatScreen = () => {
                         price
                         status
                         updatedAt
+                    }
+                    location {
+                        text
+                        lat
+                        lon
                     }
                     id
                     chatID
@@ -340,6 +369,21 @@ const ChatScreen = () => {
         }
     `
     const [newMessage] = useMutation(newMessageMutation, {client: clientChat})
+    const locationMessageMutation = gql`
+        mutation($chatID:ID! $lat:String! $lon:String! $text:String) {
+            sendMessage(chatID: $chatID location: {lat: $lat, lon: $lon, text: $text}){
+                text
+                sentAt
+                id
+                location {
+                    lat
+                    lon
+                    text
+                }
+            }
+        }
+    `
+    const [locationMessage] = useMutation(locationMessageMutation, {client: clientChat})
     const sendMessageBtn = useRef<HTMLImageElement>(null);
 
 
@@ -376,10 +420,68 @@ const ChatScreen = () => {
     }
 
 
+    const locationMessageValues = useRef({
+        lat: '',
+        lon: '',
+        text: ''
+    });
+    const [showMap, setShowMap] = useState(false);
+    // let myIcon = L.icon({
+    //     iconUrl: '/marker.png',
+    //     iconSize: [55, 55],
+    //     iconAnchor: [32, 55],
+    //     popupAnchor: [-3, -76],
+    //     // shadowUrl: 'my-icon-shadow.png',
+    //     shadowSize: [68, 95],
+    //     shadowAnchor: [22, 94]
+    // });
+
+
     return (
         <div ref={chatBoxRef} className={'w-full h-full overflow-scroll  pb-12 scroll-smooth'}>
 
-            {/*<LocationBottomSheet/>*/}
+
+            {showMap ?
+                <DynamicMap onSubmit={() => {
+
+                    setChatLoading(true)
+                    setShowMap(false)
+
+                    if (locationMessageValues.current.text && locationMessageValues.current.lat && locationMessageValues.current.lon) {
+                        locationMessage({
+                            variables: {
+                                chatID: id,
+                                text: locationMessageValues.current.text,
+                                lat: locationMessageValues.current.lat.toString(),
+                                lon: locationMessageValues.current.lon.toString(),
+                            }
+                        }).then((value) => {
+                            console.log(value)
+                            setChatLoading(false)
+
+                        })
+                    } else {
+                        Toast("لطفا فیلد آدرس را پر کنید", '', 2000, '', 50)
+
+                    }
+
+
+                }} onLatChanged={(value: string) => {
+                    locationMessageValues.current.lat = value;
+                }} onLngChanged={(value: string) => {
+                    locationMessageValues.current.lon = value;
+                }} onTextChanged={(value: string) => {
+                    locationMessageValues.current.text = value;
+                }} onClose={() => {
+
+                    setShowMap(false)
+
+                }}></DynamicMap>
+                :
+                null
+            }
+
+
             <img src="/assets/svgs/chat-back.svg"
                  className={'w-full h-full fixed top-0 left-0 pointer-events-none opacity-20 object-cover'} alt=""/>
 
@@ -509,7 +611,6 @@ const ChatScreen = () => {
 
                             let itemText = item.text;
                             let toBeRenderedElements = [];
-                            let lastWasDateIndicator = false;
                             let textWithLink = <div key={index + 'keyOfLink'} className={'contents'}>
                                 <a target={'_blank'} rel={'noreferrer'} className={'text-primary underline '}
                                    href="http://google.co">this is a text with
@@ -596,6 +697,13 @@ const ChatScreen = () => {
                                                                     //     console.log('failde to change the price or desc')
                                                                     // }
 
+                                                                    console.log(inlineButton)
+
+
+                                                                    if (inlineButton.action === "CHOOSE_ADDRESS") {
+                                                                        setShowMap(true)
+                                                                        return;
+                                                                    }
                                                                     newMessage({
                                                                         variables: {
                                                                             chatID: id,
@@ -657,6 +765,45 @@ const ChatScreen = () => {
 
                             // if (index === messages.length - 3)
 
+                            if (item.type === "LOCATION") {
+                                return toBeRenderedElements.concat(
+                                    <div key={'chat-bubble-' + index}
+                                         className={` w-full h-auto flex flex-col items-start shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
+                                        {/*<div style={{*/}
+                                        {/*    // animationDelay: index * 50 + 'ms'*/}
+                                        {/*}}*/}
+                                        {/*     className={` ${hasInlineKeyboard ? 'w-full' : ''}  flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]   `}>*/}
+                                        {/*    <p style={{*/}
+                                        {/*        wordBreak: 'break-word',*/}
+                                        {/*        whiteSpace: 'pre-line'*/}
+                                        {/*    }}*/}
+                                        {/*       className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>*/}
+
+                                        {/*        /!*<a href="/route">this is a test route</a>*!/*/}
+                                        {/*        {textWithLink}*/}
+                                        {/*    </p>*/}
+                                        {/*    <div className={'flex mt-1 flex-row justify-start items-center '}>*/}
+                                        {/*        <img src="/assets/svgs/check.svg"*/}
+                                        {/*             className={`w-2  h-2 ${sentByMe ? '' : "invert-[0.5]"}`}*/}
+                                        {/*             alt=""/>*/}
+                                        {/*        <span*/}
+                                        {/*            className={`IranSansMedium text-[0.75rem] mr-2 ${!sentByMe ? "text-textDark" : "white"}`}>{formattedTime}</span>*/}
+                                        {/*    </div>*/}
+
+                                        {/*</div>*/}
+                                        {/*<DynamicMessageMap item={item}/>*/}
+
+                                        {/*<Map/>*/}
+                                        {/*<NoSSR>*/}
+                                        {/*    <MapMessage item={item}/>*/}
+                                        {/*</NoSSR>*/}
+                                        <MapMessage item={item}/>
+
+                                        {inlineKeyboard}
+
+                                    </div>
+                                )
+                            }
                             if (item.type === 'TEXT')
                                 return toBeRenderedElements.concat(
                                     <div key={'chat-bubble-' + index}
@@ -742,16 +889,16 @@ const ChatScreen = () => {
                                             </div>
                                             <p className={`IranSansMedium ${sentByMe ? 'text-white' : 'text-black'}  mt-2 text-justify text-sm w-full text-right`}>{item.payRequest.description}</p>
                                             <div className={'w-full flex flex-row justify-between '}>
-                                                    <div className={'flex mt-1 flex-row justify-start items-center '}>
-                                                        <img src="/assets/svgs/check.svg"
-                                                             className={`w-2 z-10 h-2 ${sentByMe ? '' : 'invert-[0.5]'}`}
-                                                             alt=""/>
-                                                        <span
-                                                            className={`IranSansMedium text-[0.75rem] mr-2 ${sentByMe ? "text-white" : "text-textDarker"}`}>{formattedTime}</span>
-                                                    </div>
-
-
+                                                <div className={'flex mt-1 flex-row justify-start items-center '}>
+                                                    <img src="/assets/svgs/check.svg"
+                                                         className={`w-2 z-10 h-2 ${sentByMe ? '' : 'invert-[0.5]'}`}
+                                                         alt=""/>
+                                                    <span
+                                                        className={`IranSansMedium text-[0.75rem] mr-2 ${sentByMe ? "text-white" : "text-textDarker"}`}>{formattedTime}</span>
                                                 </div>
+
+
+                                            </div>
                                             </div>
                                             {
                                                 sentByMe ?
@@ -858,7 +1005,7 @@ const ChatScreen = () => {
                                                                                         id: item.id ?? "",
                                                                                         tempId: item.tempId ?? ""
                                                                                     }
-                                                                                }).then((value) => {
+                                                                                }).then(() => {
                                                                                     removeLoadingButton(item)
                                                                                 })
 
@@ -885,7 +1032,7 @@ const ChatScreen = () => {
             <div style={{
                 boxShadow: "0px -1px 9px 0px #0000000f"
             }}
-                 className={'bottom-0 fixed left-0 w-full bg-white  z-[60]  border grid grid-cols-12 h-14 px-3'}>
+                 className={`bottom-0 fixed left-0 w-full bg-white  z-[60]  border grid grid-cols-12 h-14 px-3 ${showMap ? 'opacity-0 pointer-events-none' : ''}`}>
                 <div className={'send-and-voice col-span-1 flex flex-row justify-start items-center'}>
 
 
@@ -988,12 +1135,12 @@ const ChatScreen = () => {
                                                      }}/>
                                             :
                                             <div></div>
-                        }
+                    }
 
-                        {/*<img src="/assets/svgs/microphone.svg" alt="Unimun chat microphone svg"*/}
-                        {/*     className={'w-6 h-6 mr-2'}/>*/}
-                    </div>
-                    <div className={'send-and-voice col-span-11 flex flex-row justify-start items-center mr-2 pr-2'}>
+                    {/*<img src="/assets/svgs/microphone.svg" alt="Unimun chat microphone svg"*/}
+                    {/*     className={'w-6 h-6 mr-2'}/>*/}
+                </div>
+                <div className={`send-and-voice col-span-11 flex flex-row justify-start items-center mr-2 pr-2 `}>
                     <textarea onKeyDown={(event) => {
                         if (event.key === "Shift") {
                             setHoldingShift(true)
@@ -1016,7 +1163,6 @@ const ChatScreen = () => {
                     }} onChange={(event) => {
                         const style = getComputedStyle(event.currentTarget);
                         let lht = parseInt(style.lineHeight, 10)
-                        let lines = event.currentTarget.scrollHeight / lht;
 
                         if (currentChatStat !== "payRequest")
                             if (event.currentTarget.value) {
@@ -1027,7 +1173,7 @@ const ChatScreen = () => {
 
 
                     }} id={'text-chat'} placeholder={currentChatStat === 'payRequest' ? 'متن درخواست' : 'بنویس'}
-                              className={'w-full IranSansMedium bg-transparent h-auto leading-5'}
+                              className={`w-full IranSansMedium bg-transparent h-auto leading-5 `}
                               rows={1} name="Text1" onClick={() => {
 
                     }}></textarea>
