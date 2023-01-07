@@ -15,10 +15,10 @@ import Toman from '../../assets/svgs/toman.svg'
 import BookCategories from "../../components/normal/BookCategories/BookCategories";
 import BookAppearance from "../../components/normal/BookAppearance/BookAppearance";
 import {BookDataStore, EditBookData, isBrochure, lastBookSubmitSuccess} from "../../store/books";
-import Trash from '../../assets/svgs/trash.svg'
+import Trash from '../../assets/svgs/trash.svg';
 import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
-import _ from 'lodash'
+import _ from 'lodash';
 import {fixPrice} from "../../helpers/fixPrice";
 import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUpload";
 import produce from "immer";
@@ -33,7 +33,6 @@ const NewBook = () => {
 
 
     //queries
-
     const createBookMutation = gql`
         mutation createBook($text:String!,$lat:String!,$lon:String!, $isBook:Boolean! $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
             createBook(
@@ -61,6 +60,7 @@ const NewBook = () => {
                     id
                 }
                 message
+                errors
             }
         }
     `
@@ -68,9 +68,9 @@ const NewBook = () => {
     const [locationBottomSheetOpen, setLocationBottomSheetOpen] = useState(false);
 
     const updateBookMutation = gql`
-        mutation updateBook($id:ID!  $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
+        mutation updateBook($text:String!,$lat:String!,$lon:String!,$id:ID! $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
             updateBook(
-                id: $id
+                id:$id
                 isDownloadable: $isDownloadable,
                 isPurchasable: $isPurchasable,
                 categoryID: $categoryID,
@@ -85,8 +85,11 @@ const NewBook = () => {
                 bookFiles: $bookFiles,
                 attachments: $attachments,
                 connectWay:$connectWay
+                pages:$pages
+                location: {text: $text, lat: $lat, lon: $lon}
             ){
                 status
+                errors
                 data {
                     title
                     id
@@ -213,6 +216,7 @@ const NewBook = () => {
                 // setUploadedImages(imagesArrString)
                 updateBookData('attachments', EditBookData().attachments)
                 updateBookData('files', EditBookData().files)
+                updateBookData('location', EditBookData().location)
 
 
                 EditBookData(null)
@@ -342,7 +346,6 @@ const NewBook = () => {
             })
         }
 
-
         if (parseInt(reactiveBookData.price) === 0) {
             setIsBookFree(true)
         }
@@ -470,6 +473,7 @@ const NewBook = () => {
 
                     }, (er: any) => {
                         setShowUploadingFileLoading(false)
+                        Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
                     }, (uploadProgress: any) => {
                         console.log(uploadProgress)
                         // setFileUploadPercentage(uploadProgress)
@@ -482,8 +486,11 @@ const NewBook = () => {
                         createBookFunc()
 
                     }, (er: any) => {
+                        setShowUploadingFileLoading(false)
+                        Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
 
                     }, (uploadProgress: any) => {
+                        console.log((uploadProgress.loaded * 100) / uploadProgress.total)
 
                         // setFileUploadPercentage(uploadProgress)
                     })
@@ -549,6 +556,9 @@ const NewBook = () => {
             {
                 locationBottomSheetOpen ?
                     <DynamicMap
+                        defaultText={reactiveBookData.location ? reactiveBookData.location.text : ""}
+                        defaultLat={reactiveBookData.location ? reactiveBookData.location.lat : ""}
+                        defaultLon={reactiveBookData.location ? reactiveBookData.location.lon : ""}
                         onClose={() => {
                             setLocationBottomSheetOpen(false)
                         }}
@@ -560,6 +570,7 @@ const NewBook = () => {
                             console.log(lon)
                         }}
                         onTextChanged={(text: string) => {
+                            console.log("address Changed")
                             address.current = text
                         }}
                         onSubmit={(e: any) => {

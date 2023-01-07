@@ -74,6 +74,11 @@ const MyBooks = () => {
                         pages
                         price
                         connectWay
+                        location {
+                            lat
+                            lon
+                            text
+                        }
                     }
                 }
             }

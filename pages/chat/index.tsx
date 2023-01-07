@@ -9,6 +9,7 @@ import {UserId, UserToken} from "../../store/user";
 import {DOWNLOAD_HOST, UnimunID} from "../../store/GLOBAL_VARIABLES";
 import {CurrentChatUserData} from "../../store/chat";
 import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
+import Toast from "../../components/normal/Toast/Toast";
 
 
 const Index = () => {
@@ -55,10 +56,18 @@ const Index = () => {
             router.push('/profile/login')
             setRender(true)
         } else {
-            getChats().then((value) => {
+            getChats().then((value: any) => {
+                //todo handle fetch chat errors
                 try {
-                    setChats(value.data.chats)
-                    setChatsArrived(true)
+                    if (value.errors) {
+                        console.log('Error')
+                        Toast(value.errors[0].message)
+                    }
+                    if (value.data.chats) {
+                        setChats(value.data.chats)
+                        setChatsArrived(true)
+                    }
+
                 } catch (e) {
 
                 }

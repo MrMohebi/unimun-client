@@ -1,7 +1,6 @@
 import React, {useEffect, useRef} from 'react';
 import lottie from 'lottie-web'
 import ask from '../assets/animations/chat.json'
-import HelpSvg from "../assets/svgs/help.svg";
 import {currentNavActiveIndex} from "../store/navbar";
 
 const Ask = () => {

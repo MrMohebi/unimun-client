@@ -32,7 +32,7 @@ import {DOWNLOAD_HOST} from "../../store/GLOBAL_VARIABLES";
 const NewBrochure = () => {
 
     //queries
-    const createBookMutation = gql`
+    const createBrochureMutation = gql`
         mutation createBook($isBook:Boolean! $term:String $university:String $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String! $teacher:String){
             createBook(
                 isBook:$isBook,
@@ -61,6 +61,7 @@ const NewBrochure = () => {
                     title
                     id
                 }
+                errors
                 message
             }
         }
@@ -98,7 +99,7 @@ const NewBrochure = () => {
         }
     `
 
-    const [createBook, createBookResult] = useMutation(createBookMutation)
+    const [createBook, createBookResult] = useMutation(createBrochureMutation)
     const [updateBook, updateBookResult] = useMutation(updateBookMutation)
 
 
@@ -1017,60 +1018,60 @@ const NewBrochure = () => {
 
                         </section>
 
-                        <div className={'w-full h-40 bg-white mt-4 px-4 pt-3 new-section'}>
+                        {/*<div className={'w-full h-40 bg-white mt-4 px-4 pt-3 new-section'}>*/}
 
-                            <span className={'text-textDark text-md IranSansMedium  '}>اطلاعات تماس</span>
-                            <div className={'w-full flex items-center justify-center relative mt-4'}>
-                                <div
-                                    className={`absolute  left-6 top-1/2 -translate-y-1/2 flex flex-col justify-center items-center w-8 h-8`}>
+                        {/*    <span className={'text-textDark text-md IranSansMedium  '}>اطلاعات تماس</span>*/}
+                        {/*    <div className={'w-full flex items-center justify-center relative mt-4'}>*/}
+                        {/*        <div*/}
+                        {/*            className={`absolute  left-6 top-1/2 -translate-y-1/2 flex flex-col justify-center items-center w-8 h-8`}>*/}
 
-                                    <div
-                                        className={`w-full relative  h-full bg-background rounded-md p-2 flex flex-col justify-center items-center `}>
-                                        <div
-                                            className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'telegram' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
-                                            <TelInputSVG/>
-                                        </div>
-                                        <div
-                                            className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'phone' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
-                                            <BoldMobile/>
-                                        </div>
-                                        <div
-                                            className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === '' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>
-                                            <RightSquareSVG/>
-                                        </div>
-                                    </div>
+                        {/*            <div*/}
+                        {/*                className={`w-full relative  h-full bg-background rounded-md p-2 flex flex-col justify-center items-center `}>*/}
+                        {/*                <div*/}
+                        {/*                    className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'telegram' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>*/}
+                        {/*                    <TelInputSVG/>*/}
+                        {/*                </div>*/}
+                        {/*                <div*/}
+                        {/*                    className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === 'phone' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>*/}
+                        {/*                    <BoldMobile/>*/}
+                        {/*                </div>*/}
+                        {/*                <div*/}
+                        {/*                    className={`w-5 absolute flex flex-col justify-center items-center h-5 ${contactType === '' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} transition-all duration-300`}>*/}
+                        {/*                    <RightSquareSVG/>*/}
+                        {/*                </div>*/}
+                        {/*            </div>*/}
 
 
-                                </div>
-                                <Input dir={'ltr'} placeHolder={''}
-                                       inputClassName={'text-left pl-12 rounded-xl border-2'} maxLength={30}
-                                       id={'title'} numOnly={false}
-                                       wrapperClassName={'w-11/12 h-14 '}
-                                       defaultValue={connectWay}
-                                       onChange={(e: any) => {
-                                           if (e.currentTarget.value.length > 0) {
-                                               if (contactType === 'phone') {
-                                                   e.currentTarget.value = e.currentTarget.value.replaceAll(/[^0-9]/g, '')
-                                               }
-                                               if (/[^0-9]/.test(e.currentTarget.value)) {
-                                                   setContactType('telegram')
-                                                   e.currentTarget.value = '@' + e.currentTarget.value.replaceAll(/[^a-zA-z0-9]/g, '')
-                                                   // e.currentTarget.value =  e.currentTarget.value.replaceAll(/[^0-9]/g, '')
+                        {/*        </div>*/}
+                        {/*        <Input dir={'ltr'} placeHolder={''}*/}
+                        {/*               inputClassName={'text-left pl-12 rounded-xl border-2'} maxLength={30}*/}
+                        {/*               id={'title'} numOnly={false}*/}
+                        {/*               wrapperClassName={'w-11/12 h-14 '}*/}
+                        {/*               defaultValue={connectWay}*/}
+                        {/*               onChange={(e: any) => {*/}
+                        {/*                   if (e.currentTarget.value.length > 0) {*/}
+                        {/*                       if (contactType === 'phone') {*/}
+                        {/*                           e.currentTarget.value = e.currentTarget.value.replaceAll(/[^0-9]/g, '')*/}
+                        {/*                       }*/}
+                        {/*                       if (/[^0-9]/.test(e.currentTarget.value)) {*/}
+                        {/*                           setContactType('telegram')*/}
+                        {/*                           e.currentTarget.value = '@' + e.currentTarget.value.replaceAll(/[^a-zA-z0-9]/g, '')*/}
+                        {/*                           // e.currentTarget.value =  e.currentTarget.value.replaceAll(/[^0-9]/g, '')*/}
 
-                                               } else {
-                                                   setContactType('phone')
-                                               }
-                                           } else
-                                               setContactType('')
-                                           setContactAddress(e.currentTarget.value)
+                        {/*                       } else {*/}
+                        {/*                           setContactType('phone')*/}
+                        {/*                       }*/}
+                        {/*                   } else*/}
+                        {/*                       setContactType('')*/}
+                        {/*                   setContactAddress(e.currentTarget.value)*/}
 
-                                           setConnectWay(e.currentTarget.value)
-                                       }}
+                        {/*                   setConnectWay(e.currentTarget.value)*/}
+                        {/*               }}*/}
 
-                                       labelText={'شماره تلفن یا آیدی تلگرام'}/>
-                            </div>
+                        {/*               labelText={'شماره تلفن یا آیدی تلگرام'}/>*/}
+                        {/*    </div>*/}
 
-                        </div>
+                        {/*</div>*/}
 
 
                         <div className={'h-32'}></div>

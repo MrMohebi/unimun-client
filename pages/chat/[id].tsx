@@ -16,6 +16,7 @@ import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 import LocationBottomSheet from "../../components/normal/LocationBottomSheet/LocationBottomSheet";
+import Badge from "../../components/view/Badge/Badge";
 
 const ChatScreen = () => {
 
@@ -120,6 +121,12 @@ const ChatScreen = () => {
                 tempId
                 chatID
                 editedAt
+                inlineKeyboard {
+                    text
+                    action
+                    data
+                    url
+                }
             }
         }`
 
@@ -134,29 +141,37 @@ const ChatScreen = () => {
                             return draft
                         })
                     );
-                scrollToBottom()
+                if (chatScrollerRef.current) {
+                    chatScrollerRef.current.scrollTo(0, chatScrollerRef.current.scrollHeight)
+
+                }
+                setTimeout(() => {
+                    scrollToBottom()
+
+                }, 300)
             }
         }, [chatsSubscription.data]);
 
-        const EDIT_PRICE_MUTATION = gql`
-            mutation ($price: Int,$tempId:String $id: ID!, $description: String,$isAccepted:Boolean,$isCanceled:Boolean) {
-                editMessage(
-                    payRequest: {price: $price, description: $description, isCanceled: $isCanceled, isAccepted: $isAccepted}
-                    id: $id,
-                    tempId:$tempId
-                ) {
-                    id
-                    tempId
-                    payRequest {
-                        status
-                        description
-                        price
-                    }
+    const [unreadMessages, setUnreadMessages] = useState(false);
+    const EDIT_PRICE_MUTATION = gql`
+        mutation ($price: Int,$tempId:String $id: ID!, $description: String,$isAccepted:Boolean,$isCanceled:Boolean) {
+            editMessage(
+                payRequest: {price: $price, description: $description, isCanceled: $isCanceled, isAccepted: $isAccepted}
+                id: $id,
+                tempId:$tempId
+            ) {
+                id
+                tempId
+                payRequest {
+                    status
+                    description
+                    price
                 }
             }
+        }
 
 
-        `
+    `
     const [editPrice] = useMutation(EDIT_PRICE_MUTATION, {
         client: clientChat, onError: (e) => {
             Toast("موجودی کافی نمیباشد", '', 3000, '', 70)
@@ -336,12 +351,17 @@ const ChatScreen = () => {
         tempId: ''
     });
     const scrollToBottom = () => {
-        if (chatBoxRef && chatBoxRef.current && chatScrollerRef && chatScrollerRef.current) {
-            chatBoxRef.current.scrollTo({
-                top: chatScrollerRef.current.getBoundingClientRect().height,
-                behavior: 'auto'
-            })
+
+        if (chatScrollerRef.current) {
+            chatScrollerRef.current.scrollTo(0, chatScrollerRef.current.scrollHeight)
+
         }
+        // if (chatBoxRef && chatBoxRef.current && chatScrollerRef && chatScrollerRef.current) {
+        //     chatBoxRef.current.scrollTo({
+        //         top: chatScrollerRef.current.getBoundingClientRect().height,
+        //         behavior: 'auto'
+        //     })
+        // }
     }
 
     const removeAllBtnLoadings = () => {
@@ -362,14 +382,27 @@ const ChatScreen = () => {
             {/*<LocationBottomSheet/>*/}
             <img src="/assets/svgs/chat-back.svg"
                  className={'w-full h-full fixed top-0 left-0 pointer-events-none opacity-20 object-cover'} alt=""/>
-            <img onClick={() => {
-                if (chatScrollerRef.current) {
-                    chatScrollerRef.current.scrollTo(0, chatScrollerRef.current.scrollHeight)
 
-                }
-            }} src="/assets/svgs/scroll-to-bottom.svg"
-                 className={`fixed bottom-16 z-50 right-3 transition-all drop-shadow ${scrollToBottomBtn && currentChatStat !== 'more' ? "opacity-100 " : 'opacity-0 pointer-events-none'}`}
-                 alt=""/>
+            {/*<Badge color={'#ff1a1a'}>*/}
+            <div className={'fixed bottom-16 z-50 right-3  flex flex-row justify-center items-center'}>
+                {/*<Badge className={`${scrollToBottomBtn && currentChatStat !== 'more' ? "opacity-100" : "opacity-0"}`}*/}
+                {/*       color={`#1aafff`}>*/}
+                <img
+                    onClick={() => {
+                        if (chatScrollerRef.current) {
+                            chatScrollerRef.current.scrollTo(0, chatScrollerRef.current.scrollHeight)
+
+                        }
+                    }}
+                    src="/assets/svgs/scroll-to-bottom.svg"
+                    className={` transition-all drop-shadow ${scrollToBottomBtn && currentChatStat !== 'more' ? "opacity-100 " : 'opacity-0 pointer-events-none'}`}
+                    alt=""/>
+                {/*</Badge>*/}
+
+            </div>
+
+            {/*</Badge>*/}
+
             <ToastContainer/>
 
             <BottomSheet open={payRequestOpen} onClose={() => {
@@ -483,6 +516,12 @@ const ChatScreen = () => {
                                     link</a>
                             </div>;
 
+                            let hasInlineKeyboard = false;
+                            if (item.inlineKeyboard && item.inlineKeyboard.length)
+                                hasInlineKeyboard = true
+
+                            let inlineKeyboard = null;
+
                             if (!lastMessageGroupDate) {
                                 (lastMessageGroupDate as any).current = moment(item.sentAt * 1000).format('jDD/jMM');
                             } else {
@@ -493,7 +532,7 @@ const ChatScreen = () => {
 
                                         toBeRenderedElements.push(
                                             <div
-                                                className={'w-full h-12 text-sm flex flex-col justify-center items-center IranSansMedium'}>
+                                                className={'w-full h-12 text-sm flex flex-col justify-center items-center IranSansMedium '}>
                                                 <div
                                                     className={'bg-glassButtonColor text-white px-4 py-1 rounded-2xl'}>{
 
@@ -521,10 +560,64 @@ const ChatScreen = () => {
                             let minutes = "0" + date.getMinutes();
                             let formattedTime = hours + ':' + minutes.substr(-2)
 
+                            if (hasInlineKeyboard)
+                                inlineKeyboard =
+                                    <div
+                                        className={`w-full flex flex-row ${sentByMe ? "justify-start" : 'justify-end'}`}>
+                                        <div style={{}}
+                                             className={'w-full flex flex-col h-auto justify-between items-center max-w-[80%] '}>
+                                            {hasInlineKeyboard ?
+                                                item.inlineKeyboard.map((inlineButton: any, index: number) => {
+
+
+                                                    return <div key={'inline-' + index + Math.random() * 999}
+                                                                className={'w-full h-auto'}>
+                                                        <Button loading={loadingButtonIds.includes(item.id)}
+                                                                onClick={() => {
+                                                                    // setLoadingButtonIds(produce((draft) => {
+                                                                    //     draft.push(item.id)
+                                                                    // }))
+                                                                    //
+                                                                    // try {
+                                                                    //
+                                                                    //
+                                                                    //     editPrice({
+                                                                    //         variables: {
+                                                                    //             isAccepted: true,
+                                                                    //             id: item.id ?? "",
+                                                                    //             tempId: item.tempId ?? ""
+                                                                    //         }
+                                                                    //     }).then((value) => {
+                                                                    //         removeLoadingButton(item)
+                                                                    //     })
+                                                                    //
+                                                                    //
+                                                                    // } catch (e) {
+                                                                    //     console.log('failde to change the price or desc')
+                                                                    // }
+
+                                                                    newMessage({
+                                                                        variables: {
+                                                                            chatID: id,
+                                                                            text: inlineButton.text
+                                                                        }
+                                                                    }).then(() => {
+                                                                    });
+                                                                }} id={'pay-btn'}
+                                                                className={'bg-glassButtonColor mt-2 w-full flex flex-row justify-center items-center  h-11 text-sm text-white rounded-xl'}>
+                                                                <span
+                                                                    className={'IranSansMedium '}>{inlineButton.text}</span>
+                                                        </Button>
+                                                    </div>
+                                                })
+                                                :
+                                                null
+                                            }
+                                        </div>
+                                    </div>
+
 
                             if (itemText)
-
-
                                 try {
 
 
@@ -567,11 +660,11 @@ const ChatScreen = () => {
                             if (item.type === 'TEXT')
                                 return toBeRenderedElements.concat(
                                     <div key={'chat-bubble-' + index}
-                                         className={` w-full h-auto flex flex-row items-center shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
+                                         className={` w-full h-auto flex flex-col items-start shrink-0 py-1 px-3 ${sentByMe ? "justify-start" : "justify-end"} `}>
                                         <div style={{
                                             // animationDelay: index * 50 + 'ms'
                                         }}
-                                             className={` flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]   `}>
+                                             className={` ${hasInlineKeyboard ? 'w-full' : ''}  flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]   `}>
                                             <p style={{
                                                 wordBreak: 'break-word',
                                                 whiteSpace: 'pre-line'
@@ -590,6 +683,7 @@ const ChatScreen = () => {
                                             </div>
 
                                         </div>
+                                        {inlineKeyboard}
 
                                     </div>
                                 )
@@ -624,7 +718,7 @@ const ChatScreen = () => {
                                         break
 
 
-                                    }
+                                }
 
 
                                 return toBeRenderedElements.concat(<div
@@ -638,16 +732,16 @@ const ChatScreen = () => {
                                                      alt=""/>
                                                 <span
                                                     className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium w-full mr-3`}>درخواست</span>
-                                                    <div
-                                                        className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium whitespace-nowrap flex flex-row justify-center items-start`}>
+                                                <div
+                                                    className={`${sentByMe ? 'text-white' : 'text-black'} IranSansMedium whitespace-nowrap flex flex-row justify-center items-start`}>
                                                     <span
                                                         className={'ml-1 text-lg'}>{(item.payRequest.price / 1000).toLocaleString()}</span>
-                                                        <img src="/assets/svgs/thousand-tomans.svg" alt=""
-                                                             className={`ml-3 w-20 ${sentByMe ? '' : 'invert'}`}/>
-                                                    </div>
+                                                    <img src="/assets/svgs/thousand-tomans.svg" alt=""
+                                                         className={`ml-3 w-20 ${sentByMe ? '' : 'invert'}`}/>
                                                 </div>
-                                                <p className={`IranSansMedium ${sentByMe ? 'text-white' : 'text-black'}  mt-2 text-justify text-sm w-full text-right`}>{item.payRequest.description}</p>
-                                                <div className={'w-full flex flex-row justify-between '}>
+                                            </div>
+                                            <p className={`IranSansMedium ${sentByMe ? 'text-white' : 'text-black'}  mt-2 text-justify text-sm w-full text-right`}>{item.payRequest.description}</p>
+                                            <div className={'w-full flex flex-row justify-between '}>
                                                     <div className={'flex mt-1 flex-row justify-start items-center '}>
                                                         <img src="/assets/svgs/check.svg"
                                                              className={`w-2 z-10 h-2 ${sentByMe ? '' : 'invert-[0.5]'}`}
@@ -923,7 +1017,6 @@ const ChatScreen = () => {
                         const style = getComputedStyle(event.currentTarget);
                         let lht = parseInt(style.lineHeight, 10)
                         let lines = event.currentTarget.scrollHeight / lht;
-                        console.log(Math.floor(lines));
 
                         if (currentChatStat !== "payRequest")
                             if (event.currentTarget.value) {

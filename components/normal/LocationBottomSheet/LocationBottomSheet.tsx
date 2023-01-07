@@ -1,9 +1,10 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {MapContainer, Marker, Popup, TileLayer, useMapEvents} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet';
 import Input from "../../view/Input/Input";
 import Button from "../../view/Button/Button";
+import {EditBookData} from "../../../store/books";
 
 
 const LocationBottomSheet = (props: {
@@ -12,6 +13,9 @@ const LocationBottomSheet = (props: {
     onLngChanged: Function
     onTextChanged: Function
     onClose: Function
+    defaultText?: string
+    defaultLat?: string
+    defaultLon?: string
 
 }) => {
 
@@ -69,15 +73,35 @@ const LocationBottomSheet = (props: {
         )
     }
 
+
     let [markerX, setMarkerX] = useState(30.287415)
     let [markerY, setMarkerY] = useState(57.052425)
+
+    useEffect(() => {
+        if (props.defaultLat)
+            setMarkerX(parseFloat(props.defaultLat))
+        if (props.defaultLon)
+            setMarkerY(parseFloat(props.defaultLon))
+
+        if (props.defaultText) {
+            console.log('there is default text')
+            props.onTextChanged(props.defaultText)
+            props.onLatChanged(props.defaultLat)
+            props.onLngChanged(props.defaultLon)
+        }
+
+
+    }, []);
+
+    const BottomSheetInputRef = useRef<HTMLInputElement>(null);
     return (
         <div
-            className={'fixed top-0 left-0 h-full bg-blue-300 w-full z-[99] bg-black/40 overflow-scroll flex flex-col-reverse  items-center '}
+            className={'fixed top-0 left-0 h-full bg-blue-300 w-full z-[45] bg-black/40 overflow-scroll flex flex-col-reverse  items-center '}
             style={{}}>
-            <div className={'w-full rounded-t-2xl  overflow-hidden shrink-0 bg-white h-[70%] relative'}>
+            <div className={'w-full rounded-t-2xl  overflow-hidden shrink-0 bg-white  relative'}>
                 <MapContainer ref={mapRef} zoomAnimation={true}
-                              className={'h-72 relative rounded-2xl mx-1.5 mt-1.5'} center={[30.287415, 57.052425]}
+                              className={'h-72 relative rounded-2xl mx-1.5 mt-1.5'}
+                              center={props.defaultLat ? [parseFloat(props.defaultLat), (parseFloat(props.defaultLon ?? '0'))] : [markerX, markerY]}
                               zoom={15} scrollWheelZoom={false}>
                     <div
                         className={'absolute right-2 bottom-7 h-10 w-10 rounded-xl flex flex-col justify-center items-center bg-white shadow-2xl z-[999]'}
@@ -100,14 +124,21 @@ const LocationBottomSheet = (props: {
                     <MapEvent/>
                 </MapContainer>
 
-                <Input id={'inpt'} multiLine={true} wrapperClassName={' mt-3 px-2'} inputClassName={'pt-2'}
-                       placeHolder={"آدرس"} numOnly={false}
+                <Input defaultValue={props.defaultText ?? ""} inputRef={BottomSheetInputRef} id={'inpt'}
+                       multiLine={true}
+                       wrapperClassName={' mt-3 px-2 max-h-32 h-0 min-h-[2.7rem]'}
+                       inputClassName={'pt-2'}
+                       placeHolder={"توضیحات آدرس"} numOnly={false}
                        onChange={(e: any) => {
+                           let div = e.currentTarget as HTMLDivElement
+                           let parentDiv = div.parentElement ?? document.createElement('div');
+                           parentDiv.style.setProperty("height", 0 + "px", 'important');
+                           parentDiv.style.setProperty("height", div.scrollHeight + "px", 'important');
                            props.onTextChanged(e.target.value)
                        }}/>
                 <span
                     className={'IranSansMedium text-textDark mr-3 text-[0.7rem]'}>آدرس دقیق محل تحویل کتاب را بنویسید</span>
-                <div className={'IranSans text-textDark w-full bg-background h-3 mt-2'}/>
+                <div className={'IranSans text-textDark w-full bg-background h-3 mt-2 mb-20'}/>
                 <div
                     className={'absolute w-full border bottom-0 left-1/2 -translate-x-1/2 h-12 flex flex-row justify-start items-center'}>
                     <Button className={'mr-2 rounded-2xl active:scale-75 transition-all'} onClick={() => {
