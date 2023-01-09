@@ -1,38 +1,63 @@
 import React, {useEffect, useRef} from 'react';
-import PaymentBaseSVG from '../../assets/svgs/paymentTicket.svg'
-import Button from "../../components/view/Button/Button";
+import PaymentBaseSVG from '../assets/svgs/paymentTicket.svg'
+import Button from "../components/view/Button/Button";
+import {useRouter} from "next/router";
+import {fixPrice} from "../helpers/fixPrice";
 
-const PaymentInfo = () => {
+
+const ResultPay = () => {
+    const router = useRouter();
 
     const svgRef = useRef(null)
+    // const router = useRouter();
 
     const putCommaInNumber = (number: string) => {
         return number.split('').reverse().map((e, i) => (
             i % 3 === 0 && i !== 0 ? e + "," : e
         )).reverse().join('')
     }
-    const retry = ()=>{
+    const retry = () => {
 
     }
-    const backToUnimun = ()=>{
+    const backToUnimun = () => {
+        window.open('/wallet', "_self")
 
     }
+    useEffect(() => {
+
+        let routerLocal = router.query as {
+            amount: string
+            status: string
+            balance: string
+        }
+        console.log(router)
+        if ('amount' in routerLocal && 'balance' in routerLocal && 'status' in routerLocal) {
+            setAmount(routerLocal.amount)
+            setPaymentStatus(!!parseInt(routerLocal.status))
+            setBalance(fixPrice(parseInt(routerLocal.balance)))
+        } else {
+            backToUnimun()
+
+        }
+
+
+    }, [router.query]);
     const setBalance = (balance: String) => {
-        const svg = svgRef && svgRef.current?(svgRef.current as HTMLDivElement).firstChild as HTMLDivElement:document.createElement('div')
+        const svg = svgRef && svgRef.current ? (svgRef.current as HTMLDivElement).firstChild as HTMLDivElement : document.createElement('div')
         svg.querySelector('.paymentTicket_svg__balance')!.innerHTML = balance.toString();
         let balanceHolderElement = svg.querySelector('.paymentTicket_svg__balanceHolder');
         balanceHolderElement!.setAttribute("transform", `translate(${30 - (balance.length) * 5} 0)`)
     }
 
     const setAmount = (amount: string) => {
-        const svg = svgRef && svgRef.current?(svgRef.current as HTMLDivElement).firstChild as HTMLDivElement:document.createElement('div')
+        const svg = svgRef && svgRef.current ? (svgRef.current as HTMLDivElement).firstChild as HTMLDivElement : document.createElement('div')
         svg.querySelector('.paymentTicket_svg__amount')!.innerHTML = amount.toString();
         let balanceHolderElement = svg.querySelector('.paymentTicket_svg__amountHolder');
         balanceHolderElement!.setAttribute("transform", `translate(${30 - (amount.length) * 5} 0)`)
     }
 
     const setPaymentStatus = (success: boolean) => {
-        const svg = svgRef && svgRef.current?(svgRef.current as HTMLDivElement).firstChild as HTMLDivElement:document.createElement('div')
+        const svg = svgRef && svgRef.current ? (svgRef.current as HTMLDivElement).firstChild as HTMLDivElement : document.createElement('div')
         let successElement = svg.querySelector('.paymentTicket_svg__success')
         let failedElement = svg.querySelector('.paymentTicket_svg__failed')
         let failedButton = svg.querySelector('.paymentTicket_svg__failedButton')
@@ -40,17 +65,17 @@ const PaymentInfo = () => {
         if (success) {
             successElement!.setAttribute('opacity', '1')
             failedElement!.setAttribute('opacity', '0.001')
-            failedButton!.setAttribute('opacity','0.001')
+            failedButton!.setAttribute('opacity', '0.001')
 
         } else {
             failedElement!.setAttribute('opacity', '1')
             successElement!.setAttribute('opacity', '0.001')
-            failedButton!.setAttribute('opacity','1')
-            let onClick = ()=>{
+            failedButton!.setAttribute('opacity', '1')
+            let onClick = () => {
                 retry()
             }
-            failedButton!.removeEventListener('click',onClick)
-            failedButton!.addEventListener('click',onClick)
+            failedButton!.removeEventListener('click', onClick)
+            failedButton!.addEventListener('click', onClick)
         }
     }
 
@@ -74,7 +99,9 @@ const PaymentInfo = () => {
             </div>
             <div
                 className={'w-full absolute -translate-x-1/2 left-1/2 bottom-4 flex flex-col justify-center items-center'}>
-                <Button id={'paymentInfo-button'}
+                <Button id={'paymentInfo-button'} onClick={() => {
+                    backToUnimun()
+                }}
                         className={'w-11/12 rounded-2xl mx-3 bg-primary text-white p-4 bottom-0'} rippleColor={'white'}>
                     <span className={'IranSansMedium'}>بازگشت به یونیمون</span>
                 </Button>
@@ -83,4 +110,4 @@ const PaymentInfo = () => {
     );
 };
 
-export default PaymentInfo;
+export default ResultPay;

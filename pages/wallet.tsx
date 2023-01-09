@@ -48,8 +48,8 @@ const Wallet = () => {
         }
     `
     const CHARGE_WALLLET_QUERY = gql`
-        mutation($amount:Int! $walletID:String!) {
-            chargeWallet(walletID: $walletID, amount: $amount) {
+        mutation($amount:Int! ) {
+            chargeWallet(amount: $amount) {
                 data {
                     url
                 }
@@ -273,11 +273,12 @@ const Wallet = () => {
                             chargeWallet({
                                 variables: {
                                     amount: chargeWalletAmount,
-                                    walletID: getWalletDataResult.data.wallet.data.id
                                 }
                             }).then((value) => {
+                                setBottomSheetBtnLoading(false)
+
                                 try {
-                                    Toast("خطا هنگام درخواست واریز")
+                                    // Toast("خطا هنگام درخواست واریز")
 
                                     if (value.data.chargeWallet.data.url) {
                                         window.open(value.data.chargeWallet.data.url, "_self")

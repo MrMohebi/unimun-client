@@ -52,7 +52,7 @@ type Message {
 
 type Mutation {
     createPV(receiverID: ID!, text: String): Chat
-    editMessage(id: ID, payRequest: PayRequestEditInp, tempId: String, text: String): Message
+    editMessage(id: ID, inlineKeyboard: [InlineKeyboardInp], payRequest: PayRequestEditInp, tempId: String, text: String): Message
     sendMessage(chatID: ID!, location: LocationInp, payRequest: PayRequestCreateInp, text: String): Message
 }
 
@@ -109,6 +109,13 @@ type User {
     name: String
     profiles: [Profile]
     verifiedAt: Int
+}
+
+input InlineKeyboardInp {
+    action: String
+    data: String
+    text: String!
+    url: String
 }
 
 input LocationInp {
