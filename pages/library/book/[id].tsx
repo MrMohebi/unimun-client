@@ -16,7 +16,7 @@ import {getUserQuery} from "../../../Requests/normal/user";
 import {fixPrice} from "../../../helpers/fixPrice";
 import NoPic from "../../../components/normal/NoPic/NoPic";
 import Free from "../../../assets/svgs/free.svg";
-import {DOWNLOAD_HOST, UNIMUN_PROVIDERS, UnimunID} from "../../../store/GLOBAL_VARIABLES";
+import {DOWNLOAD_HOST, UNIMUN_PROVIDERS} from "../../../store/GLOBAL_VARIABLES";
 import {clientChat} from "../../../apollo-client";
 import {TailSpin} from "react-loader-spinner";
 import {CurrentChatUserData} from "../../../store/chat";
@@ -83,8 +83,8 @@ const Book = (props: Props) => {
     `
 
     const LIKE_BOOK_MUTATIOn = gql`
-        mutation likeBook($id:ID!) {
-            likeBook(id: $id, isLiked: false){
+        mutation likeBook($id:ID! $like:Boolean!) {
+            likeBook(id: $id, isLiked: $like){
                 message
                 data
                 status
@@ -109,8 +109,8 @@ const Book = (props: Props) => {
         }
     `
 
-    const [bookConnectMutation, {loading, data, error}] = useMutation(bookConnectQuery)
-    const [getUser, getUserResults] = useLazyQuery(gql`${getUserQuery(['id', 'name', 'created_at', 'phone', 'referenceCode','username','bio','level','xpLevelPercentage']).query}`)
+    // const [bookConnectMutation, {loading, data, error}] = useMutation(bookConnectQuery)
+    // const [getUser, getUserResults] = useLazyQuery(gql`${getUserQuery(['id', 'name', 'created_at', 'phone', 'referenceCode','username','bio','level','xpLevelPercentage']).query}`)
 
     const [getBook, getBookResults] = useLazyQuery(getBookQuery)
     const [fullScreenLoading, setFullScreenLoading] = useState(false);
@@ -283,7 +283,8 @@ const Book = (props: Props) => {
                             setBookIsLiked(true)
                             likeBook({
                                 variables: {
-                                    id: bookId
+                                    id: bookId,
+                                    like: true
                                 }
                             }).then((value) => {
                                 if (value.data.likeBook.status === "SUCCESS") {
@@ -294,6 +295,25 @@ const Book = (props: Props) => {
                                 console.log(value)
 
                             })
+
+
+                        } else {
+                            setBookIsLiked(false)
+                            likeBook({
+                                variables: {
+                                    id: bookId,
+                                    like: false
+                                }
+                            }).then((value) => {
+                                if (value.data.likeBook.status === "SUCCESS") {
+                                    setBookIsLiked(false)
+                                } else {
+                                    setBookIsLiked(true)
+                                }
+                                console.log(value)
+
+                            })
+
                         }
                     }} className={'w-6'}
                          src={`/assets/svgs/${book.isLiked || bookIsLiked ? "filled-heart" : "heart"}.svg`} alt=""/>

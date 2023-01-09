@@ -89,6 +89,7 @@ const Index = () => {
                 }
             }
         }
+
     `;
 
 
@@ -358,7 +359,7 @@ const Index = () => {
                             pullDownToRefreshContent={
                                 <div
                                     className={'h-12 pb-4  w-full text-center IranSansMedium text-sm flex flex-col items-center justify-center'}>
-                                    بکشید
+                                    {/*بکشید*/}
                                 </div>
                             }
                             pullDownToRefreshThreshold={70}
@@ -580,7 +581,46 @@ const Index = () => {
 
                                                                 </div>
                                                             :
-                                                            null
+                                                            book.likes ?
+
+                                                                <div
+                                                                    className={'absolute h-7 left-1/2 -translate-x-1/2 flex flex-row justify-between items-center bottom-0 px-1 w-full'}>
+                                                                    <div></div>
+                                                                    {/*<div*/}
+                                                                    {/*    className={'w-7 flex flex-row h-7 justify-between items-center    py-1 rounded-lg px-2 '}*/}
+                                                                    {/*    style={{*/}
+                                                                    {/*        bottom: '0.4rem',*/}
+                                                                    {/*        background: 'rgba(83,82,85,0.61)'*/}
+                                                                    {/*    }}>*/}
+
+                                                                    {/*    /!*<div dir={'ltr'}*!/*/}
+                                                                    {/*    /!*     className={'IranSans w-full flex flex-col justify-center items-center h-full  '}>*!/*/}
+                                                                    {/*    /!*    <DownloadOutline/>*!/*/}
+                                                                    {/*    /!*</div>*!/*/}
+                                                                    {/*    /!*<span*!/*/}
+                                                                    {/*    /!*    className={'text-white whitespace-nowrap text-tiny IranSans'}>قـابـل دانـلـود</span>*!/*/}
+
+                                                                    {/*</div>*/}
+                                                                    <div
+                                                                        className={'w-12 flex flex-row h-7 justify-between items-center  py-1 rounded-lg px-2 '}
+                                                                        style={{
+                                                                            bottom: '0.4rem',
+                                                                            background: 'rgba(83,82,85,0.61)'
+                                                                        }}>
+
+                                                                        <span
+                                                                            className={'text-white IranSans text-sm'}>{book.likes}</span>
+                                                                        <img
+                                                                            src={`/assets/svgs/${book.isLiked ? 'filled-heart' : 'heart'}.svg`}
+                                                                            className={'h-4 w-4'} alt=""/>
+                                                                        {/*<span*/}
+                                                                        {/*    className={'text-white whitespace-nowrap text-tiny IranSans'}>قـابـل دانـلـود</span>*/}
+
+                                                                    </div>
+
+                                                                </div>
+                                                                :
+                                                                null
                                                         }
 
 

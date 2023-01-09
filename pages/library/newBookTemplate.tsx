@@ -737,7 +737,7 @@ const NewBook = () => {
                                                        setBookUploadState('uploaded')
 
                                                    } else {
-                                                       Toast('خطا در آپلود فایل، دوبره تلاش کنید')
+                                                       Toast('خطا در آپلود فایل، دوباره تلاش کنید')
                                                        setBookUploadState('')
 
                                                    }
