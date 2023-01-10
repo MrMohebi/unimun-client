@@ -32,6 +32,7 @@ const ResultPay = () => {
     }
 
     const setAmount = (amount: string) => {
+        console.log('amount' + amount)
         const svg = svgRef && svgRef.current ? (svgRef.current as HTMLDivElement).firstChild as HTMLDivElement : document.createElement('div')
         svg.querySelector('.paymentTicket_svg__amount')!.innerHTML = amount.toString();
         let balanceHolderElement = svg.querySelector('.paymentTicket_svg__amountHolder');
@@ -69,23 +70,16 @@ const ResultPay = () => {
     }, [])
 
     useEffect(() => {
-
         let routerLocal = router.query as {
             amount: string
             status: string
             balance: string
         }
-        console.log(router)
-        // console.log('ye')
-        // if ('amount' in routerLocal && 'balance' in routerLocal && 'status' in routerLocal) {
-        setAmount(routerLocal.amount)
-        setPaymentStatus(!!parseInt(routerLocal.status))
-        setBalance(fixPrice(parseInt(routerLocal.balance)))
-        // } else {
-        //     backToUnimun()
-        // }
-
-
+        if ('amount' in routerLocal && 'balance' in routerLocal && 'status' in routerLocal) {
+            setAmount(routerLocal.amount)
+            setPaymentStatus(!!parseInt(routerLocal.status))
+            setBalance(fixPrice(parseInt(routerLocal.balance)))
+        }
     }, [router.query]);
 
 
