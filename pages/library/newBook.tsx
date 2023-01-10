@@ -131,6 +131,7 @@ const NewBook = () => {
     const [currentSelectedImage, setCurrentSelectedImage] = useState(0);
     const reactiveBookData = useReactiveVar(BookDataStore)
     const freeCheckboxRef = useRef<HTMLInputElement>(null);
+    const [strictTypeMode, setStrictTypeMode] = useState(false);
 
     const address = useRef<string>('');
     const lat = useRef<string>('');
@@ -176,8 +177,8 @@ const NewBook = () => {
             setEditing(() => {
                 return true
             })
+            setStrictTypeMode(true)
 
-            // console.log(EditBookData())
             try {
 
                 updateBookData('title', EditBookData()?.title)
@@ -189,8 +190,26 @@ const NewBook = () => {
                 updateBookData('categoryID', EditBookData().categoryID)
                 updateBookData('details', EditBookData().details)
                 updateBookData('writer', EditBookData().writer)
+                updateBookData('bookFiles', EditBookData().bookFiles);
+                if (EditBookData().bookFiles.length) {
+                    setBookUploadState('uploaded')
+                    console.log('there is a file name')
+                    console.log(EditBookData().bookFiles[0].url.split('/').reverse()[0])
+                    setFileName(EditBookData().bookFiles[0].url.split('/').reverse()[0])
+                }
+
+
                 updateBookData('publishedDate', EditBookData().publishedDate)
-                updateBookData('price', parseInt(EditBookData().price))
+                updateBookData('isDownloadable', EditBookData().isDownloadable)
+                updateBookData("type", EditBookData().isDownloadable ? "pdf" : 'physical');
+
+
+                if (!EditBookData().price || isNaN(EditBookData().price)) {
+                    setIsBookFree(true)
+                    updateBookData('price', 0)
+                } else {
+                    updateBookData('price', parseInt(EditBookData().price))
+                }
 
                 updateBookData('publisher', EditBookData().publisher ?? '')
 
@@ -212,6 +231,7 @@ const NewBook = () => {
                 })
 
                 updateBookData('attachments', attachments)
+                updateBookData('files', EditBookData().files)
 
                 // setUploadedImages(imagesArrString)
                 updateBookData('attachments', EditBookData().attachments)
@@ -227,6 +247,7 @@ const NewBook = () => {
                 console.log(e)
                 Toast('خطا در هنگام ویرایش کتاب')
             }
+            console.log(reactiveBookData)
             EditBookData({})
         } else {
             _categoryComponent(true)
@@ -243,9 +264,6 @@ const NewBook = () => {
     useEffect(() => {
         if (isBookFree)
             freeCheckboxRef!.current!.checked = true
-
-        // console.log(isBookFree)
-
     }, [isBookFree]);
     const pdfSoonRef = useRef<HTMLDivElement>(null);
 
@@ -259,27 +277,11 @@ const NewBook = () => {
     }
 
     const updateBookData = (param: string | any, value: string | any) => {
-        // let updatedBookData = reactiveBookData;
-        // updatedBookData[`${param}`] = value;
-        // setBookData({...updatedBookData});
-
         const newBookData = produce(BookDataStore(), (draft: any) => {
             draft[param] = value
         })
         BookDataStore(newBookData)
-        // setBookData(produce((draft) => {
-        //     //@ts-ignore
-        //     draft[`${param}`] = value;
-        // }))
     }
-
-    //todo here is the changed trigger commented
-    // useEffect(() => {
-    //
-    //     console.log('changed')
-    //     console.log(reactiveBookData)
-    // }, [reactiveBookData]);
-
 
     const createBookFunc = () => {
 
@@ -287,24 +289,6 @@ const NewBook = () => {
 
 
         createBook({
-            // variables: {
-            //     title: reactiveBookData.title,
-            //     categoryID: reactiveBookData.categoryID,
-            //     details: reactiveBookData.details,
-            //     isPurchasable: reactiveBookData.price ? reactiveBookData.price !== 0 : false,
-            //     isDownloadable: reactiveBookData.type === 'pdf',
-            //     isBook: true,
-            //     bookFiles: reactiveBookData.files,
-            //     attachments: reactiveBookData.attachments,
-            //     connectWay: connectWay,
-            //     appearanceID: reactiveBookData.appearanceID,
-            //     pages: reactiveBookData.pages,
-            //     publishedDate: reactiveBookData.publishedDate,
-            //     publisher: reactiveBookData.publisher,
-            //     price: isBookFree ? "0" : reactiveBookData.price,
-            //     writer: reactiveBookData.writer,
-            //     language: reactiveBookData.language
-            // }
             variables: {
                 ...BookDataStore(),
                 text: address.current,
@@ -367,23 +351,11 @@ const NewBook = () => {
 
             updateBook({
                 variables: {
-                    id: reactiveBookData.id,
-                    title: reactiveBookData.title,
-                    categoryID: reactiveBookData.categoryID,
-                    details: reactiveBookData.details,
-                    isPurchasable: reactiveBookData.price ? parseInt(reactiveBookData.price) !== 0 : false,
-                    isDownloadable: reactiveBookData.type === 'pdf',
-                    isBook: true,
-
-                    attachments: reactiveBookData.attachments,
-                    connectWay: connectWay,
-                    appearanceID: reactiveBookData.appearanceID,
-                    pages: reactiveBookData.pages,
-                    publishedDate: reactiveBookData.publishedDate,
-                    publisher: reactiveBookData.publisher,
-                    price: isBookFree ? "0" : reactiveBookData.price,
-                    writer: reactiveBookData.writer,
-                    language: reactiveBookData.language
+                    ...BookDataStore(),
+                    text: address.current,
+                    lat: lat.current.toString(),
+                    lon: lon.current.toString(),
+                    connectWay: '@mokafela'
                 }
             }).then((e) => {
                 try {
@@ -469,6 +441,8 @@ const NewBook = () => {
                     }, "Book_" + Math.random() * 99999999, (result: any) => {
                         console.log(result)
                         setShowUploadingFileLoading(false)
+                        console.log(result)
+                        updateBookData('bookFiles', [result.data])
                         createBookFunc()
 
                     }, (er: any) => {
@@ -476,13 +450,14 @@ const NewBook = () => {
                         Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
                     }, (uploadProgress: any) => {
                         console.log(uploadProgress)
-                        // setFileUploadPercentage(uploadProgress)
 
                     })
                 } else {
                     uploadPrivateBookFile(bookLocalFiles, () => {
                     }, "Book_" + Math.random() * 99999999, (result: any) => {
                         console.log(result)
+                        updateBookData('bookFiles', [result.data])
+
                         createBookFunc()
 
                     }, (er: any) => {
@@ -774,7 +749,11 @@ const NewBook = () => {
                         <div className={'new-divider '}/>
                         <div className={'IranSansMedium text-textDarker pt-5 mx-3'}>مترجم <span
                             className={'text-textDark text-tiny '}>اختیاری</span></div>
-                        <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
+                        <Input defaultValue={reactiveBookData.translator}
+                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                   updateBookData('translator', e.currentTarget.value)
+                                   console.log(e.currentTarget.value)
+                               }} id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
                                wrapperClassName={'px-6 h-14'}
                                placeHolder={'کی ترجمه کرده ؟'}/>
                     </section>
@@ -939,19 +918,10 @@ const NewBook = () => {
                             <div
                                 className={`relative IranSansMedium relative transition-all h-full leading-9 ${reactiveBookData.type === 'pdf' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                 onClick={() => {
-                                    updateBookData('type', 'pdf')
-                                    updateBookData('isDownloadable', true)
-                                    // updateBookData('price', 0)
-
-                                    // setIsBookFree(true)
-                                    // (pdfSoonRef.current as HTMLInputElement).style.opacity = "1";
-                                    //
-                                    //
-                                    // setTimeout(() => {
-                                    //     (pdfSoonRef.current as HTMLInputElement).style.opacity = "0";
-                                    //
-                                    // }, 1000)
-
+                                    if (!strictTypeMode) {
+                                        updateBookData('type', 'pdf')
+                                        updateBookData('isDownloadable', true)
+                                    }
                                 }}>
                                 <div style={{
                                     opacity: 0
@@ -974,17 +944,18 @@ const NewBook = () => {
                             <div
                                 className={`IranSansMedium transition-all h-full leading-9 ${reactiveBookData.type === 'physical' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                 onClick={() => {
-                                    updateBookData('type', 'physical')
-                                    updateBookData('isDownloadable', false)
-                                    updateBookData('price', lastPrice.current)
+                                    if (!strictTypeMode) {
+                                        updateBookData('type', 'physical')
+                                        updateBookData('isDownloadable', false)
+                                        // updateBookData('price', lastPrice.current)
+                                    }
                                 }}>کتابِ فیـزیکـی
                             </div>
                         </div>
 
                     </section>
                     <div className={'w-full IranSans text-textDarker text-sm px-3 mt-3 mb-3 text-justify leading-6'}>
-                        فعلا فقط میتونین کتابای فیزیکیتون رو توی یونیـمـون قرار بدین . به زودی بخش کتاب دیجیتال هم اضافه
-                        میشه
+                        تو یونیـمـون میتونین کتاب رو به صورت دیجیتال یا به صورت فیزیکی قرار بدین
                     </div>
 
 
@@ -1207,6 +1178,7 @@ const NewBook = () => {
                             <Input id={'page-count'} numOnly={true} maxLength={5} wrapperClassName={'w-20 h-10'}
                                    inputClassName={'center-placeholder IranSans text-center rounded-xl'}
                                    placeHolder={'تعداد'}
+                                   defaultValue={reactiveBookData.pages}
                                    onChange={(e: InputEvent) => {
                                        let el = e.currentTarget as HTMLTextAreaElement
                                        updateBookData('pages', parseInt(el.value))

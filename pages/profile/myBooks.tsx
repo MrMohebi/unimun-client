@@ -7,7 +7,7 @@ import Seen from '../../assets/svgs/eye.svg'
 import FreeSVG from '../../assets/svgs/free.svg'
 import Toman from '../../assets/svgs/toman.svg'
 
-import {gql, useLazyQuery, useMutation} from "@apollo/client";
+import {gql, useLazyQuery, useMutation, useQuery} from "@apollo/client";
 import {useRouter} from "next/router";
 import {UserToken} from "../../store/user";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -52,10 +52,15 @@ const MyBooks = () => {
                         title
                         id
                         pages
+                        isDownloadable
                         verifiedAt
                         writer
                         term
                         publisher
+                        bookFiles {
+                            url
+                            preview
+                        }
                         university
                         appearanceID
                         appearance {
@@ -96,76 +101,74 @@ const MyBooks = () => {
     `
 
 
-    const [getMyBooks, getMyBooksData] = useLazyQuery(myBooksQuery)
+    const getMyBooks = useQuery(myBooksQuery, {
+        variables: {
+            variables: {
+                first: 50,
+                after: null
+            }
+        },
+    })
     const [removeBook, removeBookResult] = useMutation(removeBookQuery)
 
     const router = useRouter();
     useEffect(() => {
 
-            if (!getMyBooksData.loading) {
-                getMyBooksData.loading = true;
-            }
+
             if (UserToken()) {
-                getMyBooks({
-                    variables: {
-                        first: 10,
-                        after: null
+                if (getMyBooks.data) {
+                    try {
+
+                        let MyBooks = getMyBooks.data.booksUserCreated.edges.map((item: any) => {
+                                if (item.node.isBook) {
+                                    return item.node
+                                }
+                            }
+                        ).filter((item: any) => item);
+                        let MyBrochures = getMyBooks.data.booksUserCreated.edges.map((item: any) => {
+                                if (!item.node.isBook) {
+                                    return item.node
+                                }
+                            }
+                        ).filter((item: any) => item)
+
+
+                        _myBooks(MyBooks);
+                        _myBrochures(MyBrochures);
+                        (getMyBooks.data.booksUserCreated.edges as []).forEach((item, index) => {
+
+                            let book = (item as { node: any }).node as {
+                                price: string
+                                isBook: boolean
+                                title: string
+                                seen: string
+                            }
+                            if (book.isBook) {
+                                _booksLength(booksLength++)
+                            } else {
+                                console.log(item)
+                            }
+                        })
+
+
+                    } catch
+                        (e) {
+                        Toast('خطا در هنگام دریافت کتاب ها')
                     }
-                }).then(e => {
-                    console.log(e)
-
-                        try {
-
-                            let MyBooks = e.data.booksUserCreated.edges.map((item: any) => {
-                                    if (item.node.isBook) {
-                                        return item.node
-                                    }
-                                }
-                            ).filter((item: any) => item);
-                            let MyBrochures = e.data.booksUserCreated.edges.map((item: any) => {
-                                    if (!item.node.isBook) {
-                                        return item.node
-                                    }
-                                }
-                            ).filter((item: any) => item)
+                }
 
 
-                            _myBooks(MyBooks);
-                            _myBrochures(MyBrochures);
-                            (e.data.booksUserCreated.edges as []).forEach((item, index) => {
-
-                                let book = (item as { node: any }).node as {
-                                    price: string
-                                    isBook: boolean
-                                    title: string
-                                    seen: string
-                                }
-                                if (book.isBook) {
-                                    _booksLength(booksLength++)
-                                } else {
-                                    console.log(item)
-                                }
-                            })
-
-
-                        } catch
-                            (e) {
-                            Toast('خطا در هنگام دریافت کتاب ها')
-                        }
-                    }
-                )
             } else {
                 router.push('/profile/login')
             }
-
         }
-        ,
-        []
-    )
+
+
+        , [getMyBooks.data])
     return (
         <div className={'h-full pb-20 '}>
 
-            <FullScreenLoading show={getMyBooksData.loading || loading}/>
+            <FullScreenLoading show={getMyBooks.loading || loading}/>
             <ToastContainer/>
 
             <Header noShadow={true} backOnClick={() => {
@@ -197,7 +200,8 @@ const MyBooks = () => {
 
                 <InfiniteScroll pullDownToRefreshContent={<h1 className={'h-10'}></h1>}
                                 releaseToRefreshContent={<div
-                                    className={'h-10 w-full text-center IranSans text-sm '}>والا اینجا چیزی واسه رفرش
+                                    className={'h-10 w-full text-center IranSans text-sm '}>والا اینجا چیزی واسه
+                                    رفرش
                                     نیست شما که از خودمونی :)</div>}
                                 className={''}
                                 pullDownToRefreshThreshold={90} refreshFunction={() => {
@@ -217,7 +221,8 @@ const MyBooks = () => {
 
                     {
                         currentActivePart === 2 && myBrochures.length === 0 ?
-                            <div className={'h-10 w-full IranSans text-center text-textDark mt-5 '}>هنوز جزوه ای اضافه
+                            <div className={'h-10 w-full IranSans text-center text-textDark mt-5 '}>هنوز جزوه ای
+                                اضافه
                                 نکردی</div>
                             :
                             null

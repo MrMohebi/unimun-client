@@ -48,6 +48,7 @@ export interface Book {
     verifiedAt: string
     writer: string
     wroteYear: string
+    translator: string
     location: {
         text: string
         lon: string

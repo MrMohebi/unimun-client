@@ -53,7 +53,7 @@ const Input = ({
                        type={numOnly ? 'number' : ''}
                        defaultValue={defaultValue}
                        autoFocus={autoFocus}
-                       onChange={(e) => {
+                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 
                            if (numOnly) {
                                let text = fixNumbers(e.currentTarget.value);

@@ -29,6 +29,7 @@ import {UNIMUN_PROVIDERS} from "../../store/GLOBAL_VARIABLES";
 import {currentNavActiveIndex} from "../../store/navbar";
 import {EndCursor} from "../../store/appeals";
 import {useDebouncedCallback} from "use-debounce";
+import {ToastContainer} from "react-toastify";
 
 const Index = () => {
 
@@ -123,7 +124,9 @@ const Index = () => {
     useEffect(() => {
 
 
+
         if (lastBookSubmitSuccess().length) {
+            console.log('thee should be an alert for new book')
             Toast('کتاب شما ثبت شد و  در انتظار بررسی است')
             lastBookSubmitSuccess('')
         }
@@ -318,6 +321,7 @@ const Index = () => {
     const booksDivRef = useRef<HTMLDivElement>(null);
     return (
         <div className={'h-full relative '}>
+            <ToastContainer/>
             <div id={'dimmer'}
                  onClick={(e) => {
                      let el = e.target as HTMLDialogElement
