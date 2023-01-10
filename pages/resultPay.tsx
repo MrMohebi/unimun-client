@@ -23,24 +23,7 @@ const ResultPay = () => {
         window.open('/wallet', "_self")
 
     }
-    useEffect(() => {
 
-        let routerLocal = router.query as {
-            amount: string
-            status: string
-            balance: string
-        }
-        console.log(router)
-        // if ('amount' in routerLocal && 'balance' in routerLocal && 'status' in routerLocal) {
-        setAmount(routerLocal.amount)
-        setPaymentStatus(!!parseInt(routerLocal.status))
-        setBalance(fixPrice(parseInt(routerLocal.balance)))
-        // } else {
-        //     backToUnimun()
-        // }
-
-
-    }, [router.query]);
     const setBalance = (balance: String) => {
         const svg = svgRef && svgRef.current ? (svgRef.current as HTMLDivElement).firstChild as HTMLDivElement : document.createElement('div')
         svg.querySelector('.paymentTicket_svg__balance')!.innerHTML = balance.toString();
@@ -80,10 +63,31 @@ const ResultPay = () => {
 
 
     useEffect(() => {
-        setPaymentStatus(false)
-        setBalance(putCommaInNumber("500"))
-        setAmount(putCommaInNumber("1000000000"))
+        // setPaymentStatus(false)
+        // setBalance(putCommaInNumber("500"))
+        // setAmount(putCommaInNumber("1000000000"))
     }, [])
+
+    useEffect(() => {
+
+        let routerLocal = router.query as {
+            amount: string
+            status: string
+            balance: string
+        }
+        console.log(router)
+        // console.log('ye')
+        // if ('amount' in routerLocal && 'balance' in routerLocal && 'status' in routerLocal) {
+        setAmount(routerLocal.amount)
+        setPaymentStatus(!!parseInt(routerLocal.status))
+        setBalance(fixPrice(parseInt(routerLocal.balance)))
+        // } else {
+        //     backToUnimun()
+        // }
+
+
+    }, [router.query]);
+
 
     return (
         <div className={'w-100 h-100 left-1/2  top-1/2 flex flex-col items-center justify-center '}>
