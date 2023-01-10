@@ -28,6 +28,11 @@ const MyAppeals = () => {
                         categoryID
                         createdAt
                         status
+                        attachments {
+                            url
+                            preview
+                            uploadedAsFile
+                        }
                     }
                 }
             }

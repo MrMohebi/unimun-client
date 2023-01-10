@@ -4,15 +4,17 @@ import axios, {AxiosRequestConfig} from "axios";
 export const uploadImage = (image: any, removeEmptyProgresses: Function, currentAppealTempId: { current: string }, success: Function, error: Function, onUploadProgress: Function) => {
     removeEmptyProgresses()
     let data = new FormData();
-    data.append('token', UserToken());
+    // data.append('token', UserToken());
     data.append('file', image);
-    data.append('appealID', currentAppealTempId.current);
+    data.append('id', currentAppealTempId.current);
     data.append('uploadedAsFile', '0');
 
     let config: AxiosRequestConfig = {
         method: 'post',
-        url: 'https://apidl.unimun.me/appealUpload.php',
-        headers: {},
+        url: 'https://dl.unimun.me/public/appeal/',
+        headers: {
+            token: UserToken()
+        },
         data: data,
         onUploadProgress: (progressEvent: any) => {
             onUploadProgress(progressEvent)
@@ -34,15 +36,47 @@ export const uploadImage = (image: any, removeEmptyProgresses: Function, current
 export const uploadBookImages = (image: any, currentBookId: string, success: Function, error: Function, onUploadProgress: Function) => {
     // removeEmptyProgresses()
     let data = new FormData();
-    data.append('token', UserToken());
+    // data.append('token', UserToken());
     data.append('file', image);
-    data.append('bookID', currentBookId);
+    data.append('id', currentBookId);
     data.append('uploadedAsFile', '0');
 
     let config: AxiosRequestConfig = {
         method: 'post',
-        url: 'https://apidl.unimun.me/bookUpload.php',
-        headers: {},
+        url: 'https://dl.unimun.me/public/book/',
+        headers: {
+            token: UserToken()
+        },
+        data: data,
+        onUploadProgress: (progressEvent: any) => {
+            onUploadProgress(progressEvent)
+        }
+    };
+
+    axios(config)
+        .then(function (response) {
+            success(response)
+        })
+
+        .catch(function (er) {
+            error(er)
+        });
+
+}
+export const uploadAppealImage = (image: any, curentAppealId: string, success: Function, error: Function, onUploadProgress: Function) => {
+    // removeEmptyProgresses()
+    let data = new FormData();
+    // data.append('token', UserToken());
+    data.append('file', image);
+    data.append('id', curentAppealId);
+    data.append('uploadedAsFile', '0');
+
+    let config: AxiosRequestConfig = {
+        method: 'post',
+        url: 'https://dl.unimun.me/public/appeal/',
+        headers: {
+            token: UserToken()
+        },
         data: data,
         onUploadProgress: (progressEvent: any) => {
             onUploadProgress(progressEvent)

@@ -13,22 +13,22 @@ import {gql} from "@apollo/client";
 import {newAppealQuery} from "../../../Requests/withAuthentication/appeals";
 import GallerySVG from '../../../assets/svgs/gallery.svg'
 import FileUploadSVG from '../../../assets/svgs/fileUpload.svg'
-import GalleryImageSVG from '../../../assets/svgs/galleryImage.svg'
-import NewPhotoSVG from '../../../assets/svgs/newPhoto.svg'
 import TelInputSVG from '../../../assets/svgs/telInput.svg'
 import BoldMobile from '../../../assets/svgs/boldMobile.svg'
 import RightSquareSVG from '../../../assets/svgs/rightSquare.svg'
-import SVGModifier from "../../../components/common/SVGModifier/SVGModifier";
 import axios, {AxiosRequestConfig} from "axios";
 import FileSVG from "../../../assets/svgs/file.svg";
 import EmptyFileSVG from "../../../assets/svgs/emptyFile.svg";
 import {UserToken} from "../../../store/user";
 import CircularProgressBar from "../../../components/view/CircularProgressBar/CircularProgressBar";
 import {toast, ToastContainer} from "react-toastify";
-import {uploadImage} from "../../../Requests/uploadRequests";
 import CloseSVG from "../../../assets/svgs/close.svg";
 import {lastAppealSubmitSuccess} from "../../../store/appeals";
 import BottomSheet from "../../../components/view/BottomSheet/BottomSheet";
+import BookImageUpload from "../../../components/normal/BookImageUpload/BookImageUpload";
+import {DOWNLOAD_HOST} from "../../../store/GLOBAL_VARIABLES";
+import produce from "immer";
+import UploadingFileLoading from "../../../components/normal/UploadingFileLoading/UploadingFileLoading";
 
 
 const Index = () => {
@@ -42,8 +42,8 @@ const Index = () => {
     const [connectWay, setConnectWay] = useState('')
     const [upperPrice, setUpper] = useState(300)
     const [hashtags, setHashtags] = useState([] as string[])
-    const [uploadedImages, setUploadedImages] = useState([] as string[])
-    const [uploadedFiles, setUpladedFiles] = useState([] as string[])
+    const [uploadedImages, setUploadedImages] = useState([] as any[])
+    const [uploadedFiles, setUpladedFiles] = useState([] as any[])
     const [currentStep, setCurrentStep] = useState(0)
     const [uploadingProgress, setUploadingProgress] = useState([] as number[])
     const [imageBottomSheetOpened, setImageBottomSheetOpened] = useState(false)
@@ -89,10 +89,10 @@ const Index = () => {
 
         let files = [] as any;
         uploadedImages.forEach(image => {
-            files.push(JSON.parse(image))
+            files.push((image))
         })
         uploadedFiles.forEach(file => {
-            files.push(JSON.parse(file))
+            files.push((file))
         })
         return files
     }
@@ -104,21 +104,26 @@ const Index = () => {
         error
     }] = useMutation(gql`${query.query}`, {variables: query.variables})
 
+    const [uploadingFile, setUploadingFile] = useState(false);
 
     const uploadFile = (file: any) => {
         let fileName = file.name as string;
         let fileSize = file.size as string;
 
+        setUploadingFile(true)
+
         let data = new FormData();
-        data.append('token', UserToken());
+        // data.append('token', UserToken());
         data.append('file', file);
-        data.append('appealID', currentAppealTempId.current.toString());
+        data.append('id', currentAppealTempId.current.toString());
         data.append('uploadedAsFile', '1');
 
         let config: AxiosRequestConfig = {
             method: 'post',
-            url: 'https://apidl.unimun.me/appealUpload.php',
-            headers: {},
+            url: 'https://dl.unimun.me/public/appeal/',
+            headers: {
+                token: UserToken()
+            },
             data: data,
             onUploadProgress: (progressEvent: any) => {
                 let percentCompleted = Math.round(
@@ -129,8 +134,10 @@ const Index = () => {
 
         axios(config)
             .then(function (response) {
+                setUploadingFile(false)
+
                 if (response.data.hasOwnProperty('url')) {
-                    setUpladedFiles([...uploadedFiles, JSON.stringify(response.data)])
+                    setUpladedFiles([...uploadedFiles, response.data])
                 }
             })
 
@@ -152,6 +159,7 @@ const Index = () => {
     return (
         <div className={'h-full  overflow-scroll'} ref={newAppealMainSection}>
 
+            <UploadingFileLoading dim={true} show={uploadingFile} uploadPercentage={0}/>
             <BottomSheet onClose={() => {
                 setImageBottomSheetOpened(false)
             }} open={imageBottomSheetOpened}>
@@ -412,95 +420,45 @@ const Index = () => {
 
                         <div
                             className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-3 max-w-sm mx-auto'}>
-                            <div
-                                className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative mt-4'}>
-                                {
-                                    uploadedImages.length < 5 ?
-                                        <input type={'file'}
-                                               className={'opacity-0 absolute top-0 left-0 w-full h-full '}
-                                               accept={'.png,.jpeg,.jpg'} onInput={(e) => {
-                                            if (e.currentTarget && e.currentTarget.files && e.currentTarget.files.length)
-                                                uploadImage(e.currentTarget.files[0], removeEmptyProgresses, currentAppealTempId, (response: any) => {
-                                                        if (response.data !== 500 && response.data !== 401) {
-                                                            setUploadedImages([...uploadedImages, JSON.stringify(response.data)])
-                                                            let updateUploadingProgress = [...uploadingProgress]
-                                                            updateUploadingProgress[uploadingProgress.length] = 0;
-                                                            setUploadingProgress(updateUploadingProgress)
-                                                            removeEmptyProgresses()
-                                                        }
-                                                    }, (error: any) => {
-                                                        showError('خطا در آپلود فایل، دوبره تلاش کنید')
-
-                                                        let updateUploadingProgress = [...uploadingProgress]
-                                                        updateUploadingProgress[uploadingProgress.length] = 0;
-                                                        setUploadingProgress(updateUploadingProgress)
-                                                        removeEmptyProgresses()
-                                                    },
-                                                    (progressEvent: any) => {
-                                                        let percentCompleted = Math.round(
-                                                            (progressEvent.loaded * 100) / progressEvent.total
-                                                        );
-                                                        let updatedUploadedProgress = [...uploadingProgress]
-                                                        updatedUploadedProgress[uploadingProgress.length] = percentCompleted
-                                                        setUploadingProgress(updatedUploadedProgress)
-                                                    }
-                                                )
-                                        }}/> : null
-                                }
-
-                                <div className={'flex flex-col items-center justify-center'}>
-                                    <div className={'h-7 w-7'}><NewPhotoSVG/></div>
-                                    <span className={'text-sm IranSansMedium'}>افزودن عکس</span>
-                                </div>
-                            </div>
                             {
-                                uploadedImages.map((uploadedImage, index) => {
-                                    return (<div onClick={(e) => {
-                                            setImageBottomSheetOpened(true)
-                                            currentSelectedImage.current = uploadedImage
-                                        }} key={`${index}photo`}
-                                                 className={'new-photo h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-2 mx-3 relative overflow-hidden mt-4'}>
-                                            <img src={`https://dl.unimun.me/${JSON.parse(uploadedImage).thumbnail}`}
-                                                 alt={'Unimun ' + index}
-                                                 className={' w-full h-full'}/>
-                                            <div dir={'ltr'}
-                                                 className={'w-9 h-9  rounded-xl absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col justify-center items-center'}
-                                                 style={{background: 'rgba(255,255,255,0.85)'}}>
-                                                <SVGModifier SVGName={'galleryImage'} elementClass={'number'}
-                                                             value={(index + 1).toString()}>
-                                                    <GalleryImageSVG/>
-                                                </SVGModifier>
-                                            </div>
-                                        </div>
-                                    )
+                                Array(6).fill('').map((photos, index) => {
+
+                                    return <div key={index + 'imageUpload'} className={'contents'}>
+                                        <BookImageUpload type={'appeal'} index={index}
+                                                         onImageClick={(indexOfSelectedImage: number) => {
+                                                             // setCurrentSelectedImage(indexOfSelectedImage)
+                                                             console.log(indexOfSelectedImage)
+
+                                                             // setImageOptionsOpen(true)
+                                                         }}
+                                                         defaultImage={uploadedImages[index] ? DOWNLOAD_HOST() + uploadedImages[index].preview ?? "" : ''}
+                                                         isFirst={index === 0}
+                                                         id={index.toString()}
+                                                         onUploadComplete={(e: any) => {
+                                                             if (typeof e.data !== 'number') {
+                                                                 let backBook = produce(uploadedImages, (draft: any) => {
+                                                                     draft.push(e.data)
+                                                                 })
+                                                                 console.log(e.data)
+                                                                 console.log(backBook)
+                                                                 // updateBookData('attachments', backBook)
+                                                                 setUploadedImages(backBook)
+
+                                                                 console.log(e)
+
+                                                             }
+
+                                                         }} onError={(e: any) => {
+                                            console.log(e)
+                                        }} bookID={currentAppealTempId.current} setUploading={() => {
+
+                                        }}/>
+                                    </div>
+
                                 })
                             }
-                            {Array(5 - uploadedImages.length).fill('').map((photos, index) => {
-                                return (
-                                    <div key={`${index}photo`}
-                                         className={'new-photo relative h-24 w-24 flex flex-col justify-center items-center rounded-2xl border-dashed border-2 mx-3 relative mt-4'}>
-                                        {
-                                            uploadingProgress[index] ?
-                                                <div
-                                                    className={'relative '}>
-                                                    <CircularProgressBar sqSize={40} strokeWidth={1.5}
-                                                                         percentage={uploadingProgress[index]}
-                                                                         color={'#0080ff'}/>
-                                                    <div
-                                                        className={'absolute left-1/2 top-1/2 -translate-y-1/2 IranSans text-primary -translate-x-1/2'}>
-                                                        {`${uploadingProgress[index]}%`}
-                                                    </div>
-                                                </div>
 
-                                                :
-                                                <div className={'flex flex-col items-center justify-center opacity-60'}>
-                                                    <div className={'h-7 w-7'}><GallerySVG/></div>
-                                                    <span className={'text-sm IranSansMedium'}>عکس</span>
-                                                </div>
-                                        }
-                                    </div>
-                                )
-                            })}
+
                         </div>
 
 
@@ -538,7 +496,7 @@ const Index = () => {
                                     <div className={'file-right flex flex-row justify-start items-center'}>
                                         <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><FileSVG/></div>
                                         <div
-                                            className={'IranSansMedium mr-4 opacity-60'}>{(JSON.parse(file).url).split('/').reverse()[0]}</div>
+                                            className={'IranSansMedium mr-4 opacity-60'}>{((file).url).split('/').reverse()[0]}</div>
                                     </div>
                                     <div dir={'ltr'} className={'IranSans w-7 h-7 '}><FileUploadSVG/></div>
                                 </div>

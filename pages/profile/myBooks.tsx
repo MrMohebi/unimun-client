@@ -225,6 +225,7 @@ const MyBooks = () => {
 
                     {
                         (currentActivePart === 1 ? myBooks : myBrochures).map((item, index) => {
+
                             let book: {
                                 id: string
                                 price: string
@@ -234,7 +235,6 @@ const MyBooks = () => {
                                 status: string
                                 attachments: any[]
                             } = item;
-
 
                             return (
                                 <div dir={'ltr'} key={'my-book' + index}
