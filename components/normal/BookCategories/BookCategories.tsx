@@ -1,16 +1,18 @@
 import React, {useEffect, useRef, useState} from 'react';
 import Header from "../../common/Header/Header";
 import Back from '../../../assets/svgs/back.svg'
-import {gql, useLazyQuery} from "@apollo/client";
+import {gql, useLazyQuery, useQuery} from "@apollo/client";
 import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 import {useRouter} from "next/router";
 import SearchSVG from "../../../assets/svgs/search.svg";
 import CloseSVG from "../../../assets/svgs/close.svg";
+import {BookDataStore} from "../../../store/books";
 
 const BookCategories = (props: { onCatSelected: Function }) => {
 
     const [tree, _tree] = useState([] as [])
     const data = useRef(null)
+    const [lastSelectedCat, setLastSelectedCat] = useState('');
     const lastClicked = useRef([])
     const [searchText, _searchText] = useState('')
     const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -28,7 +30,7 @@ const BookCategories = (props: { onCatSelected: Function }) => {
             }
         }
     `
-    const [getBookCategories, getBookCategoriesResult] = useLazyQuery(BookCategoriesQuery);
+    const getBookCategories = useQuery(BookCategoriesQuery);
 
 
     const createCategoryTree = (dataArray: [], clickedId: string) => {
@@ -72,11 +74,13 @@ const BookCategories = (props: { onCatSelected: Function }) => {
     }
 
     useEffect(() => {
-        getBookCategories().then(e => {
-            createCategoryTree(e.data.bookCategories.data, '')
-            data.current = e.data.bookCategories.data
-        })
-    }, [])
+        if (getBookCategories.data) {
+            createCategoryTree(getBookCategories.data.bookCategories.data, '')
+            data.current = getBookCategories.data.bookCategories.data
+        }
+
+        // })
+    }, [getBookCategories.data])
 
 
     const onSearchInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -109,9 +113,14 @@ const BookCategories = (props: { onCatSelected: Function }) => {
         <div className={'w-full pt-20 h-full absolute  top-0 left-0 z-40 bg-background overflow-scroll pb-10 '}
              id={'test-categories'}>
             <Header title={'انتخاب دسته بندی'} back={true} backOnClick={() => {
+                console.log(BookDataStore().categoryID)
+                console.log(BookDataStore().categoryPersian)
 
-                if (getBookCategoriesResult.loading || lastClicked.current.length < 1) {
-                    props.onCatSelected('')
+                if (getBookCategories.loading || lastClicked.current.length < 1) {
+                    props.onCatSelected({
+                        id: BookDataStore().categoryID,
+                        title: BookDataStore().categoryPersian
+                    },)
                 } else {
                     if (lastClicked.current.length) {
                         createCategoryTree(data.current as any, lastClicked.current[lastClicked.current.length - 2])
@@ -168,7 +177,7 @@ const BookCategories = (props: { onCatSelected: Function }) => {
 
 
             {
-                getBookCategoriesResult.loading ?
+                getBookCategories.loading ?
                     <div className={'fixed top-0 left-0 w-full h-full z-50 '}
                          style={{background: 'rgba(0,0,0,0.4)'}}>
                         <div
@@ -190,6 +199,7 @@ const BookCategories = (props: { onCatSelected: Function }) => {
                              onClick={() => {
                                  if (!cat.hasChild) {
                                      props.onCatSelected(cat)
+                                     // setLastSelectedCat(cat)
                                  }
                                  createCategoryTree(data.current as any, cat.id)
                                  lastClicked.current.push(cat.id)

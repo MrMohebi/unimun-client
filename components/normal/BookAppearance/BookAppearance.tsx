@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import Header from "../../common/Header/Header";
 import Back from '../../../assets/svgs/back.svg'
-import {gql, useLazyQuery} from "@apollo/client";
+import {gql, useLazyQuery, useQuery} from "@apollo/client";
 import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 import {useRouter} from "next/router";
 import {prop} from "styled-tools";
@@ -21,7 +21,9 @@ const BookAppearance = (props: { onAppearanceSelected: Function }) => {
             }
         }
     `
-    const [getBookAppearance, getBookAppearanceResult] = useLazyQuery(BookAppearanceQuery);
+    const getBookAppearance = useQuery(BookAppearanceQuery, {
+        fetchPolicy: 'cache-first'
+    });
 
     const emojies = [
         'star',
@@ -31,14 +33,17 @@ const BookAppearance = (props: { onAppearanceSelected: Function }) => {
         'melting',
     ]
     useEffect(() => {
-        getBookAppearance().then(e => {
-            try {
-                _appearances(e.data.bookAppearances.data)
-            } catch (e) {
-                props.onAppearanceSelected('')
-            }
-        })
-    }, [])
+        if (getBookAppearance.data)
+            _appearances(getBookAppearance.data.bookAppearances.data)
+
+        // getBookAppearance().then(e => {
+        //     try {
+        //         _appearances(e.data.bookAppearances.data)
+        //     } catch (e) {
+        //         props.onAppearanceSelected('')
+        //     }
+        // })
+    }, [getBookAppearance.data])
 
 
     const router = useRouter();
@@ -50,7 +55,7 @@ const BookAppearance = (props: { onAppearanceSelected: Function }) => {
 
 
             {
-                getBookAppearanceResult.loading ?
+                getBookAppearance.loading ?
                     <div className={'fixed top-0 left-0 w-full h-full z-50 '} style={{background: 'rgba(0,0,0,0.4)'}}>
                         <div
                             className={'top-1/2 left-1/2 fixed bg-white rounded-3xl shadow p-4 -translate-x-1/2 -translate-y-1/2'}>
