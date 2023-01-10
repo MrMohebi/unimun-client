@@ -31,14 +31,13 @@ const ResultPay = () => {
             balance: string
         }
         console.log(router)
-        if ('amount' in routerLocal && 'balance' in routerLocal && 'status' in routerLocal) {
+        // if ('amount' in routerLocal && 'balance' in routerLocal && 'status' in routerLocal) {
             setAmount(routerLocal.amount)
             setPaymentStatus(!!parseInt(routerLocal.status))
             setBalance(fixPrice(parseInt(routerLocal.balance)))
-        } else {
+        // } else {
             backToUnimun()
-
-        }
+        // }
 
 
     }, [router.query]);
