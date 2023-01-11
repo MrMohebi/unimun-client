@@ -82,14 +82,14 @@ const BookImageUpload = (props: {
 
                 :
                 <div className={'w-full h-full absolute opacity-0 pointer-events-auto'} onClick={() => {
-                    props.onImageClick(props.index)
+                    props.onImageClick(uploadedImageURL)
                     console.log('clicked')
                 }}></div>
             }
 
 
             <div onClick={() => {
-                props.onImageClick()
+                // props.onImageClick()
             }}
                  className={`new-photo relative overflow-hidden ${props.type === "appeal" ? "h-24 w-24" : "h-36 w-24"} flex flex-col justify-center items-center rounded-2xl ${props.isFirst ? "border" : "border-dashed"} border-2  relative `}>
                 {

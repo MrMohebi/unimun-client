@@ -128,7 +128,7 @@ const NewBook = () => {
     const [fileName, setFileName] = useState("");
     const [editing, setEditing] = useState(false);
     const [uploading, setUploading] = useState(false);
-    const [currentSelectedImage, setCurrentSelectedImage] = useState(0);
+    const [currentSelectedImage, setCurrentSelectedImage] = useState("");
     const reactiveBookData = useReactiveVar(BookDataStore)
     const freeCheckboxRef = useRef<HTMLInputElement>(null);
     const [strictTypeMode, setStrictTypeMode] = useState(false);
@@ -576,11 +576,11 @@ const NewBook = () => {
             }}>
                 <Button className={'h-14 mb-3 w-full flex flex-row justify-start items-center px-4'} onClick={() => {
                     let attachments = BookDataStore().attachments
-                    attachments.filter((item) => {
-                        return item.url !== BookDataStore().attachments[currentSelectedImage];
-
+                    let filtered = attachments.filter((item) => {
+                        return (DOWNLOAD_HOST() + item.preview) !== currentSelectedImage;
                     })
-                    console.log(attachments)
+                    updateBookData('attachments', filtered)
+                    setImageOptionsOpen(false)
                 }}>
                     <img src="/assets/svgs/remove-image.svg" alt=""/>
                     <span className={"IranSansMedium text-sm mr-2"}>حذف عکس</span>
@@ -781,12 +781,13 @@ const NewBook = () => {
 
 
                         <div
+                            key={reactiveBookData.attachments.length}
                             className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-1 max-w-sm mx-auto'}>
                             {
                                 Array(6).fill('').map((photos, index) => {
 
                                     return <div key={index + 'imageUpload'} className={'contents'}>
-                                        <BookImageUpload index={index} onImageClick={(indexOfSelectedImage: number) => {
+                                        <BookImageUpload index={index} onImageClick={(indexOfSelectedImage: string) => {
                                             setCurrentSelectedImage(indexOfSelectedImage)
                                             console.log(indexOfSelectedImage)
 

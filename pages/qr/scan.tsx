@@ -41,7 +41,7 @@ const Scan = () => {
                     router.push('/')
                 }} className={'w-8 h-8 rotate-180'} alt=""/>
             </div>
-            <img alt={'Library'} src={''} id={'dasf'}></img>
+            {/*<img alt={'Library'} src={''} id={'dasf'}></img>*/}
             <div className={'w-full pt-16  flex flex-col justify-center items-center  '}>
                 <div className={'w-24'}>
                     <Library/>

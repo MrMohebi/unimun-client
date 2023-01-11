@@ -38,6 +38,7 @@ import produce from "immer";
 import UploadingFileLoading from "../../components/normal/UploadingFileLoading/UploadingFileLoading";
 import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
 import dynamic from "next/dynamic";
+import BottomSheet from "../../components/view/BottomSheet/BottomSheet";
 
 const NewBrochure = () => {
 
@@ -145,7 +146,7 @@ const NewBrochure = () => {
     const [bookLocalFiles, setBookLocalFiles] = useState(null);
     const [loading, setLoading] = useState(false);
     const lastPrice = useRef("");
-    const [currentSelectedImage, setCurrentSelectedImage] = useState(0);
+    const [currentSelectedImage, setCurrentSelectedImage] = useState("");
     const [imageOptionsOpen, setImageOptionsOpen] = useState(false);
 
     const address = useRef<string>('');
@@ -638,15 +639,33 @@ const NewBrochure = () => {
 
             }
 
+            <BottomSheet open={imageOptionsOpen} onClose={() => {
+
+                setImageOptionsOpen(false)
+            }}>
+                <Button className={'h-14 mb-3 w-full flex flex-row justify-start items-center px-4'} onClick={() => {
+                    let attachments = BookDataStore().attachments
+                    let filtered = attachments.filter((item) => {
+                        return (DOWNLOAD_HOST() + item.preview) !== currentSelectedImage;
+                    })
+                    updateBookData('attachments', filtered)
+                    setImageOptionsOpen(false)
+                }}>
+                    <img src="/assets/svgs/remove-image.svg" alt=""/>
+                    <span className={"IranSansMedium text-sm mr-2"}>حذف عکس</span>
+                </Button>
+            </BottomSheet>
+
+
             <Dimmer onClose={() => {
                 Sdimmer(false)
-                    SlangDropDown(false)
-                }} show={dimmer}/>
-                <Header backOnClick={() => {
-                    // console.log(currentStep)
-                    if (currentStep > 0)
-                        ScurrentStep(currentStep - 1)
-                    else
+                SlangDropDown(false)
+            }} show={dimmer}/>
+            <Header backOnClick={() => {
+                // console.log(currentStep)
+                if (currentStep > 0)
+                    ScurrentStep(currentStep - 1)
+                else
                         router.push('/library')
 
                 }} back={true} title={'افزودن جزوه'}/>
@@ -834,7 +853,7 @@ const NewBrochure = () => {
 
                                         return <div key={index + 'imageUpload'} className={'contents'}>
                                             <BookImageUpload index={index}
-                                                             onImageClick={(indexOfSelectedImage: number) => {
+                                                             onImageClick={(indexOfSelectedImage: string) => {
                                                                  setCurrentSelectedImage(indexOfSelectedImage)
                                                                  console.log(indexOfSelectedImage)
 

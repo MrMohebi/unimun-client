@@ -39,6 +39,7 @@ const Book = (props: Props) => {
                 data{
                     title
                     id
+
                     connectWay
                     creator {
                         name
@@ -75,6 +76,9 @@ const Book = (props: Props) => {
                     term
                     language
                     bookFiles {
+                        cypher
+                        preview
+                        uploadedAsFile
                         url
                     }
                 }
@@ -543,8 +547,16 @@ const Book = (props: Props) => {
                             <Button id={'buy-book'} className={'w-full h-12 bg-primary rounded-xl  bottom-0 '}
                                     rippleColor={'rgba(255,255,255,0.4)'}
                                     onClick={() => {
-                                        if (!btnLoading)
-                                            buyBookFromUnimun()
+                                        if (!btnLoading) {
+                                            if (book.isDownloadable) {
+                                                if (book.bookFiles.length) {
+                                                    window.open(DOWNLOAD_HOST() + book.bookFiles[0].url, '_blank')
+                                                }
+                                            } else {
+                                                buyBookFromUnimun()
+                                            }
+                                        }
+
 
                                     }}
 
