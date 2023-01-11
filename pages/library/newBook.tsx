@@ -193,8 +193,8 @@ const NewBook = () => {
                 updateBookData('bookFiles', EditBookData().bookFiles);
                 if (EditBookData().bookFiles.length) {
                     setBookUploadState('uploaded')
-                    console.log('there is a file name')
-                    console.log(EditBookData().bookFiles[0].url.split('/').reverse()[0])
+                    // console.log('there is a file name')
+                    // console.log(EditBookData().bookFiles[0].url.split('/').reverse()[0])
                     setFileName(EditBookData().bookFiles[0].url.split('/').reverse()[0])
                 }
 
@@ -247,7 +247,7 @@ const NewBook = () => {
                 console.log(e)
                 Toast('خطا در هنگام ویرایش کتاب')
             }
-            console.log(reactiveBookData)
+            // console.log(reactiveBookData)
             EditBookData({})
         } else {
             _categoryComponent(true)
@@ -298,7 +298,7 @@ const NewBook = () => {
             }
         }).then((e) => {
             try {
-                console.log(e)
+                // console.log(e)
                 if (e.data.createBook.status === 'SUCCESS') {
                     lastBookSubmitSuccess(e.data.createBook.data.id)
                     router.push('/library')
@@ -309,7 +309,7 @@ const NewBook = () => {
                 console.log(e)
 
             }
-            console.log(e.data.createBook.status)
+            // console.log(e.data.createBook.status)
         })
 
     }
@@ -318,7 +318,7 @@ const NewBook = () => {
     const submitBook = () => {
 
         if (!reactiveBookData.isDownloadable && !locationBottomSheetOpen) {
-            console.log('open')
+            // console.log('open')
             setLocationBottomSheetOpen(true)
             return;
         }
@@ -337,14 +337,15 @@ const NewBook = () => {
 
 
         updateBookData('price', parseInt(reactiveBookData.price))
+        updateBookData('pages', parseInt(reactiveBookData.pages))
 
         if (uploading) {
             Toast('در حال آپلود فایل یا عکس...')
             // return 0
         }
 
-        console.log('data')
-        console.log(BookDataStore())
+        // console.log('data')
+        // console.log(BookDataStore())
 
         // return;
         if (editing) {
@@ -439,9 +440,9 @@ const NewBook = () => {
                     uploadPublicBookFile(bookLocalFiles, () => {
 
                     }, "Book_" + Math.random() * 99999999, (result: any) => {
-                        console.log(result)
+                        // console.log(result)
                         setShowUploadingFileLoading(false)
-                        console.log(result)
+                        // console.log(result)
                         updateBookData('bookFiles', [result.data])
                         createBookFunc()
 
@@ -449,13 +450,13 @@ const NewBook = () => {
                         setShowUploadingFileLoading(false)
                         Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
                     }, (uploadProgress: any) => {
-                        console.log(uploadProgress)
+                        // console.log(uploadProgress)
 
                     })
                 } else {
                     uploadPrivateBookFile(bookLocalFiles, () => {
                     }, "Book_" + Math.random() * 99999999, (result: any) => {
-                        console.log(result)
+                        // console.log(result)
                         updateBookData('bookFiles', [result.data])
 
                         createBookFunc()
@@ -465,7 +466,7 @@ const NewBook = () => {
                         Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
 
                     }, (uploadProgress: any) => {
-                        console.log((uploadProgress.loaded * 100) / uploadProgress.total)
+                        // console.log((uploadProgress.loaded * 100) / uploadProgress.total)
 
                         // setFileUploadPercentage(uploadProgress)
                     })
@@ -481,7 +482,7 @@ const NewBook = () => {
     }
 
     const bookVerification = () => {
-        console.log(reactiveBookData)
+        // console.log(reactiveBookData)
 
         if (currentStep === 0 && reactiveBookData.title && reactiveBookData.title.length > 2 && reactiveBookData.categoryID) {
             return true
@@ -542,14 +543,14 @@ const NewBook = () => {
                         }}
                         onLngChanged={(val: string) => {
                             lon.current = val;
-                            console.log(lon)
+                            // console.log(lon)
                         }}
                         onTextChanged={(text: string) => {
-                            console.log("address Changed")
+                            // console.log("address Changed")
                             address.current = text
                         }}
                         onSubmit={(e: any) => {
-                            console.log(address.current)
+                            // console.log(address.current)
                             if (!address.current) {
                                 Toast("لطفا فیلد آدرس را پر کنید", '', 2000, '', 50)
                                 return;

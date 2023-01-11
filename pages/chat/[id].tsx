@@ -456,7 +456,7 @@ const ChatScreen = () => {
                                 lon: locationMessageValues.current.lon.toString(),
                             }
                         }).then((value) => {
-                            console.log(value)
+                            // console.log(value)
                             setChatLoading(false)
 
                         })
@@ -697,7 +697,7 @@ const ChatScreen = () => {
                                                                     //     console.log('failde to change the price or desc')
                                                                     // }
 
-                                                                    console.log(inlineButton)
+                                                                    // console.log(inlineButton)
 
 
                                                                     if (inlineButton.action === "CHOOSE_ADDRESS") {

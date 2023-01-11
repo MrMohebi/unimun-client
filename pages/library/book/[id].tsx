@@ -132,7 +132,7 @@ const Book = (props: Props) => {
             try {
                 _book(e.data.book.data)
                 setIsBook(e.data.book.data.isBook)
-                console.log(e.data.book.data)
+                // console.log(e.data.book.data)
                 if (e.data.book.data.isLiked) {
                     setBookIsLiked(true)
                 }
@@ -292,7 +292,7 @@ const Book = (props: Props) => {
                                 } else {
                                     setBookIsLiked(false)
                                 }
-                                console.log(value)
+                                // console.log(value)
 
                             })
 
@@ -310,7 +310,7 @@ const Book = (props: Props) => {
                                 } else {
                                     setBookIsLiked(true)
                                 }
-                                console.log(value)
+                                // console.log(value)
 
                             })
 

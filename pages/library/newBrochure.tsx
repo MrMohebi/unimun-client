@@ -6,17 +6,23 @@ import Step from "../../components/view/StepperFtagment/Step/Step";
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import Dimmer from "../../components/view/Dimmer/Dimmer";
-import {uploadBookFile} from "../../Requests/uploadRequests";
+import {uploadBookFile, uploadPrivateBookFile, uploadPublicBookFile} from "../../Requests/uploadRequests";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 import FileUploadSVG from "../../assets/svgs/fileUpload.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
 import FileSVG from "../../assets/svgs/file.svg";
-import {gql, useMutation} from "@apollo/client";
+import {gql, useMutation, useReactiveVar} from "@apollo/client";
 import Toman from '../../assets/svgs/toman.svg'
 import BookCategories from "../../components/normal/BookCategories/BookCategories";
 import BookAppearance from "../../components/normal/BookAppearance/BookAppearance";
 import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
-import {EditBookData, isBrochure, lastBookSubmitSuccess} from "../../store/books";
+import {
+    BookDataStore,
+    EditBookData,
+    isBrochure,
+    lastBookSubmitSuccess,
+    lastBrochureSubmitSuccess
+} from "../../store/books";
 import TelInputSVG from "../../assets/svgs/telInput.svg";
 import BoldMobile from "../../assets/svgs/boldMobile.svg";
 import RightSquareSVG from "../../assets/svgs/rightSquare.svg";
@@ -28,12 +34,16 @@ import {fixPrice} from "../../helpers/fixPrice";
 import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUpload";
 import Trash from "../../assets/svgs/trash.svg";
 import {DOWNLOAD_HOST} from "../../store/GLOBAL_VARIABLES";
+import produce from "immer";
+import UploadingFileLoading from "../../components/normal/UploadingFileLoading/UploadingFileLoading";
+import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
+import dynamic from "next/dynamic";
 
 const NewBrochure = () => {
 
     //queries
     const createBrochureMutation = gql`
-        mutation createBook($isBook:Boolean! $term:String $university:String $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String! $teacher:String){
+        mutation createBook($text:String!,$lat:String!,$lon:String! $isBook:Boolean! $term:String $university:String $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String! $teacher:String){
             createBook(
                 isBook:$isBook,
                 isDownloadable: $isDownloadable,
@@ -54,6 +64,8 @@ const NewBrochure = () => {
                 pages:$pages
                 university: $university
                 term:$term
+                location: {text: $text, lat: $lat, lon: $lon}
+
 
             ){
                 status
@@ -106,7 +118,6 @@ const NewBrochure = () => {
     const router = useRouter()
     const [currentStep, ScurrentStep] = useState(0)
     const [isBook, _isBook] = useState(false)
-    const [loading, Sloading] = useState(false)
     const [dimmer, Sdimmer] = useState(false)
     const [langDropDown, SlangDropDown] = useState(false)
     const [uploadedImages, setUploadedImages] = useState([] as string[])
@@ -125,7 +136,21 @@ const NewBrochure = () => {
     const [chosenSemester, setChosenSemester] = useState("");
     const [editing, setEditing] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [strictTypeMode, setStrictTypeMode] = useState(false);
+    const [isBookFree, setIsBookFree] = useState(false)
+    const reactiveBookData = useReactiveVar(BookDataStore)
+    const [showUploadingFileLoading, setShowUploadingFileLoading] = useState(false);
+    const [locationBottomSheetOpen, setLocationBottomSheetOpen] = useState(false);
+    const [fileUploadPercentage, setFileUploadPercentage] = useState(0);
+    const [bookLocalFiles, setBookLocalFiles] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const lastPrice = useRef("");
+    const [currentSelectedImage, setCurrentSelectedImage] = useState(0);
+    const [imageOptionsOpen, setImageOptionsOpen] = useState(false);
 
+    const address = useRef<string>('');
+    const lat = useRef<string>('');
+    const lon = useRef<string>('');
 
     const [fileSize, setFileSize] = useState(0);
     const [bookUploadState, setBookUploadState] = useState('');
@@ -187,7 +212,7 @@ const NewBrochure = () => {
                 return true
             })
 
-            console.log(EditBookData())
+            // console.log(EditBookData())
             try {
 
                 updateBookData('title', EditBookData()?.title)
@@ -233,7 +258,7 @@ const NewBrochure = () => {
 
 
             } catch (e) {
-                console.log(e)
+                // console.log(e)
                 Toast('خطا در هنگام ویرایش کتاب')
             }
             EditBookData({})
@@ -245,33 +270,157 @@ const NewBrochure = () => {
     const freeCheckBox = useRef<HTMLInputElement>(null);
 
 
-    const submitBook = () => {
-        console.log(BookData)
+    // const submitBook = () => {
+    //     console.log(reactiveBookData)
+    //
+    //     if (editing) {
+    //
+    //         updateBook({
+    //             variables: {
+    //                 id: reactiveBookData.id,
+    //                 title: reactiveBookData.title,
+    //                 categoryID: reactiveBookData.categoryID,
+    //                 isPurchasable: reactiveBookData.price ? reactiveBookData.price !== 0 : false,
+    //                 isDownloadable: reactiveBookData.type === 'pdf',
+    //                 isBook: true,
+    //                 details: reactiveBookData.details,
+    //                 bookFiles: reactiveBookData.files,
+    //                 attachments: reactiveBookData.attachments,
+    //                 connectWay: connectWay,
+    //                 appearanceID: reactiveBookData.appearanceID,
+    //                 pages: parseInt(reactiveBookData.pages),
+    //                 university: reactiveBookData.university,
+    //                 price: reactiveBookData.price,
+    //                 term: reactiveBookData.term
+    //             }
+    //         }).then((e) => {
+    //             try {
+    //                 if (e.data.updateBook.status === 'SUCCESS') {
+    //                     lastBookSubmitSuccess(e.data.updateBook.data.id)
+    //                     router.push('/library')
+    //                 } else {
+    //                     Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
+    //                 }
+    //             } catch (e) {
+    //                 console.log(e)
+    //             }
+    //         })
+    //
+    //     } else {
+    //
+    //
+    //         createBook({
+    //             variables: {
+    //                 title: reactiveBookData.title,
+    //                 categoryID: reactiveBookData.categoryID,
+    //                 isPurchasable: reactiveBookData.price ? reactiveBookData.price !== 0 : false,
+    //                 isDownloadable: reactiveBookData.type === 'pdf',
+    //                 isBook: false,
+    //                 bookFiles: reactiveBookData.files,
+    //                 details: reactiveBookData.details,
+    //                 attachments: reactiveBookData.attachments,
+    //                 connectWay: connectWay,
+    //                 teacher: reactiveBookData.teacher,
+    //                 term: reactiveBookData.term,
+    //                 university: reactiveBookData.university,
+    //                 price: reactiveBookData.price,
+    //                 pages: reactiveBookData.pages,
+    //             }
+    //         }).then((e) => {
+    //             try {
+    //                 console.log(e)
+    //                 if (e.data.createBook.status === 'SUCCESS') {
+    //                     lastBookSubmitSuccess(e.data.createBook.data.id)
+    //                     router.push('/library')
+    //                 }
+    //             } catch (e) {
+    //                 console.log(e)
+    //             }
+    //         })
+    //     }
+    //
+    // }
 
+
+    const createBookFunc = () => {
+
+        setLoading(true)
+
+
+        createBook({
+            variables: {
+                ...BookDataStore(),
+                text: address.current,
+                lat: lat.current.toString(),
+                lon: lon.current.toString(),
+                connectWay: '@mokafela'
+            }
+        }).then((e) => {
+            try {
+                console.log(e)
+                if (e.data.createBook.status === 'SUCCESS') {
+                    lastBrochureSubmitSuccess(e.data.createBook.data.id)
+                    router.push('/library')
+                } else {
+                    Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
+                }
+            } catch (e) {
+                console.log(e)
+
+            }
+            console.log(e.data.createBook.status)
+        })
+
+    }
+    const submitBook = () => {
+
+        updateBookData('isBook', false)
+
+        if (!reactiveBookData.isDownloadable && !locationBottomSheetOpen) {
+            // console.log('open')
+            setLocationBottomSheetOpen(true)
+            return;
+        }
+        if (!reactiveBookData.isDownloadable) {
+            updateBookData('location', {
+                lat: lat.current.toString(),
+                lon: lon.current.toString(),
+                text: address.current
+            })
+        }
+
+        if (parseInt(reactiveBookData.price) === 0) {
+            setIsBookFree(true)
+        }
+        updateBookData('isPurchasable', !isBookFree)
+
+
+        updateBookData('price', parseInt(reactiveBookData.price))
+        updateBookData('pages', parseInt(reactiveBookData.pages))
+
+        if (uploading) {
+            Toast('در حال آپلود فایل یا عکس...')
+            // return 0
+        }
+
+        // console.log('data')
+        // console.log(BookDataStore())
+
+        // return;
         if (editing) {
 
             updateBook({
                 variables: {
-                    id: BookData.id,
-                    title: BookData.title,
-                    categoryID: BookData.categoryID,
-                    isPurchasable: BookData.price ? BookData.price !== 0 : false,
-                    isDownloadable: BookData.type === 'pdf',
-                    isBook: true,
-                    details: BookData.details,
-                    bookFiles: BookData.files,
-                    attachments: BookData.attachments,
-                    connectWay: connectWay,
-                    appearanceID: BookData.appearanceID,
-                    pages: parseInt(BookData.pages),
-                    university: BookData.university,
-                    price: BookData.price,
-                    term: BookData.term
+                    ...BookDataStore(),
+                    text: address.current,
+                    lat: lat.current.toString(),
+                    lon: lon.current.toString(),
+                    connectWay: '@mokafela'
                 }
             }).then((e) => {
                 try {
                     if (e.data.updateBook.status === 'SUCCESS') {
-                        lastBookSubmitSuccess(e.data.updateBook.data.id)
+                        lastBrochureSubmitSuccess(e.data.updateBook.data.id)
                         router.push('/library')
                     } else {
                         Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
@@ -280,94 +429,221 @@ const NewBrochure = () => {
                     console.log(e)
                 }
             })
-
         } else {
 
+            //
+            //     let axios = require('axios');
+            //     let data = JSON.stringify({
+            //         query: `mutation createBook($text:String!,$lat:String!,$lon:String!, $isBook:Boolean! $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
+            //     createBook(
+            //         isBook:$isBook,
+            //         isDownloadable: $isDownloadable,
+            //         isPurchasable: $isPurchasable,
+            //         categoryID: $categoryID,
+            //         title: $title,
+            //         details: $details,
+            //         price: $price,
+            //         language: $language,
+            //         writer: $writer,
+            //         publisher: $publisher,
+            //         publishedDate: $publishedDate,
+            //         appearanceID: $appearanceID
+            //         bookFiles: $bookFiles,
+            //         attachments: $attachments,
+            //         connectWay:$connectWay
+            //         pages:$pages
+            //         location: {text: $text, lat: $lat, lon: $lon}
+            //     ){
+            //         status
+            //         data {
+            //             title
+            //             id
+            //         }
+            //         message
+            //     }
+            // }`,
+            //         variables: {
+            //             ...BookDataStore()
+            //             ,
+            //
+            //
+            //         }
+            //     });
+            //
+            //     var config = {
+            //         method: 'post',
+            //         url: 'https://api.unimun.me/graphql',
+            //         headers: {
+            //             'token': UserToken(),
+            //             'Content-Type': 'application/json'
+            //         },
+            //         data: data
+            //     };
+            //
+            //     axios(config)
+            //         .then(function (response: any) {
+            //             console.log(JSON.stringify(response.data));
+            //         })
+            //         .catch(function (error: any) {
+            //             console.log(error);
+            //         });
 
-            createBook({
-                variables: {
-                    title: BookData.title,
-                    categoryID: BookData.categoryID,
-                    isPurchasable: BookData.price ? BookData.price !== 0 : false,
-                    isDownloadable: BookData.type === 'pdf',
-                    isBook: false,
-                    bookFiles: BookData.files,
-                    details: BookData.details,
-                    attachments: BookData.attachments,
-                    connectWay: connectWay,
-                    teacher: BookData.teacher,
-                    term: BookData.term,
-                    university: BookData.university,
-                    price: BookData.price,
-                    pages: BookData.pages,
+
+            // console.log(reactiveBookData)
+
+            if (reactiveBookData.isDownloadable) {
+                setShowUploadingFileLoading(true)
+
+                if (isBookFree) {
+
+                    uploadPublicBookFile(bookLocalFiles, () => {
+
+                    }, "Book_" + Math.random() * 99999999, (result: any) => {
+                        // console.log(result)
+                        setShowUploadingFileLoading(false)
+                        // console.log(result)
+                        updateBookData('bookFiles', [result.data])
+                        createBookFunc()
+
+                    }, (er: any) => {
+                        setShowUploadingFileLoading(false)
+                        Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
+                    }, (uploadProgress: any) => {
+                        // console.log(uploadProgress)
+
+                    })
+                } else {
+                    uploadPrivateBookFile(bookLocalFiles, () => {
+                    }, "Book_" + Math.random() * 99999999, (result: any) => {
+                        // console.log(result)
+                        updateBookData('bookFiles', [result.data])
+
+                        createBookFunc()
+
+                    }, (er: any) => {
+                        setShowUploadingFileLoading(false)
+                        Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
+
+                    }, (uploadProgress: any) => {
+                        // console.log((uploadProgress.loaded * 100) / uploadProgress.total)
+
+                        // setFileUploadPercentage(uploadProgress)
+                    })
                 }
-            }).then((e) => {
-                try {
-                    console.log(e)
-                    if (e.data.createBook.status === 'SUCCESS') {
-                        lastBookSubmitSuccess(e.data.createBook.data.id)
-                        router.push('/library')
-                    }
-                } catch (e) {
-                    console.log(e)
-                }
-            })
+            } else {
+                createBookFunc()
+            }
+
+
         }
+
 
     }
-        const removeEmptyProgresses = () => {
-            let updateUploadingProgress = [...uploadingProgress];
-            updateUploadingProgress.filter(item => {
-                return item !== 100 && item !== 0;
-            })
-            setUploadingProgress(updateUploadingProgress)
+    const removeEmptyProgresses = () => {
+        let updateUploadingProgress = [...uploadingProgress];
+        updateUploadingProgress.filter(item => {
+            return item !== 100 && item !== 0;
+        })
+        setUploadingProgress(updateUploadingProgress)
+    }
+
+    // const updateBookData = (param: string | any, value: string | any) => {
+    //     let updatedBookData = reactiveBookData;
+    //     //@ts-ignore
+    //     updatedBookData[`${param}`] = value;
+    //     setBookData({...updatedBookData});
+    // }
+    const updateBookData = (param: string | any, value: string | any) => {
+        const newBookData = produce(BookDataStore(), (draft: any) => {
+            draft[param] = value
+        })
+        BookDataStore(newBookData)
+    }
+
+    const bookVerification = () => {
+
+        if (currentStep === 0 && reactiveBookData.title && reactiveBookData.title.length > 2 && reactiveBookData.categoryID) {
+            return true
         }
-
-        const updateBookData = (param: string | any, value: string | any) => {
-            let updatedBookData = BookData;
-            //@ts-ignore
-            updatedBookData[`${param}`] = value;
-            setBookData({...updatedBookData});
-        }
-
-        const bookVerification = () => {
-
-            if (currentStep === 0 && BookData.title && BookData.title.length > 2 && BookData.categoryID) {
-                return true
-            }
-            if (currentStep === 1)
-                return true
+        if (currentStep === 1)
+            return true
             if (currentStep === 2) {
-                // if (contactType === 'phone' && connectWay.length === 11) {
+                if (!reactiveBookData.isDownloadable) {
+                    return true
+                }
+                if (reactiveBookData.isDownloadable && bookLocalFiles) {
+                    return true
+                } else {
+                    return false;
+                }
+
+
+                // if (contactType === 'phone' && reactiveBookData.connectWay.length === 11) {
                 //     return true
                 // }
-                // if (contactType === 'telegram' && connectWay.length > 3) {
+                // if (contactType === 'telegram' && reactiveBookData.connectWay.length > 3) {
                 //     return true
                 // }
 
-                if (BookData.isDownloadable && BookData.bookFiles.length) {
-                    return true
-                } else if (BookData.isDownloadable && !BookData.bookFiles.length) {
-                    return false
-                }
-                return true
+            }
+        return false
+    }
+
+    const DynamicMap = dynamic(() => import('../../components/normal/LocationBottomSheet/LocationBottomSheet'), {
+        ssr: false
+    });
+
+
+    return (
+        <div className={'pb-20 overflow-scroll h-full'}>
+            <ToastContainer/>
+            <UploadingFileLoading uploadPercentage={fileUploadPercentage} show={showUploadingFileLoading} dim={true}/>
+            <FullScreenLoading show={loading} dim={true}/>
+            {
+                locationBottomSheetOpen ?
+                    <DynamicMap
+                        defaultText={reactiveBookData.location ? reactiveBookData.location.text : ""}
+                        defaultLat={reactiveBookData.location ? reactiveBookData.location.lat : ""}
+                        defaultLon={reactiveBookData.location ? reactiveBookData.location.lon : ""}
+                        onClose={() => {
+                            setLocationBottomSheetOpen(false)
+                        }}
+                        onLatChanged={(val: string) => {
+                            lat.current = val;
+                        }}
+                        onLngChanged={(val: string) => {
+                            lon.current = val;
+                            console.log(lon)
+                        }}
+                        onTextChanged={(text: string) => {
+                            // console.log("address Changed")
+                            address.current = text
+                        }}
+                        onSubmit={(e: any) => {
+                            // console.log(address.current)
+                            if (!address.current) {
+                                Toast("لطفا فیلد آدرس را پر کنید", '', 2000, '', 50)
+                                return;
+                            }
+                            if (!(lat.current && lon.current)) {
+                                Toast("لطفا مکان را مشخص کنید", '', 2000, '', 50)
+                                return;
+                            }
+                            submitBook()
+
+
+                        }}/>
+                    :
+                    null
 
             }
 
-            return false
-        }
-
-        return (
-            <div className={'pb-20 overflow-scroll h-full'}>
-                <ToastContainer/>
-
-
-                <Dimmer onClose={() => {
-                    Sdimmer(false)
+            <Dimmer onClose={() => {
+                Sdimmer(false)
                     SlangDropDown(false)
                 }} show={dimmer}/>
                 <Header backOnClick={() => {
-                    console.log(currentStep)
+                    // console.log(currentStep)
                     if (currentStep > 0)
                         ScurrentStep(currentStep - 1)
                     else
@@ -392,7 +668,6 @@ const NewBrochure = () => {
                 {
                     categoryComponent ?
                         <BookCategories onCatSelected={(category: { id: string, title: string }) => {
-                            console.log(category)
                             updateBookData('categoryID', category.id)
                             updateBookData('categoryPersian', category.title)
                             _categoryComponent(false)
@@ -405,7 +680,7 @@ const NewBrochure = () => {
                     appearanceComponent ?
                         <BookAppearance
                             onAppearanceSelected={(appearance: { id: string, title: string, details: string }) => {
-                                console.log(appearance)
+                                // console.log(appearance)
                                 _appearanceComponent(false)
 
                                 updateBookData('appearance', appearance.title)
@@ -434,20 +709,20 @@ const NewBrochure = () => {
                 <div
                     className={`overflow-hidden new-book-dropdown fixed top-1/2 left-1/2 transition-all -translate-x-1/2 -translate-y-1/2  bg-white z-50 flex flex-col justify-center items-center rounded-2xl w-36 ${langDropDown ? 'opacity-100 scale-100 ' : 'opacity-0 scale-0'} `}>
                     <Button onClick={() => {
-                        let updatedBookData = BookData
-                        updatedBookData.language = 'persian'
-                        setBookData(updatedBookData)
-                        Sdimmer(false)
                         SlangDropDown(false)
+
+
+                        updateBookData('language', 'فارسی')
+                        Sdimmer(false)
                     }} id={'book-lang-f'} rippleColor={'rgba(0,0,0,0.3)'}
                             className={'w-full h-10 flex flex-col justify-center items-start IranSansMedium pr-3'}>
                         فارسی
                     </Button>
                     <div className={'new-divider'}/>
                     <Button onClick={() => {
-                        let updatedBookData = BookData
-                        updatedBookData.language = 'english'
-                        setBookData(updatedBookData)
+                        updateBookData('language', 'انگلیسی')
+
+
                         Sdimmer(false)
                         SlangDropDown(false)
                     }} id={'book-lang-e'} rippleColor={'rgba(0,0,0,0.3)'}
@@ -466,7 +741,8 @@ const NewBrochure = () => {
                                 }}
                                 className={'flex flex-row pt-5 justify-between items-center text-textDarker IranSansMedium'}>
                                 <span>دسته بندی</span>
-                                <span className={'text-textDark'}>{BookData.categoryPersian ?? "انتخاب دسته بندی"}</span>
+                                <span
+                                    className={'text-textDark'}>{reactiveBookData.categoryPersian ?? "انتخاب دسته بندی"}</span>
                             </div>
 
                             <div className={'new-divider mt-5'}/>
@@ -475,7 +751,7 @@ const NewBrochure = () => {
                             <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl  '}
                                    wrapperClassName={'px-3 h-14'}
                                    placeHolder={'جـزوه ی چه درسیه ؟'}
-                                   defaultValue={BookData.title}
+                                   defaultValue={reactiveBookData.title}
                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                        updateBookData('title', e.currentTarget.value)
                                    }}
@@ -493,7 +769,7 @@ const NewBrochure = () => {
                             <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
                                    wrapperClassName={'px-3 h-14'}
                                    placeHolder={'مال کدوم استاده ؟'}
-                                   defaultValue={BookData.teacher}
+                                   defaultValue={reactiveBookData.teacher}
                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                        updateBookData('teacher', e.currentTarget.value)
                                    }}
@@ -507,7 +783,7 @@ const NewBrochure = () => {
                             <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
                                    wrapperClassName={'px-3 h-14'}
                                    placeHolder={'کدوم دانشگاه ؟'}
-                                   defaultValue={BookData.university ?? ''}
+                                   defaultValue={reactiveBookData.university ?? ''}
                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                        updateBookData('university', e.currentTarget.value)
                                    }}
@@ -524,7 +800,7 @@ const NewBrochure = () => {
                             >
                                 <span>ترم ارائه درس <span className={'text-tiny text-textDarker'}>اختیاری</span></span>
                                 <span dir={'ltr'}
-                                      className={'text-textDark'}>{BookData.term.length ? BookData.term : "انتخاب کنید"}</span>
+                                      className={'text-textDark'}>{reactiveBookData.term ? reactiveBookData.term.length ? reactiveBookData.term : "انتخاب کنید" : "انتخاب کنید"}</span>
                             </div>
 
                         </section>
@@ -554,26 +830,33 @@ const NewBrochure = () => {
                                 className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-1س max-w-sm mx-auto'}>
                                 {
                                     Array(6).fill('').map((photos, index) => {
-                                        console.log(BookData)
+                                        console.log(reactiveBookData)
 
                                         return <div key={index + 'imageUpload'} className={'contents'}>
-                                            <BookImageUpload onImageClick={() => {
+                                            <BookImageUpload index={index}
+                                                             onImageClick={(indexOfSelectedImage: number) => {
+                                                                 setCurrentSelectedImage(indexOfSelectedImage)
+                                                                 console.log(indexOfSelectedImage)
 
-                                            }}
-                                                             defaultImage={BookData.attachments[index] ? DOWNLOAD_HOST() + (BookData.attachments[index] as { preview: string }).preview : ""}
+                                                                 setImageOptionsOpen(true)
+                                                             }}
+                                                             defaultImage={reactiveBookData.attachments[index] ? DOWNLOAD_HOST() + reactiveBookData.attachments[index].preview : ""}
                                                              isFirst={index === 0}
                                                              id={index.toString()}
                                                              onUploadComplete={(e: any) => {
-                                                                 let _bookAttachments: any[] = BookData.attachments;
-                                                                 _bookAttachments.push(e.data)
-                                                                 updateBookData('attachments', _bookAttachments)
+                                                                 if (typeof e.data !== 'number') {
+                                                                     let backBook = produce(BookDataStore().attachments, (draft: any) => {
+                                                                         draft.push(e.data)
+                                                                     })
+                                                                     console.log(e.data)
+                                                                     updateBookData('attachments', backBook)
 
-                                                                 setTimeout(() => {
-                                                                     console.log(BookData)
-                                                                 }, 1000)
-                                                                 console.log(e)
-                                                             }} onError={() => {
-                                                console.log('error')
+                                                                     console.log(e)
+
+                                                                 }
+
+                                                             }} onError={(e: any) => {
+                                                console.log(e)
                                             }} bookID={currentBookId.current} setUploading={setUploading}/>
                                         </div>
 
@@ -592,7 +875,7 @@ const NewBrochure = () => {
                                 className={'text-tiny text-textDarker'}>اختیاری</span></div>
 
                             <Input multiLine={true} id={'input'} numOnly={false}
-                                   defaultValue={BookData.details}
+                                   defaultValue={reactiveBookData.details}
                                    inputClassName={'IranSans rounded-xl h-32 mt-5  border-primary border-2  pt-2 px-3 w-full outline-0 '}
                                    wrapperClassName={''}
                                    onChange={(e: InputEvent) => {
@@ -609,7 +892,7 @@ const NewBrochure = () => {
                             {/*        // Sdimmer(true)*/}
                             {/*        // SlangDropDown(true)*/}
                             {/*    }}*/}
-                            {/*          className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
+                            {/*          className={'text-textDark'}>{!reactiveBookData.language ? "انتخاب کنید" : reactiveBookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
                             {/*</div>*/}
                             {/*<div className={'new-divider mt-5'}/>*/}
                             {/*<div*/}
@@ -619,7 +902,7 @@ const NewBrochure = () => {
                             {/*        // Sdimmer(true)*/}
                             {/*        // SlangDropDown(true)*/}
                             {/*    }}*/}
-                            {/*          className={'text-textDark'}>{!BookData.language ? "انتخاب کنید" : BookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
+                            {/*          className={'text-textDark'}>{!reactiveBookData.language ? "انتخاب کنید" : reactiveBookData.language === "persian" ? "فارسی" : "انگلیسی"}</span>*/}
                             {/*</div>*/}
                         </div>
 
@@ -634,15 +917,14 @@ const NewBrochure = () => {
                             <div
                                 className={'w-4/5 mx-auto p-0 flex flex-row mt-3 items-center justify-between overflow-hidden rounded-lg relative border border-primary h-10'}>
                                 <div
-                                    className={`absolute w-1/2  top-0 h-full bg-primary transition-all ease-in-out ${BookData.type === 'physical' ? 'left-0' : 'left-1/2'}`}></div>
+                                    className={`absolute w-1/2  top-0 h-full bg-primary transition-all ease-in-out ${reactiveBookData.type === 'physical' ? 'left-0' : 'left-1/2'}`}></div>
                                 <div
-                                    className={`IranSansMedium relative transition-all h-full leading-9 ${BookData.type === 'pdf' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
+                                    className={`IranSansMedium relative transition-all h-full leading-9 ${reactiveBookData.type === 'pdf' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                     onClick={() => {
-                                        updateBookData('type', 'pdf')
-                                        updateBookData('isDownloadable', true)
-                                        updateBookData('isPurchasable', false)
-                                        updateBookData('price', 0)
-                                        freeCheckBox!.current!.checked = true;
+                                        if (!strictTypeMode) {
+                                            updateBookData('type', 'pdf')
+                                            updateBookData('isDownloadable', true)
+                                        }
 
                                     }}>
                                     <div
@@ -657,12 +939,13 @@ const NewBrochure = () => {
                                     </div>
                                 </div>
                                 <div
-                                    className={`IranSansMedium transition-all h-full leading-9 ${BookData.type === 'physical' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
+                                    className={`IranSansMedium transition-all h-full leading-9 ${reactiveBookData.type === 'physical' ? 'text-white' : 'text-black'} z-10 w-full text-center`}
                                     onClick={() => {
-                                        updateBookData('type', 'physical')
-
-                                        updateBookData('isDownloadable', false)
-
+                                        if (!strictTypeMode) {
+                                            updateBookData('type', 'physical')
+                                            updateBookData('isDownloadable', false)
+                                            // updateBookData('price', lastPrice.current)
+                                        }
 
                                     }}>جـزوه فیـزیکـی
                                 </div>
@@ -674,7 +957,7 @@ const NewBrochure = () => {
 
 
                         <section
-                            className={`bg-white w-full  ${BookData.type !== 'pdf' ? 'h-0 overflow-hidden ' : 'px-3 pt-5 pb-5'} `}>
+                            className={`bg-white w-full  ${reactiveBookData.type !== 'pdf' ? 'h-0 overflow-hidden ' : 'px-3 pt-5 pb-5'} `}>
                             {/*<div*/}
                             {/*    className={'new-file  flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>*/}
                             {/*    <input type={"file"} className={'absolute w-full h-full top-0 left-0 opacity-0 z-10'}*/}
@@ -700,7 +983,7 @@ const NewBrochure = () => {
                             {/*                               // updateUploadingProgress[uploadingProgress.length] = 0;*/}
                             {/*                               // setUploadingProgress(updateUploadingProgress)*/}
                             {/*                               let files = [];*/}
-                            {/*                               files = BookData.files*/}
+                            {/*                               files = reactiveBookData.files*/}
 
                             {/*                               files.push({*/}
                             {/*                                   url: response.data.url as never,*/}
@@ -711,7 +994,7 @@ const NewBrochure = () => {
                             {/*                               fileNames.push(fileName)*/}
                             {/*                               updateBookData('files', [...files])*/}
                             {/*                               updateBookData('fileNames', [...fileNames])*/}
-                            {/*                               console.log(BookData)*/}
+                            {/*                               console.log(reactiveBookData)*/}
                             {/*                               removeEmptyProgresses()*/}
                             {/*                           }*/}
                             {/*                       }, (error: any) => {*/}
@@ -769,54 +1052,57 @@ const NewBrochure = () => {
                                                setFileName(fileName)
                                                setBookUploadState('uploading')
 
+                                               setBookLocalFiles(e.currentTarget.files[0] as any)
+                                               return 0
 
-                                               uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {
-                                                       console.log(response)
-                                                       _fileUploadingPercentage('0')
-                                                       if (response.data.validMimes) {
-                                                           Toast("فرمت فایل معتبر نیست")
-                                                       } else if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
-                                                           console.log('request success')
-                                                           console.log(response.data.url)
-                                                           let files = [] as any;
 
-                                                           files.concat(BookData.bookFiles)
-
-                                                           try {
-                                                               files.push({
-                                                                   url: response.data.url as never,
-                                                                   type: 'pdf' as never,
-                                                                   mime: 'pdf' as never,
-                                                               } as never);
-                                                           } catch (e) {
-                                                               console.log(e)
-                                                           }
-
-                                                           console.log(files)
-                                                           console.log("was files")
-                                                           let fileNames = []
-                                                           fileNames.push(fileName)
-                                                           updateBookData('bookFiles', [...files])
-                                                           // updateBookData('fileNames', [...fileNames])
-                                                           removeEmptyProgresses()
-                                                           setBookUploadState('uploaded')
-
-                                                       } else {
-                                                           Toast('خطا در آپلود فایل، دوباره تلاش کنید')
-                                                           setBookUploadState('')
-
-                                                       }
-                                                   }, (error: any) => {
-                                                       Sdimmer(false)
-                                                       setBookUploadState('')
-                                                   },
-                                                   (progressEvent: any) => {
-                                                       let percentCompleted = Math.round(
-                                                           (progressEvent.loaded * 100) / progressEvent.total
-                                                       );
-                                                       _fileUploadingPercentage(percentCompleted as any)
-                                                   }
-                                               )
+                                               // uploadBookFile(e.currentTarget.files[0], removeEmptyProgresses, currentBookId.current, (response: any) => {
+                                               //         console.log(response)
+                                               //         _fileUploadingPercentage('0')
+                                               //         if (response.data.validMimes) {
+                                               //             Toast("فرمت فایل معتبر نیست")
+                                               //         } else if (response.data !== 500 && response.data !== 401 && response.data !== 400) {
+                                               //             console.log('request success')
+                                               //             console.log(response.data.url)
+                                               //             let files = [] as any;
+                                               //
+                                               //             files.concat(reactiveBookData.bookFiles)
+                                               //
+                                               //             try {
+                                               //                 files.push({
+                                               //                     url: response.data.url as never,
+                                               //                     type: 'pdf' as never,
+                                               //                     mime: 'pdf' as never,
+                                               //                 } as never);
+                                               //             } catch (e) {
+                                               //                 console.log(e)
+                                               //             }
+                                               //
+                                               //             console.log(files)
+                                               //             console.log("was files")
+                                               //             let fileNames = []
+                                               //             fileNames.push(fileName)
+                                               //             updateBookData('bookFiles', [...files])
+                                               //             // updateBookData('fileNames', [...fileNames])
+                                               //             removeEmptyProgresses()
+                                               //             setBookUploadState('uploaded')
+                                               //
+                                               //         } else {
+                                               //             Toast('خطا در آپلود فایل، دوبره تلاش کنید')
+                                               //             setBookUploadState('')
+                                               //
+                                               //         }
+                                               //     }, (error: any) => {
+                                               //         Sdimmer(false)
+                                               //         setBookUploadState('')
+                                               //     },
+                                               //     (progressEvent: any) => {
+                                               //         let percentCompleted = Math.round(
+                                               //             (progressEvent.loaded * 100) / progressEvent.total
+                                               //         );
+                                               //         _fileUploadingPercentage(percentCompleted as any)
+                                               //     }
+                                               // )
                                            }
 
                                            e.currentTarget.value = '';
@@ -850,21 +1136,19 @@ const NewBrochure = () => {
                                                         className={'flex flex-row-reverse justify-center items-center'}>
                                                         <div
                                                             className={"relative flex flex-col justify-center items-center mr-3"}>
-                                                            <CircularProgressBar sqSize={30} strokeWidth={3}
-                                                                                 percentage={parseInt(fileUploadingPercentage)}
-                                                                                 color={'#1DA1F2'}/>
+                                                            {/*<CircularProgressBar sqSize={30} strokeWidth={3}*/}
+                                                            {/*                     percentage={parseInt(fileUploadingPercentage)}*/}
+                                                            {/*                     color={'#1DA1F2'}/>*/}
 
-                                                            <span
-                                                                className={'block text-textDarker absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 IranSansMedium scale-90'}>{fileUploadingPercentage}</span>
+                                                            {/*<span*/}
+                                                            {/*    className={'block text-textDarker absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 IranSansMedium scale-90'}>{fileUploadingPercentage}</span>*/}
                                                         </div>
-                                                        {
-                                                            parseInt(fileUploadingPercentage) ?
-                                                                <span dir={'ltr'}
-                                                                      className={'IranSansMedium text-sm'}>{`${(fileSize * parseInt(fileUploadingPercentage) / 100).toFixed(2)} MB / ${fileSize} MB`}</span> :
-                                                                <span dir={'ltr'}
-                                                                      className={'IranSansMedium text-sm'}>{`0MB / ${fileSize} MB`}</span>
 
-                                                        }
+
+                                                        <span dir={'ltr'}
+                                                              className={'IranSansMedium text-sm'}>{`${fileSize} MB`}</span>
+
+
                                                     </div>
 
                                                     :
@@ -899,63 +1183,61 @@ const NewBrochure = () => {
                                 </div>
                             </div>
 
-                            {
-                                BookData.fileNames.map((file: { name: string }) => {
+                            {/*                {*/}
+                            {/*                    reactiveBookData.fileNames.map((file: { name: string }) => {*/}
 
-                                    return (
-                                        <div key={file.name}
-                                             className={'new-file mt-4 flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>
-                                            <div className={'file w-full flex flex-row justify-between items-center my-3'}>
-                                                <div className={'file-right flex flex-row justify-center items-center'}>
-                                                    <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><FileSVG/>
-                                                    </div>
-                                                    <div className={'IranSansMedium w-24 mr-4 opacity-60 overflow-hidden'}>
+                            {/*                        return (*/}
+                            {/*                            <div key={file.name}*/}
+                            {/*                                 className={'new-file mt-4 flex flex-col justify-center items-center max-w-sm border-2 border-dashed  rounded-2xl mx-auto px-4 relative'}>*/}
+                            {/*                                <div className={'file w-full flex flex-row justify-between items-center my-3'}>*/}
+                            {/*                                    <div className={'file-right flex flex-row justify-center items-center'}>*/}
+                            {/*                                        <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><FileSVG/>*/}
+                            {/*                                        </div>*/}
+                            {/*                                        <div className={'IranSansMedium w-24 mr-4 opacity-60 overflow-hidden'}>*/}
 
-                <span
-                    className={'block w-full ml-0  whitespace-nowrap overflow-hidden'}>
-            {file.name}
+                            {/*    <span*/}
+                            {/*        className={'block w-full ml-0  whitespace-nowrap overflow-hidden'}>*/}
+                            {/*{file.name}*/}
 
-                </span>
+                            {/*    </span>*/}
 
-                                                    </div>
-                                                </div>
-                                                <div dir={'ltr'} className={'IranSans w-7 h-7 '}><DownloadFileSVG/></div>
-                                            </div>
-                                        </div>
-
-
+                            {/*                                        </div>*/}
+                            {/*                                    </div>*/}
+                            {/*                                    <div dir={'ltr'} className={'IranSans w-7 h-7 '}><DownloadFileSVG/></div>*/}
+                            {/*                                </div>*/}
+                            {/*                            </div>*/}
 
 
-                                        // <a href={DOWNLOAD_HOST + '/' + file.url} rel={'noreferrer'}
-                                        //    target={'_blank'} key={file.url} className={'block w-full flex flex-row-reverse justify-center border border-gray-300 max-w-sm rounded-2xl  items-center mt-4 mx-auto'}>
-                                        //     <div
-                                        //         className={'file w-full flex flex-col justify-between items-center my-3'}>
-                                        //         <div
-                                        //             className={'file-right  w-96 flex flex-row justify-center items-center'}>
-                                        //             <div dir={'ltr'}
-                                        //                  className={'h-10 w-10 m-0 overflow-hidden'}>
-                                        //                 <FileSVG/></div>
-                                        //             <div
-                                        //                 className={'IranSansMedium mr-2 w-20 overflow-hidden'}>{file.name}</div>
-                                        //             <div dir={'ltr'}
-                                        //                  className={'download-holder w-4 h-4 mr-2'}>
-                                        //                 <DownloadFileSVG/>
-                                        //             </div>
-                                        //         </div>
-                                        //         {/*<div dir={'ltr'} className={'IranSans'}>{"12.5 MB"}</div>*/}
-                                        //     </div>
-                                        //
-                                        //
-                                        // </a>
-                                    )
+                            {/*                            // <a href={DOWNLOAD_HOST + '/' + file.url} rel={'noreferrer'}*/}
+                            {/*                            //    target={'_blank'} key={file.url} className={'block w-full flex flex-row-reverse justify-center border border-gray-300 max-w-sm rounded-2xl  items-center mt-4 mx-auto'}>*/}
+                            {/*                            //     <div*/}
+                            {/*                            //         className={'file w-full flex flex-col justify-between items-center my-3'}>*/}
+                            {/*                            //         <div*/}
+                            {/*                            //             className={'file-right  w-96 flex flex-row justify-center items-center'}>*/}
+                            {/*                            //             <div dir={'ltr'}*/}
+                            {/*                            //                  className={'h-10 w-10 m-0 overflow-hidden'}>*/}
+                            {/*                            //                 <FileSVG/></div>*/}
+                            {/*                            //             <div*/}
+                            {/*                            //                 className={'IranSansMedium mr-2 w-20 overflow-hidden'}>{file.name}</div>*/}
+                            {/*                            //             <div dir={'ltr'}*/}
+                            {/*                            //                  className={'download-holder w-4 h-4 mr-2'}>*/}
+                            {/*                            //                 <DownloadFileSVG/>*/}
+                            {/*                            //             </div>*/}
+                            {/*                            //         </div>*/}
+                            {/*                            //         /!*<div dir={'ltr'} className={'IranSans'}>{"12.5 MB"}</div>*!/*/}
+                            {/*                            //     </div>*/}
+                            {/*                            //*/}
+                            {/*                            //*/}
+                            {/*                            // </a>*/}
+                            {/*                        )*/}
 
-                                })
-                            }
+                            {/*                    })*/}
+                            {/*                }*/}
 
                         </section>
 
                         <div
-                            className={`w-full h-10 IranSans text-textDarker text-sm  ${BookData.type !== 'pdf' ? 'h-0 hidden overflow-hidden ' : 'px-3 mt-3 mb-3'} `}>
+                            className={`w-full h-10 IranSans text-textDarker text-sm  ${reactiveBookData.type !== 'pdf' ? 'h-0 hidden overflow-hidden ' : 'px-3 mt-3 mb-3'} `}>
                             محدودیت آپلود برای کتاب ها 500 مگابایت است
                         </div>
 
@@ -978,16 +1260,26 @@ const NewBrochure = () => {
                                 <span className={'IranSansMedium'}>فروش به قیمت</span>
                                 <div
                                     className={'IranSansMedium h-10 w-20 flex flex-row justify-around items-center bg-background rounded-lg'}>
-                                    <input disabled={BookData.isDownloadable} id={'free-book'}
+                                    <input id={'free-book'}
                                            className={'free-checkbox'}
-                                           defaultValue={fixPrice(BookData.price)}
+                                        // defaultValue={fixPrice(reactiveBookData.price)}
                                            type={'checkbox'} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                        if (e.currentTarget.checked)
+                                        setIsBookFree(e.currentTarget.checked)
+
+                                        if (e.currentTarget.checked) {
+                                            //todo this state just added
                                             updateBookData('price', 0)
-                                        else if (priceInputRef.current)
-                                            updateBookData('price', 20000)
+                                            setIsBookFree(true)
+                                        } else if (priceInputRef.current) {
+                                            setIsBookFree(false);
+                                            if (priceInputRef.current)
+                                                if (parseInt((priceInputRef.current as HTMLInputElement).value) > 0) {
+                                                    updateBookData('price', '5000');
+                                                    (priceInputRef.current as HTMLInputElement).value = ('5000' ?? "").split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
 
+                                                }
 
+                                        }
                                     }} ref={freeCheckBox}/>
                                     <label htmlFor={'free-book'}> رایگان</label>
                                 </div>
@@ -995,13 +1287,15 @@ const NewBrochure = () => {
 
 
                             <div
-                                className={`${BookData.price === 0 ? 'grayscale pointer-events-none' : ''} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
+                                className={`transition-all ${isBookFree ? 'opacity-0 overflow-hidden border-none h-0 grayscale pointer-events-none' : 'opacity-100'} border-primary border-2 w-11/12 mx-auto h-14  rounded-xl mt-5 flex flex-row-reverse justify-start items-center`}>
                                 <div className={'w-10 h-10 mx-2 p-2'}>
                                     <Toman/>
                                 </div>
+                                {/*todo theres a bug when user wants to edit its always 20000*/}
+
                                 <div className={'h-3/5 bg-gray-400 w-0 border'}/>
                                 <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'}
-                                       defaultValue={fixPrice(BookData.price) ?? '20,000'}
+                                       defaultValue={fixPrice(parseInt(reactiveBookData.price)) ?? '20,000'}
                                        numOnly={false}
 
                                        inputClassName={'border-0 border-transparent text-left text-lg IranSansBold rounded-xl'}
@@ -1010,7 +1304,8 @@ const NewBrochure = () => {
                                            let el = e.currentTarget as HTMLInputElement
                                            updateBookData('price', parseInt(el.value.replace(',', '')))
                                            el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
-
+                                           if (lastPrice.current)
+                                               lastPrice.current = el.value.toString()
                                        }}
                                 />
                             </div>

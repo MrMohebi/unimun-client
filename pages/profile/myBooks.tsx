@@ -205,9 +205,9 @@ const MyBooks = () => {
                                     نیست شما که از خودمونی :)</div>}
                                 className={''}
                                 pullDownToRefreshThreshold={90} refreshFunction={() => {
-                    console.log('rfreshing')
+                    // console.log('rfreshing')
                 }} pullDownToRefresh={true} scrollableTarget={'my-books-scroller'} next={() => {
-                    console.log('gettin new')
+                    // console.log('gettin new')
 
                 }} hasMore={false} loader={<h1>loading</h1>} dataLength={5}>
 
@@ -291,7 +291,7 @@ const MyBooks = () => {
 
                                                 onClick={() => {
                                                     EditBookData(item)
-                                                    console.log(item)
+                                                    // console.log(item)
 
                                                     router.push(book.isBook ? "/library/newBook" : "/library/newBrochure")
                                                 }}
@@ -319,7 +319,7 @@ const MyBooks = () => {
 
                                                             }).then((value) => {
                                                                 setLoading(false)
-                                                                console.log(value);
+                                                                // console.log(value);
                                                                 _myBooks(produce(draft => {
 
                                                                     draft.forEach((item: { id: string, status: string }) => {

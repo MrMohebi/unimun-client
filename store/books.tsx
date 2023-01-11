@@ -1,6 +1,7 @@
 import {makeVar} from "@apollo/client";
 
 export const lastBookSubmitSuccess = makeVar('')
+export const lastBrochureSubmitSuccess = makeVar('')
 export const isBrochure = makeVar(false)
 export const BooksStore = makeVar([] as object[])
 export const BooksEndCursor = makeVar("")

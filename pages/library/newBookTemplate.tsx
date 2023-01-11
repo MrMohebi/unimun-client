@@ -158,7 +158,7 @@ const NewBook = () => {
                 return true
             })
 
-            console.log(EditBookData())
+            // console.log(EditBookData())
             try {
 
                 updateBookData('title', EditBookData()?.title)
@@ -204,7 +204,7 @@ const NewBook = () => {
 
 
             } catch (e) {
-                console.log(e)
+                // console.log(e)
                 Toast('خطا در هنگام ویرایش کتاب')
             }
             EditBookData({})
@@ -268,7 +268,7 @@ const NewBook = () => {
                 }
             })
         } else {
-            console.log(BookData)
+            // console.log(BookData)
 
             createBook({
                 variables: {
@@ -289,13 +289,7 @@ const NewBook = () => {
                     language: BookData.language
                 }
             }).then((e) => {
-                try {
-                    console.log(e)
 
-                } catch (e) {
-                    console.log(e)
-
-                }
             })
         }
 
@@ -345,7 +339,7 @@ const NewBook = () => {
                 SlangDropDown(false)
             }} show={dimmer}/>
             <Header backOnClick={() => {
-                console.log(currentStep)
+                // console.log(currentStep)
                 if (currentStep > 0)
                     ScurrentStep(currentStep - 1)
                 else

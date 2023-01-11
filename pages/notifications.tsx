@@ -46,7 +46,7 @@ const Notifications = () => {
             router.push('/profile/login')
         } else {
             getNotifications().then(e => {
-                console.log(e)
+                // console.log(e)
                 if (e.data)
                     try {
                         sNotifications(e.data.notifications.edges)

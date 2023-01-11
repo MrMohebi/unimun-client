@@ -9,7 +9,7 @@ import {
     EditBookData,
     EmptyBook,
     LastBooksScrollPosition,
-    lastBookSubmitSuccess
+    lastBookSubmitSuccess, lastBrochureSubmitSuccess
 } from "../../store/books";
 import Toast from "../../components/normal/Toast/Toast";
 import {gql, useLazyQuery, useQuery, useReactiveVar} from "@apollo/client";
@@ -124,10 +124,15 @@ const Index = () => {
     useEffect(() => {
 
 
-
         if (lastBookSubmitSuccess().length) {
-            console.log('thee should be an alert for new book')
+            // console.log('thee should be an alert for new book')
             Toast('کتاب شما ثبت شد و  در انتظار بررسی است')
+            lastBookSubmitSuccess('')
+        }
+
+        if (lastBrochureSubmitSuccess().length) {
+            // console.log('thee should be an alert for new book')
+            Toast('جزوه شما ثبت شد و  در انتظار بررسی است')
             lastBookSubmitSuccess('')
         }
 
@@ -763,6 +768,8 @@ const Index = () => {
                     افزودن کتاب
                 </Button>
                 <Button id={'new-note-option'} rippleColor={'rgba(0,0,0,0.24)'} onClick={() => {
+                    EditBookData({})
+                    BookDataStore(EmptyBook());
                     // isBrochure(true)
                     if (UserToken())
                         router.push('library/newBrochure')

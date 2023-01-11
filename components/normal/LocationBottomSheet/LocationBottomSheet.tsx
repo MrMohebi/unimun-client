@@ -50,7 +50,7 @@ const LocationBottomSheet = (props: {
                     let lat = map.getCenter().lat
                     let lon = map.getCenter().lng
 
-                    console.log(map.getCenter())
+                    // console.log(map.getCenter())
                     props.onLatChanged(lat)
                     setMarkerX(lat)
                     props.onLngChanged(lon)
@@ -84,7 +84,7 @@ const LocationBottomSheet = (props: {
             setMarkerY(parseFloat(props.defaultLon))
 
         if (props.defaultText) {
-            console.log('there is default text')
+            // console.log('there is default text')
             props.onTextChanged(props.defaultText)
             props.onLatChanged(props.defaultLat)
             props.onLngChanged(props.defaultLon)
