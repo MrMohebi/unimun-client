@@ -172,13 +172,14 @@ const Wallet = () => {
                     <HelpSvg/>
                 </div>
             </div>
+            <ToastContainer/>
 
             <FullScreenLoading whiteBack={true} show={loading}/>
-            <BottomSheet open={payRequestOpen} onClose={() => {
-                setPayRequestOpen(false)
-            }}>
+            <BottomSheet open={payRequestOpen}
+                         onClose={() => {
+                             setPayRequestOpen(false)
+                         }}>
 
-                <ToastContainer/>
                 <div className={' w-full bg-transparent flex flex-col justify-start items-center pt-4 '}>
 
                     <span
@@ -300,7 +301,7 @@ const Wallet = () => {
 
 
                     }} className={'w-11/12 bg-primary h-14 text-white rounded-2xl mt-5'}>
-                        <span className={'IranSansMedium'}>درخواست وجه</span>
+                        <span className={'IranSansMedium'}>واریز وجه</span>
                     </Button>
 
                     <div className={'h-4'}></div>

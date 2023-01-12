@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import ImageSlider from "../../../components/normal/ImageSlider/ImageSlider";
-import {gql, useLazyQuery, useMutation} from "@apollo/client";
+import {gql, useLazyQuery, useMutation, useQuery} from "@apollo/client";
 import Button from "../../../components/view/Button/Button";
 import Toman from '../../../assets/svgs/toman.svg'
 import Pdf from '../../../assets/svgs/pdf.svg'
@@ -23,6 +23,7 @@ import {CurrentChatUserData} from "../../../store/chat";
 import {GET_SUPPORT_CHAT_QUERY, NEW_MESSAGE_MUTATION} from "../../../Requests/GlobalRequests/GlobalRequests";
 import LoginBottomSheet from "../../../components/normal/LoginBottomSheet/LoginBottomSheet";
 import FullScreenLoading from "../../../components/normal/FullScreenLoading/FullScreenLoading";
+import Toast from "../../../components/normal/Toast/Toast";
 
 
 interface Props {
@@ -86,6 +87,18 @@ const Book = (props: Props) => {
         }
     `
 
+    const BUY_BOOK_MUTATION = gql`
+        mutation ($id:ID!) {
+            buyDigitalBook(id: $id) {
+                message
+                data {
+                    cypher
+                }
+            }
+        }
+    `
+    const [buyBook, buyBookResult] = useMutation(BUY_BOOK_MUTATION);
+
     const LIKE_BOOK_MUTATIOn = gql`
         mutation likeBook($id:ID! $like:Boolean!) {
             likeBook(id: $id, isLiked: $like){
@@ -116,7 +129,11 @@ const Book = (props: Props) => {
     // const [bookConnectMutation, {loading, data, error}] = useMutation(bookConnectQuery)
     // const [getUser, getUserResults] = useLazyQuery(gql`${getUserQuery(['id', 'name', 'created_at', 'phone', 'referenceCode','username','bio','level','xpLevelPercentage']).query}`)
 
-    const [getBook, getBookResults] = useLazyQuery(getBookQuery)
+    const getBook = useQuery(getBookQuery, {
+        variables: {
+            id: window.location.href.split('/')[window.location.href.split('/').length - 1]
+        }
+    })
     const [fullScreenLoading, setFullScreenLoading] = useState(false);
 
     const [isBook, setIsBook] = useState(true);
@@ -129,24 +146,25 @@ const Book = (props: Props) => {
     const [btnLoading, setBtnLoading] = useState(false);
     const [bookIsLiked, setBookIsLiked] = useState(false);
     useEffect(() => {
-
         let bookId = window.location.href.split('/')[window.location.href.split('/').length - 1]
         setBookId(bookId)
-        getBook({variables: {id: bookId}}).then((e) => {
+
+
+        if (getBook.data) {
             try {
-                _book(e.data.book.data)
-                setIsBook(e.data.book.data.isBook)
+                _book(getBook.data.book.data)
+                setIsBook(getBook.data.book.data.isBook)
                 // console.log(e.data.book.data)
-                if (e.data.book.data.isLiked) {
+                if (getBook.data.book.data.isLiked) {
                     setBookIsLiked(true)
                 }
             } catch (e) {
                 console.log(e)
             }
-        })
+        }
 
 
-    }, [])
+    }, [getBook])
 
 
     const [newMessage, newMessageResult] = useMutation(NEW_MESSAGE_MUTATION, {client: clientChat})
@@ -205,9 +223,11 @@ const Book = (props: Props) => {
 
     }
 
+
     return (
         <div className={'overflow-scroll h-full'}>
 
+            <ToastContainer/>
             <LoginBottomSheet open={loginOpen} onClose={() => {
                 setLoginOpen(false)
             }} onLoginComplete={() => {
@@ -246,7 +266,7 @@ const Book = (props: Props) => {
             {/*/>book*/}
 
             <ToastContainer/>
-            <FullScreenLoading dim={true} show={fullScreenLoading || getBookResults.loading}/>
+            <FullScreenLoading dim={true} show={fullScreenLoading || getBook.loading}/>
             {/*    <Dimmer show={getBookResults.loading} onClose={() => {*/}
 
 
@@ -550,6 +570,23 @@ const Book = (props: Props) => {
                                         if (!btnLoading) {
                                             if (book.isDownloadable) {
                                                 if (book.bookFiles.length) {
+                                                    if (book.isPurchasable && !book.bookFiles[0].cypher) {
+                                                        setFullScreenLoading(true)
+                                                        buyBook({
+                                                            variables: {
+                                                                id: bookId
+                                                            }
+                                                        }).then((e) => {
+                                                            setFullScreenLoading(false)
+                                                            console.log(e)
+                                                            if (e.data.buyDigitalBook.message) {
+                                                                Toast(e.data.buyDigitalBook.message);
+                                                            }
+                                                            if (e.data.buyDigitalBook.cypher) {
+                                                                window.open(DOWNLOAD_HOST() + e.data.buyDigitalBook.cypher, '_blank')
+                                                            }
+                                                        })
+                                                    }
                                                     window.open(DOWNLOAD_HOST() + book.bookFiles[0].url, '_blank')
                                                 }
                                             } else {
@@ -579,9 +616,25 @@ const Book = (props: Props) => {
                                                     <div className={'h-6 w-6'}>
                                                         <DownloadBold/>
                                                     </div>
-                                                    <span
-                                                        className={'text-white block mr-3 '}
-                                                        style={{fontSize: '1rem'}}>{book.isBook ? 'دانـلود کتـاب' : 'دانـلود جـزوه'}</span>
+
+                                                    {
+                                                        book.isPurchasable && !book.bookFiles[0].cypher ?
+                                                            <span
+                                                                className={'text-white block mr-3 '}
+                                                                style={{fontSize: '1rem'}}>
+                                                        {book.isBook ? 'خرید و دانـلود کتـاب' : 'خرید و دانـلود جـزوه'}
+                                                    </span>
+
+                                                            :
+
+                                                            <span
+                                                                className={'text-white block mr-3 '}
+                                                                style={{fontSize: '1rem'}}>
+                                                        {book.isBook ? 'دانـلود کتـاب' : 'دانـلود جـزوه'}
+                                                    </span>
+                                                    }
+
+
                                                 </div>
                                                 <div className={'flex px-3 flex-row justify-center items-center'}>
 
