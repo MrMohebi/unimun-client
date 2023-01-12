@@ -378,7 +378,6 @@ const NewBrochure = () => {
         updateBookData('isBook', false)
 
         if (!reactiveBookData.isDownloadable && !locationBottomSheetOpen) {
-            // console.log('open')
             setLocationBottomSheetOpen(true)
             return;
         }
@@ -510,8 +509,8 @@ const NewBrochure = () => {
                         setShowUploadingFileLoading(false)
                         Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
                     }, (uploadProgress: any) => {
-                        // console.log(uploadProgress)
-
+                        let percentage = (uploadProgress.loaded * 100) / uploadProgress.total;
+                        setFileUploadPercentage((Math.floor(percentage)))
                     })
                 } else {
                     uploadPrivateBookFile(bookLocalFiles, () => {
@@ -526,6 +525,8 @@ const NewBrochure = () => {
                         Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
 
                     }, (uploadProgress: any) => {
+                        let percentage = (uploadProgress.loaded * 100) / uploadProgress.total;
+                        setFileUploadPercentage((Math.floor(percentage)))
                         // console.log((uploadProgress.loaded * 100) / uploadProgress.total)
 
                         // setFileUploadPercentage(uploadProgress)
@@ -568,25 +569,25 @@ const NewBrochure = () => {
         }
         if (currentStep === 1)
             return true
-            if (currentStep === 2) {
-                if (!reactiveBookData.isDownloadable) {
-                    return true
-                }
-                if (reactiveBookData.isDownloadable && bookLocalFiles) {
-                    return true
-                } else {
-                    return false;
-                }
-
-
-                // if (contactType === 'phone' && reactiveBookData.connectWay.length === 11) {
-                //     return true
-                // }
-                // if (contactType === 'telegram' && reactiveBookData.connectWay.length > 3) {
-                //     return true
-                // }
-
+        if (currentStep === 2) {
+            if (!reactiveBookData.isDownloadable) {
+                return true
             }
+            if (reactiveBookData.isDownloadable && bookLocalFiles) {
+                return true
+            } else {
+                return false;
+            }
+
+
+            // if (contactType === 'phone' && reactiveBookData.connectWay.length === 11) {
+            //     return true
+            // }
+            // if (contactType === 'telegram' && reactiveBookData.connectWay.length > 3) {
+            //     return true
+            // }
+
+        }
         return false
     }
 
@@ -617,11 +618,9 @@ const NewBrochure = () => {
                             console.log(lon)
                         }}
                         onTextChanged={(text: string) => {
-                            // console.log("address Changed")
                             address.current = text
                         }}
                         onSubmit={(e: any) => {
-                            // console.log(address.current)
                             if (!address.current) {
                                 Toast("لطفا فیلد آدرس را پر کنید", '', 2000, '', 50)
                                 return;
@@ -666,16 +665,16 @@ const NewBrochure = () => {
                 if (currentStep > 0)
                     ScurrentStep(currentStep - 1)
                 else
-                        router.push('/library')
+                    router.push('/library')
 
-                }} back={true} title={'افزودن جزوه'}/>
+            }} back={true} title={'افزودن جزوه'}/>
 
-                {
-                    showSemester ?
-                        <Semesters onCatSelected={(e: string) => {
-                            setShowSemester(false)
+            {
+                showSemester ?
+                    <Semesters onCatSelected={(e: string) => {
+                        setShowSemester(false)
 
-                            if (e.length) {
+                        if (e.length) {
                                 setChosenSemester(e)
                                 updateBookData('term', e)
                             }

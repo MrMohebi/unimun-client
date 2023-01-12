@@ -32,7 +32,7 @@ const UploadingFileLoading = (props: { show: boolean, dim?: boolean, whiteBack?:
                 <div className={'w-40 h-40'} ref={lottieRef}></div>
 
                 <CircularProgressBar sqSize={40} strokeWidth={2} percentage={props.uploadPercentage} color={'#1da1f2'}/>
-                <p className={'IranSans'}>{props.uploadPercentage}%</p>
+                <p className={'IranSans mt-1'}>{props.uploadPercentage}%</p>
             </div>
 
             {/*<LoadingDialog wrapperClassName={'w-20 h-20 bg-white rounded-xl '} color={'#1da1f2'}/>*/}

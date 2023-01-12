@@ -116,7 +116,7 @@ const NewBook = () => {
     const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
     const [categoryComponent, _categoryComponent] = useState(false)
     const [appearanceComponent, _appearanceComponent] = useState(false)
-    const [fileUploadingPercentage, _fileUploadingPercentage] = useState('0')
+    const [fileUploadingPercentage, _fileUploadingPercentage] = useState(0)
     const [contactType, setContactType] = useState('')
     const [connectWay, setConnectWay] = useState('')
     const [langPosition, _langPosition] = useState([1000, 1000]);
@@ -318,7 +318,6 @@ const NewBook = () => {
     const submitBook = () => {
 
         if (!reactiveBookData.isDownloadable && !locationBottomSheetOpen) {
-            // console.log('open')
             setLocationBottomSheetOpen(true)
             return;
         }
@@ -348,6 +347,8 @@ const NewBook = () => {
         // console.log(BookDataStore())
 
         // return;
+
+
         if (editing) {
 
             updateBook({
@@ -372,66 +373,6 @@ const NewBook = () => {
             })
         } else {
 
-            //
-            //     let axios = require('axios');
-            //     let data = JSON.stringify({
-            //         query: `mutation createBook($text:String!,$lat:String!,$lon:String!, $isBook:Boolean! $pages:Int $isDownloadable:Boolean! $isPurchasable:Boolean! $categoryID:ID! $title:String $details:String $price:Int $language:String $writer:String $publisher:String $publishedDate:Int $appearanceID:ID $attachments:[UploadedFileInput] $bookFiles:[UploadedFileInput] $connectWay:String!){
-            //     createBook(
-            //         isBook:$isBook,
-            //         isDownloadable: $isDownloadable,
-            //         isPurchasable: $isPurchasable,
-            //         categoryID: $categoryID,
-            //         title: $title,
-            //         details: $details,
-            //         price: $price,
-            //         language: $language,
-            //         writer: $writer,
-            //         publisher: $publisher,
-            //         publishedDate: $publishedDate,
-            //         appearanceID: $appearanceID
-            //         bookFiles: $bookFiles,
-            //         attachments: $attachments,
-            //         connectWay:$connectWay
-            //         pages:$pages
-            //         location: {text: $text, lat: $lat, lon: $lon}
-            //     ){
-            //         status
-            //         data {
-            //             title
-            //             id
-            //         }
-            //         message
-            //     }
-            // }`,
-            //         variables: {
-            //             ...BookDataStore()
-            //             ,
-            //
-            //
-            //         }
-            //     });
-            //
-            //     var config = {
-            //         method: 'post',
-            //         url: 'https://api.unimun.me/graphql',
-            //         headers: {
-            //             'token': UserToken(),
-            //             'Content-Type': 'application/json'
-            //         },
-            //         data: data
-            //     };
-            //
-            //     axios(config)
-            //         .then(function (response: any) {
-            //             console.log(JSON.stringify(response.data));
-            //         })
-            //         .catch(function (error: any) {
-            //             console.log(error);
-            //         });
-
-
-            // console.log(reactiveBookData)
-
             if (reactiveBookData.isDownloadable) {
                 setShowUploadingFileLoading(true)
 
@@ -451,7 +392,8 @@ const NewBook = () => {
                         Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
                     }, (uploadProgress: any) => {
                         // console.log(uploadProgress)
-
+                        let percentage = (uploadProgress.loaded * 100) / uploadProgress.total;
+                        setFileUploadPercentage((Math.floor(percentage)))
                     })
                 } else {
                     uploadPrivateBookFile(bookLocalFiles, () => {
@@ -467,8 +409,8 @@ const NewBook = () => {
 
                     }, (uploadProgress: any) => {
                         // console.log((uploadProgress.loaded * 100) / uploadProgress.total)
-
-                        // setFileUploadPercentage(uploadProgress)
+                        let percentage = (uploadProgress.loaded * 100) / uploadProgress.total;
+                        setFileUploadPercentage((Math.floor(percentage)))                        // setFileUploadPercentage(uploadProgress)
                     })
                 }
             } else {
@@ -524,7 +466,8 @@ const NewBook = () => {
     return (
         <div ref={mainScroller} className={'pb-20 overflow-scroll h-full'}>
 
-            <UploadingFileLoading uploadPercentage={fileUploadPercentage} show={showUploadingFileLoading} dim={true}/>
+            <UploadingFileLoading uploadPercentage={fileUploadPercentage} show={showUploadingFileLoading}
+                                  dim={true}/>
 
             <FullScreenLoading show={loading} dim={true}/>
 
@@ -626,21 +569,21 @@ const NewBook = () => {
                     null
             }
 
-            {
-                fileUploadingPercentage && dimmer ?
-                    <div
+            {/*{*/}
+            {/*    fileUploadingPercentage && dimmer ?*/}
+            {/*        <div*/}
 
-                        className={'fixed top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-50 bg-white  rounded-3xl p-5'}>
-                        <CircularProgressBar sqSize={100} strokeWidth={2} percentage={parseInt(fileUploadingPercentage)}
-                                             color={'#0095ff'}/>
+            {/*            className={'fixed top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 z-50 bg-white  rounded-3xl p-5'}>*/}
+            {/*            <CircularProgressBar sqSize={100} strokeWidth={2} percentage={parseInt(fileUploadingPercentage)}*/}
+            {/*                                 color={'#0095ff'}/>*/}
 
-                        <div className={'absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-primary'}>
-                            {fileUploadingPercentage + '%'}
-                        </div>
-                    </div>
-                    :
-                    null
-            }
+            {/*            <div className={'absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-primary'}>*/}
+            {/*                {fileUploadingPercentage + '%'}*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*        :*/}
+            {/*        null*/}
+            {/*}*/}
 
 
             <StepperFragment step={currentStep}>

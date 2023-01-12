@@ -410,6 +410,7 @@ const Appeals = () => {
 
                             firstCatch.current = true;
                             gtAppeals.refetch().then((value) => {
+                                console.log(value)
                                 let tempAppeals = reactiveAppeals
                                 tempAppeals.reverse()
                                 tempAppeals.concat(_.difference(value.data.appeals.edges, reactiveAppeals))
