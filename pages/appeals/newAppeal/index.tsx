@@ -129,6 +129,7 @@ const Index = () => {
                 let percentCompleted = Math.round(
                     (progressEvent.loaded * 100) / progressEvent.total
                 );
+                setUploadFilePercentage(percentCompleted)
             }
         };
 
@@ -156,10 +157,11 @@ const Index = () => {
     }, [data, loading, error])
 
 
+    const [uploadFilePercentage, setUploadFilePercentage] = useState(0);
     return (
         <div className={'h-full  overflow-scroll'} ref={newAppealMainSection}>
 
-            <UploadingFileLoading dim={true} show={uploadingFile} uploadPercentage={0}/>
+            <UploadingFileLoading dim={true} show={uploadingFile} uploadPercentage={uploadFilePercentage}/>
             <BottomSheet onClose={() => {
                 setImageBottomSheetOpened(false)
             }} open={imageBottomSheetOpened}>

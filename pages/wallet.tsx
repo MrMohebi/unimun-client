@@ -120,7 +120,6 @@ const Wallet = () => {
 
     useEffect(() => {
         if (getWalletDataResult.data) {
-            console.log(getWalletDataResult.data)
             if (!UserToken())
                 router.push('/profile/login')
             else
@@ -141,7 +140,6 @@ const Wallet = () => {
         if (getTransactions.data) {
 
             setTransactions(getTransactions.data.transactions.edges)
-            console.log(getTransactions.data.transactions.edges)
 
         }
 
@@ -204,8 +202,6 @@ const Wallet = () => {
                         <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>سقف مبلغ قابل درخواست یک میلیون تومان میباشد</span>
                     </div>
                     <Button loading={bottomSheetBtnLoading} onClick={() => {
-                        console.log(balance)
-                        console.log(payRequestPrice)
 
                         if (payRequestPrice !== 0 && payRequestPrice <= balance) {
 
@@ -411,7 +407,6 @@ const Wallet = () => {
                     </div>
                     <div className={'w-full h-full overflow-scroll'}>
                         {transactions.map((item: any, index) => {
-                            console.log(item)
                             let transaction = item.node;
                             let deposit = false;
                             if (transaction.toWallet === walletID)

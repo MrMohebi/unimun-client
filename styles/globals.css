@@ -258,21 +258,19 @@ body {
   }
 }
 .react-loading-skeleton {
-  --base-color: #ebebeb;
-  --highlight-color: #f5f5f5;
-  --animation-duration: 1.5s;
-  --animation-direction: normal;
-  --pseudo-element-display: block;
-  /* Enable animation */
-  background-color: var(--base-color);
-  width: 100%;
-  border-radius: 0.25rem;
-  display: inline-flex;
-  line-height: 1;
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-  /* Necessary for overflow: hidden to work correctly in Safari */
+    --base-color: #ebebeb;
+    --highlight-color: #f5f5f5;
+    --animation-duration: 1.5s;
+    --animation-direction: normal;
+    --pseudo-element-display: block; /* Enable animation */
+    background-color: var(--base-color);
+    width: 100%;
+    border-radius: 0.25rem;
+    display: inline-flex;
+    line-height: 1;
+    position: relative;
+    overflow: hidden;
+    z-index: 1; /* Necessary for overflow: hidden to work correctly in Safari */
 }
 
 .react-loading-skeleton::after {
@@ -362,28 +360,35 @@ button {
 }
 
 body {
-  background-color: #F6F8FA;
+    background-color: #F6F8FA;
 }
 
 html,
 body,
 #__next {
-  margin: 0;
-  height: 100%;
+    margin: 0;
+    height: 100%;
 }
 
-* input[type=number]::-webkit-outer-spin-button,
-* input[type=number]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0;
 }
-* input[type=number] {
-  -moz-appearance: textfield;
+
+input[type=number] {
+    -moz-appearance: textfield !important;
+}
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 html, body {
-  margin: 0;
-  height: 100%;
+    margin: 0;
+    height: 100%;
 }
 
 * {
@@ -439,18 +444,19 @@ body * {
 }
 
 .center-placeholder::-webkit-input-placeholder {
-  text-align: center;
+    text-align: center;
 }
-.center-placeholder:-moz-placeholder {
-  /* Firefox 18- */
-  text-align: center;
+
+.center-placeholder:-moz-placeholder { /* Firefox 18- */
+    text-align: center;
 }
-.center-placeholder::-moz-placeholder {
-  /* Firefox 19+ */
-  text-align: center;
+
+.center-placeholder::-moz-placeholder { /* Firefox 19+ */
+    text-align: center;
 }
+
 .center-placeholder:-ms-input-placeholder {
-  text-align: center;
+    text-align: center;
 }
 
 .desktop {
@@ -488,35 +494,35 @@ body * {
 }
 
 textarea {
-  outline: none !important;
-  user-select: all !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
-  background-clip: padding-box !important;
+    outline: none !important;
+    user-select: all !important;
+    -webkit-appearance: textfield !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+    background-clip: padding-box !important;
 }
 textarea:focus {
-  user-select: all !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
-  background-clip: padding-box !important;
+    user-select: all !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+    background-clip: padding-box !important;
 }
 
 input {
-  outline: none !important;
-  user-select: all !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
-  background-clip: padding-box !important;
+    outline: none !important;
+    user-select: all !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+    background-clip: padding-box !important;
 }
 input:focus {
-  user-select: all !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
-  background-clip: padding-box !important;
+    user-select: all !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+    background-clip: padding-box !important;
 }
 
 .should-be-filled {

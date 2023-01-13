@@ -50,7 +50,7 @@ const Input = ({
                     if (onClick)
                         onClick(e)
                 }} ref={inputRef ?? null} onBlur={onBlur} onFocus={onFocus}
-                       type={numOnly ? 'number' : ''}
+                       type={numOnly ? 'number' : 'text'}
                        defaultValue={defaultValue}
                        autoFocus={autoFocus}
                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +67,7 @@ const Input = ({
                                onChange(e)
                            }
                        }} dir={dir ? dir : 'rtl'} id={id}
-                       className={inputClassName + ` bg-transparent h-full w-full IranSans border-2 border-gray-300 focus:border-primary outline-0 rounded-xl bg-pri outline-0 px-3 `}/>
+                       className={inputClassName + ` bg-transparent h-full  w-full IranSans border-2 border-gray-300 focus:border-primary outline-0 rounded-xl bg-pri outline-0 px-3 app `}/>
                 {labelText ?
                     <label dir={'rtl'} className={'IranSans text-textDark text-sm mr-3 mt-2'}
                            htmlFor={id}>{labelText}</label>

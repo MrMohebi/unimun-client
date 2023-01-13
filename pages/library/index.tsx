@@ -254,9 +254,6 @@ const Index = () => {
                 searchText: '',
                 first: 100,
                 after: EndCursor()
-            }).then((value) => {
-                console.log(value)
-
             })
             // getBooks({
             //     variables: {
@@ -377,7 +374,6 @@ const Index = () => {
                                     _refreshLoading(true)
                                 getBooks.refetch().then((result) => {
 
-                                    console.log(result)
                                     try {
                                         let Books = [] as object[]
                                         result.data.books.edges.forEach((book: { node: any }) => {
@@ -437,7 +433,6 @@ const Index = () => {
                                     teacher: string
                                     creator: { name: string, id: string }
                                 }, index: number) => {
-                                    console.log(book)
 
                                     if (book.status === 'DELETED')
                                         return null

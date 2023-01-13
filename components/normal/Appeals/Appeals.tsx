@@ -57,6 +57,7 @@ const Appeals = () => {
                     node {
                         title
                         createdAt
+                        publishedAt
                         details
                         priceStart
                         priceEnd
@@ -410,12 +411,12 @@ const Appeals = () => {
 
                             firstCatch.current = true;
                             gtAppeals.refetch().then((value) => {
-                                console.log(value)
-                                let tempAppeals = reactiveAppeals
-                                tempAppeals.reverse()
-                                tempAppeals.concat(_.difference(value.data.appeals.edges, reactiveAppeals))
-                                tempAppeals.reverse()
-                                AppealsStore(tempAppeals)
+
+                                // let tempAppeals = reactiveAppeals
+                                // tempAppeals.reverse()
+                                // tempAppeals.concat(_.difference(value.data.appeals.edges, reactiveAppeals))
+                                // tempAppeals.reverse()
+                                AppealsStore(value.data.appeals.edges)
                                 _refreshLoading(false)
 
 

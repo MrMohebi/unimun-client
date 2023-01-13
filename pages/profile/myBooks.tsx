@@ -7,7 +7,7 @@ import Seen from '../../assets/svgs/eye.svg'
 import FreeSVG from '../../assets/svgs/free.svg'
 import Toman from '../../assets/svgs/toman.svg'
 
-import {gql, useLazyQuery, useMutation, useQuery} from "@apollo/client";
+import {gql, useMutation, useQuery} from "@apollo/client";
 import {useRouter} from "next/router";
 import {UserToken} from "../../store/user";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -109,7 +109,7 @@ const MyBooks = () => {
             }
         },
     })
-    const [removeBook, removeBookResult] = useMutation(removeBookQuery)
+    const [removeBook] = useMutation(removeBookQuery)
 
     const router = useRouter();
     useEffect(() => {
@@ -135,7 +135,7 @@ const MyBooks = () => {
 
                         _myBooks(MyBooks);
                         _myBrochures(MyBrochures);
-                        (getMyBooks.data.booksUserCreated.edges as []).forEach((item, index) => {
+                        (getMyBooks.data.booksUserCreated.edges as []).forEach((item) => {
 
                             let book = (item as { node: any }).node as {
                                 price: string
@@ -145,8 +145,6 @@ const MyBooks = () => {
                             }
                             if (book.isBook) {
                                 _booksLength(booksLength++)
-                            } else {
-                                console.log(item)
                             }
                         })
 
@@ -317,7 +315,7 @@ const MyBooks = () => {
                                                                     status: 'DELETED'
                                                                 }
 
-                                                            }).then((value) => {
+                                                            }).then(() => {
                                                                 setLoading(false)
                                                                 // console.log(value);
                                                                 _myBooks(produce(draft => {

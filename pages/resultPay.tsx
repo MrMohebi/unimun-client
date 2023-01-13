@@ -9,13 +9,7 @@ const ResultPay = () => {
     const router = useRouter();
 
     const svgRef = useRef(null)
-    // const router = useRouter();
 
-    const putCommaInNumber = (number: string) => {
-        return number.split('').reverse().map((e, i) => (
-            i % 3 === 0 && i !== 0 ? e + "," : e
-        )).reverse().join('')
-    }
     const retry = () => {
 
     }
@@ -32,7 +26,6 @@ const ResultPay = () => {
     }
 
     const setAmount = (amount: string) => {
-        console.log('amount' + amount)
         const svg = svgRef && svgRef.current ? (svgRef.current as HTMLDivElement).firstChild as HTMLDivElement : document.createElement('div')
         svg.querySelector('.paymentTicket_svg__amount')!.innerHTML = amount.toString();
         let balanceHolderElement = svg.querySelector('.paymentTicket_svg__amountHolder');

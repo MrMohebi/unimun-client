@@ -54,16 +54,25 @@ body,
 
 //hide spinners
 * {
-  input[type=number]::-webkit-outer-spin-button,
-  input[type=number]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
 
-  input[type=number] {
-    -moz-appearance: textfield;
-  }
 }
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield !important;
+}
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 
 html, body {
   margin: 0;
@@ -237,15 +246,15 @@ textarea {
   &:focus {
     user-select: all !important;
     -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
     background-clip: padding-box !important;
   }
 
   user-select: all !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
+  -webkit-appearance: textfield !important;
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
   background-clip: padding-box !important;
 }
 
@@ -256,15 +265,15 @@ input {
   &:focus {
     user-select: all !important;
     -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
     background-clip: padding-box !important;
   }
 
   user-select: all !important;
   -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
   background-clip: padding-box !important;
 }
 
@@ -297,6 +306,7 @@ input {
     max-height: 200px;
   }
 }
+
 .white-scan {
   section {
     section {

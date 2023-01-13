@@ -6,7 +6,6 @@ import Step from "../../components/view/StepperFtagment/Step/Step";
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import Dimmer from "../../components/view/Dimmer/Dimmer";
-import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 import FileUploadSVG from "../../assets/svgs/fileUpload.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
 import FileSVG from "../../assets/svgs/file.svg";
@@ -116,8 +115,6 @@ const NewBook = () => {
     const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
     const [categoryComponent, _categoryComponent] = useState(false)
     const [appearanceComponent, _appearanceComponent] = useState(false)
-    const [fileUploadingPercentage, _fileUploadingPercentage] = useState(0)
-    const [contactType, setContactType] = useState('')
     const [connectWay, setConnectWay] = useState('')
     const [langPosition, _langPosition] = useState([1000, 1000]);
     const selectLangRef = useRef<HTMLSpanElement>(null);
@@ -138,38 +135,6 @@ const NewBook = () => {
     const lon = useRef<string>('');
 
 
-    const [BookData, setBookData] = useState({
-        type: 'physical',
-        price: 20000,
-        attachments: [],
-        files: [],
-        fileNames: [],
-
-    } as {
-        location: {
-            text: string,
-            lat: string
-            lon: string
-        }
-        id: string
-        isBook: boolean
-        title: string
-        writer: string
-        language: string
-        appearance: string
-        appearanceID: string
-        details: string
-        type: string
-        price: number
-        pages: number
-        categoryID: string
-        categoryPersian: string
-        publisher: string
-        publishedDate: string
-        files: []
-        attachments: []
-        fileNames: []
-    })
 
 
     useEffect(() => {
@@ -214,7 +179,7 @@ const NewBook = () => {
                 updateBookData('publisher', EditBookData().publisher ?? '')
 
                 setConnectWay(EditBookData().connectWay)
-                setContactType(EditBookData().connectWay[0] === "0" ? 'phone' : 'telegram')
+                // setContactType(EditBookData().connectWay[0] === "0" ? 'phone' : 'telegram')
                 updateBookData('language', EditBookData().language)
                 // updateBookData('attachments', EditBookData().attachments)
                 let imagesArr = [] as any[]
@@ -696,7 +661,6 @@ const NewBook = () => {
                         <Input defaultValue={reactiveBookData.translator}
                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                    updateBookData('translator', e.currentTarget.value)
-                                   console.log(e.currentTarget.value)
                                }} id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
                                wrapperClassName={'px-6 h-14'}
                                placeHolder={'کی ترجمه کرده ؟'}/>
@@ -732,7 +696,6 @@ const NewBook = () => {
                                     return <div key={index + 'imageUpload'} className={'contents'}>
                                         <BookImageUpload index={index} onImageClick={(indexOfSelectedImage: string) => {
                                             setCurrentSelectedImage(indexOfSelectedImage)
-                                            console.log(indexOfSelectedImage)
 
                                             setImageOptionsOpen(true)
                                         }}
@@ -744,15 +707,10 @@ const NewBook = () => {
                                                                  let backBook = produce(BookDataStore().attachments, (draft: any) => {
                                                                      draft.push(e.data)
                                                                  })
-                                                                 console.log(e.data)
                                                                  updateBookData('attachments', backBook)
-
-                                                                 console.log(e)
-
                                                              }
 
                                                          }} onError={(e: any) => {
-                                            console.log(e)
                                         }} bookID={currentBookId.current} setUploading={setUploading}/>
                                     </div>
 

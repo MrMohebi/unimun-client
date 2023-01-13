@@ -6,7 +6,7 @@ import Step from "../../components/view/StepperFtagment/Step/Step";
 import Button from "../../components/view/Button/Button";
 import {useRouter} from "next/router";
 import Dimmer from "../../components/view/Dimmer/Dimmer";
-import {uploadBookFile, uploadPrivateBookFile, uploadPublicBookFile} from "../../Requests/uploadRequests";
+import {uploadPrivateBookFile, uploadPublicBookFile} from "../../Requests/uploadRequests";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 import FileUploadSVG from "../../assets/svgs/fileUpload.svg";
 import EmptyFileSVG from "../../assets/svgs/emptyFile.svg";
@@ -15,7 +15,6 @@ import {gql, useMutation, useReactiveVar} from "@apollo/client";
 import Toman from '../../assets/svgs/toman.svg'
 import BookCategories from "../../components/normal/BookCategories/BookCategories";
 import BookAppearance from "../../components/normal/BookAppearance/BookAppearance";
-import DownloadFileSVG from "../../assets/svgs/downloadFile.svg";
 import {
     BookDataStore,
     EditBookData,
@@ -260,7 +259,7 @@ const NewBrochure = () => {
 
             } catch (e) {
                 // console.log(e)
-                Toast('خطا در هنگام ویرایش کتاب')
+                Toast('خطا در هنگام ویرایش جزوه')
             }
             EditBookData({})
         } else {
@@ -363,7 +362,7 @@ const NewBrochure = () => {
                     lastBrochureSubmitSuccess(e.data.createBook.data.id)
                     router.push('/library')
                 } else {
-                    Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
+                    Toast('مشکلی در ساخت جزوه به وجود آمده لطفا مجددا تلاش کنید')
                 }
             } catch (e) {
                 console.log(e)
@@ -423,7 +422,7 @@ const NewBrochure = () => {
                         lastBrochureSubmitSuccess(e.data.updateBook.data.id)
                         router.push('/library')
                     } else {
-                        Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
+                        Toast('مشکلی در ساخت جزوه به وجود آمده لطفا مجددا تلاش کنید')
                     }
                 } catch (e) {
                     console.log(e)
@@ -785,7 +784,7 @@ const NewBrochure = () => {
                         <section className={'bg-white w-full px-3 pb-10'}>
                             <div className={'IranSansMedium text-textDarker pt-5'}>نام استاد</div>
                             <Input id={'input'} numOnly={false} inputClassName={'h-14 mt-5 rounded-xl'}
-                                   wrapperClassName={'px-3 h-14'}
+                                   wrapperClassName={'px-3  mb-3'}
                                    placeHolder={'مال کدوم استاده ؟'}
                                    defaultValue={reactiveBookData.teacher}
                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -793,7 +792,7 @@ const NewBrochure = () => {
                                    }}
                             />
 
-                            <div className={'new-divider mt-5'}/>
+                            {/*<div className={'new-divider mt-5'}/>*/}
 
                             <div className={'new-divider mt-5'}/>
                             <div className={'IranSansMedium text-textDarker pt-5'}>دانشگاه ارائه درس <span
@@ -822,11 +821,11 @@ const NewBrochure = () => {
                             </div>
 
                         </section>
-                        <div className={'w-full h-10 IranSans text-textDarker text-sm px-3 mt-3 mb-3 '}>اگه کتاب ترجمه
-                            شده
-                            از زبان دیگه ای هست اسم مترجمش رو بهمون بگو
-                        </div>
-                        <div className={'h-32'}></div>
+                        {/*<div className={'w-full h-10 IranSans text-textDarker text-sm px-3 mt-3 mb-3 '}>اگه کتاب ترجمه*/}
+                        {/*    شده*/}
+                        {/*    از زبان دیگه ای هست اسم مترجمش رو بهمون بگو*/}
+                        {/*</div>*/}
+                        <div className={'h-28'}></div>
 
                     </Step>
 
@@ -970,7 +969,7 @@ const NewBrochure = () => {
                             </div>
                         </section>
                         <div className={'w-full h-10 IranSans text-textDarker text-sm px-3 mt-3 mb-3 '}>
-                            تو یونیـمـون میتونین کتاب رو به صورت دیجیتال یا به صورت فیزیکی قرار بدین
+                            تو یونیـمـون میتونین جزوه رو به صورت دیجیتال یا به صورت فیزیکی قرار بدین
                         </div>
 
 
@@ -1256,7 +1255,7 @@ const NewBrochure = () => {
 
                         <div
                             className={`w-full h-10 IranSans text-textDarker text-sm  ${reactiveBookData.type !== 'pdf' ? 'h-0 hidden overflow-hidden ' : 'px-3 mt-3 mb-3'} `}>
-                            محدودیت آپلود برای کتاب ها 500 مگابایت است
+                            محدودیت آپلود برای جزوه ها 500 مگابایت است
                         </div>
 
                         <section className={'bg-white w-full px-3 pt-5 pb-5 '}>

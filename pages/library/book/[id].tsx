@@ -92,6 +92,7 @@ const Book = (props: Props) => {
             buyDigitalBook(id: $id) {
                 message
                 data {
+                    url
                     cypher
                 }
             }
@@ -400,9 +401,10 @@ const Book = (props: Props) => {
                                     </div>
                                     :
                                     <span
-                                        className={'text-textBlack IranSansMedium text-sm mt-1 '}>{book.creator ? book.creator.name : ''}</span>
+                                        className={'text-textBlack IranSansMedium text-sm mt-1 '}>{book.creator ? book.creator.name ?? "کاربر یونیمون" : 'کاربر یونیمون'}</span>
                                 :
-                                null
+                                <span
+                                    className={'text-textBlack IranSansMedium text-sm mt-1 '}>{'کاربر یونیمون'}</span>
 
 
                         }
@@ -582,12 +584,17 @@ const Book = (props: Props) => {
                                                             if (e.data.buyDigitalBook.message) {
                                                                 Toast(e.data.buyDigitalBook.message);
                                                             }
-                                                            if (e.data.buyDigitalBook.cypher) {
-                                                                window.open(DOWNLOAD_HOST() + e.data.buyDigitalBook.cypher, '_blank')
+                                                            if (e.data.buyDigitalBook.data[0].cypher) {
+                                                                console.log('yep')
+                                                                window.open(DOWNLOAD_HOST() + e.data.buyDigitalBook.data[0].url, '_blank')
+                                                                window.location.reload();
                                                             }
                                                         })
+                                                    } else {
+                                                        window.open(DOWNLOAD_HOST() + book.bookFiles[0].url, '_blank')
                                                     }
-                                                    window.open(DOWNLOAD_HOST() + book.bookFiles[0].url, '_blank')
+                                                } else {
+                                                    buyBookFromUnimun()
                                                 }
                                             } else {
                                                 buyBookFromUnimun()
@@ -619,19 +626,24 @@ const Book = (props: Props) => {
 
                                                     {
                                                         book.isPurchasable && !book.bookFiles[0].cypher ?
-                                                            <span
-                                                                className={'text-white block mr-3 '}
+                                                            <div
+                                                                className={'text-white w-20 block mr-3 whitespace-nowrap\t '}
                                                                 style={{fontSize: '1rem'}}>
-                                                        {book.isBook ? 'خرید و دانـلود کتـاب' : 'خرید و دانـلود جـزوه'}
-                                                    </span>
+                                                                {book.isBook ? 'خرید و دانـلود کتـاب' : 'خرید و دانـلود جـزوه'}
+                                                                <span
+                                                                    className={'text-[0.7rem] mx-2 inline-block'}>(با حجم نیم بها)</span>
+                                                            </div>
 
                                                             :
 
-                                                            <span
-                                                                className={'text-white block mr-3 '}
+                                                            <div
+                                                                className={'text-white w-20 block mr-3 whitespace-nowrap '}
                                                                 style={{fontSize: '1rem'}}>
-                                                        {book.isBook ? 'دانـلود کتـاب' : 'دانـلود جـزوه'}
-                                                    </span>
+                                                                {book.isBook ? 'دانـلود کتـاب' : 'دانـلود جـزوه'}
+                                                                <span
+                                                                    className={'text-[0.7rem] mx-2 inline-block'}>(با حجم نیم بها)</span>
+
+                                                            </div>
                                                     }
 
 
