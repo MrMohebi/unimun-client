@@ -108,13 +108,9 @@ const MyAppeals = () => {
                     </div>}
                     pullDownToRefreshThreshold={60}
                     refreshFunction={() => {
-
-                        console.log('refreshing')
                         setGettingLoading(true)
                         getMyAppealsResult.refetch().then((value) => {
                             setGettingLoading(false)
-
-                            console.log('gotten')
                             setAppeals(value.data.appealsUserCreated.edges)
                         })
                     }}
@@ -200,7 +196,6 @@ const MyAppeals = () => {
                                                             first: 100
                                                         }
                                                     }).then((value) => {
-                                                        console.log(value)
                                                         try {
                                                             setAppeals(value.data.appealsUserCreated.edges)
                                                         } catch (e) {

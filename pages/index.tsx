@@ -14,7 +14,7 @@ const Home: NextPage = () => {
         }
 
 
-        currentNavActiveIndex(2)
+        currentNavActiveIndex(0)
 
 
     }, [])

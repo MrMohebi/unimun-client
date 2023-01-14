@@ -135,8 +135,6 @@ const NewBook = () => {
     const lon = useRef<string>('');
 
 
-
-
     useEffect(() => {
         if (Object.keys(EditBookData()).length) {
             setEditing(() => {
@@ -144,74 +142,95 @@ const NewBook = () => {
             })
             setStrictTypeMode(true)
 
-            try {
-
-                updateBookData('title', EditBookData()?.title)
-                updateBookData('id', EditBookData()?.id)
-                if (EditBookData().appearance)
-                    updateBookData('appearance', EditBookData().appearance.title)
-                if (EditBookData().category)
-                    updateBookData('categoryPersian', EditBookData().category.title)
-                updateBookData('categoryID', EditBookData().categoryID)
-                updateBookData('details', EditBookData().details)
-                updateBookData('writer', EditBookData().writer)
-                updateBookData('bookFiles', EditBookData().bookFiles);
-                if (EditBookData().bookFiles.length) {
+            const newBookData = produce(BookDataStore(), (draft: any) => {
+                draft = {...EditBookData()}
+                draft.category = draft.category.title;
+                draft.categoryPersian = draft.category;
+                draft.appearance = draft.appearance.title;
+                draft.type = draft.isDownloadable ? 'pdf' : 'physical'
+                if (draft.bookFiles.length) {
                     setBookUploadState('uploaded')
-                    // console.log('there is a file name')
-                    // console.log(EditBookData().bookFiles[0].url.split('/').reverse()[0])
                     setFileName(EditBookData().bookFiles[0].url.split('/').reverse()[0])
                 }
-
-
-                updateBookData('publishedDate', EditBookData().publishedDate)
-                updateBookData('isDownloadable', EditBookData().isDownloadable)
-                updateBookData("type", EditBookData().isDownloadable ? "pdf" : 'physical');
-
-
-                if (!EditBookData().price || isNaN(EditBookData().price)) {
+                if (draft.price === 0) {
                     setIsBookFree(true)
-                    updateBookData('price', 0)
                 } else {
-                    updateBookData('price', parseInt(EditBookData().price))
+                    if (priceInputRef.current) {
+                        (priceInputRef.current as HTMLInputElement).value = fixPrice(parseInt(reactiveBookData.price))
+                    }
                 }
+                return draft;
+            })
+            BookDataStore(newBookData)
 
-                updateBookData('publisher', EditBookData().publisher ?? '')
-
-                setConnectWay(EditBookData().connectWay)
-                // setContactType(EditBookData().connectWay[0] === "0" ? 'phone' : 'telegram')
-                updateBookData('language', EditBookData().language)
-                // updateBookData('attachments', EditBookData().attachments)
-                let imagesArr = [] as any[]
-                let attachments = [] as any[]
-                let imagesArrString = [] as any[]
-                if (EditBookData().attachments) {
-                    (EditBookData().attachments as []).map((attachment) => {
-                        imagesArr.push(attachment)
-                    })
-                }
-                imagesArr.forEach((e) => {
-                    attachments.push((_.omit(e, ['__typename'])).test = "e")
-                    imagesArrString.push(JSON.stringify(_.omit(e, ['__typename'])))
-                })
-
-                updateBookData('attachments', attachments)
-                updateBookData('files', EditBookData().files)
-
-                // setUploadedImages(imagesArrString)
-                updateBookData('attachments', EditBookData().attachments)
-                updateBookData('files', EditBookData().files)
-                updateBookData('location', EditBookData().location)
-
-
-                EditBookData(null)
-                bookVerification()
-
-
-            } catch (e) {
-                console.log(e)
-                Toast('خطا در هنگام ویرایش کتاب')
-            }
+            // try {
+            //
+            //     updateBookData('title', EditBookData()?.title)
+            //     updateBookData('id', EditBookData()?.id)
+            //     if (EditBookData().appearance)
+            //         updateBookData('appearance', EditBookData().appearance.title)
+            //     if (EditBookData().category)
+            //         updateBookData('categoryPersian', EditBookData().category.title)
+            //     updateBookData('categoryID', EditBookData().categoryID)
+            //     updateBookData('details', EditBookData().details)
+            //     updateBookData('writer', EditBookData().writer)
+            //     updateBookData('bookFiles', EditBookData().bookFiles);
+            //     if (EditBookData().bookFiles.length) {
+            //         setBookUploadState('uploaded')
+            //         // console.log('there is a file name')
+            //         // console.log(EditBookData().bookFiles[0].url.split('/').reverse()[0])
+            //         setFileName(EditBookData().bookFiles[0].url.split('/').reverse()[0])
+            //     }
+            //
+            //
+            //     updateBookData('publishedDate', EditBookData().publishedDate)
+            //     updateBookData('isDownloadable', EditBookData().isDownloadable)
+            //     updateBookData("type", EditBookData().isDownloadable ? "pdf" : 'physical');
+            //
+            //
+            //     if (!EditBookData().price || isNaN(EditBookData().price)) {
+            //         setIsBookFree(true)
+            //         updateBookData('price', 0)
+            //     } else {
+            //         updateBookData('price', parseInt(EditBookData().price))
+            //     }
+            //
+            //     updateBookData('publisher', EditBookData().publisher ?? '')
+            //
+            //     setConnectWay(EditBookData().connectWay)
+            //     // setContactType(EditBookData().connectWay[0] === "0" ? 'phone' : 'telegram')
+            //     updateBookData('language', EditBookData().language)
+            //     // updateBookData('attachments', EditBookData().attachments)
+            //     let imagesArr = [] as any[]
+            //     let attachments = [] as any[]
+            //     let imagesArrString = [] as any[]
+            //     if (EditBookData().attachments) {
+            //         (EditBookData().attachments as []).map((attachment) => {
+            //             imagesArr.push(attachment)
+            //         })
+            //     }
+            //     imagesArr.forEach((e) => {
+            //         attachments.push((_.omit(e, ['__typename'])).test = "e")
+            //         imagesArrString.push(JSON.stringify(_.omit(e, ['__typename'])))
+            //     })
+            //
+            //     updateBookData('attachments', attachments)
+            //     updateBookData('files', EditBookData().files)
+            //
+            //     // setUploadedImages(imagesArrString)
+            //     updateBookData('attachments', EditBookData().attachments)
+            //     updateBookData('files', EditBookData().files)
+            //     updateBookData('location', EditBookData().location)
+            //
+            //
+            //     EditBookData(null)
+            //     bookVerification()
+            //
+            //
+            // } catch (e) {
+            //     console.log(e)
+            //     Toast('خطا در هنگام ویرایش کتاب')
+            // }
             // console.log(reactiveBookData)
             EditBookData({})
         } else {
@@ -278,6 +297,36 @@ const NewBook = () => {
         })
 
     }
+    const updateBookFunc = () => {
+
+        setLoading(true)
+
+
+        updateBook({
+            variables: {
+                ...BookDataStore(),
+                text: address.current,
+                lat: lat.current.toString(),
+                lon: lon.current.toString(),
+                connectWay: '@mokafela'
+            }
+        }).then((e) => {
+            try {
+                // console.log(e)
+                if (e.data.createBook.status === 'SUCCESS') {
+                    lastBookSubmitSuccess(e.data.createBook.data.id)
+                    router.push('/library')
+                } else {
+                    Toast('مشکلی در ویرایش کتاب به وجود آمده لطفا مجددا تلاش کنید')
+                }
+            } catch (e) {
+                console.log(e)
+
+            }
+            // console.log(e.data.createBook.status)
+        })
+
+    }
 
 
     const submitBook = () => {
@@ -313,76 +362,54 @@ const NewBook = () => {
 
         // return;
 
+        if (reactiveBookData.isDownloadable) {
+            setShowUploadingFileLoading(true)
 
-        if (editing) {
+            if (isBookFree) {
 
-            updateBook({
-                variables: {
-                    ...BookDataStore(),
-                    text: address.current,
-                    lat: lat.current.toString(),
-                    lon: lon.current.toString(),
-                    connectWay: '@mokafela'
-                }
-            }).then((e) => {
-                try {
-                    if (e.data.updateBook.status === 'SUCCESS') {
-                        lastBookSubmitSuccess(e.data.updateBook.data.id)
-                        router.push('/library')
-                    } else {
-                        Toast('مشکلی در ساخت کتاب به وجود آمده لطفا مجددا تلاش کنید')
-                    }
-                } catch (e) {
-                    console.log(e)
-                }
-            })
+                uploadPublicBookFile(bookLocalFiles, () => {
+
+                }, "Book_" + Math.random() * 99999999, (result: any) => {
+                    // console.log(result)
+                    setShowUploadingFileLoading(false)
+                    // console.log(result)
+                    updateBookData('bookFiles', [result.data])
+                    createBookFunc()
+
+                }, (er: any) => {
+                    setShowUploadingFileLoading(false)
+                    Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
+                }, (uploadProgress: any) => {
+                    // console.log(uploadProgress)
+                    let percentage = (uploadProgress.loaded * 100) / uploadProgress.total;
+                    setFileUploadPercentage((Math.floor(percentage)))
+                })
+            } else {
+                uploadPrivateBookFile(bookLocalFiles, () => {
+                }, "Book_" + Math.random() * 99999999, (result: any) => {
+                    // console.log(result)
+                    updateBookData('bookFiles', [result.data])
+
+                    createBookFunc()
+
+                }, (er: any) => {
+                    setShowUploadingFileLoading(false)
+                    Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
+
+                }, (uploadProgress: any) => {
+                    // console.log((uploadProgress.loaded * 100) / uploadProgress.total)
+                    let percentage = (uploadProgress.loaded * 100) / uploadProgress.total;
+                    setFileUploadPercentage((Math.floor(percentage)))                        // setFileUploadPercentage(uploadProgress)
+                })
+            }
         } else {
+            if (editing) {
 
-            if (reactiveBookData.isDownloadable) {
-                setShowUploadingFileLoading(true)
 
-                if (isBookFree) {
-
-                    uploadPublicBookFile(bookLocalFiles, () => {
-
-                    }, "Book_" + Math.random() * 99999999, (result: any) => {
-                        // console.log(result)
-                        setShowUploadingFileLoading(false)
-                        // console.log(result)
-                        updateBookData('bookFiles', [result.data])
-                        createBookFunc()
-
-                    }, (er: any) => {
-                        setShowUploadingFileLoading(false)
-                        Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
-                    }, (uploadProgress: any) => {
-                        // console.log(uploadProgress)
-                        let percentage = (uploadProgress.loaded * 100) / uploadProgress.total;
-                        setFileUploadPercentage((Math.floor(percentage)))
-                    })
-                } else {
-                    uploadPrivateBookFile(bookLocalFiles, () => {
-                    }, "Book_" + Math.random() * 99999999, (result: any) => {
-                        // console.log(result)
-                        updateBookData('bookFiles', [result.data])
-
-                        createBookFunc()
-
-                    }, (er: any) => {
-                        setShowUploadingFileLoading(false)
-                        Toast("خطا در هنگام آپلود فایل", "", 3000, '', 80)
-
-                    }, (uploadProgress: any) => {
-                        // console.log((uploadProgress.loaded * 100) / uploadProgress.total)
-                        let percentage = (uploadProgress.loaded * 100) / uploadProgress.total;
-                        setFileUploadPercentage((Math.floor(percentage)))                        // setFileUploadPercentage(uploadProgress)
-                    })
-                }
             } else {
                 createBookFunc()
+
             }
-
-
         }
 
 

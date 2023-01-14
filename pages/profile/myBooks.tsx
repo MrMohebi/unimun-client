@@ -53,6 +53,7 @@ const MyBooks = () => {
                         id
                         pages
                         isDownloadable
+                        isPurchasable
                         verifiedAt
                         writer
                         term
@@ -77,7 +78,9 @@ const MyBooks = () => {
                             url
                         }
                         pages
+                        seen
                         price
+                        translator
                         connectWay
                         location {
                             lat

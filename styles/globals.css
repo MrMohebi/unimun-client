@@ -446,15 +446,12 @@ body * {
 .center-placeholder::-webkit-input-placeholder {
     text-align: center;
 }
-
 .center-placeholder:-moz-placeholder { /* Firefox 18- */
     text-align: center;
 }
-
 .center-placeholder::-moz-placeholder { /* Firefox 19+ */
     text-align: center;
 }
-
 .center-placeholder:-ms-input-placeholder {
     text-align: center;
 }
@@ -550,13 +547,34 @@ input:focus {
     max-height: 200px;
   }
 }
+
 .white-scan section section div {
-  box-shadow: rgba(255, 255, 255, 0.7) 0px 0px 0px 5px inset !important;
-  border-radius: 70px;
+    box-shadow: rgba(255, 255, 255, 0.7) 0px 0px 0px 5px inset !important;
+    border-radius: 70px;
 }
 
 .free-checkbox {
-  @apply flex flex-col justify-center items-center relative border-2 border-gray-400 after:w-full  checked:border-0 after:h-full after:content-[] checked:after:content-[url("/assets/svgs/check-box.svg")] h-5 w-5 rounded;
+    @apply flex flex-col justify-center items-center relative border-2 border-gray-400 after:w-full  checked:border-0 after:h-full after:content-[] checked:after:content-[url("/assets/svgs/check-box.svg")] h-5 w-5 rounded;
+}
+
+.guide {
+    box-shadow: 0px 0px 0px 5000px rgba(0, 0, 0, 0.6);
+    z-index: 100;
+    animation: guide-animation 3s infinite ease-in-out;
+    transition: all 0.2s;
+    transform-origin: center !important;
+}
+
+@keyframes guide-animation {
+    0% {
+        scale: 1;
+    }
+    50% {
+        scale: 1.15;
+    }
+    100% {
+        scale: 1;
+    }
 }
 
 /*# sourceMappingURL=globals.css.map */

@@ -30,6 +30,9 @@ import {currentNavActiveIndex} from "../../store/navbar";
 import {EndCursor} from "../../store/appeals";
 import {useDebouncedCallback} from "use-debounce";
 import {ToastContainer} from "react-toastify";
+import Guide from "../../components/normal/Guide/Guide";
+import {getLocalStorageItem, getToken, setLocalStorageItem} from "../../helpers/TokenHelper";
+import WelcomLibary from "../../components/normal/WelcomLibary/WelcomLibary";
 
 const Index = () => {
 
@@ -133,11 +136,11 @@ const Index = () => {
         if (lastBrochureSubmitSuccess().length) {
             // console.log('thee should be an alert for new book')
             Toast('جزوه شما ثبت شد و  در انتظار بررسی است')
-            lastBookSubmitSuccess('')
+            lastBrochureSubmitSuccess('')
         }
 
 
-        currentNavActiveIndex(1)
+        currentNavActiveIndex(2)
 
 
     }, [])
@@ -320,10 +323,39 @@ const Index = () => {
         })
 
     }, 600)
+
+
     const booksDivRef = useRef<HTMLDivElement>(null);
+    const [showGuide, setShowGuide] = useState(false);
+
+    const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
+
+
+    useEffect(() => {
+        if (!getLocalStorageItem('seenWelcomeDialog')) {
+            setLocalStorageItem('seenWelcomeDialog', 'true')
+            setShowWelcomeDialog(true)
+        } else {
+            if (!showWelcomeDialog) {
+                if (!getLocalStorageItem('seenGuide')) {
+                    setLocalStorageItem('seenGuide', 'true')
+                    setTimeout(() => {
+                        setShowGuide(true)
+                    }, 500)
+                }
+            }
+        }
+
+
+    }, [showWelcomeDialog]);
+
     return (
         <div className={'h-full relative '}>
             <ToastContainer/>
+            <WelcomLibary show={showWelcomeDialog} onCLose={() => {
+                setShowWelcomeDialog(false)
+            }}/>
+
             <div id={'dimmer'}
                  onClick={(e) => {
                      let el = e.target as HTMLDialogElement
@@ -724,6 +756,17 @@ const Index = () => {
             </div>
 
 
+            <Guide title={'افزودن جزوه و کتاب'} description={'با\n' +
+                ' استفاده از این دکمه میتونی کتاب یا جزوه ات رو اضافه کنی'
+            }
+                   descriptionClassName={'fixed bottom-44 w-full  px-5  left-1/2 -translate-x-1/2 z-[100] IranSansMedium text-sm text-white text-justify'}
+                   titleClassName={'fixed top-16 w-full  px-5  left-1/2 -translate-x-1/2 z-[100] IranSansBold text-xl text-white text-center'}
+                   onCLose={() => {
+
+                       setShowGuide(false)
+                   }}
+                   className={'fixed  origin-center rounded-full h-24 w-24 flex flex-col justify-center items-center right-2 bottom-14 z-[100] bg-transparent'}
+                   show={showGuide}/>
             <div className={'fixed flex flex-col justify-center items-center right-7 bottom-20 z-50'}>
                 <Button rippleColor={'rgba(0,0,0,0.24)'} id={'new-book-btn'}
                         className={'w-14 h-14 bg-white shadow-sm rounded-2xl z-50'}

@@ -322,3 +322,26 @@ input {
   @apply flex flex-col justify-center items-center relative border-2 border-gray-400 after:w-full  checked:border-0 after:h-full after:content-[] checked:after:content-[url("/assets/svgs/check-box.svg")] h-5 w-5 rounded;
 }
 
+// WelcomLibary
+.guide {
+  box-shadow: 0px 0px 0px 5000px rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  animation: guide-animation 3s infinite ease-in-out;
+  transition: all 0.2s;
+  transform-origin: center !important;
+
+}
+
+@keyframes guide-animation {
+  0% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.15;
+  }
+
+  100% {
+    scale: 1;
+  }
+
+}

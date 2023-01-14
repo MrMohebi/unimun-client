@@ -16,6 +16,11 @@ const Navbar = (props: { children: any }) => {
 
     const navbarIcons = [
         {
+            name: 'آگهی ها',
+            path: '/',
+            svg: 'home'
+        },
+        {
             name: 'بپرس',
             path: '/ask',
             svg: 'messages'
@@ -25,11 +30,7 @@ const Navbar = (props: { children: any }) => {
             path: '/library',
             svg: 'book'
         },
-        {
-            name: 'آگهی ها',
-            path: '/',
-            svg: 'home'
-        },
+
         {
             name: 'یونی جیب',
             path: '/wallet',

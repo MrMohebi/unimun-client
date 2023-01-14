@@ -143,7 +143,7 @@ const Login = () => {
                     if (e.data) {
                         if (e.data.updateUser.status === 'SUCCESS') {
                             router.push('/').then(() => {
-                                currentNavActiveIndex(2)
+                                currentNavActiveIndex(0)
                             })
                         }
                     }
@@ -195,8 +195,6 @@ const Login = () => {
                 if (shouldSignUp) {
                     UserToken(verifyVCodeResult.data.verifyVCode.data.token)
                     setToken(verifyVCodeResult.data.verifyVCode.data.token)
-                    console.log(verifyVCodeResult.data.verifyVCode.data.token)
-                    console.log('this is id of user')
                     setId(verifyVCodeResult.data.verifyVCode.data.id)
                     setStep(2)
                 } else
@@ -205,15 +203,13 @@ const Login = () => {
                         setToken(verifyVCodeResult.data.verifyVCode.data.token)
                         setId(verifyVCodeResult.data.verifyVCode.data.id)
                         router.push('/').then(() => {
-                            currentNavActiveIndex(2)
+                            currentNavActiveIndex(0)
                         })
                     }, 300)
 
             } else {
                 verifyVCodeResult.reset()
                 setVCodeError(true)
-
-                console.log('here we change it')
             }
         }
 
@@ -229,7 +225,7 @@ const Login = () => {
 
                 if (currentStep === 0)
                     router.push('/').then(() => {
-                        currentNavActiveIndex(2)
+                        currentNavActiveIndex(0)
                     })
 
                 if (currentStep === 1) {

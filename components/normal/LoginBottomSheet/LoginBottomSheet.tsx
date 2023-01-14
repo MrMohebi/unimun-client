@@ -88,7 +88,7 @@ const LoginBottomSheet = (props: {
                     if (e.data) {
                         if (e.data.updateUser.status === 'SUCCESS') {
                             router.push('/').then(() => {
-                                currentNavActiveIndex(2)
+                                currentNavActiveIndex(0)
                             })
                         }
                     }

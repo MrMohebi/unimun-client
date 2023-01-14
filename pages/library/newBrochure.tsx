@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
 import StepperFragment from "../../components/view/StepperFtagment/StepperFragment";
@@ -211,59 +211,101 @@ const NewBrochure = () => {
             setEditing(() => {
                 return true
             })
+            setStrictTypeMode(true)
 
-            // console.log(EditBookData())
-            try {
-
-                updateBookData('title', EditBookData()?.title)
-                updateBookData('id', EditBookData()?.id)
-                if (EditBookData().appearance)
-                    updateBookData('appearance', EditBookData().appearance.title)
-                if (EditBookData().category)
-                    updateBookData('categoryPersian', EditBookData().category.title)
-                updateBookData('categoryID', EditBookData().categoryID)
-                updateBookData('writer', EditBookData().writer)
-                updateBookData('details', EditBookData().details)
-                updateBookData('teacher', EditBookData().teacher ?? "")
-                updateBookData('term', EditBookData().term ?? "")
-                // updateBookData('price', EditBookData().price??'')
-                // updateBookData('connectWay', EditBookData().connectWay)
-                setConnectWay(EditBookData().connectWay)
-                setContactType(EditBookData().connectWay[0] === "0" ? 'phone' : 'telegram')
-                updateBookData('language', EditBookData().language)
-                updateBookData('university', EditBookData().university)
-                // updateBookData('attachments', EditBookData().attachments)
-                let imagesArr = [] as any[]
-                let attachments = [] as any[]
-                let imagesArrString = [] as any[]
-                if (EditBookData().attachments) {
-                    (EditBookData().attachments as []).map((attachment) => {
-                        imagesArr.push(attachment)
-                    })
+            const newBookData = produce(BookDataStore(), (draft: any) => {
+                draft = {...EditBookData()}
+                draft.category = draft.category.title;
+                draft.categoryPersian = draft.category;
+                // draft.appearance = draft.appearance.title;
+                draft.type = draft.isDownloadable ? 'pdf' : 'physical'
+                if (draft.bookFiles.length) {
+                    setBookUploadState('uploaded')
+                    setFileName(EditBookData().bookFiles[0].url.split('/').reverse()[0])
                 }
-                imagesArr.forEach((e) => {
-                    attachments.push((_.omit(e, ['__typename'])).test = "e")
-                    imagesArrString.push(JSON.stringify(_.omit(e, ['__typename'])))
-                })
+                if (draft.price === 0) {
+                    setIsBookFree(true)
+                } else {
+                    // if (priceInputRef.current) {
+                    //     (priceInputRef.current as HTMLInputElement).value = fixPrice(parseInt(reactiveBookData.price))
+                    // }
+                }
+                return draft;
+            })
+            BookDataStore(newBookData)
 
-                updateBookData('attachments', attachments)
-
-                setUploadedImages(imagesArrString)
-                updateBookData('attachments', EditBookData().attachments)
-                updateBookData('files', EditBookData().files)
-
-
-                EditBookData(null)
-                bookVerification()
-
-
-            } catch (e) {
-                // console.log(e)
-                Toast('خطا در هنگام ویرایش جزوه')
-            }
+            // try {
+            //
+            //     updateBookData('title', EditBookData()?.title)
+            //     updateBookData('id', EditBookData()?.id)
+            //     if (EditBookData().appearance)
+            //         updateBookData('appearance', EditBookData().appearance.title)
+            //     if (EditBookData().category)
+            //         updateBookData('categoryPersian', EditBookData().category.title)
+            //     updateBookData('categoryID', EditBookData().categoryID)
+            //     updateBookData('details', EditBookData().details)
+            //     updateBookData('writer', EditBookData().writer)
+            //     updateBookData('bookFiles', EditBookData().bookFiles);
+            //     if (EditBookData().bookFiles.length) {
+            //         setBookUploadState('uploaded')
+            //         // console.log('there is a file name')
+            //         // console.log(EditBookData().bookFiles[0].url.split('/').reverse()[0])
+            //         setFileName(EditBookData().bookFiles[0].url.split('/').reverse()[0])
+            //     }
+            //
+            //
+            //     updateBookData('publishedDate', EditBookData().publishedDate)
+            //     updateBookData('isDownloadable', EditBookData().isDownloadable)
+            //     updateBookData("type", EditBookData().isDownloadable ? "pdf" : 'physical');
+            //
+            //
+            //     if (!EditBookData().price || isNaN(EditBookData().price)) {
+            //         setIsBookFree(true)
+            //         updateBookData('price', 0)
+            //     } else {
+            //         updateBookData('price', parseInt(EditBookData().price))
+            //     }
+            //
+            //     updateBookData('publisher', EditBookData().publisher ?? '')
+            //
+            //     setConnectWay(EditBookData().connectWay)
+            //     // setContactType(EditBookData().connectWay[0] === "0" ? 'phone' : 'telegram')
+            //     updateBookData('language', EditBookData().language)
+            //     // updateBookData('attachments', EditBookData().attachments)
+            //     let imagesArr = [] as any[]
+            //     let attachments = [] as any[]
+            //     let imagesArrString = [] as any[]
+            //     if (EditBookData().attachments) {
+            //         (EditBookData().attachments as []).map((attachment) => {
+            //             imagesArr.push(attachment)
+            //         })
+            //     }
+            //     imagesArr.forEach((e) => {
+            //         attachments.push((_.omit(e, ['__typename'])).test = "e")
+            //         imagesArrString.push(JSON.stringify(_.omit(e, ['__typename'])))
+            //     })
+            //
+            //     updateBookData('attachments', attachments)
+            //     updateBookData('files', EditBookData().files)
+            //
+            //     // setUploadedImages(imagesArrString)
+            //     updateBookData('attachments', EditBookData().attachments)
+            //     updateBookData('files', EditBookData().files)
+            //     updateBookData('location', EditBookData().location)
+            //
+            //
+            //     EditBookData(null)
+            //     bookVerification()
+            //
+            //
+            // } catch (e) {
+            //     console.log(e)
+            //     Toast('خطا در هنگام ویرایش کتاب')
+            // }
+            // console.log(reactiveBookData)
             EditBookData({})
         } else {
-
+            _categoryComponent(true)
         }
 
     }, [])
@@ -368,7 +410,6 @@ const NewBrochure = () => {
                 console.log(e)
 
             }
-            console.log(e.data.createBook.status)
         })
 
     }
@@ -572,7 +613,7 @@ const NewBrochure = () => {
             if (!reactiveBookData.isDownloadable) {
                 return true
             }
-            if (reactiveBookData.isDownloadable && bookLocalFiles) {
+            if (reactiveBookData.isDownloadable && (bookLocalFiles || bookUploadState === 'uploaded')) {
                 return true
             } else {
                 return false;
@@ -674,13 +715,13 @@ const NewBrochure = () => {
                         setShowSemester(false)
 
                         if (e.length) {
-                                setChosenSemester(e)
-                                updateBookData('term', e)
-                            }
-                        }}/>
-                        :
-                        null
-                }
+                            setChosenSemester(e)
+                            updateBookData('term', e)
+                        }
+                    }}/>
+                    :
+                    null
+            }
 
                 {
                     categoryComponent ?
@@ -1264,6 +1305,7 @@ const NewBrochure = () => {
                                 <Input id={'page-count'} numOnly={true} maxLength={5} wrapperClassName={'w-20 h-10'}
                                        inputClassName={' center-placeholder center-placeholder IranSans text-center rounded-xl place'}
                                        placeHolder={'تعداد'}
+                                       defaultValue={reactiveBookData.pages ?? ""}
                                        onChange={(e: InputEvent) => {
                                            let el = e.currentTarget as HTMLTextAreaElement
                                            console.log(el.value)
@@ -1311,20 +1353,25 @@ const NewBrochure = () => {
                                 {/*todo theres a bug when user wants to edit its always 20000*/}
 
                                 <div className={'h-3/5 bg-gray-400 w-0 border'}/>
-                                <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'}
-                                       defaultValue={fixPrice(parseInt(reactiveBookData.price)) ?? '20,000'}
-                                       numOnly={false}
+                                {reactiveBookData.title ?
+                                    <Input inputRef={priceInputRef} id={'book-price'} dir={'ltr'}
+                                           defaultValue={fixPrice(parseInt(reactiveBookData.price)) ?? '20,000'}
+                                           numOnly={false}
 
-                                       inputClassName={'border-0 border-transparent text-left text-lg IranSansBold rounded-xl'}
-                                       wrapperClassName={'w-full h-full '}
-                                       onChange={(e: InputEvent) => {
-                                           let el = e.currentTarget as HTMLInputElement
-                                           updateBookData('price', parseInt(el.value.replace(',', '')))
-                                           el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
-                                           if (lastPrice.current)
-                                               lastPrice.current = el.value.toString()
-                                       }}
-                                />
+                                           inputClassName={'border-0 border-transparent text-left text-lg IranSansBold rounded-xl'}
+                                           wrapperClassName={'w-full h-full '}
+                                           onChange={(e: InputEvent) => {
+                                               let el = e.currentTarget as HTMLInputElement
+                                               updateBookData('price', parseInt(el.value.replace(',', '')))
+                                               el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
+                                               if (lastPrice.current)
+                                                   lastPrice.current = el.value.toString()
+                                           }}
+                                    />
+                                    :
+                                    null
+                                }
+
                             </div>
 
 

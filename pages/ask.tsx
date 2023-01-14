@@ -16,7 +16,7 @@ const Ask = () => {
                 loop: true,
                 autoplay: true
             })
-        currentNavActiveIndex(0)
+        currentNavActiveIndex(1)
 
     }, [])
 

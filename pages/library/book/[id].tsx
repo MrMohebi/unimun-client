@@ -585,7 +585,6 @@ const Book = (props: Props) => {
                                                                 Toast(e.data.buyDigitalBook.message);
                                                             }
                                                             if (e.data.buyDigitalBook.data[0].cypher) {
-                                                                console.log('yep')
                                                                 window.open(DOWNLOAD_HOST() + e.data.buyDigitalBook.data[0].url, '_blank')
                                                                 window.location.reload();
                                                             }
