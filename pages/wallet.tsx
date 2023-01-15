@@ -130,7 +130,7 @@ const Wallet = () => {
 
                     setLoading(false)
                 } catch (e) {
-                    alert('bad request')
+                    // alert('bad request')
                 }
         }
 

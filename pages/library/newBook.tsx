@@ -467,6 +467,9 @@ const NewBook = () => {
             {
                 locationBottomSheetOpen ?
                     <DynamicMap
+                        onOutOfBound={() => {
+                            console.log("out of bounds")
+                        }}
                         defaultText={reactiveBookData.location ? reactiveBookData.location.text : ""}
                         defaultLat={reactiveBookData.location ? reactiveBookData.location.lat : ""}
                         defaultLon={reactiveBookData.location ? reactiveBookData.location.lon : ""}

@@ -16,10 +16,18 @@ const LocationBottomSheet = (props: {
     defaultText?: string
     defaultLat?: string
     defaultLon?: string
-
+    onOutOfBound?: Function
 }) => {
 
 
+    let limit = {
+        lat: {min: 30.21694853888659, max: 30.33680887367791},
+        lon: {min: 57.01101532162637, max: 57.138377537426074},
+    }
+    let southWest = L.latLng(30.21694853888659, 57.138377537426074),
+        northEast = L.latLng(30.33680887367791, 57.01101532162637),
+        mybounds = L.latLngBounds(southWest, northEast);
+    let defaultPoint = L.latLng(30.287415, 57.052425)
     let myIcon = L.icon({
         iconUrl: '/marker.png',
         iconSize: [55, 55],
@@ -32,6 +40,7 @@ const LocationBottomSheet = (props: {
 
     let mapRef = useRef(null);
 
+    const [outOfBounds, setOutOfBounds] = useState(false);
 
     function MapEvent() {
         const [position, setPosition] = useState(null)
@@ -43,6 +52,7 @@ const LocationBottomSheet = (props: {
             load() {
                 // setMarkerX(map.getCenter().lat)
                 // setMarkerY(map.getCenter().lng)
+                map.setMaxBounds(mybounds)
             },
 
             move() {
@@ -50,11 +60,44 @@ const LocationBottomSheet = (props: {
                     let lat = map.getCenter().lat
                     let lon = map.getCenter().lng
 
-                    // console.log(map.getCenter())
+
+                    if ((!(lat > limit.lat.max || lat < limit.lat.min) && !(lon > limit.lon.max || lon < limit.lon.min))) {
+                        setOutOfBounds(false)
+                    } else {
+                        setOutOfBounds(true)
+                    }
+
+                    if (lat > limit.lat.max || lat < limit.lat.min) {
+
+                        if (props.onOutOfBound) {
+                            props.onOutOfBound()
+                            // setMarkerX(30.287415)
+                            // map.panTo(defaultPoint)
+                        }
+                    } else {
+                        setMarkerX(lat)
+
+                    }
+
+                    if (lon > limit.lon.max || lon < limit.lon.min) {
+
+                        if (props.onOutOfBound) {
+                            props.onOutOfBound()
+                            // setMarkerY(57.052425)
+                            // map.panTo(defaultPoint)
+                        }
+
+
+                    } else {
+                        setMarkerY(lon)
+
+                    }
                     props.onLatChanged(lat)
-                    setMarkerX(lat)
+                    // setMarkerX(lat)
                     props.onLngChanged(lon)
-                    setMarkerY(lon)
+                    // setMarkerY(lon)
+
+
                 } catch (e) {
                     console.log(e)
                 }
@@ -98,7 +141,9 @@ const LocationBottomSheet = (props: {
         <div
             className={'fixed top-0 left-0 h-full bg-blue-300 w-full z-[45] bg-black/40 overflow-scroll flex flex-col-reverse  items-center '}
             style={{}}>
-            <div className={'w-full rounded-t-2xl  overflow-hidden shrink-0 bg-white  relative'}>
+
+            <div className={'w-full rounded-t-2xl relative  overflow-hidden shrink-0 bg-white  relative'}>
+
                 <MapContainer ref={mapRef} zoomAnimation={true}
                               className={'h-72 relative rounded-2xl mx-1.5 mt-1.5'}
                               center={props.defaultLat ? [parseFloat(props.defaultLat), (parseFloat(props.defaultLon ?? '0'))] : [markerX, markerY]}
@@ -123,6 +168,15 @@ const LocationBottomSheet = (props: {
                     </Marker>
                     <MapEvent/>
                 </MapContainer>
+                {outOfBounds ?
+                    <div
+                        className={'pointer-events-none absolute top-32 w-full h-10 bg-black/50 backdrop-blur pt-2 z-[999] IranSansMedium text-center text-white'}>
+                        در حال حاضر فقط از محدوده کرمان پشتیبانی میکنیم.
+                    </div>
+                    :
+                    null
+                }
+
 
                 <Input defaultValue={props.defaultText ?? ""} inputRef={BottomSheetInputRef} id={'inpt'}
                        multiLine={true}
@@ -140,13 +194,16 @@ const LocationBottomSheet = (props: {
                     className={'IranSansMedium text-textDark mr-3 text-[0.7rem]'}>آدرس دقیق محل تحویل کتاب را بنویسید</span>
                 <div className={'IranSans text-textDark w-full bg-background h-3 mt-2 mb-20'}/>
                 <div
-                    className={'absolute w-full border bottom-0 left-1/2 -translate-x-1/2 h-12 flex flex-row justify-start items-center'}>
+                    className={`${outOfBounds ? "grayscale pointer-events-none" : ""} absolute w-full border bottom-0 left-1/2 -translate-x-1/2 h-12 flex flex-row justify-start items-center`}>
                     <Button className={'mr-2 rounded-2xl active:scale-75 transition-all'} onClick={() => {
                         props.onSubmit()
                     }}>
                         <img src="/assets/svgs/send.svg" className={'w-8 h-8 '} alt=""/>
 
                     </Button>
+                    <Input id={'text'} numOnly={false} wrapperClassName={'h-full w-full'}
+                           inputClassName={'border-none IranSansMedium'} placeHolder={'عنوان آدرس (اختیاری)'}/>
+
                 </div>
             </div>
 
