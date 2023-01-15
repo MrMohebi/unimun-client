@@ -241,7 +241,6 @@ const Book = (props: Props) => {
                 null
             }
 
-
             {/*<ContactToast*/}
             {/*    onClose={(command: string) => {*/}
             {/*        if (command === 'copyPhone') {*/}
