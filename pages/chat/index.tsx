@@ -10,6 +10,7 @@ import {DOWNLOAD_HOST, UnimunID} from "../../store/GLOBAL_VARIABLES";
 import {CurrentChatUserData} from "../../store/chat";
 import FullScreenLoading from "../../components/normal/FullScreenLoading/FullScreenLoading";
 import Toast from "../../components/normal/Toast/Toast";
+import {CHAT} from "../../Interfaces";
 
 
 const Index = () => {
@@ -107,7 +108,7 @@ const Index = () => {
             {/*</div>*/}
 
 
-            <div className={'h-full overflow-scroll '}>
+            <div className={'h-full overflow-scroll pb-20'}>
                 <FullScreenLoading show={!chats.length && !chatsArrived}/>
 
                 {/*{*/}
@@ -122,23 +123,9 @@ const Index = () => {
                 {/*}*/}
 
 
-                {chats.map((chat: {
-                    id: string
-                    title: string
-                    profiles: [any]
-                    members: any
-                    user: {
-                        id: string
-                        name: string
-                        profiles: [any]
-                    }
-                    lastMessage: {
-                        text: string
-                        sentAt: number
-                    }
-
-                }, index) => {
-
+                {chats.slice().sort((a: CHAT, b: CHAT) => {
+                    return b.lastMessage.sentAt - a.lastMessage.sentAt
+                }).map((chat: CHAT, index) => {
                     // if (chat.id !== UnimunID())/
                     if (chat.user)
                         return (
@@ -171,7 +158,7 @@ const Index = () => {
                                             className={'col-span-5 border-b-2 flex flex-col justify-start items-start pt-3'}>
                                             <div id={'name'} className={'flex flex-row justify-start items-center'}>
                                                 <span
-                                                    className={"IranSansMedium text-black"}>{chat.title}</span>
+                                                    className={"IranSansMedium text-black"}>{chat.title.length ? chat.title : "کاربر یونیمون"}</span>
                                             </div>
                                             <div id={'status'}
                                                  className={'flex flex-row justify-between items-center mt-2 w-full'}>

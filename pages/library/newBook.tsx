@@ -535,7 +535,7 @@ const NewBook = () => {
                     mainScroller.current.scroll(0, 0)
 
 
-            }} back={true} title={'افزودن کتاب'}/>
+            }} back={true} title={editing ? "ویرایش کتاب" : 'افزودن کتاب'}/>
 
             {
                 categoryComponent ?

@@ -229,14 +229,17 @@ const Book = (props: Props) => {
         <div className={'overflow-scroll h-full'}>
 
             <ToastContainer/>
-            <LoginBottomSheet open={loginOpen} onClose={() => {
-                setLoginOpen(false)
-            }} onLoginComplete={() => {
-                window.location.reload();
-                setLoginOpen(false)
+            {loginOpen ?
+                <LoginBottomSheet open={loginOpen} onClose={() => {
+                    setLoginOpen(false)
+                }} onLoginComplete={() => {
+                    window.location.reload();
+                    setLoginOpen(false)
 
-            }}
-            />
+                }}
+                /> :
+                null
+            }
 
 
             {/*<ContactToast*/}
@@ -569,34 +572,38 @@ const Book = (props: Props) => {
                             <Button id={'buy-book'} className={'w-full h-12 bg-primary rounded-xl  bottom-0 '}
                                     rippleColor={'rgba(255,255,255,0.4)'}
                                     onClick={() => {
-                                        if (!btnLoading) {
-                                            if (book.isDownloadable) {
-                                                if (book.bookFiles.length) {
-                                                    if (book.isPurchasable && !book.bookFiles[0].cypher) {
-                                                        setFullScreenLoading(true)
-                                                        buyBook({
-                                                            variables: {
-                                                                id: bookId
-                                                            }
-                                                        }).then((e) => {
-                                                            setFullScreenLoading(false)
-                                                            console.log(e)
-                                                            if (e.data.buyDigitalBook.message) {
-                                                                Toast(e.data.buyDigitalBook.message);
-                                                            }
-                                                            if (e.data.buyDigitalBook.data[0].cypher) {
-                                                                window.open(DOWNLOAD_HOST() + e.data.buyDigitalBook.data[0].url, '_blank')
-                                                                window.location.reload();
-                                                            }
-                                                        })
+                                        if (!UserToken()) {
+                                            setLoginOpen(true)
+                                        } else {
+                                            if (!btnLoading) {
+                                                if (book.isDownloadable) {
+                                                    if (book.bookFiles.length) {
+                                                        if (book.isPurchasable && !book.bookFiles[0].cypher) {
+                                                            setFullScreenLoading(true)
+                                                            buyBook({
+                                                                variables: {
+                                                                    id: bookId
+                                                                }
+                                                            }).then((e) => {
+                                                                setFullScreenLoading(false)
+                                                                console.log(e)
+                                                                if (e.data.buyDigitalBook.message) {
+                                                                    Toast(e.data.buyDigitalBook.message);
+                                                                }
+                                                                if (e.data.buyDigitalBook.data[0].cypher) {
+                                                                    window.open(DOWNLOAD_HOST() + e.data.buyDigitalBook.data[0].url, '_blank')
+                                                                    window.location.reload();
+                                                                }
+                                                            })
+                                                        } else {
+                                                            window.open(DOWNLOAD_HOST() + book.bookFiles[0].url, '_blank')
+                                                        }
                                                     } else {
-                                                        window.open(DOWNLOAD_HOST() + book.bookFiles[0].url, '_blank')
+                                                        requestBookFromChat()
                                                     }
                                                 } else {
-                                                    buyBookFromUnimun()
+                                                    requestBookFromChat()
                                                 }
-                                            } else {
-                                                buyBookFromUnimun()
                                             }
                                         }
 

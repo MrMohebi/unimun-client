@@ -707,7 +707,7 @@ const NewBrochure = () => {
                 else
                     router.push('/library')
 
-            }} back={true} title={'افزودن جزوه'}/>
+            }} back={true} title={editing ? 'ویرایش جزوه' : 'افزودن جزوه'}/>
 
             {
                 showSemester ?
