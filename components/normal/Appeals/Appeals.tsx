@@ -89,7 +89,7 @@ const Appeals = () => {
     useEffect(() => {
         if (lastAppealSubmitSuccess().length) {
             //todo change test
-            Toast('آگهی شما ثبت شد و  در انتظار بررسی است', 'test', null, <div className={'w-7 h-7 shrink-0'}>
+            Toast('آگهی شما ثبت شد و  در انتظار بررسی است', 'test', null, <div className={'w-7 h-7 shrink-0 pt-1'}>
                 <CheckCircle/></div>)
             lastAppealSubmitSuccess('')
         }
