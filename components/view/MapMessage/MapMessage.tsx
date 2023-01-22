@@ -7,9 +7,6 @@ const MapMessage = (props: {
     item: any
 }) => {
 
-
-    console.log(props)
-
     let myIcon = L.icon({
         iconUrl: '/marker.png',
         iconSize: [55, 55],

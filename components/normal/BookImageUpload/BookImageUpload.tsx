@@ -83,7 +83,6 @@ const BookImageUpload = (props: {
                 :
                 <div className={'w-full h-full absolute opacity-0 pointer-events-auto'} onClick={() => {
                     props.onImageClick(uploadedImageURL)
-                    console.log('clicked')
                 }}></div>
             }
 

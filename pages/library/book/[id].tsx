@@ -113,6 +113,13 @@ const Book = (props: Props) => {
 
     const [likeBook, likeBookResult] = useMutation(LIKE_BOOK_MUTATIOn);
 
+    const COUNT_BOOK_DOWNLOAD_MUTATION = gql`
+        mutation($id:ID!) {
+            downloadCountBook(id: $id)
+        }
+    `
+    const [downloadBookCount, downloadBookCountResult] = useMutation(COUNT_BOOK_DOWNLOAD_MUTATION);
+
     let bookConnectQuery = gql`
         mutation bookConnect($bookId:ID!,$userId:ID!){
             bookConnectClick(
@@ -225,6 +232,13 @@ const Book = (props: Props) => {
     }
 
 
+    const countBookDownload = () => {
+        downloadBookCount({
+            variables: {
+                id: bookId
+            }
+        }).then()
+    }
     return (
         <div className={'overflow-scroll h-full'}>
 
@@ -590,11 +604,13 @@ const Book = (props: Props) => {
                                                                     Toast(e.data.buyDigitalBook.message);
                                                                 }
                                                                 if (e.data.buyDigitalBook.data[0].cypher) {
+                                                                    countBookDownload()
                                                                     window.open(DOWNLOAD_HOST() + e.data.buyDigitalBook.data[0].url, '_blank')
                                                                     window.location.reload();
                                                                 }
                                                             })
                                                         } else {
+                                                            countBookDownload()
                                                             window.open(DOWNLOAD_HOST() + book.bookFiles[0].url, '_blank')
                                                         }
                                                     } else {

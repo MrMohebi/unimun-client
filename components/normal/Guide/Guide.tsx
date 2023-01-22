@@ -3,11 +3,12 @@ import React from 'react';
 const Guide = (props: {
     onCLose: Function
     show: boolean
-    className: string
+    // className: string
     descriptionClassName: string
     titleClassName: string
     title: string
     description: string
+    positionAndSizeClassNames: string
 }) => {
 
 
@@ -20,7 +21,7 @@ const Guide = (props: {
                     props.onCLose();
                 }}></div>
             <div
-                className={props.className + " guide " + (props.show ? "" : " pointer-events-none transition-all 0.2s scale-[5] opacity-0")}>
+                className={props.positionAndSizeClassNames + " guide fixed origin-center  flex flex-col justify-center items-center bg-transparent z-[100]  " + (props.show ? "" : " pointer-events-none transition-all 0.2s scale-[5] opacity-0")}>
 
             </div>
 

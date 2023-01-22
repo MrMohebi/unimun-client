@@ -21,6 +21,21 @@ const Toast = (text: string, style?: string, autoClose?: any, icon?: string | Re
             margin: 'auto',
             writable: true
 
+        },
+        'test': {
+            bottom: (bottom ?? '40') + 'px',
+            width: '95%',
+            height: "3rem",
+            minHeight: "3rem",
+            borderRadius: ' 1rem',
+            padding: '0px',
+            display: 'flex',
+            flexFlow: 'row-reverse',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: 'auto',
+            background: "rgba(255,255,255,0.9)",
+            writable: true
         }
     } as any
 

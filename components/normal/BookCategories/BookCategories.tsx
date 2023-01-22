@@ -113,8 +113,6 @@ const BookCategories = (props: { onCatSelected: Function }) => {
         <div className={'w-full pt-20 h-full absolute  top-0 left-0 z-40 bg-background overflow-scroll pb-10 '}
              id={'test-categories'}>
             <Header title={'انتخاب دسته بندی'} back={true} backOnClick={() => {
-                console.log(BookDataStore().categoryID)
-                console.log(BookDataStore().categoryPersian)
 
                 if (getBookCategories.loading || lastClicked.current.length < 1) {
                     props.onCatSelected({

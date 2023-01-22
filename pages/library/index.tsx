@@ -33,6 +33,7 @@ import {ToastContainer} from "react-toastify";
 import Guide from "../../components/normal/Guide/Guide";
 import {getLocalStorageItem, getToken, setLocalStorageItem} from "../../helpers/TokenHelper";
 import WelcomLibary from "../../components/normal/WelcomLibary/WelcomLibary";
+import CheckCircle from "../../assets/svgs/check-circle.svg";
 
 const Index = () => {
 
@@ -128,14 +129,17 @@ const Index = () => {
 
 
         if (lastBookSubmitSuccess().length) {
-            // console.log('thee should be an alert for new book')
-            Toast('کتاب شما ثبت شد و  در انتظار بررسی است')
+            //todo change test
+            Toast('کتاب شما ثبت شد و  در انتظار بررسی است', 'test', null, <div className={'w-7 h-7 shrink-0'}>
+                <CheckCircle/></div>)
             lastBookSubmitSuccess('')
         }
 
         if (lastBrochureSubmitSuccess().length) {
-            // console.log('thee should be an alert for new book')
-            Toast('جزوه شما ثبت شد و  در انتظار بررسی است')
+            //todo change test
+
+            Toast('جزوه شما ثبت شد و  در انتظار بررسی است', 'test', null, <div className={'w-7 h-7 shrink-0'}>
+                <CheckCircle/></div>)
             lastBrochureSubmitSuccess('')
         }
 
@@ -522,7 +526,7 @@ const Index = () => {
                                                                      className={'IranSansMedium flex flex-row items-center text-sm  whitespace-nowrap'}>
                                                             <span
                                                                 className={'text-textDark'}>
-                                                                وضعیت ظاهری:</span>
+                                                                ترم ارائه:</span>
                                                                     <span
                                                                         className={'overflow-hidden text-ellipsis  inline-block mr-1'}>
                                                                                                                             {book.term ? book.term ?? "-" : "-"}
@@ -535,12 +539,10 @@ const Index = () => {
                                                         <div
                                                             className={'IranSansMedium text-sm  whitespace-nowrap flex flex-row justify-center items-center'}>
                                                             <span
-                                                                className={'text-textDark ml-1'}>ارائه دهنده:</span> {book.creator ? UNIMUN_PROVIDERS().includes(book.creator.id) ?
-                                                            <div className={' w-14  inline-block'}>
-                                                                <Unimun/>
-                                                            </div>
+                                                                className={'text-textDark ml-1'}>ارائه دهنده:</span> {book.creator && book.creator.name ?
+                                                            book.creator.name
                                                             :
-                                                            book.creator.name : '-' ?? '-'}
+                                                            "کاربر یونیمون"}
                                                         </div>
 
 
@@ -760,12 +762,11 @@ const Index = () => {
                 ' استفاده از این دکمه میتونی کتاب یا جزوه ات رو اضافه کنی'
             }
                    descriptionClassName={'fixed bottom-44 w-full  px-5  left-1/2 -translate-x-1/2 z-[100] IranSansMedium text-sm text-white text-justify'}
-                   titleClassName={'fixed top-16 w-full  px-5  left-1/2 -translate-x-1/2 z-[100] IranSansBold text-xl text-white text-center'}
+                   titleClassName={'fixed bottom-56 w-full px-5  left-1/2 -translate-x-1/2 z-[100] IranSansBold text-xl text-white text-justify'}
                    onCLose={() => {
-
                        setShowGuide(false)
                    }}
-                   className={'fixed  origin-center rounded-full h-24 w-24 flex flex-col justify-center items-center right-2 bottom-14 z-[100] bg-transparent'}
+                   positionAndSizeClassNames={' h-24 w-24  right-2 bottom-14 rounded-full '}
                    show={showGuide}/>
             <div className={'fixed flex flex-col justify-center items-center right-7 bottom-20 z-50'}>
                 <Button rippleColor={'rgba(0,0,0,0.24)'} id={'new-book-btn'}

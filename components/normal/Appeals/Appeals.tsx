@@ -11,6 +11,7 @@ import {
 import {getAppealsQuery} from "../../../Requests/normal/appeals";
 import NewAppealButton from "../NewAppealButton/NewAppealButton";
 import ThousandTomans from '../../../assets/svgs/thousandTomans.svg';
+import CheckCircle from '../../../assets/svgs/check-circle.svg';
 import Search from "../Search/Search";
 import _ from 'lodash';
 import SkeletonElement from "../../view/Skeleton/Skeleton";
@@ -22,6 +23,8 @@ import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 import Toast from "../Toast/Toast";
 import {useRouter} from "next/router";
 import {useDebouncedCallback} from "use-debounce";
+
+import Guide from "../Guide/Guide";
 
 
 const Appeals = () => {
@@ -85,7 +88,9 @@ const Appeals = () => {
 
     useEffect(() => {
         if (lastAppealSubmitSuccess().length) {
-            Toast('آگهی شما ثبت شد و  در انتظار بررسی است')
+            //todo change test
+            Toast('آگهی شما ثبت شد و  در انتظار بررسی است', 'test', null, <div className={'w-7 h-7 shrink-0'}>
+                <CheckCircle/></div>)
             lastAppealSubmitSuccess('')
         }
     }, [])
@@ -150,8 +155,6 @@ const Appeals = () => {
 
 
         gtAppeals.refetch({after: EndCursor(),}).then((value) => {
-            console.log(value.data.appeals.edges[value.data.appeals.edges.length - 1])
-            console.log(reactiveAppeals[reactiveAppeals.length - 1])
 
         })
         // appealsResult.refetch({
@@ -351,7 +354,6 @@ const Appeals = () => {
                 if (!e.error) {
                     if (e.data.appeals.edges.length === 0)
                         setNothingFound(true)
-                    console.log(e.data.appeals.edges)
                     setSearchedAppeals(e.data.appeals.edges)
                 }
             })
@@ -366,7 +368,6 @@ const Appeals = () => {
     }
 
     useEffect(() => {
-        console.log(LastAppealsScrollPosition());
         if (scrollerRef.current)
             (scrollerRef.current as HTMLDivElement).scrollTo(0, LastAppealsScrollPosition())
     }, []);
@@ -374,6 +375,7 @@ const Appeals = () => {
     return (
         <div className={'h-full relative overflow-scroll '} onScroll={onAdSectionScroll}>
             <ToastContainer transition={Slide}/>
+
 
             <Search searchLoading={searchLoading} collapse={scrollingToBottom}
                     onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -474,10 +476,8 @@ const Appeals = () => {
 
                         {searchedAppeals.length ?
                             searchedAppeals.map((ad: any, index: number) => {
-                                console.log(ad)
                                 console.log('this is searched')
                                 let Appeal = ad.node
-                                console.log(Appeal.status)
                                 if (Appeal.status !== "DELETED")
                                     return (appealUI(Appeal, index, index + 'i', Appeal.id))
                             })

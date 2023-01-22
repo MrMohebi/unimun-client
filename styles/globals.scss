@@ -258,7 +258,7 @@ textarea {
   background-clip: padding-box !important;
 }
 
-input {
+input[type=text] {
 
   outline: none !important;
 
@@ -344,4 +344,18 @@ input {
     scale: 1;
   }
 
+}
+
+.Toastify__toast {
+  border-radius: 0.8rem !important;
+  padding-right: 0.1rem !important;
+
+  div[role=alert] {
+    div {
+      font-size: 0.875rem;
+      font-family: IranSansMedium;
+      text-align: right;
+      padding-right: 1rem;
+    }
+  }
 }

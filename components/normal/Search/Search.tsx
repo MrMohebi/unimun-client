@@ -26,6 +26,11 @@ const Search = (props: Props) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const router = useRouter()
 
+    const onSearchInputChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+        inputText[1](e.currentTarget.value)
+        if (props.onInputChange)
+            props.onInputChange(e)
+    }
     useEffect(() => {
         manualSearch[1](false)
 
@@ -88,22 +93,28 @@ const Search = (props: Props) => {
                     <div style={{transform: props.searchLoading ? 'scale(1)' : 'scale(0)'}}
                          className={`origin-center transition-all duration-300  w-full absolute top-0 left-0 h-full flex flex-col items-center justify-center `}>
                         {/*<TailSpin color="#42b0f3" height={25} width={25}/>*/}
-                        <LoadingDialog wrapperClassName={'w-7 h-7'} color={'#2aa0ff'} />
+                        <LoadingDialog wrapperClassName={'w-7 h-7'} color={'#2aa0ff'}/>
                     </div>
                 </div>
-                <input ref={inputRef} id={'search-input'}
+                <input ref={inputRef}
+                       id={'search-input'}
                        className={'w-full h-full bg-transparent outline-0 px-2 text-sm IranSansMedium'}
-                       placeholder={'جستجو'} type="text" onChange={(e) => {
-                    inputText[1](e.currentTarget.value)
-                    if (props.onInputChange)
-                        props.onInputChange(e)
-                }}/>
-                < div
+                       placeholder={'جستجو'}
+                       type="text"
+                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                           onSearchInputChanged(e)
+                       }}/>
+                <div
                     className={`w-5 h-5 flex flex-col justify-center transition-all duration-100 items-center p-0.5 ${inputText[0].length ? "scale-100" : 'scale-0'}`}
                     onClick={() => {
-                        if (inputRef.current)
-                            inputRef.current.value = ''
+                        if (inputRef.current) {
+                            inputRef.current.value = 'popo'
+                            // inputRef.current.value = ''
+                        }
+
                         inputText[1]('')
+
+
                     }}><CloseSVG/></div>
 
                 {/*<div className={'flex flex-row items-center justify-center grayscale opacity-0'}>*/}

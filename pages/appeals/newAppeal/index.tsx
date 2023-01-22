@@ -14,6 +14,7 @@ import {newAppealQuery} from "../../../Requests/withAuthentication/appeals";
 import GallerySVG from '../../../assets/svgs/gallery.svg'
 import FileUploadSVG from '../../../assets/svgs/fileUpload.svg'
 import TelInputSVG from '../../../assets/svgs/telInput.svg'
+import Trash from '../../../assets/svgs/trash.svg'
 import BoldMobile from '../../../assets/svgs/boldMobile.svg'
 import RightSquareSVG from '../../../assets/svgs/rightSquare.svg'
 import axios, {AxiosRequestConfig} from "axios";
@@ -274,16 +275,20 @@ const Index = () => {
                                                         newAppealMainSection.current.scrollBy(0, 200)
                                                 }, 200)
 
-                                            }} maxLength={20} onChange={(e) => {
-                                                let updatedHashtags = hashtags
-                                                e.currentTarget.value = e.currentTarget.value.replaceAll(/[ ]/g, '_')
-                                                e.currentTarget.value = e.currentTarget.value.replaceAll(/[@;!.# ]/g, '')
-                                                e.currentTarget.value = e.currentTarget.value.slice(0, 20)
-                                                updatedHashtags[index] = e.currentTarget.value
-                                                setHashtags([...updatedHashtags])
-                                                e.currentTarget.style.width = e.currentTarget.value.length + 4 + "ch"
-                                            }} value={hashtags[index]}
-                                                   className={'mr-1 w-5 outline-0 focus:outline-0 transition-all focus:outline-0'}/>
+                                            }} maxLength={20} style={{
+                                                width: '20px'
+                                            }}
+                                                   onChange={(e) => {
+                                                       let updatedHashtags = hashtags
+                                                       e.currentTarget.value = e.currentTarget.value.replaceAll(/[ ]/g, '_')
+                                                       e.currentTarget.value = e.currentTarget.value.replaceAll(/[@;!.# ]/g, '')
+                                                       e.currentTarget.value = e.currentTarget.value.slice(0, 20)
+                                                       updatedHashtags[index] = e.currentTarget.value
+                                                       setHashtags([...updatedHashtags])
+                                                       e.currentTarget.style.width = "0ch"
+                                                       e.currentTarget.style.width = e.currentTarget.value.length + 4 + "ch"
+                                                   }} value={hashtags[index]}
+                                                   className={'mr-1 outline-0 focus:outline-0 transition-all focus:outline-0'}/>
                                             <div onClick={() => {
                                                 let filterHashtag = [...hashtags]
                                                 filterHashtag = filterHashtag.filter((fhashtag, filterIndex) => {
@@ -441,9 +446,6 @@ const Index = () => {
                                                                  let backBook = produce(uploadedImages, (draft: any) => {
                                                                      draft.push(e.data)
                                                                  })
-                                                                 console.log(e.data)
-                                                                 console.log(backBook)
-                                                                 // updateBookData('attachments', backBook)
                                                                  setUploadedImages(backBook)
 
                                                                  console.log(e)
@@ -497,10 +499,17 @@ const Index = () => {
                                 <div className={'file w-full flex flex-row justify-between items-center my-3'}>
                                     <div className={'file-right flex flex-row justify-start items-center'}>
                                         <div dir={'ltr'} className={'h-10 w-10 m-0 overflow-hidden'}><FileSVG/></div>
-                                        <div
-                                            className={'IranSansMedium mr-4 opacity-60'}>{((file).url).split('/').reverse()[0]}</div>
+                                        <div className={'flex flex-col justify-start items-start'}>
+                                            <div
+                                                className={'IranSansMedium mr-4 opacity-60 whitespace-nowrap max-w-[10rem] overflow-hidden overflow-ellipsis'}>{((file).url).split('/').reverse()[0]}
+                                            </div>
+                                            <div
+                                                className={'IranSansMedium mr-4 opacity-60 whitespace-nowrap max-w-[10rem] overflow-hidden overflow-ellipsis text-textDark text-sm'}>{file.sizeMB + "MB"}
+                                            </div>
+                                        </div>
+
                                     </div>
-                                    <div dir={'ltr'} className={'IranSans w-7 h-7 '}><FileUploadSVG/></div>
+                                    <div dir={'ltr'} className={'IranSans w-7 h-7 '}><Trash/></div>
                                 </div>
                             </div>)
                         })}
@@ -566,7 +575,8 @@ const Index = () => {
             </div>
 
         </div>
-    );
+    )
+        ;
 };
 
 export default Index;

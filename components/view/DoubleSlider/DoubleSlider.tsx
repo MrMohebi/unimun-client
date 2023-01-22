@@ -61,14 +61,20 @@ const DoubleSlider = (props: Props) => {
 
     const InputsStyle = {
         background: `linear-gradient(${props.sliderColor},${props.sliderColor}) no-repeat center`,
-        backgroundSize: `100% ${props.sliderSize}`
+        backgroundSize: `100% ${props.sliderSize}`,
+
+    }
+    const UpperInputStyle = {
+        background: `linear-gradient(${props.sliderColor},${props.sliderColor}) no-repeat center`,
+        backgroundSize: `100% ${props.sliderSize}`,
+
     }
     return (
         <div className="multi-range">
             <input style={InputsStyle} type="range" min={props.min} max={props.max}
                    defaultValue={props.defaultLower ?? 0} step={props.steps}
                    id="lower"/>
-            <input type="range" min={props.min} max={props.max} defaultValue={props.defaultUpper ?? 0}
+            <input className={''} type="range" min={props.min} max={props.max} defaultValue={props.defaultUpper ?? 0}
                    step={props.steps}
                    id="upper"/>
         </div>

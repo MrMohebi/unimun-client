@@ -8,7 +8,7 @@ import {UserToken} from "./store/user";
 
 let isTesting = (process.env.NODE_ENV === 'development') || (process.env.NEXT_PUBLIC_IS_DEV_MOD === '1');
 
-// isTesting = false;
+isTesting = false;
 
 let uri = isTesting ? 'https://tttapi.unimun.me/graphql' : 'https://api.unimun.me/graphql'
 let uriChat = isTesting ? 'https://tttchat.unimun.me/graphql' : 'https://chat.unimun.me/graphql'
@@ -54,6 +54,7 @@ const authLink = setContext((_, {headers}) => {
     return {
         headers: {
             ...headers,
+            // token: token ? `kjdsahfjbvwwosdfjnsdgjhertsadhjhgkdfgjhhhksdjfg` : "",
             token: token ? `${token}` : "",
         }
     }
