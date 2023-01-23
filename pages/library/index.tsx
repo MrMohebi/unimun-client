@@ -36,7 +36,6 @@ import WelcomLibary from "../../components/normal/WelcomLibary/WelcomLibary";
 import CheckCircle from "../../assets/svgs/check-circle.svg";
 
 const Index = () => {
-
     const router = useRouter();
     const [newBookButtonOpened, SnewBookButtonOpened] = useState(false);
     const [books, _books] = useState([]);
