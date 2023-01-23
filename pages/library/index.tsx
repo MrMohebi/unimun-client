@@ -142,8 +142,6 @@ const Index = () => {
                 <CheckCircle/></div>)
             lastBrochureSubmitSuccess('')
         }
-        Toast('جزوه شما ثبت شد و  در انتظار بررسی است', 'test', null, <div className={'w-7 h-7 shrink-0 pt-1'}>
-            <CheckCircle/></div>)
 
         currentNavActiveIndex(2)
 
