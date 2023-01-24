@@ -108,7 +108,7 @@ const Search = (props: Props) => {
                     className={`w-5 h-5 flex flex-col justify-center transition-all duration-100 items-center p-0.5 ${inputText[0].length ? "scale-100" : 'scale-0'}`}
                     onClick={() => {
                         if (inputRef.current) {
-                            inputRef.current.value = 'popo'
+                            inputRef.current.value = ''
                             // inputRef.current.value = ''
                         }
 
