@@ -215,43 +215,6 @@ const Index = () => {
             booksDivRef.current.scrollTo(0, LastBooksScrollPosition())
     }, []);
 
-    // const searchDeb = _.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-    //
-    //     getBooks({
-    //         variables: {
-    //             searchText: e.target.value,
-    //             first: 20,
-    //             after: ''
-    //         }
-    //     }).then((result) => {
-    //         console.log(result)
-    //
-    //         try {
-    //
-    //             let Books = [] as object[]
-    //             result.data.books.edges.forEach((book: { node: any }) => {
-    //                 Books.push(book.node)
-    //             })
-    //             _books(Books as never[])
-    //
-    //
-    //             if (result.data.books.edges.length === 0) {
-    //                 _nothingFound(true)
-    //             } else {
-    //                 _nothingFound(false)
-    //             }
-    //
-    //
-    //         } catch (e) {
-    //             Toast('خطا هنگام دریافت کتاب ها')
-    //         }
-    //
-    //         _searchLoading(false)
-    //     })
-    //
-    // }, 1000)
-
-
     const getNewBooks = () => {
         if (hasMore) {
 
@@ -366,7 +329,11 @@ const Index = () => {
                      }
                  }}
                  className={`dimmer transition-all fixed w-full h-full bg-black ${newBookButtonOpened ? ' opacity-30' : 'opacity-0 pointer-events-none'} z-50`}></div>
-            <Search lib={true} onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            <Search onTextCleared={() => {
+                _searchLoading(false)
+                _nothingFound(false)
+                setSearchedBooks([])
+            }} lib={true} onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 if (e.target.value.replace(/ /g, '') === '') {
                     _searchLoading(false)
                     _nothingFound(false)

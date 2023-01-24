@@ -25,6 +25,7 @@ import {useRouter} from "next/router";
 import {useDebouncedCallback} from "use-debounce";
 
 import Guide from "../Guide/Guide";
+import produce from "immer";
 
 
 const Appeals = () => {
@@ -152,55 +153,9 @@ const Appeals = () => {
     }
     const getNewerAppeals = () => {
         // setReachedEndState(false)
-
-
         gtAppeals.refetch({after: EndCursor(),}).then((value) => {
 
         })
-        // appealsResult.refetch({
-        //     after: endCursor
-        // }).then((e) => {
-        //     if (e.data.appeals === null) {
-        //     } else {
-        //         if (e.error === undefined) {
-        //
-        //             if (e.data && e.data.hasOwnProperty('appeals') && e.data.appeals.hasOwnProperty('edges')) {
-        //                 if (!e.data.appeals.pageInfo.hasNextPage)
-        //                     ShasMore(false)
-        //
-        //
-        //                 let apls = appeals.concat(e.data.appeals.edges)
-        //                 setEndCursor(e.data.appeals.pageInfo.endCursor)
-        //                 setAppeals(apls)
-        //                 lastGottenAppeals(apls)
-        //                 reachedEnd.current = true;
-        //                 setReachedEndState(true)
-        //
-        //
-        //             }
-        //         } else {
-        //         }
-        //
-        //     }
-        //
-        //
-        // })
-        // if (!loading && appeals.length > 19) {
-        //     if (lastCursor != appeals[appeals.length - 1]['cursor']) {
-        //         lastCursor.current = (appeals[appeals.length - 1]['cursor'])
-        //
-        //
-        //         getAppeals({variables: {after: lastCursor.current}}).then((e) => {
-        //             checkLastCursor(e)
-        //             if (e.data) {
-        //                 if (e.data.appeals.edges.length < 19) {
-        //                     ShasMore(false)
-        //                 }
-        //             }
-        //             console.log(e)
-        //         })
-        //     }
-        // }
     }
 
     const onAdSectionScroll = (event: any) => {
@@ -377,7 +332,11 @@ const Appeals = () => {
             <ToastContainer transition={Slide}/>
 
 
-            <Search searchLoading={searchLoading} collapse={scrollingToBottom}
+            <Search onTextCleared={() => {
+                setSearchedAppeals([])
+                setSearchLoading(false)
+                setNothingFound(false)
+            }} searchLoading={searchLoading} collapse={scrollingToBottom}
                     onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         if (e.currentTarget.value.replace(/ /g, '') === '') {
                             setSearchedAppeals([])

@@ -18,6 +18,7 @@ interface Props {
     collapse: boolean
     searchLoading: boolean,
     lib?: boolean
+    onTextCleared?: Function
 }
 
 const Search = (props: Props) => {
@@ -112,6 +113,9 @@ const Search = (props: Props) => {
                             // inputRef.current.value = ''
                         }
 
+                        if (props.onTextCleared) {
+                            props.onTextCleared()
+                        }
                         inputText[1]('')
 
 
