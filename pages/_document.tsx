@@ -4,7 +4,7 @@ export default function Document() {
     return (
         <Html lang="en">
             <Head/>
-            <title>یونیمون، سیستم سیستم ارتباط سازی بین دانشگاه ها</title>
+            <title>یونیمون</title>
             <meta name="description"
                   content=" یونیمون سیستم ارتباط سازی بین داشنگاه ها، خرید و فروش کتاب و ثبت آگهی |Unimun"/>
             <body>
