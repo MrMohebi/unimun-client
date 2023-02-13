@@ -3,9 +3,7 @@ import {useRouter} from "next/router";
 import {gql, useLazyQuery, useMutation} from "@apollo/client";
 import {getAppealQuery} from "../../../Requests/normal/appeals";
 import Header from "../../../components/common/Header/Header";
-import Skeleton from "react-loading-skeleton";
 
-import {cssTransition} from "react-toastify";
 import Copy from '../../../assets/svgs/copy-icon.svg'
 
 import Divider from "../../../components/view/Divider/Divider";
@@ -13,11 +11,8 @@ import Tab from "../../../components/view/Tab/Tab";
 import FileSVG from "../../../assets/svgs/file.svg";
 import DownloadFileSVG from "../../../assets/svgs/downloadFile.svg";
 import ThousandTomans from '../../../assets/svgs/thousandTomans.svg'
-
 import {passedTime} from "../../../helpers/passedTime";
 import 'moment/locale/fa'
-import SVGModifier from "../../../components/common/SVGModifier/SVGModifier";
-import GalleryImageSVG from "../../../assets/svgs/galleryImage.svg";
 import SkeletonElement from "../../../components/view/Skeleton/Skeleton";
 import Head from "next/head";
 import {DOWNLOAD_HOST} from "../../../LocalVariables/LocalVariables";
@@ -112,9 +107,7 @@ const Item = () => {
 
     return (
         <div className={'w-full h-full'}>
-            <ToastContainer
-
-            />
+            <ToastContainer/>
 
             <ContactToast
                 onClose={(command: string) => {
@@ -351,8 +344,6 @@ const Item = () => {
                     <Button id={'connect-appeal'}
                             className={`w-11/12 h-14 transition-all duration-300 bg-primary rounded-xl flex flex-row justify-center items-center px-4`}
                             onClick={() => {
-
-
                                 setContactAppealShow(true)
                                 // if (/[^0-9]/.test(appeal.connectWay)) {
                                 //     window.location.replace(`https://t.me/${appeal.connectWay.replace('@', '')}`)

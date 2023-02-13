@@ -406,7 +406,7 @@ const Book = (props: Props) => {
                     </div>
 
 
-                    <div className={'flex flex-col justify-center items-center basis-0 flex-1'}>
+                    <div className={'flex flex-col justify-center items-center basis-0 flex-1 '}>
                         <span className={'text-textDark IranSansMedium text-sm'}>ارائه دهنده</span>
                         {
                             book.creator ?
@@ -428,7 +428,7 @@ const Book = (props: Props) => {
                 </div>
 
                 <div
-                    className={`w-full px-4 IranSansMedium pt-3 ${bookDetails ? ' pb-20' : 'pb-1'} transition-all text-sm rounded-2xl overflow-hidden bg-white relative  flex flex-col justify-start items-start mt-4`}>
+                    className={`w-full px-4 IranSansMedium pt-3 ${bookDetails ? ' pb-20' : 'pb-1'} transition-all text-sm rounded-2xl overflow-hidden bg-white relative  flex flex-col justify-start items-start mt-4 gap-1`}>
                     <div className={'flex flex-row'}>
 
                     </div>
@@ -453,6 +453,16 @@ const Book = (props: Props) => {
 
                     }
 
+                    {!book.isDownloadable ?
+                        <div className={'mt-2'}>
+                                <span
+                                    className={'text-textDark IranSansMedium text-sm inline-block'}>شهر:</span>
+
+                            <span
+                                className={'text-black IranSansMedium text-sm inline-block mr-2 '}>{"کرمان"}</span>
+                        </div> :
+                        null
+                    }
 
                     {
                         isBook ?
