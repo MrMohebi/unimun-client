@@ -12,7 +12,6 @@ import Back from '../assets/svgs/mob_back.svg'
 import Expand from '../assets/svgs/mob_expand.svg'
 import Icons from '../assets/svgs/mob-status-icons.svg'
 import UsePhone from "../components/normal/UsePhone/UsePhone";
-import {NewMessageNotification} from "../components/normal/NewMessageNotification";
 import React from "react";
 
 function MyApp({Component, pageProps}: AppProps) {
@@ -21,26 +20,25 @@ function MyApp({Component, pageProps}: AppProps) {
             <UserAuthenticationCheck>
                 <div
                     className={'overflow-hidden hide-scrollbars lg:block md:block md:h-full md:w-full lg:w-full lg:h-full block desktop  flex flex-col items-center justify-center'}>
-                    <div className={'hidden md:block lg:block'}>
+                    <div className={' use-phone hidden md:block lg:block'}>
                         <UsePhone/>
                     </div>
 
                     <div
                         id={'scaler'}
-                        className={'w-full h-full flex flex-col  items-center justify-center fixed left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2  md:h-mob-s-h lg:h-mob-s-h md:w-mob-s-w lg:w-mob-s-w '}
-                    >
+                        className={' w-full h-full flex flex-col  items-center justify-center fixed left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2  '}>
                         <div
                             dir={'ltr'}
-                            className={'w-full  h-full flex flex-col justify-center items-center md:flex lg:flex hidden '}>
+                            className={' md:aspect-[10.2/20]  md:h-[100%] flex flex-col justify-center items-center md:flex lg:flex hidden '}>
                             <Phone/>
 
-                            <div className={'w-full fixed bottom-20'}>
-                                <div dir={'ltr'} className={'w-14 h-14 p-5 rounded-2xl bottom-8 absolute -ml-16 '}
+                            <div className={'buttons w-full max-w-lg h-full fixed bottom-20'}>
+                                <div dir={'ltr'} className={'w-14 h-14 p-5 rounded-2xl bottom-8 absolute -ml-10  '}
                                      style={{background: 'rgba(255,255,255,0.5)'}}>
                                     <Back/>
                                 </div>
                                 <div dir={'ltr'}
-                                     className={'w-14 h-14 p-4 right-0 rounded-2xl bottom-8 absolute -mr-16 '}
+                                     className={'w-14 h-14 p-4 right-0 rounded-2xl bottom-8 absolute -mr-10 '}
                                      style={{background: 'rgba(255,255,255,0.5)'}}>
                                     <Expand/>
                                 </div>
@@ -50,8 +48,9 @@ function MyApp({Component, pageProps}: AppProps) {
                         {/*<NewMessageNotification/>*/}
 
                         <div dir={'rtl'}
-
-                             className={'h-full w-full -mt-2 overflow-hidden  lg:w-mob-w  lg:h-mob-h  md:w-mob-w md:h-mob-h  lg:fixed md:fixed lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2  md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-mob-border  lg:rounded-mob-border '}>
+                             className={'  md:aspect-[9.5/20] md:h-[85%]  -mt-2 overflow-hidden  ' +
+                                 // 'lg:w-mob-w  lg:h-mob-h  md:w-mob-w md:h-mob-h  ' +
+                                 'lg:fixed md:fixed lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2  md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-mob-border  lg:rounded-mob-border '}>
                             <Navbar>
                                 <div
                                     className={'h-6 w-full bg-white flex px-5 pt-1 flex-row justify-between items-center hidden lg:flex md:flex desktop-container'}
@@ -66,8 +65,6 @@ function MyApp({Component, pageProps}: AppProps) {
                                 <div className={'relative bg-background overflow-hidden h-full '}>
                                     {/*@ts-ignore*/}
                                     <Component {...pageProps} />
-
-
                                 </div>
                             </Navbar>
                         </div>
