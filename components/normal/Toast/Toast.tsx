@@ -1,9 +1,14 @@
 import React from 'react';
-import {toast} from "react-toastify";
+import {cssTransition, toast} from "react-toastify";
 
 
 const Toast = (text: string, style?: string, autoClose?: any, icon?: string | React.ReactElement, bottom?: number) => {
 
+
+    const bounce = cssTransition({
+        enter: "animate__animated animate__fadeInUp",
+        exit: "animate__animated animate__fadeOutDown"
+    });
     let styles = {
 
 
@@ -53,7 +58,8 @@ const Toast = (text: string, style?: string, autoClose?: any, icon?: string | Re
         autoClose: autoClose ?? false,
         pauseOnHover: true,
         closeButton: <div/>,
-        style: changedStyle
+        style: changedStyle,
+        transition: bounce
     });
 }
 export default Toast;

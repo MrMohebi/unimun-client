@@ -21,17 +21,15 @@ import SkeletonElement from "../../components/view/Skeleton/Skeleton";
 import {BooksStore} from "../../store/books";
 import InfiniteScroll from "react-infinite-scroll-component";
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
-import Unimun from '../../assets/svgs/unimun.svg'
 import {UserToken} from "../../store/user";
 import NoPic from "../../components/normal/NoPic/NoPic";
 import Free from '../../assets/svgs/free.svg'
-import {UNIMUN_PROVIDERS} from "../../store/GLOBAL_VARIABLES";
 import {currentNavActiveIndex} from "../../store/navbar";
 import {EndCursor} from "../../store/appeals";
 import {useDebouncedCallback} from "use-debounce";
 import {ToastContainer} from "react-toastify";
 import Guide from "../../components/normal/Guide/Guide";
-import {getLocalStorageItem, getToken, setLocalStorageItem} from "../../helpers/TokenHelper";
+import {getLocalStorageItem, setLocalStorageItem} from "../../helpers/TokenHelper";
 import WelcomLibary from "../../components/normal/WelcomLibary/WelcomLibary";
 import CheckCircle from "../../assets/svgs/check-circle.svg";
 
@@ -129,15 +127,17 @@ const Index = () => {
 
         if (lastBookSubmitSuccess().length) {
             //todo change test
-            Toast('کتاب شما ثبت شد و  در انتظار بررسی است', 'test', null, <div className={'w-7 h-7 shrink-0'}>
+            Toast('کتاب شما ثبت شد و  در انتظار بررسی است', 'test', 3000, <div className={'w-7 h-7 shrink-0'}>
                 <CheckCircle/></div>)
             lastBookSubmitSuccess('')
         }
 
         if (lastBrochureSubmitSuccess().length) {
+            // if (true) {
+
             //todo change test
 
-            Toast('جزوه شما ثبت شد و  در انتظار بررسی است', 'test', null, <div className={'w-7 h-7 shrink-0 pt-1'}>
+            Toast('جزوه شما ثبت شد و  در انتظار بررسی است', 'test', 3000, <div className={'w-7 h-7 shrink-0 pt-1'}>
                 <CheckCircle/></div>)
             lastBrochureSubmitSuccess('')
         }
@@ -315,8 +315,9 @@ const Index = () => {
     }, [showWelcomeDialog]);
 
     return (
-        <div className={'h-full relative '}>
-            <ToastContainer/>
+        <div className={'h-full relative'}>
+            <ToastContainer
+            />
             <WelcomLibary show={showWelcomeDialog} onCLose={() => {
                 setShowWelcomeDialog(false)
             }}/>
@@ -587,7 +588,7 @@ const Index = () => {
                                                             book.likes ?
 
                                                                 <div
-                                                                    className={'absolute h-7 left-1/2 -translate-x-1/2 flex flex-row justify-between items-center bottom-0 px-1 w-full'}>
+                                                                    className={'absolute h-7 left-1/2 -translate-x-1/2 flex flex-row justify-between items-center bottom-1 px-1 w-full'}>
                                                                     <div></div>
                                                                     {/*<div*/}
                                                                     {/*    className={'w-7 flex flex-row h-7 justify-between items-center    py-1 rounded-lg px-2 '}*/}
@@ -605,7 +606,7 @@ const Index = () => {
 
                                                                     {/*</div>*/}
                                                                     <div
-                                                                        className={'w-12 flex flex-row h-7 justify-between items-center  py-1 rounded-lg px-2 '}
+                                                                        className={'w-12 flex flex-row h-7 justify-between items-center py-1 rounded-lg px-2 '}
                                                                         style={{
                                                                             bottom: '0.4rem',
                                                                             background: 'rgba(83,82,85,0.61)'

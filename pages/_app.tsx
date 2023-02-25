@@ -48,7 +48,7 @@ function MyApp({Component, pageProps}: AppProps) {
                         {/*<NewMessageNotification/>*/}
 
                         <div dir={'rtl'}
-                             className={'  md:aspect-[9.5/20] md:h-[85%]  -mt-2 overflow-hidden  ' +
+                             className={' w-full h-full md:w-auto md:aspect-[9.5/20] md:h-[85%]  -mt-2 overflow-hidden  ' +
                                  // 'lg:w-mob-w  lg:h-mob-h  md:w-mob-w md:h-mob-h  ' +
                                  'lg:fixed md:fixed lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2  md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-mob-border  lg:rounded-mob-border '}>
                             <Navbar>

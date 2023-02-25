@@ -108,6 +108,69 @@ type Book {
     wroteYear: Int
 }
 
+type BookAdmin {
+    ISBN: String
+    appearance: BookAppearance
+    appearanceID: ID
+    attachments: [UploadedFile]
+    bookFiles: [UploadedFile]
+    category: BookCategory
+    categoryID: ID
+    city: String
+    cityID: ID
+    connectWay: String
+    createdAt: Int
+    creator: User
+    details: String
+    downloaded: Int
+    edition: Int
+    id: ID
+    isBook: Boolean
+    isDownloadable: Boolean
+    isLiked: Boolean
+    isPurchasable: Boolean
+    language: String
+    lessen: String
+    likes: Int
+    location: Location
+    modifiedContentAt: Int
+    pages: Int
+    price: Int
+    publishedAt: Int
+    publishedDate: Int
+    publisher: String
+    seen: Int
+    sizeMB: Int
+    status: String
+    teacher: String
+    templateId: String
+    term: String
+    title: String
+    translator: String
+    uniqueDownloaded: Int
+    university: String
+    universityID: ID
+    verifiedAt: Int
+    writer: String
+    wroteYear: Int
+}
+
+"A paginated list of BookAdmin edges."
+type BookAdminConnection {
+    "A list of BookAdmin edges."
+    edges: [BookAdminEdge!]!
+    "Pagination information about the list of edges."
+    pageInfo: PageInfo!
+}
+
+"An edge that contains a node of type BookAdmin and a cursor."
+type BookAdminEdge {
+    "A unique cursor that can be used for pagination."
+    cursor: String!
+    "The BookAdmin node."
+    node: BookAdmin!
+}
+
 type BookAppearance {
     details: String
     id: ID
@@ -161,28 +224,30 @@ type Login {
 
 type Mutation {
     addSubscriber(age: String, email: String, name: String, phone: String): Int
-    adminModifyAd(appealID: ID, bookID: ID, reason: String, status: String!, token: String!): Boolean
-    appealConnectClick(appealID: ID!, userID: ID): Response_appealConnectClick_ckeg
-    bookConnectClick(bookID: ID!, userID: ID!): Response_bookConnectClick_xtqr
-    buyDigitalBook(id: ID!): Response_buyDigitalBook_tetg
-    chargeWallet(amount: Int!): Response_chargeWallet_rsbq
-    createAddress(lat: String!, lon: String!, text: String!): Response_createAddress_qfly
-    createAppeal(categoryID: String, connectWay: String, details: String, files: [UploadedFileInput], hashtags: [String], priceEnd: Int!, priceStart: Int!, title: String!): Response_createAppeal_uydt
-    createBankAccount(shaba: String!): Response_createBankAccount_ejoc
-    createBook(ISBN: String, appearanceID: ID, attachments: [UploadedFileInput], bookFiles: [UploadedFileInput], categoryID: ID!, city: String, cityID: ID, connectWay: String, details: String, edition: Int, isBook: Boolean!, isDownloadable: Boolean!, isPurchasable: Boolean!, language: String, lessen: String, location: LocationInput, pages: Int, price: Int, publishedDate: Int, publisher: String, sizeMB: Int, teacher: String, term: String, title: String, translator: String, university: String, universityID: ID, writer: String, wroteYear: Int): Response_createBook_pzye
-    createBookTemplate(ISBN: String, appearanceID: ID, attachments: [UploadedFileInput], bookFiles: [UploadedFileInput], categoryID: ID!, details: String, edition: Int, isBook: Boolean!, isDownloadable: Boolean!, isPurchasable: Boolean!, language: String, lessen: String, pages: Int, price: Int, publishedDate: Int, publisher: String, sizeMB: Int, teacher: String, term: String, title: String, university: String, universityID: ID, writer: String, wroteYear: Int): Response_createBookTemplate_knpi
+    adminChargeWallet(amount: Int!, walletID: ID!): Response_adminChargeWallet_ncvg
+    adminModifyAd(appealID: ID, bookID: ID, reason: String, status: String!, token: String): Boolean
+    appealConnectClick(appealID: ID!, userID: ID): Response_appealConnectClick_pfye
+    bookConnectClick(bookID: ID!, userID: ID!): Response_bookConnectClick_wbfl
+    buyDigitalBook(id: ID!): Response_buyDigitalBook_qbsu
+    chargeWallet(amount: Int!): Response_chargeWallet_cage
+    createAddress(lat: String!, lon: String!, text: String!): Response_createAddress_qkws
+    createAppeal(categoryID: String, connectWay: String, details: String, files: [UploadedFileInput], hashtags: [String], priceEnd: Int!, priceStart: Int!, title: String!): Response_createAppeal_siit
+    createBankAccount(shaba: String!): Response_createBankAccount_ijay
+    createBook(ISBN: String, appearanceID: ID, attachments: [UploadedFileInput], bookFiles: [UploadedFileInput], categoryID: ID!, city: String, cityID: ID, connectWay: String, details: String, edition: Int, isBook: Boolean!, isDownloadable: Boolean!, isPurchasable: Boolean!, language: String, lessen: String, location: LocationInput, pages: Int, price: Int, publishedDate: Int, publisher: String, sizeMB: Int, teacher: String, term: String, title: String, translator: String, university: String, universityID: ID, writer: String, wroteYear: Int): Response_createBook_yqao
+    createBookTemplate(ISBN: String, appearanceID: ID, attachments: [UploadedFileInput], bookFiles: [UploadedFileInput], categoryID: ID!, details: String, edition: Int, isBook: Boolean!, isDownloadable: Boolean!, isPurchasable: Boolean!, language: String, lessen: String, pages: Int, price: Int, publishedDate: Int, publisher: String, sizeMB: Int, teacher: String, term: String, title: String, university: String, universityID: ID, writer: String, wroteYear: Int): Response_createBookTemplate_uyzo
     downloadCountBook(id: ID!): Boolean
-    likeBook(id: ID!, isLiked: Boolean!): Response_likeBook_sijd
-    seen(list: [Seen], type: String!): Response_seen_jozh
-    sendVCode(phone: String!, userAgent: String): Response_sendVCode_kpni
-    updateAddress(id: ID!, lat: String, lon: String, text: String): Response_updateAddress_xnke
-    updateAppeal(categoryID: String, connectWay: String, details: String, files: [UploadedFileInput], hashtags: [String], id: ID!, priceEnd: Int, priceStart: Int, status: String, title: String): Response_updateAppeal_vwmf
-    updateBook(ISBN: String, appearanceID: ID, attachments: [UploadedFileInput], bookFiles: [UploadedFileInput], categoryID: ID, city: String, cityID: ID, connectWay: String, details: String, edition: Int, id: ID!, isDownloadable: Boolean, isPurchasable: Boolean, language: String, lessen: String, location: LocationInput, pages: Int, price: Int, publishedDate: Int, publisher: String, status: String, teacher: String, term: String, title: String, translator: String, university: String, universityID: ID, writer: String, wroteYear: Int): Response_updateBook_lsxv
-    updateUser(bio: String, birthAt: Int, cityID: ID, email: String, hasAppealsHistory: Boolean, hasAskHistory: Boolean, hasBookHistory: Boolean, hasLastSeen: Boolean, lastname: String, name: String, nationalId: String, universityID: ID, username: String): Response_updateUser_mitt
-    uploadPrivateFileAccess(bookID: String, fileMime: String!, fileName: String!, filePath: String!, fileType: String!, previewPath: String, sizeMB: Int, thumbnailPath: String, type: String!, uploadedAsFile: Boolean): Response_uploadPrivateFileAccess_oxfc
-    uploadPublicFileAccess(appealID: String, bookID: String, fileMime: String!, fileName: String!, filePath: String!, fileType: String!, previewPath: String, sizeMB: Int, thumbnailPath: String, type: String!, uploadedAsFile: Boolean): Response_uploadPublicFileAccess_anex
-    verifyVCode(phone: String!, referenceCode: String, vCode: String!): Response_verifyVCode_tesp
-    withdrawRequest(amount: Int!, bankAccountID: ID, toBeDoneAt: Int): Response_withdrawRequest_zvbq
+    likeBook(id: ID!, isLiked: Boolean!): Response_likeBook_ocxb
+    referencePage(id: String!, userAgent: String!): Boolean
+    seen(list: [Seen], type: String!): Response_seen_zptj
+    sendVCode(phone: String!, userAgent: String): Response_sendVCode_lmqo
+    updateAddress(id: ID!, lat: String, lon: String, text: String): Response_updateAddress_nmtr
+    updateAppeal(categoryID: String, connectWay: String, details: String, files: [UploadedFileInput], hashtags: [String], id: ID!, priceEnd: Int, priceStart: Int, status: String, title: String): Response_updateAppeal_zmez
+    updateBook(ISBN: String, appearanceID: ID, attachments: [UploadedFileInput], bookFiles: [UploadedFileInput], categoryID: ID, city: String, cityID: ID, connectWay: String, details: String, edition: Int, id: ID!, isDownloadable: Boolean, isPurchasable: Boolean, language: String, lessen: String, location: LocationInput, pages: Int, price: Int, publishedDate: Int, publisher: String, status: String, teacher: String, term: String, title: String, translator: String, university: String, universityID: ID, writer: String, wroteYear: Int): Response_updateBook_imgj
+    updateUser(bio: String, birthAt: Int, cityID: ID, email: String, hasAppealsHistory: Boolean, hasAskHistory: Boolean, hasBookHistory: Boolean, hasLastSeen: Boolean, lastname: String, name: String, nationalId: String, universityID: ID, username: String): Response_updateUser_uxmg
+    uploadPrivateFileAccess(bookID: String, fileMime: String!, fileName: String!, filePath: String!, fileType: String!, previewPath: String, sizeMB: Int, thumbnailPath: String, type: String!, uploadedAsFile: Boolean): Response_uploadPrivateFileAccess_caog
+    uploadPublicFileAccess(appealID: String, bookID: String, fileMime: String!, fileName: String!, filePath: String!, fileType: String!, previewPath: String, sizeMB: Int, thumbnailPath: String, type: String!, uploadedAsFile: Boolean): Response_uploadPublicFileAccess_vjlz
+    verifyVCode(phone: String!, referenceCode: String, vCode: String!): Response_verifyVCode_njcu
+    withdrawRequest(amount: Int!, bankAccountID: ID, toBeDoneAt: Int): Response_withdrawRequest_fasb
 }
 
 type Notification {
@@ -252,7 +317,23 @@ type PaginatorInfo {
 }
 
 type Query {
-    addresses: Response_addresses_vvqh
+    addresses: Response_addresses_lzlg
+    adminAppeals(
+        "A cursor after which elements are returned."
+        after: String,
+        filterByStatus: [String],
+        "Limits number of fetched items. Maximum allowed value: 500."
+        first: Int = 20,
+        searchText: String
+    ): AppealConnection
+    adminBooks(
+        "A cursor after which elements are returned."
+        after: String,
+        filterByStatus: [String],
+        "Limits number of fetched items. Maximum allowed value: 500."
+        first: Int = 20,
+        searchText: String
+    ): BookAdminConnection
     appeal(id: ID!): Appeal
     appeals(
         "A cursor after which elements are returned."
@@ -267,9 +348,9 @@ type Query {
         "Limits number of fetched items. Maximum allowed value: 100."
         first: Int = 20
     ): AppealConnection
-    book(id: ID!): Response_book_gxia
-    bookAppearances: Response_bookAppearances_qmiw
-    bookCategories(searchText: String): Response_bookCategories_rnpx
+    book(id: ID!): Response_book_hauc
+    bookAppearances: Response_bookAppearances_semv
+    bookCategories(searchText: String): Response_bookCategories_kpks
     bookTemplate(templateId: String!): Book
     books(
         "A cursor after which elements are returned."
@@ -285,7 +366,8 @@ type Query {
         first: Int = 20
     ): BookConnection
     canDownload(cypher: String, filePath: String!, type: String!): Int
-    isReferenceCodeValid(referenceCode: String): Response_isReferenceCodeValid_lqlx
+    isReferenceCodeValid(referenceCode: String): Response_isReferenceCodeValid_jcqz
+    login(password: String!, username: String!): Response_login_hfhf
     notifications(
         "A cursor after which elements are returned."
         after: String,
@@ -299,193 +381,207 @@ type Query {
         first: Int = 20
     ): TransactionConnection
     ttt(x: String): String
-    user: Response_user_bwlc
-    wallet: Response_wallet_ovsz
+    user: Response_user_briq
+    wallet: Response_wallet_bzla
 }
 
-type Response_addresses_vvqh {
+type Response_addresses_lzlg {
     data: [Location]
     errors: String
     message: String
     status: Status!
 }
 
-type Response_appealConnectClick_ckeg {
+type Response_adminChargeWallet_ncvg {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_bookAppearances_qmiw {
+type Response_appealConnectClick_pfye {
+    data: Boolean
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_bookAppearances_semv {
     data: [BookAppearance]
     errors: String
     message: String
     status: Status!
 }
 
-type Response_bookCategories_rnpx {
+type Response_bookCategories_kpks {
     data: [BookCategory]
     errors: String
     message: String
     status: Status!
 }
 
-type Response_bookConnectClick_xtqr {
+type Response_bookConnectClick_wbfl {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_book_gxia {
+type Response_book_hauc {
     data: Book
     errors: String
     message: String
     status: Status!
 }
 
-type Response_buyDigitalBook_tetg {
+type Response_buyDigitalBook_qbsu {
     data: [UploadedFile]
     errors: String
     message: String
     status: Status!
 }
 
-type Response_chargeWallet_rsbq {
+type Response_chargeWallet_cage {
     data: CreatePayment
     errors: String
     message: String
     status: Status!
 }
 
-type Response_createAddress_qfly {
+type Response_createAddress_qkws {
     data: Location
     errors: String
     message: String
     status: Status!
 }
 
-type Response_createAppeal_uydt {
+type Response_createAppeal_siit {
     data: Appeal
     errors: String
     message: String
     status: Status!
 }
 
-type Response_createBankAccount_ejoc {
+type Response_createBankAccount_ijay {
     data: BankAccount
     errors: String
     message: String
     status: Status!
 }
 
-type Response_createBookTemplate_knpi {
+type Response_createBookTemplate_uyzo {
     data: Book
     errors: String
     message: String
     status: Status!
 }
 
-type Response_createBook_pzye {
+type Response_createBook_yqao {
     data: Book
     errors: String
     message: String
     status: Status!
 }
 
-type Response_isReferenceCodeValid_lqlx {
+type Response_isReferenceCodeValid_jcqz {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_likeBook_sijd {
+type Response_likeBook_ocxb {
     data: Boolean
     errors: String
     message: String
     status: Status!
 }
 
-type Response_seen_jozh {
-    data: Boolean
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_sendVCode_kpni {
-    data: VCode
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_updateAddress_xnke {
-    data: Location
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_updateAppeal_vwmf {
-    data: Appeal
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_updateBook_lsxv {
-    data: Book
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_updateUser_mitt {
-    data: User
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_uploadPrivateFileAccess_oxfc {
-    data: Boolean
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_uploadPublicFileAccess_anex {
-    data: Boolean
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_user_bwlc {
-    data: User
-    errors: String
-    message: String
-    status: Status!
-}
-
-type Response_verifyVCode_tesp {
+type Response_login_hfhf {
     data: Login
     errors: String
     message: String
     status: Status!
 }
 
-type Response_wallet_ovsz {
+type Response_seen_zptj {
+    data: Boolean
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_sendVCode_lmqo {
+    data: VCode
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_updateAddress_nmtr {
+    data: Location
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_updateAppeal_zmez {
+    data: Appeal
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_updateBook_imgj {
+    data: Book
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_updateUser_uxmg {
+    data: User
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_uploadPrivateFileAccess_caog {
+    data: Boolean
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_uploadPublicFileAccess_vjlz {
+    data: Boolean
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_user_briq {
+    data: User
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_verifyVCode_njcu {
+    data: Login
+    errors: String
+    message: String
+    status: Status!
+}
+
+type Response_wallet_bzla {
     data: Wallet
     errors: String
     message: String
     status: Status!
 }
 
-type Response_withdrawRequest_zvbq {
+type Response_withdrawRequest_fasb {
     data: WithdrawRequest
     errors: String
     message: String
@@ -509,13 +605,12 @@ type SimplePaginatorInfo {
 }
 
 type Transaction {
-    amountToman: Int
+    amount: Int!
     amountType: String!
-    createdAt: Int
-    fromWalletID: ID
-    id: ID
-    toWalletID: ID
+    createdAt: Int!
+    id: ID!
     type: String!
+    walletID: ID!
 }
 
 "A paginated list of Transaction edges."
