@@ -4,7 +4,6 @@ import 'leaflet/dist/leaflet.css'
 import L from 'leaflet';
 import Input from "../../view/Input/Input";
 import Button from "../../view/Button/Button";
-import {EditBookData} from "../../../store/books";
 
 
 const LocationBottomSheet = (props: {
@@ -127,7 +126,6 @@ const LocationBottomSheet = (props: {
             setMarkerY(parseFloat(props.defaultLon))
 
         if (props.defaultText) {
-            // console.log('there is default text')
             props.onTextChanged(props.defaultText)
             props.onLatChanged(props.defaultLat)
             props.onLngChanged(props.defaultLon)

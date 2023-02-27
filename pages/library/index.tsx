@@ -443,7 +443,6 @@ const Index = () => {
                                         return (
                                             <div key={'book' + index}
                                                  onClick={() => {
-                                                     // console.log(book.id)
                                                      router.push('/library/book/' + book.id)
                                                  }}
                                                  className={'bg-white h-44 mt-4 grid grid-cols-3 w-full max-w-xl mx-auto rounded-2xl relative overflow-hidden'}>

@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Header from "../../components/common/Header/Header";
 import Input from "../../components/view/Input/Input";
 import StepperFragment from "../../components/view/StepperFtagment/StepperFragment";
@@ -19,16 +19,12 @@ import {
     BookDataStore,
     EditBookData,
     isBrochure,
-    lastBookSubmitSuccess,
     lastBrochureSubmitSuccess
 } from "../../store/books";
-import TelInputSVG from "../../assets/svgs/telInput.svg";
-import BoldMobile from "../../assets/svgs/boldMobile.svg";
-import RightSquareSVG from "../../assets/svgs/rightSquare.svg";
+
 import Toast from "../../components/normal/Toast/Toast";
 import {ToastContainer} from "react-toastify";
 import Semesters from "../../components/normal/Semesters/Semesters";
-import _ from "lodash";
 import {fixPrice} from "../../helpers/fixPrice";
 import BookImageUpload from "../../components/normal/BookImageUpload/BookImageUpload";
 import Trash from "../../assets/svgs/trash.svg";
@@ -122,16 +118,12 @@ const NewBrochure = () => {
     const [langDropDown, SlangDropDown] = useState(false)
     const [uploadedImages, setUploadedImages] = useState([] as string[])
     const [uploadingProgress, setUploadingProgress] = useState([] as number[])
-    const [loadingDialog, setLoadingDialog] = useState(false)
     const priceInputRef = useRef(null)
     const currentBookId = useRef((Math.floor(Math.random() * 9999999999)).toString())
     const [categoryComponent, _categoryComponent] = useState(false)
     const [appearanceComponent, _appearanceComponent] = useState(false)
     const [uploadedFile, _uploadedFile] = useState('')
     const [fileUploadingPercentage, _fileUploadingPercentage] = useState('')
-    const [contactType, setContactType] = useState('')
-    const [contactAddress, setContactAddress] = useState('')
-    const [connectWay, setConnectWay] = useState('')
     const [showSemester, setShowSemester] = useState(false);
     const [chosenSemester, setChosenSemester] = useState("");
     const [editing, setEditing] = useState(false);
@@ -155,43 +147,6 @@ const NewBrochure = () => {
     const [fileSize, setFileSize] = useState(0);
     const [bookUploadState, setBookUploadState] = useState('');
     const [fileName, setFileName] = useState("");
-
-
-    const [BookData, setBookData] = useState({
-        type: 'physical',
-        price: 20000,
-        bookFiles: [],
-        attachments: [],
-        files: [],
-        fileNames: [],
-        term: ''
-
-    } as {
-        bookFiles: [] | [any]
-        id: string
-        isBook: boolean
-        title: string
-        writer: string
-        language: string
-        appearance: string
-        appearanceID: string
-        details: string
-        type: string
-        price: number
-        pages: string
-        teacher: string
-        categoryID: string
-        categoryPersian: string
-        publisher: string
-        publishedDate: string
-        files: []
-        attachments: []
-        fileNames: []
-        term: string
-        university: string
-        isDownloadable: boolean
-        isPurchasable: boolean
-    })
 
 
     useEffect(() => {
@@ -655,7 +610,6 @@ const NewBrochure = () => {
                         }}
                         onLngChanged={(val: string) => {
                             lon.current = val;
-                            console.log(lon)
                         }}
                         onTextChanged={(text: string) => {
                             address.current = text
@@ -888,7 +842,6 @@ const NewBrochure = () => {
                                 className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-1س max-w-sm mx-auto'}>
                                 {
                                     Array(6).fill('').map((photos, index) => {
-                                        console.log(reactiveBookData)
 
                                         return <div key={index + 'imageUpload'} className={'contents'}>
                                             <BookImageUpload index={index}

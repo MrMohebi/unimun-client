@@ -72,13 +72,7 @@ const Index = () => {
         setImageBottomSheetOpened(false)
     }, [])
 
-    const removeEmptyProgresses = () => {
-        let updateUploadingProgress = [...uploadingProgress];
-        updateUploadingProgress.filter(item => {
-            return item !== 100 && item !== 0;
-        })
-        setUploadingProgress(updateUploadingProgress)
-    }
+
     const removeEmptyHashtags = () => {
         let _hashtags = [...hashtags]
         _hashtags = _hashtags.filter((tag) => {
@@ -434,7 +428,6 @@ const Index = () => {
                                         <BookImageUpload type={'appeal'} index={index}
                                                          onImageClick={(indexOfSelectedImage: number) => {
                                                              // setCurrentSelectedImage(indexOfSelectedImage)
-                                                             console.log(indexOfSelectedImage)
 
                                                              // setImageOptionsOpen(true)
                                                          }}
@@ -447,8 +440,6 @@ const Index = () => {
                                                                      draft.push(e.data)
                                                                  })
                                                                  setUploadedImages(backBook)
-
-                                                                 console.log(e)
 
                                                              }
 

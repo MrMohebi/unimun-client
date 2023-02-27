@@ -466,7 +466,6 @@ const NewBook = () => {
                                onClick={(e: any) => {
                                    try {
                                        e.target.parentNode.parentNode.parentNode.parentNode.parentNode.scroll(0, 1000)
-                                       console.log(e.target.parentNode.parentNode.parentNode.parentNode.parentNode)
 
                                    } catch (e) {
 
@@ -527,7 +526,6 @@ const NewBook = () => {
                             className={'new-photos grid grid-cols-3 grid-rows-2 justify-items-center mt-1 max-w-sm mx-auto'}>
                             {
                                 Array(6).fill('').map((photos, index) => {
-                                    console.log(BookData)
 
                                     return <div key={index + 'imageUpload'} className={'contents'}>
                                         <BookImageUpload onImageClick={() => {
@@ -538,7 +536,6 @@ const NewBook = () => {
                                                              let backBook = produce(BookData.attachments, (draft: any) => {
                                                                  draft.push(e.data)
                                                              })
-                                                             console.log(backBook)
                                                              updateBookData('attachments', backBook)
                                                              setUploadedImages(produce(draft => {
                                                                  draft[index] = DOWNLOAD_HOST() + (e.data.preview ?? e.data.thumbnail)

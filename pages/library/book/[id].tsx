@@ -12,7 +12,6 @@ import DownloadBold from "../../../assets/svgs/download-bold.svg";
 import BackButton from "../../../assets/svgCodes/BackButton";
 import {ToastContainer} from "react-toastify";
 import {UserToken} from "../../../store/user";
-import {getUserQuery} from "../../../Requests/normal/user";
 import {fixPrice} from "../../../helpers/fixPrice";
 import NoPic from "../../../components/normal/NoPic/NoPic";
 import Free from "../../../assets/svgs/free.svg";
@@ -162,7 +161,6 @@ const Book = (props: Props) => {
             try {
                 _book(getBook.data.book.data)
                 setIsBook(getBook.data.book.data.isBook)
-                // console.log(e.data.book.data)
                 if (getBook.data.book.data.isLiked) {
                     setBookIsLiked(true)
                 }
@@ -195,8 +193,6 @@ const Book = (props: Props) => {
         getSupportChat().then((e) => {
             setBtnLoading(false)
             if (e.data && e.data.supportChat.id) {
-
-                // console.log(router.route)
                 newMessage({
                     variables: {
                         chatID: e.data.supportChat.id,
@@ -333,7 +329,6 @@ const Book = (props: Props) => {
                                 } else {
                                     setBookIsLiked(false)
                                 }
-                                // console.log(value)
 
                             })
 

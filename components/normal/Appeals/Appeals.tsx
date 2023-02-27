@@ -13,7 +13,6 @@ import NewAppealButton from "../NewAppealButton/NewAppealButton";
 import ThousandTomans from '../../../assets/svgs/thousandTomans.svg';
 import CheckCircle from '../../../assets/svgs/check-circle.svg';
 import Search from "../Search/Search";
-import _ from 'lodash';
 import SkeletonElement from "../../view/Skeleton/Skeleton";
 import {passedTime} from "../../../helpers/passedTime";
 import {ToastContainer} from "react-toastify";
@@ -24,8 +23,6 @@ import Toast from "../Toast/Toast";
 import {useRouter} from "next/router";
 import {useDebouncedCallback} from "use-debounce";
 
-import Guide from "../Guide/Guide";
-import produce from "immer";
 
 
 const Appeals = () => {
@@ -77,13 +74,6 @@ const Appeals = () => {
     // const [gtAppeals, appealsResult] = useLazyQuery(_getAppealsQuery)
 
     const gtAppeals = useQuery(_getAppealsQuery)
-
-    // useEffect(() => {
-    //     gtAppeals().then((value) => {
-    //         console.log(value)
-    //
-    //     })
-    // }, [])
 
     const reactiveAppeals = useReactiveVar(AppealsStore)
 
@@ -435,7 +425,6 @@ const Appeals = () => {
 
                         {searchedAppeals.length ?
                             searchedAppeals.map((ad: any, index: number) => {
-                                console.log('this is searched')
                                 let Appeal = ad.node
                                 if (Appeal.status !== "DELETED")
                                     return (appealUI(Appeal, index, index + 'i', Appeal.id))
