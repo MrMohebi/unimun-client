@@ -812,7 +812,7 @@ const ChatScreen = () => {
                                              className={` ${hasInlineKeyboard ? 'w-full' : ''}  flex IranSansMedium px-3 pt-2 pb-1 flex-col text-sm shrink-0 justify-start items-start ${sentByMe ? "bg-primary" : "bg-white ml-0 mr-auto"} text-white rounded-xl max-w-[80%]   `}>
                                             <p style={{
                                                 wordBreak: 'break-word',
-                                                whiteSpace: 'pre-line'
+                                                whiteSpace: 'normal'
                                             }}
                                                className={` ${!sentByMe ? "text-textBlack" : "text-white"} `}>
 

@@ -21,6 +21,7 @@ interface Props {
     inputRef?: React.Ref<any>
     placeHolder?: string
     onClick?: Function
+    pattern?: string
 }
 
 const Input = ({
@@ -39,14 +40,15 @@ const Input = ({
                    onBlur,
                    inputRef,
                    placeHolder,
-                   onClick
+                   onClick,
+                   pattern
                }: Props) => {
 
 
     return (
         !multiLine ?
             <div className={wrapperClassName ?? ''}>
-                <input placeholder={placeHolder ?? ''} onClick={(e) => {
+                <input pattern={pattern} placeholder={placeHolder ?? ''} onClick={(e) => {
                     if (onClick)
                         onClick(e)
                 }} ref={inputRef ?? null} onBlur={onBlur} onFocus={onFocus}

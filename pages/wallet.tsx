@@ -17,6 +17,7 @@ import {ToastContainer} from "react-toastify";
 import {passedTime} from "../helpers/passedTime";
 import HelpSvg from "../assets/svgs/help.svg";
 import {UserToken} from "../store/user";
+import {humanizeNumber} from "../helpers/humanizeNumber";
 
 const Wallet = () => {
 
@@ -66,11 +67,8 @@ const Wallet = () => {
             transactions(first: 10) {
                 edges {
                     node {
-                        amountToman
                         amountType
                         createdAt
-                        fromWalletID
-                        toWalletID
                         type
                     }
                 }
@@ -144,6 +142,7 @@ const Wallet = () => {
         }
 
     }, [getTransactions.data]);
+    const [cardNumber, setCardNumber] = useState("");
 
 
     return (
@@ -181,29 +180,62 @@ const Wallet = () => {
                 <div className={' w-full bg-transparent flex flex-col justify-start items-center pt-4 '}>
 
                     <span
-                        className={'IranSansMedium text-textDarker text-right w-full text-md  pr-4 text-textDarker block'}>مبلغ درخواستی خود را وارد کنید</span>
+                        className={'IranSansMedium text-black text-right w-full text-md  pr-4 text-textDarker block'}>درخواست برداشت وجه</span>
                     <div className={'relative w-full flex-col justify-center items-center mt-5'}>
 
                         <div
-                            className={'absolute left-5  px-2 h-6  top-1/2 -translate-y-1/2 flex flex-col justify-center border-r-2 items-center'}>
+                            className={'absolute left-5  px-2 h-6 -mt-3  top-1/2 -translate-y-1/2 flex flex-col justify-center border-r-2 items-center'}>
                             <img src="/assets/svgs/toman.svg" className={'invert scale-90'} alt=""/>
                         </div>
-                        <Input onChange={(e: any) => {
-                            let el = e.currentTarget
-                            el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
-                            setPayRequestPrice(parseInt(el.value.replace(',', '')))
+                        <Input
+                            onChange={(e: any) => {
+                                let el = e.currentTarget
+                                el.value = el.value.split('').reverse().join('').replace(/,/g, '').replace(/(\d{3}(?!$))/g, "$1,").split('').reverse().join('').replace(/[^\d,]/g, '')
+                                console.log(parseInt(el.value.replaceAll(',', '')));
+                                setPayRequestPrice(parseInt(el.value.replaceAll(',', '')))
 
-                        }} id={'pay-req-input'} dir={'ltr'} numOnly={false}
-                               inputClassName={'pl-12 text-black IranSansMedium'}
-                               wrapperClassName={"w-11/12 h-12 m-auto "}/>
+                            }} id={'pay-req-input'} dir={'ltr'} numOnly={false}
+                            inputClassName={'pl-12 text-black IranSansMedium'}
+                            wrapperClassName={"w-11/12 h-12 m-auto "}/>
+                        <span
+                            className={`mr-4 IranSans text-sm text-textDark transition-all ${payRequestPrice ? "opacity-100" : "opacity-0"}`}>{"معادل " + humanizeNumber(payRequestPrice) + " تومان"}</span>
 
                     </div>
                     <div className={'w-full bg-background mt-3'}>
-                        <span className={'IranSansMedium text-[0.7rem] py-2 block pr-4 text-textDarker'}>سقف مبلغ قابل درخواست یک میلیون تومان میباشد</span>
+                        <span className={'IranSans text-[0.7rem] py-2 block pr-4 text-textDarker'}>
+                            سقف قابل برداشت از حساب شما
+                            <span className={'text-black mx-1 inline-block IranSansMedium'}>
+                                {balance - (balance / 10) + " "}
+                                تومان
+                            </span>
+
+                            میباشد
+                        </span>
+                    </div>
+                    <span
+                        className={'IranSansMedium text-black text-right w-full text-md  pr-4 text-textDarker block mt-3'}>شماره کارت</span>
+
+                    <div className={'relative w-full flex-col justify-center items-center mt-5'}>
+
+                        <Input pattern={'\d*'}
+                               onChange={(e: any) => {
+
+                                   setCardNumber(e.currentTarget.value)
+
+                               }} id={'pay-req-input'} dir={'ltr'} numOnly={false}
+                               inputClassName={'px-3 text-black IranSansMedium'}
+                               wrapperClassName={"w-11/12 h-12 m-auto "}/>
+                        <span
+                            className={`mr-4 IranSans text-sm text-textDark transition-all ${payRequestPrice ? "opacity-100" : "opacity-0"}`}>{"معادل " + humanizeNumber(payRequestPrice) + " تومان"}</span>
+
                     </div>
                     <Button loading={bottomSheetBtnLoading} onClick={() => {
+                        if (cardNumber.length < 16) {
+                            Toast("شماره کارت وارد شده معتبر نمیباشد", 'test', 1000)
+                            return;
+                        }
 
-                        if (payRequestPrice !== 0 && payRequestPrice <= balance) {
+                        if (payRequestPrice !== 0 && payRequestPrice <= (balance - (balance / 10))) {
 
                             setBottomSheetBtnLoading(true)
                             getSupportChat().then((e) => {
