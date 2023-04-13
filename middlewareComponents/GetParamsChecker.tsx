@@ -8,7 +8,6 @@ export const GetParamsChecker = ({children}: { children: React.ReactNode }) => {
         mutation refPage($userAgent:String!, $id:String!) {
             referencePage(userAgent: $userAgent, id: $id)
         }
-
     `
     const [refPage] = useMutation(REFERENCE_PAGE_MUTATION);
     const router = useRouter();
