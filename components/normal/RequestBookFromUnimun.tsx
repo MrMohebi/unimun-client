@@ -34,8 +34,7 @@ export const RequestBookFromUnimun = () => {
                         کامل
                         کتاب</label>
 
-                    <input onLoad={() => {
-                    }} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    <input  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setBookTitle(e.currentTarget.value)
                     }}
                            className={`w-full border-2 border-primary h-12 px-2 rounded-lg bg-transparent IranSansMedium ${state === 1 ? "" : "hidden"} `}

@@ -26,21 +26,19 @@ const Drawer = (props: Props) => {
     }, [props.initHeight, props.minHeight])
 
     useEffect(() => {
+        if (props.initScroll) {
 
+            try {
+                drawerBack!.current!.scrollTo(0, props.initScroll)
+
+            } catch (e) {
+
+            }
+        }
 
     }, []);
     return (
-        <div ref={drawerBack} onLoad={() => {
-            if (props.initScroll) {
-
-                try {
-                    drawerBack!.current!.scrollTo(0, props.initScroll)
-
-                } catch (e) {
-
-                }
-            }
-        }}
+        <div ref={drawerBack}
              className={'fixed z-30 hide-scrollbars pointer-events-none w-full h-full bg-transparent overflow-y-scroll top-1 left-0 pointer-events-auto '}>
             <div className={'fixed w-full h-full top-0 left-0'}>
                 {

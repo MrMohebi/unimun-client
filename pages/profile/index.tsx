@@ -10,9 +10,7 @@ import InfoSVG from '../../assets/svgs/info.svg'
 import SupportSVG from '../../assets/svgs/support.svg'
 import SettingsSVG from '../../assets/svgs/settings.svg'
 import MyAppealsSVG from '../../assets/svgs/myAppeals.svg'
-import BookSVG from '../../assets/svgs/book.svg'
 import PeopleSVG from '../../assets/svgs/people.svg'
-import SaveSVG from '../../assets/svgs/save.svg'
 import DownloadAppSVG from '../../assets/svgs/downloadApp.svg'
 import {UserData, UserPhone, UserToken} from "../../store/user";
 import {gql, useLazyQuery} from "@apollo/client";
@@ -27,7 +25,6 @@ import InstaSVG from '../../assets/svgs/instagram-gray.svg'
 import TwitterSVG from '../../assets/svgs/twitter-gray.svg'
 import LoadingDialog from "../../components/view/LoadingDialog/LoadingDialog";
 import SkeletonElement from "../../components/view/Skeleton/Skeleton";
-import {route} from "next/dist/server/router";
 import {currentNavActiveIndex} from "../../store/navbar";
 
 const Index = () => {
