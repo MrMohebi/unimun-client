@@ -18,6 +18,7 @@ const UserAuthenticationCheck = ({children}: any) => {
             UserId(id as string);
             setId(id as string);
             alert("به عنوان کاربر وارد شدید.");
+            window.location.reload();
             return;
         }
         if (UserToken()) {
