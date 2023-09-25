@@ -17,7 +17,6 @@ import NoPic from "../../../components/normal/NoPic/NoPic";
 import Free from "../../../assets/svgs/free.svg";
 import {DOWNLOAD_HOST, UNIMUN_PROVIDERS} from "../../../store/GLOBAL_VARIABLES";
 import {clientChat} from "../../../apollo-client";
-import {TailSpin} from "react-loader-spinner";
 import {CurrentChatUserData} from "../../../store/chat";
 import {GET_SUPPORT_CHAT_QUERY, NEW_MESSAGE_MUTATION} from "../../../Requests/GlobalRequests/GlobalRequests";
 import LoginBottomSheet from "../../../components/normal/LoginBottomSheet/LoginBottomSheet";
@@ -636,7 +635,7 @@ const Book = (props: Props) => {
                                     btnLoading ?
                                         <div
                                             className={'w-full h-full flex flex-row justify-center items-center'}>
-                                            <TailSpin width={30} color={'white'}/>
+                                            ...
 
                                         </div>
 
