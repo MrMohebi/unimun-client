@@ -62,7 +62,6 @@ const EditProfile = () => {
                             router.push('/profile')
                         }
 
-
                 }} className={'w-6 h-6 absolute left-4 top-1/2 -translate-y-1/2'}>
                     {/*todo fix this loading*/}
                     {
