@@ -1,10 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import Header from "../../common/Header/Header";
-import Back from '../../../assets/svgs/back.svg'
-import {gql, useLazyQuery, useQuery} from "@apollo/client";
+import {gql, useQuery} from "@apollo/client";
 import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 import {useRouter} from "next/router";
-import {prop} from "styled-tools";
 
 const BookAppearance = (props: { onAppearanceSelected: Function }) => {
 

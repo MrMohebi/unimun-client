@@ -1,5 +1,4 @@
 import React, {useRef} from 'react';
-import {InfinitySpin, TailSpin} from 'react-loader-spinner'
 import LoadingDialog from "../LoadingDialog/LoadingDialog";
 
 

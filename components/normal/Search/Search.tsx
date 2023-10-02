@@ -1,15 +1,11 @@
 import React, {ChangeEventHandler, useEffect, useRef, useState} from 'react';
-import NotifSVG from '../../../assets/svgs/notif.svg'
 import SearchSVG from '../../../assets/svgs/search.svg'
-import CitySVG from '../../../assets/svgs/city.svg'
 import CloseSVG from '../../../assets/svgs/close.svg'
 import Badge from "../../view/Badge/Badge";
-import {TailSpin} from "react-loader-spinner";
 import {useRouter} from "next/router";
 import MyBooks from '../../../assets/svgs/mybook.svg'
 import LoadingDialog from "../../view/LoadingDialog/LoadingDialog";
 import {UserToken} from "../../../store/user";
-import Unimun from "../../assets/svgs/unimun.svg";
 
 
 interface Props {

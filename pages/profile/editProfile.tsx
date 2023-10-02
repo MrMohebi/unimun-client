@@ -9,7 +9,6 @@ import CheckSVG from '../../assets/svgs/check.svg'
 import {UserData} from "../../store/user";
 import {updateUser} from "../../Requests/withAuthentication/user";
 import {gql, useMutation} from "@apollo/client";
-import {TailSpin} from "react-loader-spinner";
 import CircularProgressBar from "../../components/view/CircularProgressBar/CircularProgressBar";
 
 const EditProfile = () => {
@@ -65,9 +64,10 @@ const EditProfile = () => {
 
 
                 }} className={'w-6 h-6 absolute left-4 top-1/2 -translate-y-1/2'}>
+                    {/*todo fix this loading*/}
                     {
                         loading ?
-                            <TailSpin height={20} width={20} color={'#22a2ff'}/>
+                            "loading..."
                             :
                             <CheckSVG/>
                     }
