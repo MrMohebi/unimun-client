@@ -1,0 +1,17 @@
+ARG FROM_IMAGE
+
+FROM $FROM_IMAGE:latest
+
+ENV APP_ROOT /npm
+ENV HOST 0.0.0.0
+
+WORKDIR /npm
+
+COPY . .
+
+RUN npm run build
+
+CMD npm run start
+
+
+

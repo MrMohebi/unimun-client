@@ -9,7 +9,7 @@ on:
 
 jobs:
   dev-build-base:
-    if: contains(github.event.head_commit.message, 'dev-build-base')
+    if: contains(github.event.head_commit.message, 'dev-base-build')
     runs-on: ubuntu-latest
     name: 'dev install dependencies'
     steps:
@@ -35,9 +35,9 @@ jobs:
           cache-to: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/base:buildcache,mode=max'
 
   prod-build-base:
-    if: contains(github.event.head_commit.message, 'prod-build-base')
+    if: contains(github.event.head_commit.message, 'prod-base-build')
     runs-on: ubuntu-latest
-    name: 'dev install dependencies'
+    name: 'prod install dependencies'
     steps:
       - name: Checkout
         uses: actions/checkout@v2

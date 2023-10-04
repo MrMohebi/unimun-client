@@ -1,0 +1,37 @@
+name: build project
+
+on: 
+  push:
+      branches:
+        - master
+        - dev
+
+
+jobs:
+  dev-build-project:
+    if: contains(github.event.head_commit.message, 'dev-build')
+    runs-on: ubuntu-latest
+    name: 'dev build'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to private registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./.cicd-assets/Dockerfile-ssr-dev
+          build-args: |
+            FROM_IMAGE=${{ secrets.REGISTRY_URL }}/unimun-front/dev/base:latest
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: '${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:latest'
+          cache-from: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:buildcache'
+          cache-to: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:buildcache,mode=max'
