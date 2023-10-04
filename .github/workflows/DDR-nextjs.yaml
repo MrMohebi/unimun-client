@@ -1,168 +1,35 @@
-name: deploy-dockerize-run
+name: build-base
 
 on: 
   push:
-      branches:
-        - master
+    branches:
+      - master
+      - dev
 
 
 jobs:
-  dev-install-deps:
-    if: contains(github.event.head_commit.message, 'dev-install-deps')
-    runs-on: ubuntu-22.04
+  dev-build-base:
+    if: contains(github.event.head_commit.message, 'dev-build-base')
+    runs-on: ubuntu-latest
     name: 'dev install dependencies'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: actions/checkout@v2
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/setup-buildx-action@v1
+      - name: Login to private registry
+        uses: docker/login-action@v1
         with:
-          registry: ${{ secrets.DOCKERHUB_REGISTRY }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          registry: ${{ secrets.REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./Dockerfile.npm
+          file: ./.cicd-assets/Dockerfile-base
+          builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_REGISTRY }}/unimun/unimun-front-npm-dev:latest    
-      - name: send err log
-        if: failure()
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: 'https://log.m3m.dev/api/unimun-front-deploy.php?type=DEV&token=61875b275a6ef7b562b43ce6cc640aaae3cbd1bb6224aab9c3bdb8a45e05ab44'
-          method: 'GET'
-          
-          
-  dev-build:
-    if: contains(github.event.head_commit.message, 'dev-deploy')
-    runs-on: ubuntu-22.04
-    env:
-      TAGGED_IMAGE: "${{ secrets.DOCKERHUB_REGISTRY }}/unimun/unimun-front-dev:${{ github.run_id }}"
-    name: 'dev build'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ secrets.DOCKERHUB_REGISTRY }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build and push image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_REGISTRY }}/unimun/unimun-front-dev:latest   
-            ${{ env.TAGGED_IMAGE }}
-
-
-  dev-deploy:
-    needs: dev-build
-    if: contains(github.event.head_commit.message, 'prod-deploy')
-    runs-on: ubuntu-22.04
-    env:
-      TAGGED_IMAGE: "${{ secrets.DOCKERHUB_REGISTRY }}/unimun/unimun-front-dev:${{ github.run_id }}"
-    name: 'dev deploy'
-    steps:
-      - name: update stack with new image
-        uses: fifsky/ssh-action@master
-        with:
-          command: |
-            docker service update --force --with-registry-auth dev_unimun_next-front --image ${{ env.TAGGED_IMAGE }}
-          host: ${{ secrets.SSH_HOST }}
-          user: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY}}          
-     
-  prod-install-deps:
-    if: contains(github.event.head_commit.message, 'prod-install-deps')
-    runs-on: ubuntu-22.04
-    name: 'prod install dependencies'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ secrets.DOCKERHUB_REGISTRY }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile.npm
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_REGISTRY }}/unimun/unimun-front-npm-prod:latest    
-      - name: send err log
-        if: failure()
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: 'https://log.m3m.dev/api/unimun-admin-deploy.php?type=PROD&token=61875b275a6ef7b562b43ce6cc640aaae3cbd1bb6224aab9c3bdb8a45e05ab44'
-          method: 'GET'
-          
-          
-  prod-build:
-    if: contains(github.event.head_commit.message, 'prod-deploy')
-    runs-on: ubuntu-22.04
-    env:
-      TAGGED_IMAGE: "${{ secrets.DOCKERHUB_REGISTRY }}/unimun/unimun-front-prod:${{ github.run_id }}"
-    name: 'prod build'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ secrets.DOCKERHUB_REGISTRY }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Build and push image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_REGISTRY }}/unimun/unimun-front-prod:latest   
-            ${{ env.TAGGED_IMAGE }}
-
-
-  prod-deploy:
-    needs: prod-build
-    if: contains(github.event.head_commit.message, 'prod-deploy')
-    runs-on: ubuntu-22.04
-    env:
-      TAGGED_IMAGE: "${{ secrets.DOCKERHUB_REGISTRY }}/unimun/unimun-front-prod:${{ github.run_id }}"
-    name: 'prod deploy'
-    steps:
-      - name: update stack with new image
-        uses: fifsky/ssh-action@master
-        with:
-          command: |
-            docker service update --force --with-registry-auth prod_unimun_next-front --image ${{ env.TAGGED_IMAGE }}
-          host: ${{ secrets.SSH_HOST }}
-          user: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY}}
+          tags: '${{ secrets.REGISTRY_URL }}/unimun-front/dev/base:latest'
+          cache-from: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/base:buildcache'
+          cache-to: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/base:buildcache,mode=max'

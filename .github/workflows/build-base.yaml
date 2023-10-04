@@ -1,0 +1,189 @@
+name: deploy-dockerize-run
+
+on: 
+  push:
+      branches:
+        - master
+
+
+jobs:
+  dev-install-deps:
+    if: contains(github.event.head_commit.message, 'install-deps')
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_PATH: ${{ secrets.FRONT_DEV_DEPLOY_PATH }}
+    name: 'dev install dependencies'
+    steps: 
+      - uses: actions/checkout@v2
+      - name: remove other files except composers
+        run: |
+            shopt -s extglob   
+            rm -rfv !("package.json"|"package-lock.json")
+            rm -rf .git
+            shopt -u extglob
+      - name: upload package list
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: "."
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          TARGET: ${{env.DEPLOY_PATH}}
+      - name: install deps
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            cd ${{env.DEPLOY_PATH}}/../
+            bash cache-deps.sh
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
+      - name: send err log
+        if: failure()
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://log.m3m.dev/api/unimun-clint-deploy.php?type=DEV&token=61875b275a6ef7b562b43ce6cc640aaae3cbd1bb6224aab9c3bdb8a45e05ab44'
+          method: 'GET'
+          
+  dev-deploy:
+    if: contains(github.event.head_commit.message, 'deploy')
+    runs-on: ubuntu-latest
+    env:
+      FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEV_DEPLOY_PATH }}
+    name: dev-deploy
+    steps:
+      - name: remove previous files
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            cd ${{env.FRONT_DEPLOY_PATH}}
+            rm -rf ..?* .[!.]* *
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
+          
+      - uses: actions/checkout@v2
+      - name: Deploy to Staging server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: "."
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          TARGET: ${{ secrets.FRONT_DEV_DEPLOY_PATH }}
+  
+  dev-dockerize-and-run:
+    needs: dev-deploy
+    if: contains(github.event.head_commit.message, 'deploy')
+    runs-on: ubuntu-latest
+    name: 'dev dockerize and run'
+    env:
+      FRONT_DEPLOY_PATH: ${{ secrets.FRONT_DEV_DEPLOY_PATH }}
+    steps:
+      - name: run ducker
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            cd ${{env.FRONT_DEPLOY_PATH}}
+            cd ../
+            docker compose up -d --build
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
+      - name: send err log
+        if: failure()
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://log.m3m.dev/api/unimun-clint-deploy.php?type=DEV&token=61875b275a6ef7b562b43ce6cc640aaae3cbd1bb6224aab9c3bdb8a45e05ab44'
+          method: 'GET'
+          
+     
+  prod-install-deps:
+    if: contains(github.event.head_commit.message, 'prod-install-deps')
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_PATH: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
+    name: 'prod install dependencies'
+    steps: 
+      - uses: actions/checkout@v2
+      - name: remove other files except composers
+        run: |
+            shopt -s extglob   
+            rm -rfv !("package.json"|"package-lock.json")
+            rm -rf .git
+            shopt -u extglob
+      - name: upload package list
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: "."
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          TARGET: ${{env.DEPLOY_PATH}}
+      - name: install deps
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            cd ${{env.DEPLOY_PATH}}/../
+            bash cache-deps.sh
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
+      - name: send err log
+        if: failure()
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://log.m3m.dev/api/unimun-clint-deploy.php?type=PROD&token=61875b275a6ef7b562b43ce6cc640aaae3cbd1bb6224aab9c3bdb8a45e05ab44'
+          method: 'GET'
+          
+  prod-deploy:
+    if: contains(github.event.head_commit.message, 'prod-deploy')
+    runs-on: ubuntu-latest
+    env:
+      FRONT_DEPLOY_PATH: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
+    name: 'prod deploy'
+    steps:
+      - name: remove previous files
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            cd ${{env.FRONT_DEPLOY_PATH}}
+            rm -rf ..?* .[!.]* *
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
+          
+      - uses: actions/checkout@v2
+      - name: Deploy to Staging server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: "."
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          TARGET: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
+  
+  prod-dockerize-and-run:
+    needs: prod-deploy
+    if: contains(github.event.head_commit.message, 'prod-deploy')
+    runs-on: ubuntu-latest
+    name: 'prod dockerize and run'
+    env:
+      FRONT_DEPLOY_PATH: ${{ secrets.FRONT_PROD_DEPLOY_PATH }}
+    steps:
+      - name: run ducker
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            cd ${{env.FRONT_DEPLOY_PATH}}
+            cd ../
+            docker compose up -d --build
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
+      - name: send err log
+        if: failure()
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://log.m3m.dev/api/unimun-clint-deploy.php?type=PROD&token=61875b275a6ef7b562b43ce6cc640aaae3cbd1bb6224aab9c3bdb8a45e05ab44'
+          method: 'GET'

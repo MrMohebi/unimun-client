@@ -1,0 +1,7 @@
+ARG NODE_VERSION
+
+FROM docker.iranrepo.ir/node:16.15.0-alpine
+WORKDIR /npm
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm install
