@@ -32,6 +32,7 @@ jobs:
             FROM_IMAGE=${{ secrets.REGISTRY_URL }}/unimun-front/dev/base:latest
           builder: ${{ steps.buildx.outputs.name }}
           push: true
+          no-cache: true
           tags: '${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:latest'
           cache-from: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:buildcache'
           cache-to: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:buildcache,mode=max'
