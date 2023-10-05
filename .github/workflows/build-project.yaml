@@ -77,3 +77,17 @@ jobs:
           tags: '${{ secrets.REGISTRY_URL }}/unimun-front/prod/project:latest'
           cache-from: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/prod/project:buildcache'
           cache-to: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/prod/project:buildcache,mode=max'
+
+  prod-deploy-project:
+    needs: prod-build-project
+    if: contains(github.event.head_commit.message, 'prod-build')
+    runs-on: ubuntu-latest
+    name: 'prod deploy project'
+    steps:
+      - name: ask cd service to deploy
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.CD_URL }}/updateServiceLatest
+          method: 'POST'
+          timeout: 120000
+          data: '{"name": "${{ secrets.CD_PROD_NAME }}", "token": "${{ secrets.CD_PROD_TOKEN }}"}'

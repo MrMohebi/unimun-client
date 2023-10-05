@@ -5,12 +5,7 @@ FROM $FROM_IMAGE
 ENV APP_ROOT /npm
 ENV HOST 0.0.0.0
 
-RUN pwd
-RUN ls -la
-
 WORKDIR /npm
-
-RUN ls -la
 
 COPY . .
 
