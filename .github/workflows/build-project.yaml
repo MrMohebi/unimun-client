@@ -33,8 +33,8 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: '${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:latest'
-          cache-from: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:buildcache'
-          cache-to: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:buildcache,mode=max'
+#          cache-from: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:buildcache'
+#          cache-to: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:buildcache,mode=max'
 
   dev-deploy-project:
     needs: dev-build-project
