@@ -30,7 +30,6 @@ jobs:
           file: ./.cicd-assets/Dockerfile-base
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          no-cache: true
           tags: '${{ secrets.REGISTRY_URL }}/unimun-front/dev/base:latest'
           cache-from: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/base:buildcache'
           cache-to: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/base:buildcache,mode=max'
