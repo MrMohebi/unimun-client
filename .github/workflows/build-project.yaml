@@ -36,6 +36,20 @@ jobs:
           cache-from: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:buildcache'
           cache-to: 'type=registry,ref=${{ secrets.REGISTRY_URL }}/unimun-front/dev/project:buildcache,mode=max'
 
+  dev-deploy-project:
+    needs: dev-build-project
+    if: contains(github.event.head_commit.message, 'dev-build')
+    runs-on: ubuntu-latest
+    name: 'dev deploy project'
+    steps:
+      - name: ask cd service to deploy
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.CD_URL }}/updateServiceLatest
+          method: 'POST'
+          timeout: 120000
+          data: '{"name": "${{ secrets.CD_DEV_NAME }}", "token": "${{ secrets.CD_DEV_TOKEN }}"}'
+
   prod-build-project:
     if: contains(github.event.head_commit.message, 'prod-build')
     runs-on: ubuntu-latest
