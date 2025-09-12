@@ -14,7 +14,7 @@
     "@react-buddy/ide-toolbox": "^2.2.0",
     "@svgr/webpack": "^6.2.1",
     "animate.css": "^4.1.1",
-    "axios": "^0.26.1",
+    "axios": "^1.12.0",
     "gql-query-builder": "^3.5.9",
     "graphql": "^16.3.0",
     "graphql-ws": "^5.10.1",
